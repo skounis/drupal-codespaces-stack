@@ -1,2 +1,2 @@
-# drupal-docker-stack
+# Drupal Docker Stack
 With some automations
