@@ -4,18 +4,14 @@
 		"dockerfile": "Dockerfile",
 		"args": { 
 			// Update VARIANT to pick a PHP version: 7, 7.4, 7.3
-			"VARIANT": "7",
+			"VARIANT": "7.3",
 			"INSTALL_NODE": "true",
 			"NODE_VERSION": "lts/*"
 		}
 	},
-	
-	// Set *default* container specific settings.json values on container create.
 	"settings": { 
 		"terminal.integrated.shell.linux": "/bin/bash"
 	},
-
-	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"felixfbecker.php-debug",
 		"felixfbecker.php-intellisense",
