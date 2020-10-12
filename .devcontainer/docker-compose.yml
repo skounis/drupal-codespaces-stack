@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
       args:
         # [Choice] PHP version: 7, 7.4, 7.3
-        VARIANT: "7"
+        VARIANT: "7.3"
         # [Option] Install Node.js
         INSTALL_NODE: "true"
         NODE_VERSION: "lts/*"
