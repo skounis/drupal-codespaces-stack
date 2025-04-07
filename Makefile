@@ -27,11 +27,6 @@ start:
 	@echo "Starting ddev..."
 	@ddev start
 
-# Start or restart ddev
-start:
-	@echo "Starting ddev..."
-	@ddev start
-
 restart:
 	@echo "Restarting ddev..."
 	@ddev restart
