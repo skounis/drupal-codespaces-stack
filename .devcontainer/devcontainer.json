@@ -6,7 +6,8 @@
 		"felixfbecker.php-intellisense",
 		"mrmlnc.vscode-apache",
 		"mtxr.sqltools",
-		"mtxr.sqltools-driver-mysql"
+		"mtxr.sqltools-driver-mysql",
+		"mhutchie.git-graph"
 	],
 	
 	// Additional image and features
