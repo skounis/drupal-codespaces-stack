@@ -15,5 +15,5 @@
 	"features": {
 		"ghcr.io/ddev/ddev/install-ddev:latest": {}
 	},
-	"postCreateCommand": "make"
+	"postCreateCommand": "ddev config global --instrumentation-opt-in=true && make"
 }
