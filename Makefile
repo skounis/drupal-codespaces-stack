@@ -2,10 +2,10 @@
 CMS_DIR := cms
 COMPOSER_FILE := $(CMS_DIR)/composer.json
 
-.PHONY: clean ddev setup
+.PHONY: clean ddev setup launch
 
 # Default target to run all steps
-all: clean ddev setup
+all: clean ddev setup launch
 
 # Clean the cms/ folder but keep composer.json
 clean:
@@ -39,3 +39,9 @@ setup:
 	@echo "2. composer install"
 	@echo "3. composer run-script post-install-cmd"
 	@ddev exec "cd $(CMS_DIR) && composer install && composer run-script post-install-cmd"
+
+
+# Launch the browser using ddev
+launch:
+	@echo "Launching the browser with ddev..."
+	@ddev launch
