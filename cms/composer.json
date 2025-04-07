@@ -41,7 +41,7 @@
     "conflict": {
         "drupal/drupal": "*"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
@@ -84,5 +84,14 @@
                 "  * Get involved with the Drupal community: https://drupal.org/getting-involved"
             ]
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "wget https://git.drupalcode.org/project/cms/-/archive/1.1.x/cms-1.1.x.zip -O cms-1.1.x.zip",
+            "unzip -o cms-1.1.x.zip",
+            "mkdir -p cms/web/profiles",
+            "cp -r cms-1.1.x/web/profiles/drupal_cms_installer web/profiles/",
+            "rm -rf cms-1.1.x cms-1.1.x.zip"
+        ]
     }
 }
