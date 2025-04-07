@@ -1,0 +1,172 @@
+<?php
+
+/**
+ * @file
+ * Test module for the entity API providing several entity types for testing.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Filter that limits test entity list to revisable ones.
+ */
+const ENTITY_TEST_TYPES_REVISABLE = 1;
+
+/**
+ * Filter that limits test entity list to multilingual ones.
+ */
+const ENTITY_TEST_TYPES_MULTILINGUAL = 2;
+
+/**
+ * Filter that limits test entity list to ones that can be routed.
+ */
+const ENTITY_TEST_TYPES_ROUTING = 3;
+
+/**
+ * Returns a list of test entity types.
+ *
+ * The returned entity types are one for each available entity storage type:
+ * - The plain entity_test type supports neither revisions nor multilingual
+ *   properties.
+ * - The entity_test_mul type supports multilingual properties.
+ * - The entity_test_rev type supports revisions.
+ * - The entity_test_mulrev type supports both revisions and multilingual
+ *   properties.
+ *
+ * @param int $filter
+ *   Either ENTITY_TEST_TYPES_REVISABLE to only return revisable entity types or
+ *   ENTITY_TEST_TYPES_MULTILINGUAL to only return multilingual ones. Defaults
+ *   to NULL, which returns all.
+ *
+ * @return array
+ *   List with entity_types.
+ */
+function entity_test_entity_types($filter = NULL) {
+  $types = [];
+  if ($filter === NULL || $filter === ENTITY_TEST_TYPES_ROUTING) {
+    $types[] = 'entity_test';
+  }
+  if ($filter != ENTITY_TEST_TYPES_REVISABLE) {
+    $types[] = 'entity_test_mul';
+    $types[] = 'entity_test_mul_langcode_key';
+    $types[] = 'entity_test_mul_changed';
+  }
+  if ($filter != ENTITY_TEST_TYPES_MULTILINGUAL) {
+    $types[] = 'entity_test_rev';
+  }
+  if ($filter === ENTITY_TEST_TYPES_ROUTING) {
+    $types[] = 'entity_test_base_field_display';
+    $types[] = 'entity_test_string_id';
+    $types[] = 'entity_test_uuid_id';
+    $types[] = 'entity_test_no_id';
+    $types[] = 'entity_test_mul_with_bundle';
+  }
+  $types[] = 'entity_test_mulrev';
+  $types[] = 'entity_test_mulrev_changed';
+
+  return array_combine($types, $types);
+}
+
+/**
+ * Creates a new bundle for entity_test entities.
+ *
+ * @param string $bundle
+ *   The machine-readable name of the bundle.
+ * @param string $text
+ *   (optional) The human-readable name of the bundle. If none is provided, the
+ *   machine name will be used.
+ * @param string $entity_type
+ *   (optional) The entity type for which the bundle is created. Defaults to
+ *   'entity_test'.
+ */
+function entity_test_create_bundle($bundle, $text = NULL, $entity_type = 'entity_test') {
+  $bundles = \Drupal::state()->get($entity_type . '.bundles', [$entity_type => ['label' => 'Entity Test Bundle']]);
+  $bundles += [$bundle => ['label' => $text ? $text : $bundle]];
+  \Drupal::state()->set($entity_type . '.bundles', $bundles);
+
+  \Drupal::service('entity_bundle.listener')->onBundleCreate($bundle, $entity_type);
+}
+
+/**
+ * Deletes a bundle for entity_test entities.
+ *
+ * @param string $bundle
+ *   The machine-readable name of the bundle to delete.
+ * @param string $entity_type
+ *   (optional) The entity type for which the bundle is deleted. Defaults to
+ *   'entity_test'.
+ */
+function entity_test_delete_bundle($bundle, $entity_type = 'entity_test') {
+  $bundles = \Drupal::state()->get($entity_type . '.bundles', [$entity_type => ['label' => 'Entity Test Bundle']]);
+  unset($bundles[$bundle]);
+  \Drupal::state()->set($entity_type . '.bundles', $bundles);
+
+  \Drupal::service('entity_bundle.listener')->onBundleDelete($bundle, $entity_type);
+}
+
+/**
+ * Validation handler for the entity_test entity form.
+ */
+function entity_test_form_entity_test_form_validate(array &$form, FormStateInterface $form_state) {
+  $form['#entity_test_form_validate'] = TRUE;
+}
+
+/**
+ * Validation handler for the entity_test entity form.
+ */
+function entity_test_form_entity_test_form_validate_check(array &$form, FormStateInterface $form_state) {
+  if (!empty($form['#entity_test_form_validate'])) {
+    \Drupal::state()->set('entity_test.form.validate.result', TRUE);
+  }
+}
+
+/**
+ * Field default value callback.
+ *
+ * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+ *   The entity being created.
+ * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
+ *   The field definition.
+ *
+ * @return array
+ *   An array of default values, in the same format as the $default_value
+ *   property.
+ *
+ * @see \Drupal\field\Entity\FieldConfig::$default_value
+ */
+function entity_test_field_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
+  // Include the field name and entity language in the generated values to check
+  // that they are correctly passed.
+  $string = $definition->getName() . '_' . $entity->language()->getId();
+  // Return a "default value" with multiple items.
+  return [
+    [
+      'shape' => "shape:0:$string",
+      'color' => "color:0:$string",
+    ],
+    [
+      'shape' => "shape:1:$string",
+      'color' => "color:1:$string",
+    ],
+  ];
+}
+
+/**
+ * Helper function to be used to record hook invocations.
+ *
+ * @param string $hook
+ *   The hook name.
+ * @param mixed $data
+ *   Arbitrary data associated with the hook invocation.
+ */
+function _entity_test_record_hooks($hook, $data) {
+  $state = \Drupal::state();
+  $key = 'entity_test.hooks';
+  $hooks = $state->get($key);
+  $hooks[$hook] = $data;
+  $state->set($key, $hooks);
+}

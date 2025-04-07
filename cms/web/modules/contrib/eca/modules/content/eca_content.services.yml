@@ -1,0 +1,8 @@
+services:
+  eca_content.hook_handler:
+    class: Drupal\eca_content\HookHandler
+    arguments: ['@eca.trigger_event', '@eca.service.content_entity_types']
+
+  eca_content.service.entity_loader:
+    class: Drupal\eca_content\Service\EntityLoader
+    arguments: ['@entity_type.manager', '@eca.token_services', '@string_translation', '@eca.service.yaml_parser', '@logger.channel.eca', '@language_manager']

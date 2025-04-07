@@ -1,0 +1,27 @@
+drupal.focal_point:
+  version: VERSION
+  js:
+    js/focal_point.js: {}
+  css:
+    theme:
+      css/focal_point.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    # Depending on drupal.dialog in order to include jQuery UI and
+    # jQuery UI Draggable. This is done instead of depending on the versions
+    # from the contrib module in order to work around order and double-inclusion
+    # issues in Drupal 10.1+.
+    # This will only work so long as drupal.dialog includes those jQuery UI
+    # assets.
+    # See https://www.drupal.org/project/focal_point/issues/3371179
+    # and https://www.drupal.org/project/jquery_ui/issues/3371462
+    - core/drupal.dialog
+
+drupal.focal_point_preview:
+  version: VERSION
+  js:
+      js/focal_point_preview.js: {}
+  css:
+    theme:
+      css/focal_point_preview.css: {}

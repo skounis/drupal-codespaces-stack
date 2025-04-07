@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="project_browser">
+  <!-- Drupal (core) uses stylelint: https://www.drupal.org/list-changes/drupal/published?keywords_description=stylelint-->
+  <exclude-pattern>*.css</exclude-pattern>
+  <!-- Drupal (core) uses eslint: https://www.drupal.org/list-changes/drupal/published?keywords_description=eslint-->
+  <exclude-pattern>*.js</exclude-pattern>
+
+  <!-- Use the Drupal core coding standard -->
+  <rule ref="./core.phpcs.xml.dist"></rule>
+</ruleset>

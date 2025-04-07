@@ -1,0 +1,28 @@
+trash.settings:
+  type: config_object
+  strict: true
+  mapping:
+    enabled_entity_types:
+      label: 'Enabled entity types'
+      type: sequence
+      sequence:
+        label: 'Bundles'
+        type: sequence
+        sequence:
+          label: 'Bundle ID'
+          type: string
+    auto_purge:
+      type: mapping
+      mapping:
+        enabled:
+          label: 'Auto-purge entities in trash after a period of time'
+          type: boolean
+        after:
+          label: 'Period after which entities in trash will be auto-purged. E.g.: 15 days, 2 hours'
+          type: string
+          nullable: true
+          constraints:
+            ValidAutoPurgePeriod: []
+    compact_overview:
+      label: 'Simplify the Trash overview page when there are many entity types enabled'
+      type: boolean

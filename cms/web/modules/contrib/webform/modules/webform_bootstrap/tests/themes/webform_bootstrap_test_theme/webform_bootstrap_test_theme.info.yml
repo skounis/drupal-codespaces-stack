@@ -1,0 +1,27 @@
+type: theme
+base theme: bootstrap
+
+name: 'Webform Test Bootstrap'
+description: 'Support theme for webform bootstrap integration testing.'
+package: Testing
+
+regions:
+  navigation: 'Navigation'
+  navigation_collapsible: 'Navigation (Collapsible)'
+  header: 'Top Bar'
+  highlighted: 'Highlighted'
+  help: 'Help'
+  content: 'Content'
+  sidebar_first: 'Primary'
+  sidebar_second: 'Secondary'
+  footer: 'Footer'
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+
+libraries:
+  - 'webform_bootstrap_test_theme/global-styling'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

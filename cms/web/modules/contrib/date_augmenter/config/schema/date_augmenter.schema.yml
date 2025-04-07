@@ -1,0 +1,44 @@
+# Schema for the third_party settings date_augmenter and date_augmenter plugins.
+field.formatter.third_party.date_augmenter:
+  type: mapping
+  label: 'Date Augmenters'
+  mapping:
+    instances:
+      type: date_augmenter_plugins
+      label: 'Individual Dates'
+    rule:
+      type: date_augmenter_plugins
+      label: 'Recurring Rule'
+
+date_augmenter_plugins:
+  type: mapping
+  mapping:
+    status:
+      type: sequence
+      label: 'Enabled Date Augmenters'
+      sequence:
+        type: boolean
+    weights:
+      type: mapping
+      mapping:
+        order:
+          type: sequence
+          label: 'Augmenting order'
+          sequence:
+            type: mapping
+            mapping:
+              weight:
+                type: integer
+    settings:
+      type: sequence
+      sequence:
+        type: date_augmenter.plugin.[%key]
+    augmenter_settings:
+      type: ignore
+
+date_augmenter.plugin_settings:
+  type: mapping
+  label: 'Settings'
+
+date_augmenter.plugin.*:
+  type: date_augmenter.plugin_settings

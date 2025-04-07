@@ -1,0 +1,7 @@
+services:
+  yoast_seo.manager:
+    class: Drupal\yoast_seo\SeoManager
+    arguments: ['@entity_type.manager', '@entity_type.bundle.info', '@entity_field.manager', '@string_translation']
+  yoast_seo.entity_analyser:
+    class: Drupal\yoast_seo\EntityAnalyser
+    arguments: ['@entity_type.manager', '@renderer', '@metatag.manager', '@router.no_access_checks']

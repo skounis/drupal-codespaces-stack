@@ -1,0 +1,7 @@
+{
+  "_comment": "Duplicate what is in core/.prettierrc.json",
+  "printWidth": 80,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all"
+}

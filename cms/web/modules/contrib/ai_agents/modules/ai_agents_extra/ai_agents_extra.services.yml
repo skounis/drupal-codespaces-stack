@@ -1,0 +1,6 @@
+services:
+  ai_agents_extra.webform_actions:
+    class: Drupal\ai_agents_extra\Service\WebformAgent\WebformActions
+    arguments: ['@ai_agents.agent_helper', '@extension.path.resolver', '@entity_type.manager']
+    calls:
+      - [setWebformElement, ['@?plugin.manager.webform.element']]

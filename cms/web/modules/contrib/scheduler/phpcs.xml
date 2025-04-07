@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="scheduler">
+  <description>Default PHP CodeSniffer configuration for Scheduler.</description>
+  <file>.</file>
+
+  <!-- Temporary fix until drupal.org testbot script is changed. This is also
+    compatible with running phpcs locally, and on Travis, so can be committed.
+    See https://www.drupal.org/project/drupalci_testbot/issues/3283978 -->
+  <config name="installed_paths" value="../../drupal/coder/coder_sniffer/,../../sirbrillig/phpcs-variable-analysis/,../../slevomat/coding-standard/"/>
+
+  <!-- Initially include all Drupal and DrupalPractice sniffs. -->
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+
+  <!-- Check these file extensions -->
+  <!-- .yml files are not processed by phpcs -->
+  <arg name="extensions" value="php,module,inc,install,css,md"/>
+
+  <!-- Ignore all files that match these patterns. By default the full file -->
+  <!-- path is checked, unless type=relative is used. There is an implied * -->
+  <!-- wildcard at each end and periods and slashes must be escaped using \ -->
+  <exclude-pattern>\/_+ignore</exclude-pattern>
+  <exclude-pattern>interdif</exclude-pattern>
+  <exclude-pattern>node_modules\/</exclude-pattern>
+
+  <!-- Use 's' to print the full sniff name in the report. -->
+  <arg value="s"/>
+  <arg value="-colors"/>
+  <arg name="report-width" value="130"/>
+
+  <rule ref="DrupalPractice">
+    <!-- Allow empty lines after comments, we don't like this rule. -->
+    <exclude name="DrupalPractice.Commenting.CommentEmptyLine.SpacingAfter"/>
+  </rule>
+  <rule ref="Drupal">
+    <!-- Allow empty lines after comments. There appears to be two rules
+         checking nearly the same thing. -->
+    <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
+  </rule>
+
+  <!-- This rule is disabled in Coder 8.3.10, but undefined variables will -->
+  <!-- be reported when using earlier versions. Hence re-enable the rule so -->
+  <!-- we do not get surprises when testing with other versions. -->
+  <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedVariable">
+    <severity>5</severity>
+  </rule>
+
+  <!-- Allow long lines in .md files. -->
+  <rule ref="Drupal.Files.TxtFileLineLength.TooLong">
+    <exclude-pattern>docs/*\.md</exclude-pattern>
+  </rule>
+
+  <!-- Ignore the AlphabeticallySortedUses rule because this was added to Coder before being agreed by Coding Standards team -->
+  <!-- Coding Standards https://www.drupal.org/i/1624564 and Coder https://www.drupal.org/i/3483028-->
+  <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
+    <severity>0</severity>
+  </rule>
+
+</ruleset>

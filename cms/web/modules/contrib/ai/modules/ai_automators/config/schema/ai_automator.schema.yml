@@ -1,0 +1,12 @@
+ai_automators.ai_automators.*:
+  type: config_entity
+  label: AI Automator
+  mapping:
+    id:
+      type: string
+      label: ID
+    label:
+      type: label
+      label: Label
+    uuid:
+      type: string

@@ -1,0 +1,16 @@
+name: Dashboard
+type: module
+description: 'Provides customizable dashboards.'
+core_version_requirement: ^10.2 || ^11
+package: Core
+configure: entity.dashboard.collection
+
+dependencies:
+  - drupal:layout_builder
+  - drupal:node
+  - drupal:views
+
+# Information added by Drupal.org packaging script on 2025-01-10
+version: '2.0.0'
+project: 'dashboard'
+datestamp: 1736528737

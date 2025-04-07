@@ -1,0 +1,58 @@
+services:
+  _defaults:
+    autowire: true
+
+  Drupal\automatic_updates\Routing\RouteSubscriber:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\Validation\StatusChecker:
+    arguments:
+      # @todo Remove this when https://drupal.org/i/3325557 lands.
+      $key_value_expirable_factory: '@keyvalue.expirable'
+      $resultsTimeToLive: 24
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\StatusCheckMailer: ~
+  Drupal\automatic_updates\UpdateStage:
+    calls:
+      - ['setLogger', ['@logger.channel.automatic_updates']]
+  Drupal\automatic_updates\CronUpdateRunner:
+    calls:
+      - ['setLogger', ['@logger.channel.automatic_updates']]
+    decorates: 'cron'
+  Drupal\automatic_updates\Validator\RequestedUpdateValidator:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\Validator\StagedProjectsValidator:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\ReleaseChooser: ~
+  Drupal\automatic_updates\Validator\CronFrequencyValidator:
+    arguments:
+      $lock: '@lock'
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\Validator\StagedDatabaseUpdateValidator:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\Validator\VersionPolicyValidator:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\Validator\WindowsValidator:
+    tags:
+      - { name: event_subscriber }
+  logger.channel.automatic_updates:
+    parent: logger.channel_base
+    arguments: ['automatic_updates']
+  Drupal\automatic_updates\ConsoleUpdateStage:
+    arguments:
+      $lock: '@lock'
+      $committer: '@Drupal\automatic_updates\MaintenanceModeAwareCommitter'
+    calls:
+      - ['setLogger', ['@logger.channel.automatic_updates']]
+  Drupal\automatic_updates\MaintenanceModeAwareCommitter:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates\CommandExecutor:
+    arguments:
+      $appRoot: '%app.root%'

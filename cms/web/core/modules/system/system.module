@@ -1,0 +1,489 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\FileSecurity\FileSecurity;
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
+/**
+ * Disabled option on forms and settings.
+ */
+const DRUPAL_DISABLED = 0;
+
+/**
+ * Optional option on forms and settings.
+ */
+const DRUPAL_OPTIONAL = 1;
+
+/**
+ * Required option on forms and settings.
+ */
+const DRUPAL_REQUIRED = 2;
+
+/**
+ * Return only visible regions.
+ *
+ * @see system_region_list()
+ */
+const REGIONS_VISIBLE = 'visible';
+
+/**
+ * Return all regions.
+ *
+ * @see system_region_list()
+ */
+const REGIONS_ALL = 'all';
+
+/**
+ * Implements hook_hook_info().
+ */
+function system_hook_info() {
+  $hooks['token_info'] = [
+    'group' => 'tokens',
+  ];
+  $hooks['token_info_alter'] = [
+    'group' => 'tokens',
+  ];
+  $hooks['tokens'] = [
+    'group' => 'tokens',
+  ];
+  $hooks['tokens_alter'] = [
+    'group' => 'tokens',
+  ];
+
+  return $hooks;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function system_theme_suggestions_html(array $variables) {
+  $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+  return theme_get_suggestions($path_args, 'html');
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function system_theme_suggestions_page(array $variables) {
+  $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
+  $suggestions = theme_get_suggestions($path_args, 'page');
+
+  $supported_http_error_codes = [401, 403, 404];
+  $exception = \Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
+  if ($exception instanceof HttpExceptionInterface && in_array($exception->getStatusCode(), $supported_http_error_codes, TRUE)) {
+    $suggestions[] = 'page__4xx';
+    $suggestions[] = 'page__' . $exception->getStatusCode();
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function system_theme_suggestions_maintenance_page(array $variables) {
+  $suggestions = [];
+
+  // Dead databases will show error messages so supplying this template will
+  // allow themers to override the page and the content completely.
+  $offline = defined('MAINTENANCE_MODE');
+  try {
+    \Drupal::service('path.matcher')->isFrontPage();
+  }
+  catch (Exception) {
+    // The database is not yet available.
+    $offline = TRUE;
+  }
+  if ($offline) {
+    $suggestions[] = 'maintenance_page__offline';
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function system_theme_suggestions_region(array $variables) {
+  $suggestions = [];
+  if (!empty($variables['elements']['#region'])) {
+    $suggestions[] = 'region__' . $variables['elements']['#region'];
+  }
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function system_theme_suggestions_field(array $variables) {
+  $suggestions = [];
+  $element = $variables['element'];
+
+  $suggestions[] = 'field__' . $element['#field_type'];
+  $suggestions[] = 'field__' . $element['#field_name'];
+  $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#bundle'];
+  $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'];
+  $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#bundle'];
+
+  return $suggestions;
+}
+
+/**
+ * Prepares variables for the list of available bundles.
+ *
+ * Default template: entity-add-list.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - bundles: An array of bundles with the label, description, add_link keys.
+ *   - add_bundle_message: The message shown when there are no bundles. Only
+ *     available if the entity type uses bundle entities.
+ */
+function template_preprocess_entity_add_list(&$variables): void {
+  foreach ($variables['bundles'] as $bundle_name => $bundle_info) {
+    $variables['bundles'][$bundle_name]['description'] = [
+      '#markup' => $bundle_info['description'],
+    ];
+  }
+}
+
+/**
+ * @defgroup authorize Authorized operations
+ * @{
+ * Functions to run operations with elevated privileges via authorize.php.
+ *
+ * Because of the Update manager functionality included in Drupal core, there
+ * is a mechanism for running operations with elevated file system privileges,
+ * the top-level authorize.php script. This script runs at a reduced Drupal
+ * bootstrap level so that it is not reliant on the entire site being
+ * functional. The operations use a FileTransfer class to manipulate code
+ * installed on the system as the user that owns the files, not the user that
+ * the httpd is running as.
+ *
+ * The first setup is to define a callback function that should be authorized
+ * to run with the elevated privileges. This callback should take a
+ * FileTransfer as its first argument, although you can define an array of
+ * other arguments it should be invoked with. The callback should be placed in
+ * a separate .inc file that will be included by authorize.php.
+ *
+ * To run the operation, certain data must be saved into the SESSION, and then
+ * the flow of control should be redirected to the authorize.php script. There
+ * are two ways to do this, either to call system_authorized_run() directly,
+ * or to call system_authorized_init() and then redirect to authorize.php,
+ * using the URL from system_authorized_get_url(). Redirecting yourself is
+ * necessary when your authorized operation is being triggered by a form
+ * submit handler, since calling redirecting in a submit handler is a bad
+ * idea, and you should instead use $form_state->setRedirect().
+ *
+ * Once the SESSION is setup for the operation and the user is redirected to
+ * authorize.php, they will be prompted for their connection credentials (core
+ * provides FTP and SSH by default, although other connection classes can be
+ * added via contributed modules). With valid credentials, authorize.php will
+ * instantiate the appropriate FileTransfer object, and then invoke the
+ * desired operation passing in that object. The authorize.php script can act
+ * as a Batch API processing page, if the operation requires a batch.
+ *
+ * @see authorize.php
+ * @see \Drupal\Core\FileTransfer\FileTransfer
+ * @see hook_filetransfer_info()
+ */
+
+/**
+ * Setup a given callback to run via authorize.php with elevated privileges.
+ *
+ * To use authorize.php, certain variables must be stashed in the user's
+ * session. This function sets up all the necessary session variables. The
+ * calling function should then redirect to authorize.php, using the full path
+ * returned by system_authorized_get_url(). That initiates the workflow that
+ * will eventually lead to the callback being invoked. The callback will be
+ * invoked at a low bootstrap level, without all modules being invoked, so it
+ * needs to be careful not to assume any code exists.
+ * Example (system_authorized_run()):
+ * @code
+ *   system_authorized_init($callback, $file, $arguments, $page_title);
+ *   return new RedirectResponse(system_authorized_get_url()->toString());
+ * @endcode
+ * Example (Drupal\update\Form\UpdateReady::submitForm()):
+ * @code
+ *  system_authorized_init('update_authorize_run_update',
+ *    __DIR__ . '/../../update.authorize.inc',
+ *    [$updates], $this->t('Update manager'));
+ *  $form_state->setRedirectUrl(system_authorized_get_url());
+ * @endcode
+ *
+ * @param callable $callback
+ *   The name of the function to invoke once the user authorizes the operation.
+ * @param $file
+ *   The full path to the file where the callback function is implemented.
+ * @param $arguments
+ *   Optional array of arguments to pass into the callback when it is invoked.
+ *   Note that the first argument to the callback is always the FileTransfer
+ *   object created by authorize.php when the user authorizes the operation.
+ * @param $page_title
+ *   Optional string to use as the page title once redirected to authorize.php.
+ */
+function system_authorized_init($callback, $file, $arguments = [], $page_title = NULL) {
+  $session = \Drupal::request()->getSession();
+  // First, figure out what file transfer backends the site supports, and put
+  // all of those in the SESSION so that authorize.php has access to all of
+  // them via the class autoloader, even without a full bootstrap.
+  $session->set('authorize_filetransfer_info', drupal_get_filetransfer_info());
+
+  // Now, define the callback to invoke.
+  $session->set('authorize_operation', [
+    'callback' => $callback,
+    'file' => $file,
+    'arguments' => $arguments,
+  ]);
+
+  if (isset($page_title)) {
+    $session->set('authorize_page_title', $page_title);
+  }
+}
+
+/**
+ * Return the URL for the authorize.php script.
+ *
+ * @param array $options
+ *   Optional array of options to set on the \Drupal\Core\Url object.
+ *
+ * @return \Drupal\Core\Url
+ *   The full URL to authorize.php, using HTTPS if available.
+ *
+ * @see system_authorized_init()
+ */
+function system_authorized_get_url(array $options = []) {
+  // core/authorize.php is an unrouted URL, so using the base: scheme is
+  // the correct usage for this case.
+  $url = Url::fromUri('base:core/authorize.php');
+  $url_options = $url->getOptions();
+  $url->setOptions($options + $url_options);
+  return $url;
+}
+
+/**
+ * Returns the URL for the authorize.php script when it is processing a batch.
+ *
+ * @param array $options
+ *   Optional array of options to set on the \Drupal\Core\Url object.
+ *
+ * @return \Drupal\Core\Url
+ */
+function system_authorized_batch_processing_url(array $options = []) {
+  $options['query'] = ['batch' => '1'];
+  return system_authorized_get_url($options);
+}
+
+/**
+ * Setup and invoke an operation using authorize.php.
+ *
+ * @see system_authorized_init()
+ */
+function system_authorized_run($callback, $file, $arguments = [], $page_title = NULL) {
+  system_authorized_init($callback, $file, $arguments, $page_title);
+  return new RedirectResponse(system_authorized_get_url()->toString());
+}
+
+/**
+ * Use authorize.php to run batch_process().
+ *
+ * @see batch_process()
+ */
+function system_authorized_batch_process() {
+  $finish_url = system_authorized_get_url();
+  $process_url = system_authorized_batch_processing_url();
+  return batch_process($finish_url->setAbsolute()->toString(), $process_url);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for block templates.
+ */
+function system_preprocess_block(&$variables): void {
+  switch ($variables['base_plugin_id']) {
+    case 'system_branding_block':
+      $variables['site_logo'] = '';
+      if ($variables['content']['site_logo']['#access'] && $variables['content']['site_logo']['#uri']) {
+        $variables['site_logo'] = $variables['content']['site_logo']['#uri'];
+      }
+      $variables['site_name'] = '';
+      if ($variables['content']['site_name']['#access'] && $variables['content']['site_name']['#markup']) {
+        $variables['site_name'] = $variables['content']['site_name']['#markup'];
+      }
+      $variables['site_slogan'] = '';
+      if ($variables['content']['site_slogan']['#access'] && $variables['content']['site_slogan']['#markup']) {
+        $variables['site_slogan'] = [
+          '#markup' => $variables['content']['site_slogan']['#markup'],
+        ];
+      }
+      break;
+  }
+}
+
+/**
+ * Checks the existence of the directory specified in $form_element.
+ *
+ * This function is called from the system_settings form to check all core
+ * file directories (file_public_path, file_private_path, file_temporary_path).
+ *
+ * @param $form_element
+ *   The form element containing the name of the directory to check.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ */
+function system_check_directory($form_element, FormStateInterface $form_state) {
+  $directory = $form_element['#value'];
+  if (strlen($directory) == 0) {
+    return $form_element;
+  }
+
+  $logger = \Drupal::logger('file system');
+  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+  $file_system = \Drupal::service('file_system');
+  if (!is_dir($directory) && !$file_system->mkdir($directory, NULL, TRUE)) {
+    // If the directory does not exist and cannot be created.
+    $form_state->setErrorByName($form_element['#parents'][0], t('The directory %directory does not exist and could not be created.', ['%directory' => $directory]));
+    $logger->error('The directory %directory does not exist and could not be created.', ['%directory' => $directory]);
+  }
+
+  if (is_dir($directory) && !is_writable($directory) && !$file_system->chmod($directory)) {
+    // If the directory is not writable and cannot be made so.
+    $form_state->setErrorByName($form_element['#parents'][0], t('The directory %directory exists but is not writable and could not be made writable.', ['%directory' => $directory]));
+    $logger->error('The directory %directory exists but is not writable and could not be made writable.', ['%directory' => $directory]);
+  }
+  elseif (is_dir($directory)) {
+    if ($form_element['#name'] == 'file_public_path') {
+      // Create public .htaccess file.
+      FileSecurity::writeHtaccess($directory, FALSE);
+    }
+    else {
+      // Create private .htaccess file.
+      FileSecurity::writeHtaccess($directory);
+    }
+  }
+
+  return $form_element;
+}
+
+/**
+ * Get a list of available regions from a specified theme.
+ *
+ * @param \Drupal\Core\Extension\Extension|string $theme
+ *   A theme extension object, or the name of a theme.
+ * @param $show
+ *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
+ *   regions.
+ *
+ * @return string[]
+ *   An array of regions in the form $region['name'] = 'description'.
+ */
+function system_region_list($theme, $show = REGIONS_ALL) {
+  if (!$theme instanceof Extension) {
+    $themes = \Drupal::service('theme_handler')->listInfo();
+    if (!isset($themes[$theme])) {
+      return [];
+    }
+    $theme = $themes[$theme];
+  }
+  $list = [];
+  $info = $theme->info;
+  // If requested, suppress hidden regions. See block_admin_display_form().
+  foreach ($info['regions'] as $name => $label) {
+    if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
+      $list[$name] = t($label);
+    }
+  }
+
+  return $list;
+}
+
+/**
+ * Sorts themes by their names, with the default theme listed first.
+ *
+ * Callback for uasort() within
+ * \Drupal\system\Controller\SystemController::themesPage().
+ *
+ * @see \Drupal\Core\Extension\Extension::sortByName()
+ */
+function system_sort_themes($a, $b) {
+  if ($a->is_default) {
+    return -1;
+  }
+  if ($b->is_default) {
+    return 1;
+  }
+  return strcasecmp($a->info['name'], $b->info['name']);
+}
+
+/**
+ * Gets the name of the default region for a given theme.
+ *
+ * @param $theme
+ *   The name of a theme.
+ *
+ * @return string
+ *   A string that is the region name.
+ */
+function system_default_region($theme) {
+  $regions = array_keys(system_region_list($theme, REGIONS_VISIBLE));
+  return $regions[0] ?? '';
+}
+
+/**
+ * Determines whether the current user is in compact mode.
+ *
+ * Compact mode shows certain administration pages with less description text,
+ * such as the configuration page and the permissions page.
+ *
+ * Whether the user is in compact mode is determined by a cookie, which is set
+ * for the user by \Drupal\system\Controller\SystemController::compactPage().
+ *
+ * If the user does not have the cookie, the default value is given by the
+ * configuration variable 'system.site.admin_compact_mode', which itself
+ * defaults to FALSE. This does not have a user interface to set it: it is a
+ * hidden variable which can be set in the settings.php file.
+ *
+ * @return bool
+ *   TRUE when in compact mode, FALSE when in expanded mode.
+ */
+function system_admin_compact_mode() {
+  // PHP converts dots into underscores in cookie names to avoid problems with
+  // its parser, so we use a converted cookie name.
+  return \Drupal::request()->cookies->get('Drupal_visitor_admin_compact_mode', \Drupal::config('system.site')->get('admin_compact_mode'));
+}
+
+/**
+ * Determines if Claro is the admin theme but not the active theme.
+ *
+ * @return bool
+ *   TRUE if Claro is the admin theme but not the active theme.
+ */
+function _system_is_claro_admin_and_not_active() {
+  $admin_theme = \Drupal::configFactory()->get('system.theme')->get('admin');
+  $active_theme = \Drupal::theme()->getActiveTheme()->getName();
+  return $active_theme !== 'claro' && $admin_theme === 'claro';
+}
+
+/**
+ * Implements hook_preprocess_toolbar().
+ */
+function system_preprocess_toolbar(array &$variables, $hook, $info): void {
+  // When Claro is the admin theme, Claro overrides the active theme's if that
+  // active theme is not Claro. Because of these potential overrides, the
+  // toolbar cache should be invalidated any time the default or admin theme
+  // changes.
+  $variables['#cache']['tags'][] = 'config:system.theme';
+
+  // If Claro is the admin theme but not the active theme, still include Claro's
+  // toolbar preprocessing.
+  if (_system_is_claro_admin_and_not_active()) {
+    require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
+    claro_preprocess_toolbar($variables, $hook, $info);
+  }
+}

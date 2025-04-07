@@ -1,0 +1,15 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    Based on the following form title, id and description, choose one of the field types from the list of element types.
+    Read through the whole list before choosing and try to choose one.
+    Note that this field should have options to choose from, so select or checkboxes makes sense depending on if its a
+    multi value or single value field. Answer with the id only.
+  formats:
+    - field_type: the field type id
+  one_shot_learning_examples:
+    - field_type: select
+    - field_type: checkboxes
+    - field_type: radios

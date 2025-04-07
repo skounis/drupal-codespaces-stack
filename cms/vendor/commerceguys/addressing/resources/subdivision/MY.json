@@ -1,0 +1,53 @@
+{
+	"country_code": "MY",
+	"subdivisions": {
+		"01": {
+			"name": "Johor"
+		},
+		"02": {
+			"name": "Kedah"
+		},
+		"03": {
+			"name": "Kelantan"
+		},
+		"14": {
+			"name": "Kuala Lumpur"
+		},
+		"15": {
+			"name": "Labuan"
+		},
+		"04": {
+			"name": "Melaka"
+		},
+		"05": {
+			"name": "Negeri Sembilan"
+		},
+		"06": {
+			"name": "Pahang"
+		},
+		"08": {
+			"name": "Perak"
+		},
+		"09": {
+			"name": "Perlis"
+		},
+		"07": {
+			"name": "Pulau Pinang"
+		},
+		"16": {
+			"name": "Putrajaya"
+		},
+		"12": {
+			"name": "Sabah"
+		},
+		"13": {
+			"name": "Sarawak"
+		},
+		"10": {
+			"name": "Selangor"
+		},
+		"11": {
+			"name": "Terengganu"
+		}
+	}
+}

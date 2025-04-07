@@ -1,0 +1,62 @@
+uuid: 966f917f-ba85-4b7f-889f-949343c02a86
+langcode: en
+status: true
+dependencies: {  }
+id: administrator
+label: Administrator
+description: 'Dashboard for administrator users.'
+layout:
+  -
+    layout_id: layout_onecol
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+    components:
+      09268576-66a6-4842-a32b-bece20316b51:
+        uuid: 09268576-66a6-4842-a32b-bece20316b51
+        region: content
+        configuration:
+          id: dashboard_text_block
+          label: 'Dashboard Text'
+          label_display: '0'
+          provider: dashboard
+          context_mapping: {  }
+          text:
+            value: '<p><strong>Welcome to the Administrator Dashboard!</strong></p>'
+            format: basic_html
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+  -
+    layout_id: layout_twocol_section
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+      column_widths: 50-50
+    components:
+      48c27925-fb56-4f43-8b36-b177f2ae53be:
+        uuid: 48c27925-fb56-4f43-8b36-b177f2ae53be
+        region: first
+        configuration:
+          id: announce_block
+          label: 'Announcements Feed'
+          label_display: visible
+          provider: announcements_feed
+          context_mapping: {  }
+        weight: 0
+        additional: {  }
+      1ed9e1d2-a4e8-4249-bae5-c408a8936e77:
+        uuid: 1ed9e1d2-a4e8-4249-bae5-c408a8936e77
+        region: second
+        configuration:
+          id: 'views_block:who_s_online-who_s_online_block'
+          label: ''
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: ''
+          items_per_page: none
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+weight: -10

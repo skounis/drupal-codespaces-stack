@@ -1,0 +1,62 @@
+{
+	"country_code": "UY",
+	"subdivisions": {
+		"AR": {
+			"name": "Artigas"
+		},
+		"CA": {
+			"name": "Canelones"
+		},
+		"CL": {
+			"name": "Cerro Largo"
+		},
+		"CO": {
+			"name": "Colonia"
+		},
+		"DU": {
+			"name": "Durazno"
+		},
+		"FS": {
+			"name": "Flores"
+		},
+		"FD": {
+			"name": "Florida"
+		},
+		"LA": {
+			"name": "Lavalleja"
+		},
+		"MA": {
+			"name": "Maldonado"
+		},
+		"MO": {
+			"name": "Montevideo"
+		},
+		"PA": {
+			"name": "Paysandú"
+		},
+		"RN": {
+			"name": "Río Negro"
+		},
+		"RV": {
+			"name": "Rivera"
+		},
+		"RO": {
+			"name": "Rocha"
+		},
+		"SA": {
+			"name": "Salto"
+		},
+		"SJ": {
+			"name": "San José"
+		},
+		"SO": {
+			"name": "Soriano"
+		},
+		"TA": {
+			"name": "Tacuarembó"
+		},
+		"TT": {
+			"name": "Treinta y Tres"
+		}
+	}
+}

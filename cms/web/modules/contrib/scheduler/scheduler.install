@@ -1,0 +1,281 @@
+<?php
+
+/**
+ * @file
+ * Installation file for Scheduler module.
+ */
+
+use Drupal\Core\Url;
+use Drupal\scheduler\Form\SchedulerCronForm;
+use Drupal\views\Entity\View;
+
+/**
+ * Implements hook_requirements().
+ */
+function scheduler_requirements($phase) {
+  $requirements = [];
+
+  // Report server internal clock.
+  if ($phase === 'runtime') {
+    $user = \Drupal::currentUser();
+
+    $now = \Drupal::time()->getRequestTime();
+    $system_date = \Drupal::config('system.date');
+    $date_default_timezone = $system_date->get('timezone.default') ?: date_default_timezone_get();
+    $date_formatter = \Drupal::service('date.formatter');
+
+    $t_options = [
+      // For %utc specify 'GMT' as the timezone (4th parameter) so that no
+      // timezone offset is returned.
+      '%utc' => $date_formatter->format($now, 'custom', 'jS F Y, H:i:s P', 'GMT'),
+      // For %localtime do not specify any timezone parameter so that the user
+      // or site default setting is returned.
+      '%localtime' => $date_formatter->format($now, 'custom', 'jS F Y, H:i:s P T e'),
+      '%daylight_saving' => $date_formatter->format($now, 'custom', 'I') ? t('currently in daylight saving mode') : t('not in daylight saving mode'),
+      '%date_default_timezone' => $date_default_timezone,
+      '%date_default_offset' => $date_formatter->format($now, 'custom', 'P', $date_default_timezone),
+      '%date_default_code' => $date_formatter->format($now, 'custom', 'T', $date_default_timezone),
+      '@account_edit' => Url::fromRoute('entity.user.edit_form', ['user' => $user->id()])->toString(),
+      '@admin_regional_settings' => Url::fromRoute('system.regional_settings')->toString(),
+    ];
+
+    $descriptions = [
+      t('In most cases the server time should match Coordinated Universal Time (UTC) / Greenwich Mean Time (GMT).', $t_options),
+      t('Default timezone: %date_default_timezone (%date_default_code), offset from UTC/GMT by %date_default_offset hours. This timezone can be <a href="@admin_regional_settings">changed by admin users</a> with the appropriate access.', $t_options),
+    ];
+    if ($system_date->get('timezone.user.configurable')) {
+      $descriptions[] = t('Local time: %localtime (%daylight_saving). You can change this via your <a href="@account_edit">user account</a>.', $t_options);
+      if (!$user->getTimezone()) {
+        $descriptions[] = t('Note: The user timezone has not been stored, so defaulting to the website timezone.');
+      }
+    }
+    else {
+      $descriptions[] = t('Your local time is %localtime (%daylight_saving). This is not configurable by you.', $t_options);
+    }
+
+    $requirements['scheduler_timecheck'] = [
+      'title' => t('Scheduler Time Check'),
+      'value' => t('Server time: @utc', [
+        '@utc' => $date_formatter->format($now, 'custom', 'jS F Y, H:i:s P', 'GMT'),
+      ]),
+      'description' => [
+        '#type' => 'inline_template',
+        '#template' => '{{ description|raw }}',
+        '#context' => ['description' => implode('<br />', $descriptions)],
+      ],
+    ];
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_install().
+ */
+function scheduler_install($is_syncing) {
+  if ($is_syncing) {
+    // During config import/sync nothing should be done here.
+    return;
+  }
+  // Set cron access key value, as this is now required in SchedulerCronForm.
+  \Drupal::state()->set(SchedulerCronForm::CRON_ACCESS_KEY, substr(md5(rand()), 0, 20));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scheduler_uninstall() {
+  // This should not be necessary but incase the entity db tables or config have
+  // got out-of-step with the Scheduler plugins make sure all is up to date so
+  // that uninstalling will run OK. During config sync these updates should not
+  // cause any problem.
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $scheduler_manager->entityUpdate();
+  $scheduler_manager->entityRevert();
+
+  \Drupal::state()->delete(SchedulerCronForm::CRON_ACCESS_KEY);
+}
+
+/**
+ * Reset date and time formats to default.
+ */
+function scheduler_update_8001() {
+  // See https://www.drupal.org/project/scheduler/issues/2799869
+  $config = \Drupal::configFactory()->getEditable('scheduler.settings');
+  $config
+    ->set('date_format', 'Y-m-d H:i:s')
+    ->set('date_only_format', 'Y-m-d')
+    ->set('time_only_format', 'H:i:s')
+    ->save();
+  return t('The date and time format has been reset.');
+}
+
+/**
+ * Set default value for new config option.
+ */
+function scheduler_update_8101() {
+  // See https://www.drupal.org/project/scheduler/issues/3145169
+  $config = \Drupal::configFactory()->getEditable('scheduler.settings');
+  $config
+    ->set('default_show_message_after_update', TRUE)
+    ->save();
+  return t('Default set on for new option "Show a message after updating content"');
+}
+
+/**
+ * Update view - Move 'Scheduled' tab to be a local task under 'Content'.
+ */
+function scheduler_update_8102() {
+  // The text in the doc block above is shown on the update.php list.
+  // See https://www.drupal.org/project/scheduler/issues/3167193
+  $view = View::load('scheduler_scheduled_content');
+  if ($view) {
+    $display =& $view->getDisplay('overview');
+    $display['display_options']['menu']['description'] = 'Content scheduled for publishing and unpublishing';
+    $display['display_options']['menu']['type'] = 'normal';
+    $view->save();
+    return t('The "Scheduled" tab is now a "Scheduled content" sub-task under the "Content" tab');
+  }
+}
+
+/**
+ * Add date fields to any newly supported entity types.
+ */
+function scheduler_update_8201() {
+  // If modules that have scheduler plugin support are already installed when
+  // Scheduler is then upgraded to a version which includes the entity plugins,
+  // this update function will add the missing db fields.
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  if ($result = $scheduler_manager->entityUpdate()) {
+    return t('Added Scheduler date fields to the following entity types: %updated.', [
+      '%updated' => implode(', ', $result),
+    ]);
+  }
+  else {
+    return t('No database fields had to be added.');
+  }
+}
+
+/**
+ * Refresh views for supported entity types.
+ */
+function scheduler_update_8202() {
+  // The scheduled content view needs to be refreshed from source when upgrading
+  // to the entity plugin version of Scheduler. If the media or commerce modules
+  // are already enabled this will also load those new views from source.
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  if ($result = $scheduler_manager->viewsUpdate(['node', 'media', 'commerce_product'])) {
+    return t('Updated views: %updated.', ['%updated' => implode(', ', $result)]);
+  }
+  else {
+    return t('No views require updating.');
+  }
+}
+
+/**
+ * Update entity fields and scheduled view for Taxonomy Terms.
+ */
+function scheduler_update_8203() {
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $output = [];
+  if ($result = $scheduler_manager->entityUpdate()) {
+    $output[] = t('Added Scheduler date fields to the following entity types: %updated.', [
+      '%updated' => implode(', ', $result),
+    ]);
+  }
+  if ($result = $scheduler_manager->viewsUpdate(['taxonomy_term'])) {
+    $output[] = t('Updated views: %updated.', ['%updated' => implode(', ', $result)]);
+  }
+  return $output ? implode('<br>', $output) : t('Nothing requires updating for Taxonomy Terms.');
+}
+
+/**
+ * Update Rules actions and conditions to use 'entity' context.
+ */
+function scheduler_update_8204() {
+  // The entity context names need to be 'entity' for all entity types, not
+  // 'node', 'media', 'commerce_product' or 'taxonomy_term'. This is for PHP8
+  // compatibility, fixing "Unknown named parameter in call_user_func_array()"
+  // See https://www.drupal.org/project/scheduler/issues/3276637
+  $rules = \Drupal::configFactory()->listAll('rules.reaction');
+  $rules_updated = [];
+  foreach ($rules as $config_id) {
+    $rule = \Drupal::configFactory()->getEditable($config_id);
+    $changed = FALSE;
+
+    // The expression array has 'conditions' and 'actions' elements which have
+    // the same structure, so can be fixed using the same loop process.
+    $expression = $rule->get('expression');
+    foreach (['condition_id' => 'conditions', 'action_id' => 'actions'] as $idx => $group) {
+      foreach ($expression[$group][$group] as $key => $cond_act) {
+        if (substr($cond_act[$idx], 0, 10) == 'scheduler_' && !empty($cond_act['context_mapping'])) {
+          foreach ($cond_act['context_mapping'] as $name => $value) {
+            if (in_array($name, ['node', 'media', 'commerce_product', 'taxonomy_term'])) {
+              // Replace the node/media/commerce_product key with 'entity'.
+              unset($expression[$group][$group][$key]['context_mapping'][$name]);
+              $expression[$group][$group][$key]['context_mapping']['entity'] = $value;
+              // Only add the rule label once.
+              $changed ?: $rules_updated[] = $rule->get('label');
+              $changed = TRUE;
+            }
+          }
+        }
+      }
+    }
+
+    // Replace the config value with the updated expression array.
+    if ($changed) {
+      $rule->set('expression', $expression);
+      $rule->save();
+    }
+  }
+
+  $output = empty($rules_updated) ? t('No reaction rules required updating with entity context.') :
+    \Drupal::translation()->formatPlural(count($rules_updated), '1 reaction rule updated with entity context', '@count reaction rules updated with entity context')
+    . '<br>' . implode('<br>', $rules_updated);
+  return $output;
+}
+
+/**
+ * Add date fields to any newly supported entity types, specifically Paragraphs.
+ */
+function scheduler_update_8205() {
+  return scheduler_update_8201();
+}
+
+/**
+ * Remove Scheduler fields and third_party_settings for Paragraph entity types.
+ */
+function scheduler_update_8207() {
+  // update_8206 had a typo, therefore replaced with update_8207.
+  // Check the module is enabled, to avoid 'Unknown entity type' message.
+  if (\Drupal::moduleHandler()->moduleExists('paragraphs') && ($result = \Drupal::service('scheduler.manager')->entityRevert(['paragraph']))) {
+    return t('%updated.', ['%updated' => implode(', ', $result)]);
+  }
+  else {
+    return t('No update required.');
+  }
+}
+
+/**
+ * Show/hide entity form fields to match Scheduling enabled/disabled settings.
+ */
+function scheduler_update_8208() {
+  if ($result = \Drupal::service('scheduler.manager')->resetFormDisplayFields()) {
+    return implode('</li><li>', $result);
+  }
+  else {
+    return t('No update required.');
+  }
+}
+
+/**
+ * Move lightweight_cron_access_key from config to state.
+ */
+function scheduler_update_8209() {
+  $config = \Drupal::service('config.factory')->getEditable('scheduler.settings');
+  $key = $config->get('lightweight_cron_access_key');
+  \Drupal::state()->set(SchedulerCronForm::CRON_ACCESS_KEY, $key);
+  $config->clear('lightweight_cron_access_key')->save();
+  return t('Cron access key now stored in state.');
+}

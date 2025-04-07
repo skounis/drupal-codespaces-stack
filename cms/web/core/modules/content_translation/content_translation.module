@@ -1,0 +1,191 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function content_translation_module_implements_alter(&$implementations, $hook): void {
+  switch ($hook) {
+    // Move our hook_entity_type_alter() implementation to the end of the list.
+    case 'entity_type_alter':
+      $group = $implementations['content_translation'];
+      unset($implementations['content_translation']);
+      $implementations['content_translation'] = $group;
+      break;
+
+    // Move our hook_entity_bundle_info_alter() implementation to the top of the
+    // list, so that any other hook implementation can rely on bundles being
+    // correctly marked as translatable.
+    case 'entity_bundle_info_alter':
+      $group = $implementations['content_translation'];
+      $implementations = ['content_translation' => $group] + $implementations;
+      break;
+  }
+}
+
+/**
+ * Installs Content Translation's fields for a given entity type.
+ *
+ * @param string $entity_type_id
+ *   The entity type ID.
+ *
+ * @todo Generalize this code in https://www.drupal.org/node/2346013.
+ */
+function _content_translation_install_field_storage_definitions($entity_type_id) {
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+  $field_manager = \Drupal::service('entity_field.manager');
+  /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $schema_repository */
+  $schema_repository = \Drupal::service('entity.last_installed_schema.repository');
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $field_manager->useCaches(FALSE);
+  $storage_definitions = $field_manager->getFieldStorageDefinitions($entity_type_id);
+  $field_manager->useCaches(TRUE);
+  $installed_storage_definitions = $schema_repository->getLastInstalledFieldStorageDefinitions($entity_type_id);
+  foreach (array_diff_key($storage_definitions, $installed_storage_definitions) as $storage_definition) {
+    /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition */
+    if ($storage_definition->getProvider() == 'content_translation') {
+      $definition_update_manager->installFieldStorageDefinition($storage_definition->getName(), $entity_type_id, 'content_translation', $storage_definition);
+    }
+  }
+}
+
+/**
+ * Access callback for the translation overview page.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity whose translation overview should be displayed.
+ *
+ * @return \Drupal\Core\Access\AccessResultInterface
+ *   The access result.
+ */
+function content_translation_translate_access(EntityInterface $entity) {
+  $account = \Drupal::currentUser();
+  $condition = $entity instanceof ContentEntityInterface && $entity->access('view') &&
+    !$entity->getUntranslated()->language()->isLocked() && \Drupal::languageManager()->isMultilingual() && $entity->isTranslatable() &&
+    ($account->hasPermission('create content translations') || $account->hasPermission('update content translations') || $account->hasPermission('delete content translations') ||
+    ($account->hasPermission('translate editable entities') && $entity->access('update')));
+  return AccessResult::allowedIf($condition)->cachePerPermissions()->addCacheableDependency($entity);
+}
+
+/**
+ * Returns a widget to enable content translation per entity bundle.
+ *
+ * Backward compatibility layer to support entities not using the language
+ * configuration form element.
+ *
+ * @todo Remove once all core entities have language configuration.
+ *
+ * @param string $entity_type
+ *   The type of the entity being configured for translation.
+ * @param string $bundle
+ *   The bundle of the entity being configured for translation.
+ * @param array $form
+ *   The configuration form array.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ */
+function content_translation_enable_widget($entity_type, $bundle, array &$form, FormStateInterface $form_state) {
+  $key = $form_state->get(['content_translation', 'key']);
+  $context = $form_state->get(['language', $key]) ?: [];
+  $context += ['entity_type' => $entity_type, 'bundle' => $bundle];
+  $form_state->set(['language', $key], $context);
+  $element = content_translation_language_configuration_element_process(['#name' => $key], $form_state, $form);
+  unset($element['content_translation']['#element_validate']);
+  return $element;
+}
+
+/**
+ * Process callback: Expands the language_configuration form element.
+ *
+ * @param array $element
+ *   Form API element.
+ *
+ * @return array
+ *   Processed language configuration element.
+ */
+function content_translation_language_configuration_element_process(array $element, FormStateInterface $form_state, array &$form) {
+  if (empty($element['#content_translation_skip_alter']) && \Drupal::currentUser()->hasPermission('administer content translation')) {
+    $key = $element['#name'];
+    $form_state->set(['content_translation', 'key'], $key);
+    $context = $form_state->get(['language', $key]);
+
+    $element['content_translation'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Enable translation'),
+      // For new bundle, we don't know the bundle name yet,
+      // default to no translatability.
+      '#default_value' => $context['bundle'] ? \Drupal::service('content_translation.manager')->isEnabled($context['entity_type'], $context['bundle']) : FALSE,
+      '#element_validate' => ['content_translation_language_configuration_element_validate'],
+    ];
+
+    $submit_name = isset($form['actions']['save_continue']) ? 'save_continue' : 'submit';
+    // Only add the submit handler on the submit button if the #submit property
+    // is already available, otherwise this breaks the form submit function.
+    if (isset($form['actions'][$submit_name]['#submit'])) {
+      $form['actions'][$submit_name]['#submit'][] = 'content_translation_language_configuration_element_submit';
+    }
+    else {
+      $form['#submit'][] = 'content_translation_language_configuration_element_submit';
+    }
+  }
+  return $element;
+}
+
+/**
+ * Form validation handler for element added with content_translation_language_configuration_element_process().
+ *
+ * Checks whether translation can be enabled: if language is set to one of the
+ * special languages and language selector is not hidden, translation cannot be
+ * enabled.
+ *
+ * @see content_translation_language_configuration_element_submit()
+ */
+function content_translation_language_configuration_element_validate($element, FormStateInterface $form_state, array $form) {
+  $key = $form_state->get(['content_translation', 'key']);
+  $values = $form_state->getValue($key);
+  if (!$values['language_alterable'] && $values['content_translation'] && \Drupal::languageManager()->isLanguageLocked($values['langcode'])) {
+    foreach (\Drupal::languageManager()->getLanguages(LanguageInterface::STATE_LOCKED) as $language) {
+      $locked_languages[$language->getId()] = $language->getName();
+    }
+    // @todo Set the correct form element name as soon as the element parents
+    //   are correctly set. We should be using NestedArray::getValue() but for
+    //   now we cannot.
+    $form_state->setErrorByName('', t('"Show language selector" is not compatible with translating content that has default language: %choice. Either do not hide the language selector or pick a specific language.', ['%choice' => $locked_languages[$values['langcode']]]));
+  }
+}
+
+/**
+ * Form submission handler for element added with content_translation_language_configuration_element_process().
+ *
+ * Stores the content translation settings.
+ *
+ * @see content_translation_language_configuration_element_validate()
+ */
+function content_translation_language_configuration_element_submit(array $form, FormStateInterface $form_state) {
+  $key = $form_state->get(['content_translation', 'key']);
+  $context = $form_state->get(['language', $key]);
+  $enabled = $form_state->getValue([$key, 'content_translation']);
+
+  if (\Drupal::service('content_translation.manager')->isEnabled($context['entity_type'], $context['bundle']) != $enabled) {
+    \Drupal::service('content_translation.manager')->setEnabled($context['entity_type'], $context['bundle'], $enabled);
+    \Drupal::service('router.builder')->setRebuildNeeded();
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for language-content-settings-table.html.twig.
+ */
+function content_translation_preprocess_language_content_settings_table(&$variables): void {
+  \Drupal::moduleHandler()->loadInclude('content_translation', 'inc', 'content_translation.admin');
+  _content_translation_preprocess_language_content_settings_table($variables);
+}

@@ -1,0 +1,47 @@
+services:
+  _defaults:
+    autowire: true
+
+  logger.channel.project_browser:
+    parent: logger.channel_base
+    arguments: ['project_browser']
+  Drupal\project_browser\Plugin\ProjectBrowserSourceManager:
+    parent: default_plugin_manager
+  Drupal\project_browser\EnabledSourceHandler:
+    arguments:
+      $keyValueFactory: '@keyvalue'
+    calls:
+      - [setLogger, ['@logger.channel.project_browser']]
+    tags:
+      - { name: event_subscriber }
+  cache.project_browser:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [project_browser]
+  Drupal\project_browser\ActivationManager:
+    tags:
+      - { name: service_collector, tag: project_browser.activator, call: addActivator }
+  Drupal\project_browser\Activator\ModuleActivator:
+    tags:
+      - { name: project_browser.activator }
+    public: false
+  Drupal\project_browser\Activator\RecipeActivator:
+    arguments:
+      '$appRoot': '%app.root%'
+    tags:
+      - { name: project_browser.activator }
+      - { name: event_subscriber }
+  Drupal\project_browser\Routing\ProjectEnhancer:
+    public: false
+    tags:
+      - { name: route_enhancer }
+  Drupal\project_browser\Routing\SourceConverter:
+    public: false
+    tags:
+      - { name: paramconverter }
+  Drupal\project_browser\ProjectBrowser\Normalizer: ~
+  Drupal\project_browser\InstallState:
+    arguments:
+      $keyValueFactory: '@keyvalue'

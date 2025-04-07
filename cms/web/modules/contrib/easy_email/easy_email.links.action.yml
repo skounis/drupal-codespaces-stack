@@ -1,0 +1,17 @@
+entity.easy_email.add_form:
+  route_name: entity.easy_email.add_page
+  title: 'Create new email'
+  appears_on:
+    - entity.easy_email.collection
+
+entity.easy_email_type.add_form:
+  route_name: entity.easy_email_type.add_form
+  title: 'Add email template'
+  appears_on:
+    - entity.easy_email_type.collection
+
+entity.easy_email_override.add_form:
+  route_name: entity.easy_email_override.add_form
+  title: 'Add email override'
+  appears_on:
+    - entity.easy_email_override.collection

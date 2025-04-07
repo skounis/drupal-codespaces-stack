@@ -1,0 +1,83 @@
+{
+	"country_code": "PE",
+	"subdivisions": {
+		"AMA": {
+			"name": "Amazonas"
+		},
+		"ANC": {
+			"name": "Áncash"
+		},
+		"APU": {
+			"name": "Apurímac"
+		},
+		"ARE": {
+			"name": "Arequipa"
+		},
+		"AYA": {
+			"name": "Ayacucho"
+		},
+		"CAJ": {
+			"name": "Cajamarca"
+		},
+		"CAL": {
+			"name": "Callao"
+		},
+		"CUS": {
+			"name": "Cuzco"
+		},
+		"LIM": {
+			"name": "Gobierno Regional de Lima"
+		},
+		"HUV": {
+			"name": "Huancavelica"
+		},
+		"HUC": {
+			"name": "Huánuco"
+		},
+		"ICA": {
+			"name": "Ica"
+		},
+		"JUN": {
+			"name": "Junín"
+		},
+		"LAL": {
+			"name": "La Libertad"
+		},
+		"LAM": {
+			"name": "Lambayeque"
+		},
+		"LOR": {
+			"name": "Loreto"
+		},
+		"MDD": {
+			"name": "Madre de Dios"
+		},
+		"MOQ": {
+			"name": "Moquegua"
+		},
+		"LMA": {
+			"name": "Municipalidad Metropolitana de Lima"
+		},
+		"PAS": {
+			"name": "Pasco"
+		},
+		"PIU": {
+			"name": "Piura"
+		},
+		"PUN": {
+			"name": "Puno"
+		},
+		"SAM": {
+			"name": "San Martín"
+		},
+		"TAC": {
+			"name": "Tacna"
+		},
+		"TUM": {
+			"name": "Tumbes"
+		},
+		"UCA": {
+			"name": "Ucayali"
+		}
+	}
+}

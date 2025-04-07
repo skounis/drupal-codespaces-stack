@@ -1,0 +1,519 @@
+<?php
+
+/**
+ * @file
+ * Module implementation file.
+ */
+
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Entity\ContentEntityDeleteForm;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\Form\DeleteMultipleForm;
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\PhpStorage\PhpStorageFactory;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\trash\EntityHandler\TrashNodeAccessControlHandler;
+use Drupal\trash\Form\EntityPurgeForm;
+use Drupal\trash\Form\EntityRestoreForm;
+use Drupal\trash\Handler\TrashHandlerInterface;
+use Drupal\trash\ViewsQueryAlter;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Determines whether an entity is deleted.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   An entity object.
+ *
+ * @return bool
+ *   TRUE if the entity is deleted, FALSE otherwise.
+ */
+function trash_entity_is_deleted(EntityInterface $entity): bool {
+  if (!$entity instanceof FieldableEntityInterface) {
+    return FALSE;
+  }
+
+  return $entity->getFieldDefinition('deleted')?->getFieldStorageDefinition()->getProvider() === 'trash'
+    && !$entity->get('deleted')->isEmpty();
+}
+
+/**
+ * Restores the given entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   An entity object.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ *   In case of failures, an exception is thrown.
+ */
+function trash_restore_entity(EntityInterface $entity): void {
+  if (!\Drupal::service('trash.manager')->isEntityTypeEnabled($entity->getEntityType(), $entity->bundle())) {
+    return;
+  }
+
+  $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
+  // @phpstan-ignore-next-line
+  $storage->restoreFromTrash([$entity]);
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function trash_entity_base_field_info(EntityTypeInterface $entity_type) {
+  // Add the 'deleted' base field.
+  if (\Drupal::service('trash.manager')->isEntityTypeEnabled($entity_type)) {
+    $base_field_definitions['deleted'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Deleted'))
+      ->setDescription(t('Time when the item got deleted'))
+      ->setInternal(TRUE)
+      ->setTranslatable(FALSE)
+      ->setRevisionable(TRUE);
+
+    return $base_field_definitions;
+  }
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function trash_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  $cacheability = new CacheableMetadata();
+  $cacheability->addCacheContexts(['user.permissions']);
+  $cacheability->addCacheableDependency($entity);
+
+  if (trash_entity_is_deleted($entity)) {
+    // Check if users can view, restore or purge deleted entities.
+    if ($operation === 'view' && $account->hasPermission('view deleted entities')) {
+      return AccessResult::allowed()->addCacheableDependency($cacheability);
+    }
+    elseif ($operation === 'restore' && $account->hasPermission('restore ' . $entity->getEntityTypeId() . ' entities')) {
+      return AccessResult::allowed()->addCacheableDependency($cacheability);
+    }
+    elseif ($operation === 'purge' && $account->hasPermission('purge ' . $entity->getEntityTypeId() . ' entities')) {
+      // Ensure that trashed entities can only be purged in the workspace they
+      // were created in or in Live.
+      if (\Drupal::hasService('workspaces.manager')
+        && \Drupal::service('workspaces.information')->isEntitySupported($entity)
+        && ($active_workspace = \Drupal::service('workspaces.manager')->getActiveWorkspace())
+        && !\Drupal::service('workspaces.information')->isEntityDeletable($entity, $active_workspace)
+      ) {
+        $cacheability->addCacheableDependency($active_workspace);
+        return AccessResult::forbidden()->addCacheableDependency($cacheability);
+      }
+
+      return AccessResult::allowed()->addCacheableDependency($cacheability);
+    }
+    else {
+      return AccessResult::forbidden()->addCacheableDependency($cacheability);
+    }
+  }
+
+  // If the entity is not deleted, the 'restore' and 'purge' operations should
+  // not be allowed.
+  return AccessResult::forbiddenIf($operation === 'restore' || $operation === 'purge')
+    ->addCacheableDependency($cacheability);
+}
+
+/**
+ * Implements hook_entity_query_alter().
+ */
+function trash_entity_query_alter(QueryInterface $query): void {
+  $entity_type_id = $query->getEntityTypeId();
+  /** @var \Drupal\trash\TrashManagerInterface $trash_manager */
+  $trash_manager = \Drupal::service('trash.manager');
+  if (!$trash_manager->shouldAlterQueries() || !$trash_manager->isEntityTypeEnabled($entity_type_id)) {
+    return;
+  }
+
+  $property = new \ReflectionProperty($query::class, 'condition');
+  $conditions = $property->getValue($query);
+
+  // Skip altering queries with an explicit filter on the 'deleted' field, so
+  // you can still list deleted content, if needed.
+  $deleted_key = 'deleted';
+  foreach ($conditions->conditions() as $condition) {
+    if ($condition['field'] === $deleted_key) {
+      return;
+    }
+  }
+
+  if (!$query->getMetaData('trash')) {
+    $query->addMetaData('trash', $trash_manager->getTrashContext());
+  }
+
+  if ($query->getMetaData('trash') === 'inactive') {
+    $query->exists($deleted_key);
+  }
+  else {
+    $query->notExists($deleted_key);
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter() for the 'search_node_search' tag.
+ */
+#[LegacyHook]
+function trash_query_search_node_search_alter(AlterableInterface $query) {
+  // @phpstan-ignore-next-line
+  \Drupal::service('trash.manager')->getHandler('node')?->querySearchNodeSearchAlter($query);
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function trash_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(ViewsQueryAlter::class)
+    ->alterQuery($query);
+}
+
+/**
+ * Implements hook_views_post_render().
+ */
+function trash_views_post_render(ViewExecutable $view) {
+  \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(ViewsQueryAlter::class)
+    ->postRender($view);
+}
+
+/**
+ * Generates a trash-enabled storage or storage schema class for an entity type.
+ *
+ * @param string $original_class
+ *   The entity storage class name.
+ * @param string $type
+ *   The entity storage class type, either 'storage' or 'storage_schema'.
+ *
+ * @return string
+ *   The new entity storage class name.
+ */
+function _trash_generate_storage_class($original_class, $type = 'storage') {
+  // Assert that only the supported class types are used.
+  assert($type === 'storage' || $type === 'storage_schema');
+
+  $php_storage = PhpStorageFactory::get('trash');
+  $state = \Drupal::state();
+
+  $class_suffix = $state->get('trash.class_suffix');
+  if (empty($class_suffix)) {
+    $class_suffix = uniqid();
+    $state->set('trash.class_suffix', $class_suffix);
+  }
+
+  $original_class = ltrim($original_class, '\\');
+  $trash_class = str_replace('\\', '__', $original_class) . 'Trash' . $class_suffix;
+  if (!$php_storage->exists($trash_class . '.php')) {
+    $template = ($type === 'storage') ? '@trash/TrashStorage.php.twig' : '@trash/TrashStorageSchema.php.twig';
+    $code = \Drupal::service('twig')->render($template, [
+      'trash_class' => $trash_class,
+      'original_class' => $original_class,
+    ]);
+
+    $php_storage->save($trash_class . '.php', $code);
+  }
+
+  if ($php_storage->load($trash_class . '.php')) {
+    // @todo Log a critical error when the generated class could not be loaded?
+    return $trash_class;
+  }
+
+  return $original_class;
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function trash_entity_type_alter(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  foreach ($entity_types as $entity_type_id => $entity_type) {
+    if (\Drupal::service('trash.manager')->isEntityTypeEnabled($entity_type)) {
+      if (!$entity_type->getFormClass('restore')) {
+        $entity_type->setFormClass('restore', EntityRestoreForm::class);
+      }
+      if (!$entity_type->getFormClass('purge')) {
+        $entity_type->setFormClass('purge', EntityPurgeForm::class);
+      }
+
+      // Provide link templates for the 'restore' and 'purge' routes.
+      if ($entity_type->hasLinkTemplate('canonical')) {
+        $base_path = $entity_type->getLinkTemplate('canonical');
+      }
+      else {
+        $base_path = "/admin/content/trash/$entity_type_id/{" . $entity_type_id . '}';
+      }
+      $entity_type->setLinkTemplate('restore', $base_path . '/restore');
+      $entity_type->setLinkTemplate('purge', $base_path . '/purge');
+    }
+
+    // Override node's access control handler, so we can skip the
+    // 'bypass node access' permission check if the node is deleted.
+    if ($entity_type->id() === 'node') {
+      $entity_type->setHandlerClass('access', TrashNodeAccessControlHandler::class);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function trash_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form_object = $form_state->getFormObject();
+  $is_entity_delete_form = $form_object instanceof ContentEntityDeleteForm;
+  $is_entity_multiple_delete_form = $form_object instanceof DeleteMultipleForm;
+  $is_vbo_confirm_action_form = $form_id === 'views_bulk_operations_confirm_action';
+
+  if (!($is_entity_delete_form || $is_entity_multiple_delete_form || $is_vbo_confirm_action_form)) {
+    return;
+  }
+
+  $entity_type = $bundle = $entity = NULL;
+  if ($is_entity_delete_form) {
+    assert($form_object instanceof ContentEntityDeleteForm);
+    $entity = $form_object->getEntity();
+    $entity_type = $entity->getEntityType();
+    $bundle = $entity->bundle();
+  }
+  elseif ($is_entity_multiple_delete_form) {
+    assert($form_object instanceof DeleteMultipleForm);
+    $entity_type_call = function () {
+      // @phpstan-ignore-next-line
+      return $this->entityType;
+    };
+    $entity_type = $entity_type_call->call($form_object);
+  }
+  elseif ($is_vbo_confirm_action_form) {
+    $vbo_form_data = $form_state->getStorage()['views_bulk_operations'];
+    if ($vbo_form_data['action_id'] !== 'views_bulk_operations_delete_entity') {
+      return;
+    }
+
+    // Get the first item in the VBO form data to check its entity type.
+    $first_item = reset($vbo_form_data['list']);
+    // @see \Drupal\views_bulk_operations\Form\ViewsBulkOperationsFormTrait::calculateEntityBulkFormKey()
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($first_item[2]);
+  }
+
+  if ($entity_type && !\Drupal::service('trash.manager')->isEntityTypeEnabled($entity_type, $bundle)) {
+    return;
+  }
+
+  // Change the message of the delete confirmation form to mention the actual
+  // action that is about to happen.
+  $params = [
+    '@label' => !$is_entity_delete_form ? $entity_type->getPluralLabel() : $entity_type->getSingularLabel(),
+    ':link' => Url::fromRoute('trash.admin_content_trash_entity_type', [
+      'entity_type_id' => $entity_type->id(),
+    ])->toString(),
+  ];
+
+  // Use different messages based on the user's access level.
+  if (\Drupal::currentUser()->hasPermission('restore ' . $entity_type->id() . ' entities')) {
+    $trash_settings = \Drupal::configFactory()->get('trash.settings');
+    if ($trash_settings->get('auto_purge.enabled')) {
+      $timestamp = strtotime(sprintf('+%s', $trash_settings->get('auto_purge.after')));
+      $params['@time_period'] = \Drupal::service('date.formatter')->formatDiff(\Drupal::time()->getCurrentTime(), $timestamp);
+
+      $entity_delete_label = t('Deleting this @label will move it to the <a href=":link">trash</a>. You can restore it from the trash for a limited period of time (@time_period) if necessary.', $params);
+      $entity_multiple_delete_label = t('Deleting these @label will move them to the <a href=":link">trash</a>. You can restore them from the trash for a limited period of time (@time_period) if necessary.', $params);
+    }
+    else {
+      $entity_delete_label = t('Deleting this @label will move it to the <a href=":link">trash</a>. You can restore it from the trash at a later date if necessary.', $params);
+      $entity_multiple_delete_label = t('Deleting these @label will move them to the <a href=":link">trash</a>. You can restore them from the trash at a later date if necessary.', $params);
+    }
+  }
+  elseif (\Drupal::currentUser()->hasPermission('access trash')) {
+    $entity_delete_label = t('Deleting this @label will move it to the <a href=":link">trash</a>.', $params);
+    $entity_multiple_delete_label = t('Deleting these @label will move them to the <a href=":link">trash</a>.', $params);
+  }
+  else {
+    $entity_delete_label = t('Deleting this @label will move it to the trash.', $params);
+    $entity_multiple_delete_label = t('Deleting these @label will move them to the trash.', $params);
+  }
+
+  // Prevent deleting individual translations.
+  // @todo Remove this after https://www.drupal.org/i/3376216 is fixed.
+  if ($is_entity_delete_form && $entity instanceof TranslatableInterface && $entity->isTranslatable() && !$entity->isDefaultTranslation()) {
+    $entity_delete_label = t('Deleting a translation of a @label is currently not supported by Trash. Unpublish the translation instead.', $params);
+    $form['actions']['submit']['#access'] = FALSE;
+  }
+  elseif ($is_entity_multiple_delete_form && $entity_type->isTranslatable()) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type->id());
+
+    $can_delete = TRUE;
+    foreach (array_keys($form['entities']['#items'] ?? []) as $item) {
+      [$id, $langcode] = explode(':', $item, 2);
+
+      // All entities have been loaded already in the static cache by the
+      // delete multiple form, so it's ok to single-load them again.
+      $entity = $storage->load($id);
+      assert($entity instanceof TranslatableInterface);
+
+      // Deleting the default translation is considered the same as deleting
+      // the entire entity. When all translations are selected, only the
+      // default langcode will show up in the selections.
+      if (!$entity->getTranslation($langcode)->isDefaultTranslation()) {
+        // If any of the selected translations are not the default translation
+        // of the entity, the multiple deletion can not proceed.
+        $can_delete = FALSE;
+        break;
+      }
+    }
+
+    if (!$can_delete) {
+      $entity_multiple_delete_label = t('Deleting translations of @label is currently not supported by Trash. Unpublish the translations instead.', $params);
+      $form['actions']['submit']['#access'] = FALSE;
+    }
+  }
+
+  $trash_handler = \Drupal::service('trash.manager')->getHandler($entity_type->id());
+  assert($trash_handler instanceof TrashHandlerInterface);
+  if (isset($form['description']['#markup']) && $form['description']['#markup'] instanceof TranslatableMarkup) {
+    if ($form['description']['#markup']->getUntranslatedString() === 'This action cannot be undone.') {
+      if ($is_entity_delete_form) {
+        $form['description']['#markup'] = $entity_delete_label;
+        $trash_handler->deleteFormAlter($form, $form_state);
+      }
+      elseif ($is_entity_multiple_delete_form) {
+        $form['description']['#markup'] = $entity_multiple_delete_label;
+        $trash_handler->deleteFormAlter($form, $form_state, TRUE);
+      }
+    }
+  }
+  elseif ($is_vbo_confirm_action_form) {
+    $form['description'] = [
+      '#markup' => $entity_multiple_delete_label,
+      '#weight' => -10,
+    ];
+    $trash_handler->deleteFormAlter($form, $form_state, TRUE);
+  }
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function trash_entity_operation_alter(array &$operations, EntityInterface $entity): void {
+  // Skip access checks for non-deleted entities.
+  if (!trash_entity_is_deleted($entity)) {
+    return;
+  }
+
+  // Remove all other operations for deleted entities.
+  $operations = [];
+  if ($entity->access('restore')) {
+    $url_options['attributes']['aria-label'] = t('Restore @label', [
+      '@label' => $entity->label() ?? $entity->id(),
+    ]);
+
+    $operations['restore'] = [
+      'title' => t('Restore'),
+      'url' => $entity->toUrl('restore')->mergeOptions($url_options),
+      'weight' => 0,
+      'attributes' => [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode([
+          'width' => 880,
+        ]),
+      ],
+    ];
+  }
+  if ($entity->access('purge')) {
+    $url_options['attributes']['aria-label'] = t('Purge @label', [
+      '@label' => $entity->label() ?? $entity->id(),
+    ]);
+
+    $operations['purge'] = [
+      'title' => t('Purge'),
+      'url' => $entity->toUrl('purge')->mergeOptions($url_options),
+      'weight' => 5,
+      'attributes' => [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode([
+          'width' => 880,
+        ]),
+      ],
+    ];
+  }
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function trash_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  if ($entity->getEntityTypeId() === 'workspace') {
+    /** @var \Drupal\trash\TrashManagerInterface $trash_manager */
+    $trash_manager = \Drupal::service('trash.manager');
+    foreach (Element::children($build['changes']['list']) as $key) {
+      $tracked_entity = $build['changes']['list'][$key]['#entity'];
+      if ($trash_manager->isEntityTypeEnabled($tracked_entity->getEntityType(), $tracked_entity->bundle()) && trash_entity_is_deleted($tracked_entity)) {
+        // Highlight deleted entities in the workspace changes page.
+        $build['changes']['list'][$key]['#attributes']['style'] = 'color: #a51b00; background-color: #fcf4f2;';
+      }
+    }
+  }
+
+  if (trash_entity_is_deleted($entity)) {
+    $build['#attributes']['class'][] = 'is-deleted';
+    $build['#attached']['library'][] = 'trash/trash';
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function trash_cron() {
+  \Drupal::service('trash.entity_purger')->cronPurge();
+}
+
+/**
+ * Implements hook_menu_links_discovered_alter().
+ */
+function trash_menu_links_discovered_alter(&$links): void {
+  $links['navigation.trash'] = [
+    'route_name' => 'trash.admin_content_trash',
+    'title' => t('Trash'),
+    'menu_name' => 'content',
+    'provider' => 'navigation',
+    'weight' => 1000,
+  ];
+}
+
+/**
+ * Implements hook_page_top().
+ */
+function trash_page_top(array &$page_top): void {
+  if (\Drupal::moduleHandler()->moduleExists('navigation')) {
+    $page_top['#attached']['library'][] = 'trash/trash';
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function trash_modules_installed($modules, $is_syncing) {
+  if (!$is_syncing && (
+    in_array('node', $modules, TRUE) ||
+    (in_array('trash', $modules, TRUE) && \Drupal::moduleHandler()->moduleExists('node'))
+  )) {
+    $trash_settings = \Drupal::configFactory()->getEditable('trash.settings');
+    $enabled_entity_types = $trash_settings->get('enabled_entity_types');
+    $enabled_entity_types['node'] = [];
+    $trash_settings->set('enabled_entity_types', $enabled_entity_types)->save();
+  }
+}

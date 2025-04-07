@@ -1,0 +1,20 @@
+{
+  "name": "drupal/ai_image_alt_text",
+  "description": "Allows the possibility to set an alt text using AI.",
+  "type": "drupal-module",
+  "keywords": [
+    "Drupal"
+  ],
+  "authors": [
+    {
+      "name": "DXPR",
+      "homepage": "https://dxpr.com",
+      "role": "Maintainer"
+    }
+  ],
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^10.2 || ^11",
+    "drupal/ai": "^1.0.0"
+  }
+}

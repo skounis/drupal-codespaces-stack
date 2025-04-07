@@ -1,0 +1,238 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Template\Attribute;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
+use Drupal\media\MediaTypeInterface;
+
+/**
+ * Prepares variables for the media library modal dialog.
+ *
+ * Default template: media-library-wrapper.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used: #menu, #content.
+ */
+function template_preprocess_media_library_wrapper(array &$variables): void {
+  $variables['menu'] = &$variables['element']['menu'];
+  $variables['content'] = &$variables['element']['content'];
+}
+
+/**
+ * Prepares variables for a selected media item.
+ *
+ * Default template: media-library-item.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties and children of
+ *     the element.
+ */
+function template_preprocess_media_library_item(array &$variables): void {
+  $element = &$variables['element'];
+  foreach (Element::children($element) as $key) {
+    $variables['content'][$key] = $element[$key];
+  }
+}
+
+/**
+ * Implements hook_preprocess_media().
+ */
+function media_library_preprocess_media(&$variables): void {
+  if ($variables['view_mode'] === 'media_library') {
+    /** @var \Drupal\media\MediaInterface $media */
+    $media = $variables['media'];
+    $variables['#cache']['contexts'][] = 'user.permissions';
+    $rel = $media->access('edit') ? 'edit-form' : 'canonical';
+    $variables['url'] = $media->toUrl($rel, [
+      'language' => $media->language(),
+    ]);
+    $variables += [
+      'preview_attributes' => new Attribute(),
+      'metadata_attributes' => new Attribute(),
+    ];
+    $variables['status'] = $media->isPublished();
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view() for the 'media_library' view.
+ */
+function media_library_preprocess_views_view__media_library(array &$variables): void {
+  $variables['attributes']['data-view-display-id'] = $variables['view']->current_display;
+}
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ */
+function media_library_preprocess_views_view_fields(&$variables): void {
+  // Add classes to media rendered entity field so it can be targeted for
+  // JavaScript mouseover and click events.
+  if ($variables['view']->id() === 'media_library' && isset($variables['fields']['rendered_entity'])) {
+    if (isset($variables['fields']['rendered_entity']->wrapper_attributes)) {
+      $variables['fields']['rendered_entity']->wrapper_attributes->addClass('js-click-to-select-trigger');
+    }
+  }
+}
+
+/**
+ * Alter the bulk form to add a more accessible label.
+ *
+ * @param array $form
+ *   An associative array containing the structure of the form.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ *
+ * @todo Remove in https://www.drupal.org/node/2983454
+ */
+function media_library_form_views_form_media_library_page_alter(array &$form, FormStateInterface $form_state): void {
+  if (isset($form['media_bulk_form']) && isset($form['output'])) {
+    /** @var \Drupal\views\ViewExecutable $view */
+    $view = $form['output'][0]['#view'];
+    foreach (Element::getVisibleChildren($form['media_bulk_form']) as $key) {
+      if (isset($view->result[$key])) {
+        $media = $view->field['media_bulk_form']->getEntity($view->result[$key]);
+        $form['media_bulk_form'][$key]['#title'] = $media ? t('Select @label', ['@label' => $media->label()]) : '';
+      }
+    }
+  }
+}
+
+/**
+ * Form #after_build callback for media_library view's exposed filters form.
+ */
+function _media_library_views_form_media_library_after_build(array $form, FormStateInterface $form_state) {
+  // Remove .form-actions from the view's exposed filter actions. This prevents
+  // the "Apply filters" submit button from being moved into the dialog's
+  // button area.
+  // @see \Drupal\Core\Render\Element\Actions::processActions
+  // @see Drupal.behaviors.dialog.prepareDialogButtons
+  // @todo Remove this after
+  //   https://www.drupal.org/project/drupal/issues/3089751 is fixed.
+  if (($key = array_search('form-actions', $form['actions']['#attributes']['class'])) !== FALSE) {
+    unset($form['actions']['#attributes']['class'][$key]);
+  }
+  return $form;
+}
+
+/**
+ * Submit callback for media type form.
+ */
+function _media_library_media_type_form_submit(array &$form, FormStateInterface $form_state) {
+  $form_object = $form_state->getFormObject();
+  if ($form_object->getOperation() === 'add') {
+    $type = $form_object->getEntity();
+    $form_display_created = _media_library_configure_form_display($type);
+    $view_display_created = _media_library_configure_view_display($type);
+    if ($form_display_created || $view_display_created) {
+      \Drupal::messenger()->addStatus(t('Media Library form and view displays have been created for the %type media type.', [
+        '%type' => $type->label(),
+      ]));
+    }
+  }
+}
+
+/**
+ * Ensures that the given media type has a media_library form display.
+ *
+ * @param \Drupal\media\MediaTypeInterface $type
+ *   The media type to configure.
+ *
+ * @return bool
+ *   Whether a form display has been created or not.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _media_library_configure_form_display(MediaTypeInterface $type) {
+  $display = EntityFormDisplay::load('media.' . $type->id() . '.media_library');
+
+  if ($display) {
+    return FALSE;
+  }
+
+  $values = [
+    'targetEntityType' => 'media',
+    'bundle' => $type->id(),
+    'mode' => 'media_library',
+    'status' => TRUE,
+  ];
+  $display = EntityFormDisplay::create($values);
+  // Remove all default components.
+  foreach (array_keys($display->getComponents()) as $name) {
+    $display->removeComponent($name);
+  }
+  // Expose the name field when it is not mapped.
+  if (!in_array('name', $type->getFieldMap(), TRUE)) {
+    $display->setComponent('name', [
+      'type' => 'string_textfield',
+      'settings' => [
+        'size' => 60,
+      ],
+    ]);
+  }
+  // If the source field is an image field, expose it so that users can set alt
+  // and title text.
+  $source_field = $type->getSource()->getSourceFieldDefinition($type);
+  if ($source_field->isDisplayConfigurable('form') && is_a($source_field->getItemDefinition()->getClass(), ImageItem::class, TRUE)) {
+    $type->getSource()->prepareFormDisplay($type, $display);
+  }
+  return (bool) $display->save();
+}
+
+/**
+ * Ensures that the given media type has a media_library view display.
+ *
+ * @param \Drupal\media\MediaTypeInterface $type
+ *   The media type to configure.
+ *
+ * @return bool
+ *   Whether a view display has been created or not.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _media_library_configure_view_display(MediaTypeInterface $type) {
+  $display = EntityViewDisplay::load('media.' . $type->id() . '.media_library');
+
+  if ($display) {
+    return FALSE;
+  }
+
+  $values = [
+    'targetEntityType' => 'media',
+    'bundle' => $type->id(),
+    'mode' => 'media_library',
+    'status' => TRUE,
+  ];
+  $display = EntityViewDisplay::create($values);
+  // Remove all default components.
+  foreach (array_keys($display->getComponents()) as $name) {
+    $display->removeComponent($name);
+  }
+
+  // @todo Remove dependency on 'medium' and 'thumbnail' image styles from
+  //   media and media library modules.
+  //   https://www.drupal.org/project/drupal/issues/3030437
+  $image_style = ImageStyle::load('medium');
+
+  // Expose the thumbnail component. If the medium image style doesn't exist,
+  // use the fallback 'media_library' image style.
+  $display->setComponent('thumbnail', [
+    'type' => 'image',
+    'label' => 'hidden',
+    'settings' => [
+      'image_style' => $image_style ? $image_style->id() : 'media_library',
+      'image_link' => '',
+    ],
+  ]);
+  return (bool) $display->save();
+}

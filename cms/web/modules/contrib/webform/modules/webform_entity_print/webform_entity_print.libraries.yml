@@ -1,0 +1,4 @@
+webform_entity_print:
+  css:
+    theme:
+      css/webform_entity_print.css: { }

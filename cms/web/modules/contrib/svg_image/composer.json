@@ -1,0 +1,26 @@
+{
+    "name": "drupal/svg_image",
+    "description": "Overrides the standard image formatter and widget to support SVG files.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "homepage": "https://drupal.org/project/svg_image",
+    "authors": [
+        {
+            "name": "Yaroslav Lushnikov",
+            "homepage": "https://www.drupal.org/u/imyaro",
+            "role": "Maintainer"
+        },
+        {
+            "name": "See contributors",
+            "homepage": "https://www.drupal.org/node/2887125/committers"
+        }
+    ],
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/svg_image",
+        "source": "https://git.drupalcode.org/project/svg_image"
+    },
+    "require": {
+        "enshrined/svg-sanitize": ">=0.15 <1.0"
+    }
+}

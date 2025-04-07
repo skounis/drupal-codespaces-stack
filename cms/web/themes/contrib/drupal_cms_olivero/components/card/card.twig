@@ -1,0 +1,40 @@
+<article{{ attributes.addClass('card', not image ? 'card--no-image') }}>
+  <div class="card__inner">
+    {% if image %}
+      <div class="card__image">
+        <img loading="lazy" src="{{ image.src }}" alt="{{ image.alt }}">
+      </div>
+    {% endif %}
+    <div class="card__content">
+      <header class="card__header">
+        {% if pretitle %}
+          <div class="card__pretitle">
+            {{ pretitle }}
+          </div>
+        {% endif %}
+        <h3 class="card__title">
+          {% if link_url %}
+            <a href="{{ link_url }}">{{ title }}</a>
+          {% else %}
+            {{ title }}
+          {% endif %}
+        </h3>
+        {% if subtitle %}
+          <div class="card__subtitle">
+            {{ subtitle}}
+          </div>
+        {% endif %}
+      </header>
+      <div class="card__lower">
+        {% if summary %}
+          <div class="card__summary">
+            {{ summary }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% if link_url %}
+      <div class="card__cta-icon button button--primary"></div>
+    {% endif %}
+  </div>
+</article>

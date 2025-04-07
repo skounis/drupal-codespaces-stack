@@ -1,0 +1,4 @@
+This product includes MIT licensed software developed at
+- https://github.com/bpmn-io/bpmn-js
+- https://github.com/bpmn-io/bpmn-js-properties-panel
+- https://github.com/camunda/camunda-bpmn-moddle

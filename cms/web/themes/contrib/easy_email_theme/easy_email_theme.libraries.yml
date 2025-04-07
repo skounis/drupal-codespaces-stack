@@ -1,0 +1,14 @@
+symfony_mailer_lite:
+  css:
+    theme:
+      css/style.css: {}
+
+email:
+  css:
+    theme:
+      css/style.css: {}
+
+style-tag-styles:
+  css:
+    theme:
+      css/style-tag-styles.css: {}

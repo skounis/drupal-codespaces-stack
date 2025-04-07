@@ -1,0 +1,43 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    The user is trying to create a webform. We need the following data from the
+    descriptions or comments to be able to help them:
+      - The name of the webform
+      - The form elements that the webform should have
+      - What internal link the webform should be on
+
+    If something of the above is missing, we need to ask questions about it.
+    Please make sure to read through the comments, since the data might be there.
+
+    Try to figure out the form elements from the description and comment context.
+    Don't ask unless really really necessary. If the person
+    asks for a typical contact form, you can assume they want a name, email and
+    message field. If they ask for a newsletter sign up, you can assume they want
+    an email field. If the ask for a questionnaire you can assume they want a radio
+    element of 1-5 with different questions etc.
+
+    For the form elements, if you almost understood the context, you can also
+    give back suggestions of form elements that you will create and ask if that is
+    correct. If the person says yes, you can create the form elements.
+
+    The link needs to be stated in the description or comments, otherwise ask for it.
+  possible_actions:
+    question: A question to ask the person trying to create the webform
+    no_questions: A statement to make if no questions are needed
+  formats:
+    - action: action id from list
+      question: If its a question, then the question to ask.
+  one_shot_learning_examples:
+    - action: question
+      question: What is the name of the webform you want to create?
+    - action: question
+      question: I'm not sure what form elements you want me create?
+    - action: question
+      question: Would the following question fit - "What flavour of ice cream do you like?"
+    - action: question
+      question: Should I add a email field?
+    - action: no_questions
+      question: ""

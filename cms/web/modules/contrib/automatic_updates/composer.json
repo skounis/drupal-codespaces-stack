@@ -1,0 +1,50 @@
+{
+    "name": "drupal/automatic_updates",
+    "type": "drupal-module",
+    "description": "Drupal Automatic Updates",
+    "keywords": [
+        "Drupal"
+    ],
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/automatic_updates",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/automatic_updates",
+        "source": "http://cgit.drupalcode.org/automatic_updates"
+    },
+    "require": {
+        "ext-json": "*",
+        "php-tuf/composer-stager": "^2-rc5",
+        "composer-runtime-api": "^2.1",
+        "symfony/console": "^6.2 || ^7"
+    },
+    "require-dev": {
+        "colinodell/psr-testlogger": "^1.2"
+    },
+    "conflict": {
+        "php-tuf/composer-integration": "<1-alpha11"
+    },
+    "scripts": {
+        "phpcbf": "scripts/phpcbf.sh",
+        "phpcs": "scripts/phpcs.sh",
+        "test": [
+            "Composer\\Config::disableProcessTimeout",
+            "scripts/phpunit.sh"
+        ],
+        "core-convert": "Drupal\\automatic_updates\\Development\\ConverterCommand",
+        "core-commit": "Drupal\\automatic_updates\\Development\\ConverterCommand::makeCommit"
+    },
+    "scripts-descriptions": {
+        "phpcbf": "Automatically fixes standards violations where possible.",
+        "phpcs": "Checks code for standards compliance.",
+        "test": "Runs PHPUnit tests.",
+        "core-convert": "Converts this module to a core merge request. For arguments and options see \\Drupal\\automatic_updates\\Development\\ConverterCommand::configure().",
+        "core-commit": "Converts this module to a core merge request. Excepts 1 arguments. The core clone directory."
+    },
+    "autoload": {
+        "psr-4": {
+            "Drupal\\automatic_updates\\Development\\": "scripts/src"
+        }
+    },
+    "bin": ["auto-update"]
+}

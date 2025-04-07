@@ -1,0 +1,10 @@
+name: 'Date Augmenter API'
+type: module
+description: 'Provides a plugin class for augmenting the display of dates and times.'
+core_version_requirement: ^9 || ^10 || ^11
+package: 'Date Augmenter'
+
+# Information added by Drupal.org packaging script on 2024-04-17
+version: '1.1.1'
+project: 'date_augmenter'
+datestamp: 1713350951

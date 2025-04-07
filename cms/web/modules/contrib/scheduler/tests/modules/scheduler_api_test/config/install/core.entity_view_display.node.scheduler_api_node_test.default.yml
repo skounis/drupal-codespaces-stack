@@ -1,0 +1,40 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.scheduler_api_node_test.field_approved_publishing
+    - field.field.node.scheduler_api_node_test.field_approved_unpublishing
+    - node.type.scheduler_api_node_test
+  module:
+    - user
+id: node.scheduler_api_node_test.default
+targetEntityType: node
+bundle: scheduler_api_node_test
+mode: default
+content:
+  field_approved_publishing:
+    type: boolean
+    weight: 1
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    region: content
+  field_approved_unpublishing:
+    type: boolean
+    weight: 2
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

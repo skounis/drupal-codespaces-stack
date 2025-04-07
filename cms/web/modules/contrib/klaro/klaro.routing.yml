@@ -1,0 +1,19 @@
+klaro.admin:
+  path: '/admin/config/user-interface/klaro'
+  defaults:
+    _form: '\Drupal\klaro\Form\SettingsForm'
+    _title: 'Klaro! settings'
+  requirements:
+    _permission: 'administer klaro'
+  options:
+    _admin_route: TRUE
+
+klaro.admin.texts:
+  path: '/admin/config/user-interface/klaro/texts'
+  defaults:
+    _form: '\Drupal\klaro\Form\TextSettingsForm'
+    _title: 'Text Settings'
+  requirements:
+    _permission: 'administer klaro'
+  options:
+    _admin_route: TRUE

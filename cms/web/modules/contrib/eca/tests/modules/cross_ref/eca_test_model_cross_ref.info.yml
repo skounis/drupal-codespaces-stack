@@ -1,0 +1,21 @@
+name: 'ECA model test: Cross references'
+type: module
+description: 'Support module for the ECA model tests.'
+package: Testing
+dependencies:
+  - eca:eca_base
+  - eca:eca_content
+
+config_devel:
+  - eca.eca.eca_test_0001
+  - eca.model.eca_test_0001
+  - field.field.node.type_1.field_other_node
+  - field.field.node.type_2.field_other_node
+  - field.storage.node.field_other_node
+  - node.type.type_1
+  - node.type.type_2
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

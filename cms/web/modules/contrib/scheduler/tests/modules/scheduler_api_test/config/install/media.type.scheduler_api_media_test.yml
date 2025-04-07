@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - scheduler
+  enforced:
+    module:
+      - scheduler_api_test
+third_party_settings:
+  scheduler:
+    expand_fieldset: always
+    fields_display_mode: fieldset
+    publish_enable: true
+    publish_past_date: schedule
+    publish_past_date_created: false
+    publish_required: false
+    publish_revision: false
+    publish_touch: false
+    show_message_after_update: true
+    unpublish_enable: true
+    unpublish_required: false
+    unpublish_revision: false
+id: scheduler_api_media_test
+label: 'Scheduler API Media Test'
+description: 'Image media type used in Scheduler API testing'
+source: image
+queue_thumbnail_downloads: false
+new_revision: false
+source_configuration:
+  source_field: field_media_image_api
+field_map:
+  name: name

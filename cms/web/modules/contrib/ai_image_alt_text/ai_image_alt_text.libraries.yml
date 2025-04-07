@@ -1,0 +1,12 @@
+alt_text:
+  js:
+    js/ai_image_alt_text.js: {}
+  css:
+    theme:
+      css/ai_image_alt_text.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal
+    - file/drupal.file
+    - core/drupal.ajax

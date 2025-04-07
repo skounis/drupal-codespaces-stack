@@ -1,0 +1,15 @@
+services:
+  plugin.manager.easy_email_override:
+    class: Drupal\easy_email_override\Service\DeclaredEmailManager
+    arguments: ['@module_handler', '@cache.discovery']
+  easy_email_override.mail_manager_decorator:
+    class: Drupal\easy_email_override\Service\MailManager
+    decorates: plugin.manager.mail
+    decoration_priority: 1
+    arguments: ['@easy_email_override.mail_manager_decorator.inner', '@container.namespaces', '@module_handler', '@renderer', '@entity_type.manager', '@config.factory']
+  Drupal\easy_email_override\Hook\EntityHooks:
+    class: Drupal\easy_email_override\Hook\EntityHooks
+    autowire: true
+  Drupal\easy_email_override\Hook\FormAlter:
+    class: Drupal\easy_email_override\Hook\FormAlter
+    autowire: true

@@ -1,0 +1,27 @@
+name: 'ECA model test: Set field value'
+type: module
+description: 'Support module for the ECA model tests.'
+package: Testing
+dependencies:
+  - drupal:node
+  - drupal:taxonomy
+  - eca:eca_base
+  - eca:eca_content
+
+config_devel:
+  - eca.eca.eca_test_0009
+  - eca.model.eca_test_0009
+  - field.field.node.type_set_field_value.field_term
+  - field.field.node.type_set_field_value.field_terms
+  - field.field.node.type_set_field_value.field_text_line
+  - field.field.node.type_set_field_value.field_text_lines
+  - field.storage.node.field_term
+  - field.storage.node.field_terms
+  - field.storage.node.field_text_line
+  - field.storage.node.field_text_lines
+  - node.type.type_set_field_value
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

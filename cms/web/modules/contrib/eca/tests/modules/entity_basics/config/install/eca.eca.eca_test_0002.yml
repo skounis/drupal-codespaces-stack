@@ -1,0 +1,131 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_base
+    - eca_content
+    - eca_user
+id: eca_test_0002
+modeller: bpmn_io
+label: 'Entity Events Part 1'
+version: v1
+weight: null
+events:
+  Event_0wm7ta0:
+    plugin: 'content_entity:presave'
+    label: Pre-save
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_1do22d1
+        condition: ''
+  Event_0sr0xl6:
+    plugin: 'content_entity:custom'
+    label: C1
+    configuration:
+      event_id: C1
+    successors:
+      -
+        id: Activity_1sh3bdl
+        condition: ''
+  Event_1l6ov1l:
+    plugin: 'user:set_user'
+    label: 'Set current user'
+    configuration: {  }
+    successors:
+      -
+        id: Activity_1p5hvp4
+        condition: ''
+  Event_0n1zpul:
+    plugin: 'eca_base:eca_custom'
+    label: Cplain
+    configuration:
+      event_id: ''
+    successors:
+      -
+        id: Activity_1gguvde
+        condition: ''
+conditions: {  }
+gateways: {  }
+actions:
+  Activity_1do22d1:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Message 0: [entity:title]'
+    successors:
+      -
+        id: Activity_03j3ob6
+        condition: ''
+      -
+        id: Activity_1k70gka
+        condition: ''
+      -
+        id: Activity_150pgta
+        condition: ''
+      -
+        id: Activity_00ca469
+        condition: ''
+  Activity_03j3ob6:
+    plugin: eca_trigger_content_entity_custom_event
+    label: 'Trigger C1'
+    configuration:
+      event_id: C1
+      tokens: ''
+      object: ''
+    successors: {  }
+  Activity_1k70gka:
+    plugin: eca_trigger_content_entity_custom_event
+    label: 'Trigger C2'
+    configuration:
+      event_id: C2
+      tokens: ''
+      object: ''
+    successors: {  }
+  Activity_150pgta:
+    plugin: eca_token_load_user_current
+    label: 'Load current user'
+    configuration:
+      token_name: user
+    successors:
+      -
+        id: Activity_1acmymx
+        condition: ''
+  Activity_1acmymx:
+    plugin: eca_trigger_content_entity_custom_event
+    label: 'Trigger C3'
+    configuration:
+      event_id: C3
+      tokens: ''
+      object: user
+    successors: {  }
+  Activity_1sh3bdl:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Message 1: [entity:title]'
+    successors: {  }
+  Activity_1p5hvp4:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Message set current user: [entity:title]'
+    successors: {  }
+  Activity_1gguvde:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Message without event: [entity:title]'
+    successors: {  }
+  Activity_00ca469:
+    plugin: eca_trigger_custom_event
+    label: 'Trigger Cplain'
+    configuration:
+      event_id: Cplain
+      tokens: ''
+    successors: {  }

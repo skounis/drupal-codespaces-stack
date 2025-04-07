@@ -1,0 +1,14 @@
+h2.block__title {
+  letter-spacing: -0.01em;
+  font-size: 1.5rem;
+  line-height: var(--sp2);
+  color: var(--color--black);
+  padding-left: 36px;
+  border-left: 6px solid var(--color--primary-50);
+
+  @media (min-width: 43.75rem) {
+    font-size: 2.25rem;
+    line-height: var(--sp3);
+    margin-block-end: var(--sp2);
+  }
+}

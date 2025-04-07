@@ -1,0 +1,8 @@
+{
+  "name": "goalgorilla/rtseo.js",
+  "type": "drupal-library",
+  "version": "2.1.0",
+  "description": "Text analysis application for use with the Real-Time SEO Drupal module.",
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/goalgorilla/RTSEO.js"
+}

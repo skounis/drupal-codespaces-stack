@@ -1,0 +1,59 @@
+ckeditor5.plugin.ai_ckeditor_ai:
+  type: mapping
+  label: AI CKEditor configuration
+  mapping:
+    dialog:
+      type: mapping
+      label: 'Dialog options'
+      mapping:
+        autoresize:
+          type: string
+          label: 'The CSS value at which auto resize in the modal should be triggered.'
+        height:
+          type: string
+          label: 'A pixel or percent value of what the height of the modal should be.'
+        width:
+          type: string
+          label: 'A pixel or percent value of what the width of the modal should be.'
+        dialog_class:
+          type: string
+          label: 'A CSS class to apply to the modal dialog.'
+    plugins:
+      type: sequence
+      label: 'Plugins'
+      orderby: key
+      sequence:
+        type: ckeditor5.plugin.ai_ckeditor_ai.[%key]
+ai_ckeditor.settings:
+  type: mapping
+  label: 'AI Ckeditor Settings'
+  mapping:
+    _core:
+      type: mapping
+      label: 'Core settings'
+      mapping:
+        default_config_hash:
+          type: string
+          label: 'The default configuration hash to use for the editor.'
+    prompts:
+      type: mapping
+      label: 'Prompts settings'
+      mapping:
+        complete:
+          type: string
+          label: 'Completion prompt'
+        reformat:
+          type: text
+          label: 'Reformat prompt'
+        spellfix:
+          type: text
+          label: 'Spellfix prompt'
+        summarise:
+          type: text
+          label: 'Summarize prompt'
+        tone:
+          type: text
+          label: 'Tone adjustment prompt'
+        translate:
+          type: text
+          label: 'Translate prompt'

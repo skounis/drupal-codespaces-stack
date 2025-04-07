@@ -1,0 +1,139 @@
+.klaro {
+  a,
+  label.cm-list-label {
+    display: inline-block;
+    min-height: 24px;
+    cursor: pointer;
+  }
+  input:disabled + label.cm-list-label {
+    cursor: not-allowed;
+  }
+
+  a:focus {
+    outline: revert;
+  }
+  label.cm-list-label {
+    padding-inline-start: unset;
+  }
+}
+
+.klaro_toggle_dialog {
+  position: fixed;
+  z-index: 99;
+  right: 25px;
+  bottom: 25px;
+  width: 35px;
+  height: 35px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  border: 1px solid #eaeaea;
+  border-radius: 20px;
+  background: white;
+  background-image: url(../icons/privacy.svg);
+  background-size: contain;
+  -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+}
+.klaro_toggle_dialog:focus {
+  transform: scale(1.2);
+}
+
+.klaro .context-notice p.cm-dialog-link {
+  margin-top: 6px;
+}
+
+.klaro.learn-more-as-button
+  .cookie-notice:not(.cookie-modal-notice)
+  a.cm-link.cn-learn-more {
+  flex-grow: unset;
+  min-height: 24px;
+  margin-right: auto;
+  padding: 0.4em;
+  cursor: pointer;
+  text-align: center;
+  color: #fff;
+  color: var(--button-text-color, #fff);
+  border-style: none;
+  border-radius: var(--border-radius, 4px);
+  background-color: #5c5c5c;
+  background-color: var(--dark2, #5c5c5c);
+  font-size: 1em;
+  line-height: 1.125rem;
+}
+
+.klaro.hide-consent-dialog-title h2#id-cookie-title {
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+  word-wrap: normal;
+}
+
+.klaro-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 25px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--light1, #fafafa);
+  border: none;
+  background: none;
+  &::after {
+    content: "\00d7";
+    font-size: 2em;
+  }
+}
+
+.klaro.klaro-close-enabled p#id-cookie-notice {
+  margin-right: 1em;
+}
+
+.klaro .cookie-modal .cm-modal .hide {
+  min-height: 24px;
+}
+.klaro .cookie-modal .cm-modal .hide:active,
+.klaro .cookie-modal .cm-modal .hide:focus {
+  outline: auto;
+}
+
+.klaro .cookie-modal .cm-list-input:focus + .cm-list-label .slider,
+.klaro .context-notice .cm-list-input:focus + .cm-list-label .slider,
+.klaro .cookie-notice .cm-list-input:focus + .cm-list-label .slider {
+  outline: auto;
+}
+
+@media (prefers-contrast: more) {
+  .klaro {
+    --klaro-button-focus-outline: 2px dotted #fff !important;
+    --klaro-button-focus-outline-offset: 2px !important;
+
+    .cookie-modal,
+    .cm-modal,
+    .context-notice,
+    .cookie-notice {
+      border: 1px solid #fff;
+      .cm-list-label .slider {
+        border: 2px solid #fff;
+        &::before {
+          box-sizing: border-box;
+          border: 4px solid #fff;
+        }
+      }
+      a:focus,
+      button:focus {
+        outline: 1px dotted #fff;
+      }
+    }
+    .cookie-modal .cm-modal .hide svg {
+      stroke: #fff;
+    }
+  }
+  .klaro_toggle_dialog {
+    background-image: url(../icons/privacy-white.svg);
+  }
+}

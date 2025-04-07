@@ -1,0 +1,10 @@
+{
+    "name": "drupal/drupal_cms_olivero",
+    "description": "A variant of the Olivero front-end theme, optimized for Drupal CMS.",
+    "type": "drupal-theme",
+    "license": ["GPL-2.0-or-later"],
+    "require": {
+        "drupal/core": "^11"
+    },
+    "version": "1.1.0"
+}

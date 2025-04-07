@@ -1,0 +1,13 @@
+name: 'Webform Entity Print (PDF)'
+type: module
+description: 'Provides Entity Print (PDF) integration and allows site builders to download, export, and email PDF copies of webform submissions.'
+package: Webform
+core_version_requirement: ^10.3 || ^11.0
+dependencies:
+  - 'webform:webform'
+  - 'entity_print:entity_print'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

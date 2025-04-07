@@ -1,0 +1,11 @@
+name: 'Automatic Updates Test API'
+description: 'Provides API endpoints for doing stage operations in functional tests.'
+type: module
+package: Testing
+dependencies:
+  - automatic_updates:package_manager_test_api
+
+# Information added by Drupal.org packaging script on 2025-01-13
+version: '3.1.7'
+project: 'automatic_updates'
+datestamp: 1736800616

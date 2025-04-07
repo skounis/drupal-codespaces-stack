@@ -1,0 +1,12 @@
+/**
+ * @file
+ * Dashboard toolbar icon styling.
+ */
+
+.toolbar-tray .toolbar-icon-system-dashboard::before {
+  background-image: url("../icons/dashboard.svg");
+}
+
+.toolbar-tray .toolbar-icon-system-dashboard.is-active::before {
+  background-image: url("../icons/dashboard-active.svg");
+}

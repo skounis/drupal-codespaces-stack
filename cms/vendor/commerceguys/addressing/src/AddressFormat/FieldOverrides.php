@@ -1,0 +1,83 @@
+<?php
+
+namespace CommerceGuys\Addressing\AddressFormat;
+
+/**
+ * Represents a set of field overrides.
+ */
+final class FieldOverrides
+{
+    /**
+     * The hidden fields.
+     *
+     * @var string[]
+     */
+    protected array $hiddenFields = [];
+
+    /**
+     * The optional fields.
+     *
+     * @var string[]
+     */
+    protected array $optionalFields = [];
+
+    /**
+     * The required fields.
+     *
+     * @var string[]
+     */
+    protected array $requiredFields = [];
+
+    /**
+     * Creates a new FieldOverrides instance.
+     *
+     * @param array $definition The field overrides, keyed by field name.
+     *
+     * @throws \ReflectionException
+     */
+    public function __construct(array $definition)
+    {
+        AddressField::assertAllExist(array_keys($definition));
+        FieldOverride::assertAllExist($definition);
+
+        foreach ($definition as $field => $override) {
+            if ($override === FieldOverride::HIDDEN) {
+                $this->hiddenFields[] = $field;
+            } elseif ($override === FieldOverride::OPTIONAL) {
+                $this->optionalFields[] = $field;
+            } elseif ($override === FieldOverride::REQUIRED) {
+                $this->requiredFields[] = $field;
+            }
+        }
+    }
+
+    /**
+     * Gets the hidden fields.
+     *
+     * @return string[]
+     */
+    public function getHiddenFields(): array
+    {
+        return $this->hiddenFields;
+    }
+
+    /**
+     * Gets the optional fields.
+     *
+     * @return string[]
+     */
+    public function getOptionalFields(): array
+    {
+        return $this->optionalFields;
+    }
+
+    /**
+     * Gets the required fields.
+     *
+     * @return string[]
+     */
+    public function getRequiredFields(): array
+    {
+        return $this->requiredFields;
+    }
+}

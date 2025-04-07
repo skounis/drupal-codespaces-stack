@@ -1,0 +1,23 @@
+ai_agents_explorer.explorer:
+  path: '/admin/config/ai/agents/explore'
+  defaults:
+    _form: '\Drupal\ai_agents_explorer\Form\AiAgentExplorerForm'
+    _title: 'AI Agent Explorer'
+  requirements:
+    _permission: 'use the agent explorer'
+
+ai_agent_explore.start_exploring:
+  path: '/admin/config/ai/agents/explore/start'
+  defaults:
+    _controller: '\Drupal\ai_agents_explorer\Controller\AiAgentExplorerController::runAgent'
+  methods: [POST]
+  requirements:
+    _permission: 'use the agent explorer'
+
+ai_agent_explore.poll:
+  path: '/admin/config/ai/agents/explore/poll/{uuid}'
+  defaults:
+    _controller: '\Drupal\ai_agents_explorer\Controller\AiAgentExplorerController::pollAgent'
+  methods: [GET]
+  requirements:
+    _permission: 'use the agent explorer'

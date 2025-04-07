@@ -1,0 +1,21 @@
+[
+  {"tid": "13434", "name": "Access Control"},
+  {"tid": "193884", "name": "Accessibility"},
+  {"tid": "53", "name": "Administration Tools"},
+  {"tid": "11480", "name": "Automation"},
+  {"tid": "58", "name": "Content Display"},
+  {"tid": "57", "name": "Content Editing Experience"},
+  {"tid": "186018", "name": "Decoupled"},
+  {"tid": "59", "name": "Developer Tools"},
+  {"tid": "104", "name": "E-commerce"},
+  {"tid": "64", "name": "Import and Export"},
+  {"tid": "52", "name": "Integrations"},
+  {"tid": "67", "name": "Media"},
+  {"tid": "97", "name": "Multilingual"},
+  {"tid": "123", "name": "Performance"},
+  {"tid": "36748", "name": "Search Engine Optimization (SEO)"},
+  {"tid": "69", "name": "Security"},
+  {"tid": "105", "name": "Site Search"},
+  {"tid": "20224", "name": "Site Structure"},
+  {"tid": "60", "name": "User Engagement"}
+]

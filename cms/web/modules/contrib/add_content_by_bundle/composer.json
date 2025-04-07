@@ -1,0 +1,11 @@
+{
+    "name": "drupal/add_content_by_bundle",
+    "type": "drupal-module",
+    "description": "Add Content by Bundle Views Area Plugin",
+    "homepage": "https://www.drupal.org/project/add_content_by_bundle",
+    "license": "GPL-2.0-or-later",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/add_content_by_bundle",
+        "source": "https://git.drupalcode.org/project/add_content_by_bundle"
+    }
+}

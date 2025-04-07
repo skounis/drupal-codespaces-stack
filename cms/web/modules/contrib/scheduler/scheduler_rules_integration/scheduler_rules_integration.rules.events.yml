@@ -1,0 +1,61 @@
+# Six events dispatched for node entity types.
+scheduler_new_node_is_scheduled_for_publishing_event:
+  label: 'After saving a new content item that is scheduled for publishing'
+  category: 'Content (Scheduler)'
+  context_definitions:
+    node:
+      type: 'entity:node'
+      label: 'Scheduled Content Node'
+      description: 'The node object representing the scheduled content'
+
+scheduler_existing_node_is_scheduled_for_publishing_event:
+  label: 'After updating a content item that is scheduled for publishing'
+  category: 'Content (Scheduler)'
+  context_definitions:
+    node:
+      type: 'entity:node'
+      label: 'Scheduled Content Node'
+      description: 'The node object representing the scheduled content'
+
+scheduler_new_node_is_scheduled_for_unpublishing_event:
+  label: 'After saving a new content item that is scheduled for unpublishing'
+  category: 'Content (Scheduler)'
+  context_definitions:
+    node:
+      type: 'entity:node'
+      label: 'Scheduled Content Node'
+      description: 'The node object representing the scheduled content'
+
+scheduler_existing_node_is_scheduled_for_unpublishing_event:
+  label: 'After updating a content item that is scheduled for unpublishing'
+  category: 'Content (Scheduler)'
+  context_definitions:
+    node:
+      type: 'entity:node'
+      label: 'Scheduled Content Node'
+      description: 'The node object representing the scheduled content'
+
+scheduler_has_published_this_node_event:
+  label: 'After Scheduler has published a content item'
+  category: 'Content (Scheduler)'
+  context_definitions:
+    node:
+      type: 'entity:node'
+      label: 'Scheduled Content Node'
+      description: 'The node object representing the scheduled content'
+
+scheduler_has_unpublished_this_node_event:
+  label: 'After Scheduler has unpublished a content item'
+  category: 'Content (Scheduler)'
+  context_definitions:
+    node:
+      type: 'entity:node'
+      label: 'Scheduled Content Node'
+      description: 'The node object representing the scheduled content'
+
+# Use a deriver to build the corresponding six events for all other entity
+# types that are supported by Scheduler. This will not create any node events,
+# as they need to remain unchanged as above for backwards compatibility.
+scheduler:
+  deriver: 'Drupal\scheduler_rules_integration\Event\EventDeriver'
+  class: '\Drupal\rules\EventHandler\ConfigurableEventHandlerEntityBundle'

@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Styles used by the Automatic Updates module.
+ */
+
+.automatic-updates-unsupported-version .project-update__download-link {
+  display: none;
+}

@@ -1,0 +1,274 @@
+<?php
+
+/**
+ * @file
+ * Adds autocomplete capabilities for Search API searches.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Utility\Error;
+use Drupal\search_api\Plugin\views\filter\SearchApiText;
+use Drupal\search_api\Plugin\views\query\SearchApiQuery;
+use Drupal\search_api\Utility\Utility;
+use Drupal\search_api_autocomplete\Search\SearchPluginDeriverBase;
+use Drupal\search_api_page\SearchApiPageInterface;
+use Drupal\user\Entity\Role;
+use Drupal\views\ViewEntityInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function search_api_autocomplete_theme() {
+  $themes['search_api_autocomplete_suggestion'] = [
+    'variables' => [
+      'keys' => NULL,
+      'url' => NULL,
+      'label' => NULL,
+      'note' => NULL,
+      'results_count' => NULL,
+      'suggestion_prefix' => '',
+      'suggestion_suffix' => '',
+      'user_input' => '',
+    ],
+  ];
+
+  return $themes;
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function search_api_autocomplete_entity_operation(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() != 'search_api_index') {
+    return [];
+  }
+
+  $operations = [];
+  $operations['autocomplete'] = [
+    'title' => t('Autocomplete'),
+    'weight' => 30,
+    'url' => Url::fromRoute('search_api_autocomplete.admin_overview', ['search_api_index' => $entity->id()]),
+  ];
+  return $operations;
+}
+
+/**
+ * Implements hook_hook_info().
+ *
+ * Allows other modules to place all their hook implementations for this module
+ * into a "MODULE.search_api_autocomplete.inc" file.
+ */
+function search_api_autocomplete_hook_info() {
+  $hooks = [
+    'search_api_autocomplete_suggestions_alter',
+    'search_api_autocomplete_suggester_info_alter',
+    'search_api_autocomplete_search_info_alter',
+    'search_api_autocomplete_views_fulltext_fields_alter',
+  ];
+  $info = [
+    'group' => 'search_api_autocomplete',
+  ];
+  return array_fill_keys($hooks, $info);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for "search_api_autocomplete_search".
+ */
+function search_api_autocomplete_search_api_autocomplete_search_delete(EntityInterface $entity) {
+  // Remove the search-specific permission from all roles.
+  $permissionString = "use search_api_autocomplete for {$entity->id()}";
+  foreach (Role::loadMultiple() as $role) {
+    // Check if permission is set for this role and revoke it.
+    if ($role->hasPermission($permissionString)) {
+      $role->revokePermission($permissionString);
+      try {
+        $role->save();
+      }
+      catch (EntityStorageException $e) {
+        $variables = [
+          '%perm' => $permissionString,
+          '%role' => $role->label(),
+        ];
+        Error::logException(\Drupal::logger('search_api_autocomplete'), $e, '%type while trying to remove permission %perm from user role %role: @message in %function (line %line of %file).', $variables);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for "views_exposed_form".
+ *
+ * Adds autocompletion to input fields for fulltext keywords on views with
+ * exposed filters.
+ *
+ * @see \Drupal\views\Form\ViewsExposedForm
+ * @see \Drupal\search_api_autocomplete\Plugin\search_api_autocomplete\search\Views
+ */
+function search_api_autocomplete_form_views_exposed_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\views\ViewExecutable $view */
+  $view = $form_state->get('view');
+  if (substr($view->storage->get('base_table'), 0, 17) != 'search_api_index_') {
+    return;
+  }
+
+  $plugin_id = 'views:' . $view->id();
+  $cache_tag = "search_api_autocomplete_search_list:$plugin_id";
+  if (!isset($form['#cache']['tags'])
+      || !in_array($cache_tag, $form['#cache']['tags'])) {
+    $form['#cache']['tags'][] = $cache_tag;
+  }
+
+  /** @var \Drupal\search_api_autocomplete\Entity\SearchStorage $search_storage */
+  $search_storage = \Drupal::entityTypeManager()
+    ->getStorage('search_api_autocomplete_search');
+  $search = $search_storage->loadBySearchPlugin($plugin_id);
+  if (!$search || !$search->status()) {
+    return;
+  }
+
+  $config = $search->getSearchPlugin()->getConfiguration();
+  if (!Utility::matches($view->current_display, $config['displays'])) {
+    return;
+  }
+
+  $fields = $search->getIndex()->getFulltextFields();
+  if (!$fields) {
+    return;
+  }
+  // Add the "Search: Fulltext search" filter as another text field.
+  $fields[] = 'search_api_fulltext';
+
+  \Drupal::moduleHandler()->alter('search_api_autocomplete_views_fulltext_fields', $fields, $search, $view);
+
+  $base_data = [
+    'display' => $view->current_display,
+    'arguments' => $view->args,
+  ];
+
+  foreach ($view->filter as $filter) {
+    if (!in_array($filter->realField, $fields)
+        || empty($filter->options['expose']['identifier'])) {
+      continue;
+    }
+    $key = $filter->options['expose']['identifier'];
+
+    if (isset($form[$key])) {
+      $element = &$form[$key];
+    }
+    elseif (isset($form[$key . '_wrapper'][$key])) {
+      $element = &$form[$key . '_wrapper'][$key];
+    }
+    else {
+      continue;
+    }
+    $data = $base_data;
+
+    // Look for single-field filters to handle those properly as well.
+    if ($filter instanceof SearchApiText) {
+      // Some individual Views filters in some versions of Drupal use a nested
+      // "value" key for the form element, so we need to take that into account.
+      if (!empty($element['value'])) {
+        $element = &$element['value'];
+      }
+      $data['field'] = $filter->realField;
+    }
+
+    if (isset($element['#type']) && $element['#type'] === 'textfield') {
+      $data['filter'] = $key;
+      \Drupal::getContainer()
+        ->get('search_api_autocomplete.helper')
+        ->alterElement($element, $search, $data);
+    }
+
+    unset($element);
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for "search_api_page_block_form".
+ *
+ * Adds autocompletion to the keywords field on search pages, if enabled by the
+ * user.
+ *
+ * @see \Drupal\search_api_page\Form\SearchApiPageBlockForm
+ * @see \Drupal\search_api_autocomplete\Plugin\search_api_autocomplete\search\Page
+ */
+function search_api_autocomplete_form_search_api_page_block_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $page_id = substr($form_id, strlen('search_api_page_block_form_'));
+  /** @var \Drupal\search_api_autocomplete\Entity\SearchStorage $search_storage */
+  $search_storage = \Drupal::entityTypeManager()
+    ->getStorage('search_api_autocomplete_search');
+  $plugin_id = 'page:' . $page_id;
+  $search = $search_storage->loadBySearchPlugin($plugin_id);
+
+  $cache_tag = "search_api_autocomplete_search_list:$plugin_id";
+  if (!isset($form['#cache']['tags'])
+      || !in_array($cache_tag, $form['#cache']['tags'])) {
+    $form['#cache']['tags'][] = $cache_tag;
+  }
+
+  if ($search && $search->status()) {
+    \Drupal::getContainer()
+      ->get('search_api_autocomplete.helper')
+      ->alterElement($form['keys'], $search);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for type "view".
+ *
+ * Clear the search plugin definitions cache when new search views are created.
+ * Could use better support from the Plugin API – see #2633878.
+ */
+function search_api_autocomplete_view_insert(ViewEntityInterface $view) {
+  if (SearchApiQuery::getIndexFromTable($view->get('base_table'))) {
+    \Drupal::getContainer()
+      ->get('plugin.manager.search_api_autocomplete.search')
+      ->clearCachedDefinitions();
+    SearchPluginDeriverBase::resetStaticDerivativeCaches('views');
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for type "view".
+ *
+ * Clear the search plugin definitions cache when search views are deleted.
+ * Could use better support from the Plugin API – see #2633878.
+ */
+function search_api_autocomplete_view_delete(ViewEntityInterface $view) {
+  if (SearchApiQuery::getIndexFromTable($view->get('base_table'))) {
+    \Drupal::getContainer()
+      ->get('plugin.manager.search_api_autocomplete.search')
+      ->clearCachedDefinitions();
+    SearchPluginDeriverBase::resetStaticDerivativeCaches('views');
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for type "search_api_page".
+ *
+ * Clear the search plugin definitions cache when search pages are created.
+ * Could use better support from the Plugin API – see #2633878.
+ */
+function search_api_autocomplete_search_api_page_insert(SearchApiPageInterface $page) {
+  \Drupal::getContainer()
+    ->get('plugin.manager.search_api_autocomplete.search')
+    ->clearCachedDefinitions();
+  SearchPluginDeriverBase::resetStaticDerivativeCaches('page');
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for type "search_api_page".
+ *
+ * Clear the search plugin definitions cache when search pages are deleted.
+ * Could use better support from the Plugin API – see #2633878.
+ */
+function search_api_autocomplete_search_api_page_delete(SearchApiPageInterface $page) {
+  \Drupal::getContainer()
+    ->get('plugin.manager.search_api_autocomplete.search')
+    ->clearCachedDefinitions();
+  SearchPluginDeriverBase::resetStaticDerivativeCaches('page');
+}

@@ -1,0 +1,13 @@
+/**
+ * @file
+ * Custom styling for search view.
+*/
+.view-search .node--view-mode-search-result {
+  .node__title {
+    margin-top: 0;
+  }
+
+  .node__content {
+    padding-bottom: 0;
+  }
+}

@@ -1,0 +1,17 @@
+@media screen and (max-width:600px) {
+  .email-body-wrapper {
+    padding: 0 !important;
+  }
+  .email-body > .content {
+    padding: 10px 20px !important;
+  }
+  .email-body > .header {
+    padding: 20px 20px !important;
+  }
+}
+.button:hover {
+  background-color: rgb(20, 117, 173) !important;
+}
+.button.danger:hover {
+  background-color: rgb(180, 0, 0) !important;
+}

@@ -1,0 +1,4 @@
+ai_setup_form:
+  css:
+    component:
+      assets/css/ai_setup_form.css: {}

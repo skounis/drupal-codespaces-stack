@@ -1,0 +1,16 @@
+name: Easy Email
+type: module
+description: A simple system for sending HTML-formatted emails
+package: Mail
+core_version_requirement: ^10.1 || ^11
+configure: entity.easy_email_type.collection
+
+dependencies:
+  - drupal:text
+  - jquery_ui_resizable:jquery_ui_resizable
+  - token:token
+
+# Information added by Drupal.org packaging script on 2024-12-27
+version: '3.0.4'
+project: 'easy_email'
+datestamp: 1735316201

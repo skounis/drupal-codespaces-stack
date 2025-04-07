@@ -1,0 +1,8 @@
+administer klaro:
+  title: 'Administer Klaro!'
+  description: 'Allows a user to access any Klaro! settings.'
+  restrict access: true
+
+use klaro:
+  title: 'Use Klaro! UI'
+  description: 'Allows users to configure preferences using the Klaro! Consent Manager.'

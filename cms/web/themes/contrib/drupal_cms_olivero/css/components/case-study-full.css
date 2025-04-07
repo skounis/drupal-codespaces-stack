@@ -1,0 +1,22 @@
+/**
+ * @file
+ * Styles for case study content type.
+ */
+
+.field--name-field-case-study__client-logo {
+  margin-bottom: var(--sp2);
+}
+
+.field--name-field-case-study__client-name {
+  color: var(--color-text-neutral-medium)
+}
+
+.field--name-field-case-study__client-link a {
+  margin-block: 0;
+}
+
+.node--type-case-study {
+  .field--name-field-content {
+    margin-bottom: var(--sp3);
+  }
+}

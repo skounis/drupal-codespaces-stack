@@ -1,0 +1,12 @@
+name: 'Add to Calendar Date Augmenter'
+type: module
+description: 'Provides a plugin to inject add to calendar links into date displays.'
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+package: 'Date Augmenter'
+dependencies:
+  - 'date_augmenter:date_augmenter'
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '1.2.4'
+project: 'addtocal_augment'
+datestamp: 1741987946

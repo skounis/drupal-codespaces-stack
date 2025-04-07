@@ -1,0 +1,28 @@
+id: focal_point_crop_type
+label: Focal Point crop type
+migration_tags:
+  - Drupal 7
+  - Configuration
+source:
+  plugin: md_empty
+  source_module: focal_point
+  constants:
+    label: 'Focal point'
+    id: focal_point
+    description: 'Crop type used by Focal point module.'
+    aspect_ratio: ''
+    soft_limit_width: null
+    soft_limit_height: null
+    hard_limit_width: null
+    hard_limit_height: null
+process:
+  label: 'constants/label'
+  id: 'constants/id'
+  description: 'constants/description'
+  aspect_ratio: 'constants/aspect_ratio'
+  soft_limit_width: 'constants/soft_limit_width'
+  soft_limit_height: 'constants/soft_limit_height'
+  hard_limit_width: 'constants/hard_limit_width'
+  hard_limit_height: 'constants/hard_limit_height'
+destination:
+  plugin: entity:crop_type

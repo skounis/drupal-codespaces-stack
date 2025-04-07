@@ -1,0 +1,12 @@
+{
+    "name": "drupal/trash",
+    "description": "This module adds a trash bin for all content entities.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "suggest": {
+        "drush/drush": "^12 || ^13"
+    },
+    "conflict": {
+        "drush/drush": "<12.5.1"
+    }
+}

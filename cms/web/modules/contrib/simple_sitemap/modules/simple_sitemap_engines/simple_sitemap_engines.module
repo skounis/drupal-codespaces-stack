@@ -1,0 +1,124 @@
+<?php
+
+/**
+ * @file
+ * Main module file containing hooks.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\simple_sitemap_engines\Entity\SimpleSitemapEngine;
+
+/**
+ * Implements hook_cron().
+ *
+ * If the sitemap submission interval has elapsed, adds each search engine to
+ * the submission queue to be processed.
+ *
+ * @see Drupal\simple_sitemap_engines\Plugin\QueueWorker\SitemapSubmittingWorker
+ */
+function simple_sitemap_engines_cron() {
+  $config = \Drupal::config('simple_sitemap_engines.settings');
+
+  if ($config->get('enabled')) {
+    $interval = (int) $config->get('submission_interval') * 60 * 60;
+    $request_time = \Drupal::time()->getRequestTime();
+
+    foreach (SimpleSitemapEngine::loadSitemapSubmissionEngines() as $id => $engine) {
+      $last_submitted = \Drupal::state()->get("simple_sitemap_engines.simple_sitemap_engine.{$id}.last_submitted", -1);
+      if ($last_submitted !== -1
+        && $last_submitted + $interval > $request_time) {
+        continue;
+      }
+      if (!empty($engine->sitemap_variants)) {
+        \Drupal::queue('simple_sitemap_engine_submit')->createItem($id);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function simple_sitemap_engines_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\simple_sitemap_engines\Form\FormHelper $form_helper */
+  $form_helper = \Drupal::service('simple_sitemap.engines.form_helper');
+  $form_helper->formAlter($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function simple_sitemap_engines_form_simple_sitemap_entity_bundles_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\simple_sitemap_engines\Form\FormHelper $form_helper */
+  $form_helper = \Drupal::service('simple_sitemap.engines.form_helper');
+  $form_helper->entityBundlesFormAlter($form);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function simple_sitemap_engines_form_simple_sitemap_entities_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\simple_sitemap_engines\Form\FormHelper $form_helper */
+  $form_helper = \Drupal::service('simple_sitemap.engines.form_helper');
+  $form_helper->entitiesFormAlter($form);
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function simple_sitemap_engines_entity_delete(EntityInterface $entity) {
+  /** @var \Drupal\simple_sitemap_engines\Submitter\IndexNowSubmitter $submitter */
+  $submitter = \Drupal::service('simple_sitemap.engines.index_now_submitter');
+  $submitter->submitIfSubmittable($entity);
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function simple_sitemap_engines_entity_insert(EntityInterface $entity) {
+  /** @var \Drupal\simple_sitemap_engines\Submitter\IndexNowSubmitter $submitter */
+  $submitter = \Drupal::service('simple_sitemap.engines.index_now_submitter');
+  $submitter->submitIfSubmittable($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function simple_sitemap_engines_entity_update(EntityInterface $entity) {
+  /** @var \Drupal\simple_sitemap_engines\Submitter\IndexNowSubmitter $submitter */
+  $submitter = \Drupal::service('simple_sitemap.engines.index_now_submitter');
+  $submitter->submitIfSubmittable($entity);
+}
+
+/**
+ * Implements hook_entity_bundle_delete().
+ *
+ * Removes settings of the removed bundle.
+ */
+function simple_sitemap_engines_entity_bundle_delete($entity_type_id, $bundle) {
+  \Drupal::configFactory()
+    ->getEditable("simple_sitemap_engines.bundle_settings.$entity_type_id.$bundle")->delete();
+}
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function simple_sitemap_engines_entity_extra_field_info() {
+  $extra = [];
+
+  if (\Drupal::config('simple_sitemap_engines.settings')->get('index_now_enabled')) {
+    // Use the hook implementation from the main module as a base.
+    foreach (simple_sitemap_entity_extra_field_info() as $entity_type_id => $entity_type_info) {
+      foreach ($entity_type_info as $bundle_name => $bundle_info) {
+
+        $extra[$entity_type_id][$bundle_name]['form']['simple_sitemap_index_now'] = [
+          'label' => t('IndexNow notification'),
+          'description' => t('IndexNow notification checkbox'),
+          'weight' => 130,
+        ];
+      }
+    }
+  }
+  return $extra;
+}

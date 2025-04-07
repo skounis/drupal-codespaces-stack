@@ -1,0 +1,5 @@
+project_browser.settings:
+  title: Project Browser
+  description: 'Configure the Project Browser settings'
+  route_name: project_browser.settings
+  parent: system.admin_config_development

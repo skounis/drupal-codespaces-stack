@@ -1,0 +1,18 @@
+symfony_mailer_lite.symfony_mailer_lite_transport.collection:
+  title: Transport
+  description: 'Listing of Drupal Symfony Mailer Lite transports.'
+  base_route: entity.symfony_mailer_lite_transport.collection
+  route_name: entity.symfony_mailer_lite_transport.collection
+
+symfony_mailer_lite.message_settings:
+  route_name: symfony_mailer_lite.message_settings
+  title: Message Settings
+  base_route: entity.symfony_mailer_lite_transport.collection
+  weight: 5
+
+symfony_mailer_lite.test:
+  title: Test
+  description: 'Send test email'
+  base_route: entity.symfony_mailer_lite_transport.collection
+  route_name: symfony_mailer_lite.test
+  weight: 10

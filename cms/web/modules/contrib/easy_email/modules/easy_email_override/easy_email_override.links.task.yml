@@ -1,0 +1,5 @@
+entity.easy_email_override.collection:
+  route_name: entity.easy_email_override.collection
+  base_route: entity.easy_email_type.collection
+  title: 'Overrides'
+  weight: 10

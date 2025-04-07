@@ -1,0 +1,134 @@
+diff --git a/composer.json b/composer.json
+index f5f380a..beab6ee 100644
+--- a/composer.json
++++ b/composer.json
+@@ -10,6 +10,7 @@
+         "drupal/devel_generate": ">=4",
+         "drupal/workbench_moderation": "*",
+         "drupal/workbench_moderation_actions": "*",
++        "commerceguys/addressing": "1.3",
+         "drupal/commerce": "^2 || ^3"
+     },
+     "repositories": {
+diff --git a/tests/src/Functional/SchedulerNonEnabledTypeTest.php b/tests/src/Functional/SchedulerNonEnabledTypeTest.php
+index 150714b..1e5fa93 100644
+--- a/tests/src/Functional/SchedulerNonEnabledTypeTest.php
++++ b/tests/src/Functional/SchedulerNonEnabledTypeTest.php
+@@ -40,14 +40,10 @@ class SchedulerNonEnabledTypeTest extends SchedulerBrowserTestBase {
+         'scheduler_publish_enable' => $publishing_enabled,
+         'scheduler_unpublish_enable' => $unpublishing_enabled,
+       ];
+-      if ($entityTypeId == 'commerce_product') {
+-        // Products need an extra checkbox to be ticked.
+-        // cspell:ignore variationtypes .
+-        $edit['edit-variationtypes-default'] = TRUE;
+-      }
++      // The version of Commerce Product used before Drupal 9 does not have
++      // the extra 'edit-variationtypes-default' field. Also the function
++      // statusMessageNotExists() does not exist. So just save() here.
+       $this->submitForm($edit, 'Save');
+-      // Check that the save was successful with no error message.
+-      $this->assertSession()->statusMessageNotExists('error');
+ 
+       // Show the form display page for info.
+       $this->drupalGet($this->adminUrl('bundle_form_display', $entityTypeId, $bundle));
+diff --git a/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php b/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php
+index f4f86b2..778921c 100644
+--- a/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php
++++ b/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php
+@@ -3,7 +3,6 @@ abstract class SchedulerJavascriptTestBase extends WebDriverTestBase {
+ namespace Drupal\Tests\scheduler\FunctionalJavascript;
+ 
+ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+-use Drupal\Tests\DocumentElement;
+ use Drupal\Tests\scheduler\Traits\SchedulerCommerceProductSetupTrait;
+ use Drupal\Tests\scheduler\Traits\SchedulerMediaSetupTrait;
+ use Drupal\Tests\scheduler\Traits\SchedulerSetupTrait;
+@@ -44,10 +43,11 @@ abstract class SchedulerJavascriptTestBase extends WebDriverTestBase {
+    * The default theme.
+    *
+    * The vertical tabs test needs 'claro' theme not 'stark'.
++   * For Drupal 8 use 'bartik'.
+    *
+    * @var string
+    */
+-  protected $defaultTheme = 'claro';
++  protected $defaultTheme = 'bartik';
+ 
+   /**
+    * {@inheritdoc}
+@@ -97,7 +97,7 @@ abstract class SchedulerJavascriptTestBase extends WebDriverTestBase {
+    */
+   public function waitForNoText($text, $timeout = 10000) {
+     $page = $this->getSession()->getPage();
+-    return (bool) $page->waitFor($timeout / 1000, function (DocumentElement $page) use ($text) {
++    return (bool) $page->waitFor($timeout / 1000, function () use ($page, $text) {
+       $actual = preg_replace('/\\s+/u', ' ', $page->getText());
+       // Negative look-ahead on the text that should be hidden.
+       $regex = '/^((?!' . preg_quote($text, '/') . ').)*$/ui';
+diff --git a/tests/src/FunctionalJavascript/SchedulerJavascriptVerticalTabsTest.php b/tests/src/FunctionalJavascript/SchedulerJavascriptVerticalTabsTest.php
+index 671c36f..af8e067 100644
+--- a/tests/src/FunctionalJavascript/SchedulerJavascriptVerticalTabsTest.php
++++ b/tests/src/FunctionalJavascript/SchedulerJavascriptVerticalTabsTest.php
+@@ -15,6 +15,11 @@ class SchedulerJavascriptVerticalTabsTest extends SchedulerJavascriptTestBase {
+    * @dataProvider dataStandardEntityTypes()
+    */
+   public function testEditEntitySummary($entityTypeId, $bundle) {
++    // In Drupal8, the Product and Term forms do not have vertical tabs so skip
++    // testing with these entity types.
++    if ($entityTypeId == 'commerce_product' || $entityTypeId == 'taxonomy_term') {
++      return;
++    }
+     $this->drupalLogin($this->schedulerUser);
+     /** @var \Drupal\Tests\WebAssert $assert */
+     $assert = $this->assertSession();
+@@ -53,9 +58,8 @@ class SchedulerJavascriptVerticalTabsTest extends SchedulerJavascriptTestBase {
+     // vertical tabs are implemented in a different way to 10.2. We now need to
+     // click to bring focus on that tab, ready for filling the date fields.
+     $page = $this->getSession()->getPage();
+-    if ($entityTypeId == 'media' || ($entityTypeId == 'taxonomy_term' && version_compare(\Drupal::VERSION, '10.3', '>='))) {
+-      $page->clickLink('Scheduling options');
+-    }
++    // In Bartik theme, click 'Scheduling options' for all entity types.
++    $page->clickLink('Scheduling options');
+ 
+     // Fill in a publish_on date and check the summary text.
+     $page->fillField('edit-publish-on-0-value-date', '05/02/' . (date('Y') + 1));
+@@ -108,6 +112,11 @@ class SchedulerJavascriptVerticalTabsTest extends SchedulerJavascriptTestBase {
+    * @dataProvider dataStandardEntityTypes()
+    */
+   public function testConfigureEntityTypeSummary($entityTypeId, $bundle) {
++    // In Drupal8, the Product and Term forms do not have vertical tabs so skip
++    // testing with these entity types.
++    if ($entityTypeId == 'commerce_product' || $entityTypeId == 'taxonomy_term') {
++      return;
++    }
+     /** @var \Drupal\Tests\WebAssert $assert */
+     $assert = $this->assertSession();
+ 
+diff --git a/tests/src/Kernel/MigrateSchedulerNodeTypeConfigTest.php b/tests/src/Kernel/MigrateSchedulerNodeTypeConfigTest.php
+index 349e43b..8c3b8e1 100644
+--- a/tests/src/Kernel/MigrateSchedulerNodeTypeConfigTest.php
++++ b/tests/src/Kernel/MigrateSchedulerNodeTypeConfigTest.php
+@@ -14,7 +14,7 @@ class MigrateSchedulerNodeTypeConfigTest extends MigrateSchedulerTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected static $modules = ['menu_ui'];
++  public static $modules = ['menu_ui'];
+ 
+   /**
+    * {@inheritdoc}
+diff --git a/tests/src/Kernel/MigrateSchedulerTestBase.php b/tests/src/Kernel/MigrateSchedulerTestBase.php
+index 419b508..2d5ce12 100644
+--- a/tests/src/Kernel/MigrateSchedulerTestBase.php
++++ b/tests/src/Kernel/MigrateSchedulerTestBase.php
+@@ -12,7 +12,7 @@ abstract class MigrateSchedulerTestBase extends MigrateDrupal7TestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected static $modules = [
++  public static $modules = [
+     'node',
+     'scheduler',
+     'text',

@@ -1,0 +1,114 @@
+{
+	"country_code": "EG",
+	"locale": "ar",
+	"subdivisions": {
+		"ASN": {
+			"name": "Aswan Governorate",
+			"local_name": "أسوان"
+		},
+		"AST": {
+			"name": "Asyut Governorate",
+			"local_name": "أسيوط"
+		},
+		"ALX": {
+			"name": "Alexandria Governorate",
+			"local_name": "الإسكندرية"
+		},
+		"IS": {
+			"name": "Ismailia Governorate",
+			"local_name": "الإسماعيلية"
+		},
+		"LX": {
+			"name": "Luxor Governorate",
+			"local_name": "الأقصر"
+		},
+		"BA": {
+			"name": "Red Sea Governorate",
+			"local_name": "البحر الأحمر"
+		},
+		"BH": {
+			"name": "El Beheira Governorate",
+			"local_name": "البحيرة"
+		},
+		"GZ": {
+			"name": "Giza Governorate",
+			"local_name": "الجيزة"
+		},
+		"DK": {
+			"name": "Dakahlia Governorate",
+			"local_name": "الدقهلية"
+		},
+		"SUZ": {
+			"name": "Suez Governorate",
+			"local_name": "السويس"
+		},
+		"SHR": {
+			"name": "Ash Sharqia Governorate",
+			"local_name": "الشرقية"
+		},
+		"GH": {
+			"name": "Gharbia Governorate",
+			"local_name": "الغربية"
+		},
+		"FYM": {
+			"name": "Faiyum Governorate",
+			"local_name": "الفيوم"
+		},
+		"C": {
+			"name": "Cairo Governorate",
+			"local_name": "القاهرة"
+		},
+		"KB": {
+			"name": "Qalyubia Governorate",
+			"local_name": "القليوبية"
+		},
+		"MNF": {
+			"name": "Menofia Governorate",
+			"local_name": "المنوفية"
+		},
+		"MN": {
+			"name": "Menia Governorate",
+			"local_name": "المنيا"
+		},
+		"WAD": {
+			"name": "New Valley Governorate",
+			"local_name": "الوادي الجديد"
+		},
+		"BNS": {
+			"name": "Beni Suef Governorate",
+			"local_name": "بني سويف"
+		},
+		"PTS": {
+			"name": "Port Said Governorate",
+			"local_name": "بورسعيد"
+		},
+		"JS": {
+			"name": "South Sinai Governorate",
+			"local_name": "جنوب سيناء"
+		},
+		"DT": {
+			"name": "Damietta Governorate",
+			"local_name": "دمياط"
+		},
+		"SHG": {
+			"name": "Sohag Governorate",
+			"local_name": "سوهاج"
+		},
+		"SIN": {
+			"name": "North Sinai Governorate",
+			"local_name": "شمال سيناء"
+		},
+		"KN": {
+			"name": "Qena Governorate",
+			"local_name": "قنا"
+		},
+		"KFS": {
+			"name": "Kafr El Sheikh Governorate",
+			"local_name": "كفر الشيخ"
+		},
+		"MT": {
+			"name": "Matrouh Governorate",
+			"local_name": "مطروح"
+		}
+	}
+}

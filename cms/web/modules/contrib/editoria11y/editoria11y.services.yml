@@ -1,0 +1,12 @@
+services:
+  editoria11y.api:
+    class: Drupal\editoria11y\Api
+    arguments: ['@current_user', '@database', '@entity_type.manager']
+
+  editoria11y.dashboard:
+    class: Drupal\editoria11y\Dashboard
+    arguments: ['@database']
+
+  editoria11y.dismissals_on_page:
+    class: Drupal\editoria11y\DismissalsOnPage
+    arguments: ['@database']

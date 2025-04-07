@@ -1,0 +1,5 @@
+ai_image_alt_text.settings:
+  title: 'AI Image Alt Text settings'
+  description: 'AI Image Alt Text settings'
+  parent: ai.admin_settings
+  route_name: ai_image_alt_text.settings_form

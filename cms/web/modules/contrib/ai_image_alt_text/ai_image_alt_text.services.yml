@@ -1,0 +1,4 @@
+services:
+  ai_image_alt_text.provider:
+    class: Drupal\ai_image_alt_text\ProviderHelper
+    arguments: ['@config.factory', '@ai.provider']

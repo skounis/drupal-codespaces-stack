@@ -1,0 +1,4 @@
+services:
+  simple_search_form.lazy_builder:
+    class: Drupal\simple_search_form\SimpleSearchFormLazyBuilder
+    arguments: ['@form_builder']

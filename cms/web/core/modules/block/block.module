@@ -1,0 +1,148 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Installer\InstallerKernel;
+
+/**
+ * Initializes blocks for installed themes.
+ *
+ * @param $theme_list
+ *   An array of theme names.
+ *
+ * @see block_modules_installed()
+ */
+function block_themes_installed($theme_list) {
+  // Disable this functionality prior to install profile installation because
+  // block configuration is often optional or provided by the install profile
+  // itself. block_theme_initialize() will be called when the install profile is
+  // installed.
+  if (InstallerKernel::installationAttempted() && \Drupal::config('core.extension')->get('module.' . \Drupal::installProfile()) === NULL) {
+    return;
+  }
+
+  foreach ($theme_list as $theme) {
+    // Don't initialize themes that are not displayed in the UI.
+    if (\Drupal::service('theme_handler')->hasUi($theme)) {
+      block_theme_initialize($theme);
+    }
+  }
+}
+
+/**
+ * Assigns an initial, default set of blocks for a theme.
+ *
+ * This function is called the first time a new theme is installed. The new
+ * theme gets a copy of the default theme's blocks, with the difference that if
+ * a particular region isn't available in the new theme, the block is assigned
+ * to the new theme's default region.
+ *
+ * @param $theme
+ *   The name of a theme.
+ */
+function block_theme_initialize($theme) {
+  // Initialize theme's blocks if none already registered.
+  $has_blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $theme]);
+  if (!$has_blocks) {
+    $default_theme = \Drupal::config('system.theme')->get('default');
+    // Apply only to new theme's visible regions.
+    $regions = system_region_list($theme, REGIONS_VISIBLE);
+    $default_theme_blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $default_theme]);
+    foreach ($default_theme_blocks as $default_theme_block_id => $default_theme_block) {
+      if (str_starts_with($default_theme_block_id, $default_theme . '_')) {
+        $id = str_replace($default_theme . '_', '', $default_theme_block_id);
+      }
+      else {
+        $id = $default_theme_block_id;
+      }
+      $id = \Drupal::service('block.repository')->getUniqueMachineName($id, $theme);
+      $block = $default_theme_block->createDuplicateBlock($id, $theme);
+      // If the region isn't supported by the theme, assign the block to the
+      // theme's default region.
+      if (!isset($regions[$block->getRegion()])) {
+        $block->setRegion(system_default_region($theme));
+      }
+      $block->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function block_theme_suggestions_block(array $variables) {
+  $suggestions = [];
+
+  $suggestions[] = 'block__' . $variables['elements']['#configuration']['provider'];
+  // Hyphens (-) and underscores (_) play a special role in theme suggestions.
+  // Theme suggestions should only contain underscores, because within
+  // drupal_find_theme_templates(), underscores are converted to hyphens to
+  // match template file names, and then converted back to underscores to match
+  // pre-processing and other function names. So if your theme suggestion
+  // contains a hyphen, it will end up as an underscore after this conversion,
+  // and your function names won't be recognized. So, we need to convert
+  // hyphens to underscores in block deltas for the theme suggestions.
+
+  // We can safely explode on : because we know the Block plugin type manager
+  // enforces that delimiter for all derivatives.
+  $parts = explode(':', $variables['elements']['#plugin_id']);
+  $suggestion = 'block';
+  while ($part = array_shift($parts)) {
+    $suggestions[] = $suggestion .= '__' . strtr($part, '-', '_');
+  }
+
+  if (!empty($variables['elements']['#id'])) {
+    $suggestions[] = 'block__' . $variables['elements']['#id'];
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Prepares variables for block templates.
+ *
+ * Default template: block.html.twig.
+ *
+ * Prepares the values passed to the theme_block function to be passed
+ * into a pluggable template engine. Uses block properties to generate a
+ * series of template file suggestions. If none are found, the default
+ * block.html.twig is used.
+ *
+ * Most themes use their own copy of block.html.twig. The default is located
+ * inside "core/modules/block/templates/block.html.twig". Look in there for the
+ * full list of available variables.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the properties of the element.
+ *     Properties used: #block, #configuration, #children, #plugin_id.
+ */
+function template_preprocess_block(&$variables): void {
+  $variables['configuration'] = $variables['elements']['#configuration'];
+  $variables['plugin_id'] = $variables['elements']['#plugin_id'];
+  $variables['base_plugin_id'] = $variables['elements']['#base_plugin_id'];
+  $variables['derivative_plugin_id'] = $variables['elements']['#derivative_plugin_id'];
+  $variables['in_preview'] = $variables['elements']['#in_preview'] ?? FALSE;
+  $variables['label'] = !empty($variables['configuration']['label_display']) ? $variables['configuration']['label'] : '';
+  $variables['content'] = $variables['elements']['content'];
+  // A block's label is configuration: it is static. Allow dynamic labels to be
+  // set in the render array.
+  if (isset($variables['elements']['content']['#title']) && !empty($variables['configuration']['label_display'])) {
+    $variables['label'] = $variables['elements']['content']['#title'];
+  }
+
+  // Create a valid HTML ID and make sure it is unique.
+  if (!empty($variables['elements']['#id'])) {
+    $variables['attributes']['id'] = Html::getUniqueId('block-' . $variables['elements']['#id']);
+  }
+
+  // Proactively add aria-describedby if possible to improve accessibility.
+  if ($variables['label'] && isset($variables['attributes']['role'])) {
+    $variables['title_attributes']['id'] = Html::getUniqueId($variables['label']);
+    $variables['attributes']['aria-describedby'] = $variables['title_attributes']['id'];
+  }
+
+}

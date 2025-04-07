@@ -1,0 +1,119 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a developer that can generate Drupal Views. Based on the following
+    context of a task description and comments could you figure out what kind of
+    filters they want the view to have.
+
+    You will be given a list of all fields available in the system, so you know
+    what you can filter on. Try to figure out which filter they want to use.
+    If they did not specify any fields, don't add any filters to the view.
+
+    You will also be given a list of all the plugin id types that are available
+    for filters. You can use these to figure out what kind of plugin_id they want.
+
+    If a bundle is given, add a filter for the bundle type that is not exposed.
+
+    If its listed as an administrative mode, assume that the view should have
+    filters for the most common fields like title, status.
+    Only override this if the task description says otherwise. If there is an
+    exact number of filters defined, just follow these instructions instead.
+    In administrative view the status field should be exposed. Administrative
+    views filters should usually not have any values set.
+
+    Don't do address fields or ratings unless prompted so.
+
+    If the name of a field is bundle or type, you can assume that the plugin id
+    should be bundle. The field id for fields name content type should be "type".
+
+    If it's not listed as an administrative mode, assume that the view should have
+    a none-exposed filter for status and set to true if the field is available.
+
+    Any long text fields should usually be exposed and set the operator to contains.
+
+    There exists no bundle id. Only type should be set.
+
+    For status field on administrative views, the value should be set to All. For
+    other views it should be set to 1.
+
+    If the field type is date, changed or created, the value should be set to
+    an object with min, max, value and type. The type should be set to offset and
+    the value should be set to a string with a date offset should be empty, unless
+    otherwise specified.
+
+    If the field type is taxonomy, the plugin should be taxonomy_index_tid and
+    a vid has to be set.
+
+    You can answer with multiple objects if its fields, if its rendered content
+    you can only answer with one object.
+  possible_actions:
+    create: Create a filter.
+  formats:
+    - action: always create
+      id: The filter id to use, usually similar to field name.
+      label: The label of the filter.
+      plugin_id: The plugin id of the filter.
+      field: The data field name of the filter.
+      exposed: Boolean if the filter should be exposed.
+      operator: The operator to use for the filter.
+      value: The value to use for the filter, can be empty if exposed. Should be object when many keys are needed for date fields, created and changed. Usually just a value.
+      identifier: The identifier of the filter if exposed.
+      vid: The vocabulary id if the field is a taxonomy field.
+  one_shot_learning_examples:
+    - action: create
+      id: title
+      label: Title
+      plugin_id: string
+      field: title
+      exposed: true
+      operator: contains
+      value: ''
+    - action: create
+      id: status
+      label: Published
+      plugin_id: boolean
+      field: status
+      exposed: false
+      operator: '='
+      value: All
+    - action: create
+      id: created
+      label: 'Authored on'
+      plugin_id: date
+      field: created
+      exposed: true
+      operator: '>='
+      value:
+        min: ''
+        max: ''
+        value: '-10 days'
+        type: offset
+    - action: create
+      id: car_type
+      label: Car Type
+      plugin_id: taxonomy_index_tid
+      field: field_car_type
+      exposed: true
+      operator: or
+      value: ''
+      vid: car_type
+    - action: create
+      id: description
+      label: Description
+      plugin_id: string
+      field: field_description
+      exposed: true
+      operator: contains
+      value: ''
+    - action: create
+      id: type
+      label: Content Type
+      plugin_id: string
+      field: type
+      exposed: false
+      operator: in
+      value:
+        article: article
+

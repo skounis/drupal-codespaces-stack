@@ -1,0 +1,80 @@
+{
+	"country_code": "VE",
+	"subdivisions": {
+		"Z": {
+			"name": "Amazonas"
+		},
+		"B": {
+			"name": "Anzoátegui"
+		},
+		"C": {
+			"name": "Apure"
+		},
+		"D": {
+			"name": "Aragua"
+		},
+		"E": {
+			"name": "Barinas"
+		},
+		"F": {
+			"name": "Bolívar"
+		},
+		"G": {
+			"name": "Carabobo"
+		},
+		"H": {
+			"name": "Cojedes"
+		},
+		"Y": {
+			"name": "Delta Amacuro"
+		},
+		"W": {
+			"name": "Dependencias Federales"
+		},
+		"A": {
+			"name": "Distrito Federal"
+		},
+		"I": {
+			"name": "Falcón"
+		},
+		"J": {
+			"name": "Guárico"
+		},
+		"K": {
+			"name": "Lara"
+		},
+		"L": {
+			"name": "Mérida"
+		},
+		"M": {
+			"name": "Miranda"
+		},
+		"N": {
+			"name": "Monagas"
+		},
+		"O": {
+			"name": "Nueva Esparta"
+		},
+		"P": {
+			"name": "Portuguesa"
+		},
+		"R": {
+			"name": "Sucre"
+		},
+		"S": {
+			"name": "Táchira"
+		},
+		"T": {
+			"name": "Trujillo"
+		},
+		"X": {
+			"name": "La Guaira"
+		},
+		"U": {
+			"name": "Yaracuy"
+		},
+		"V": {
+			"name": "Zulia"
+		}
+	}
+}

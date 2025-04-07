@@ -1,0 +1,12 @@
+<?php
+
+use Drupal\trash\TrashStorageTrait;
+
+/**
+ * Provides a custom storage class for trash-enabled entity types.
+ */
+class {{ trash_class }} extends \{{ original_class }} {
+
+  use TrashStorageTrait;
+
+}

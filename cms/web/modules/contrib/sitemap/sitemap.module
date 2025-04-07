@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * @file
+ * Provides sitemap functionality.
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\system\MenuInterface;
+use Drupal\taxonomy\VocabularyInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function sitemap_theme() {
+  return [
+    'sitemap' => [
+      'variables' => [
+        'message' => NULL,
+        'sitemap_items' => [],
+      ],
+    ],
+    'sitemap_item' => [
+      'variables' => [
+        'title' => '',
+        'content' => [],
+        'sitemap' => '',
+      ],
+      'file' => 'sitemap.theme.inc',
+
+    ],
+    'sitemap_taxonomy_term' => [
+      'variables' => [
+        'name' => '',
+        'show_link' => FALSE,
+        'url' => '',
+        'show_count' => FALSE,
+        'count' => '',
+        'show_feed' => FALSE,
+        'feed' => '',
+        'feed_icon' => '',
+      ],
+      'file' => 'sitemap.theme.inc',
+
+    ],
+    'sitemap_frontpage_item' => [
+      'variables' => [
+        'text' => '',
+        'url' => '',
+        'feed' => '',
+        'feed_icon' => '',
+      ],
+      'file' => 'sitemap.theme.inc',
+    ],
+    'sitemap_menu' => [
+      'variables' => [
+        'menu_name' => NULL,
+        'items' => [],
+        'attributes' => [],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_sitemap_item().
+ */
+function sitemap_theme_suggestions_sitemap_item(array $variables) {
+  $suggestions = [];
+
+  if (isset($variables['sitemap'])) {
+    if ($id = $variables['sitemap']->getPluginDefinition()['id']) {
+      $filter = [
+        ' ' => '_',
+        '-' => '_',
+        '/' => '_',
+        '[' => '_',
+        ']' => '_',
+        ':' => '_',
+      ];
+      $type = Html::cleanCssIdentifier($id, $filter);
+      $suggestions[] = 'sitemap_item__' . $type;
+      $suggestions[] = 'sitemap_item__' . $type . '__' . Html::cleanCssIdentifier($variables['sitemap']->getPluginId(), $filter);
+    }
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function sitemap_theme_suggestions_menu_alter(array &$suggestions, array $variables) {
+  if (!empty($variables['theme_hook_original'])) {
+    if ($variables['theme_hook_original'] == 'menu__sitemap') {
+      $menu_name = strtr($variables['menu_name'], '-', '_');
+      array_unshift($suggestions, 'menu__' . $menu_name);
+      $suggestions[] = 'menu__sitemap__' . $menu_name;
+    }
+  }
+}
+
+/**
+ * Count the number of published nodes classified by a term.
+ *
+ * This is a re-implementation of taxonomy_term_count_nodes() that has been
+ * removed from D7 core.
+ *
+ * Implementation note: the normal way to count field instances is through
+ * field_attach_query(), but taxonomy.module has a special denormalized
+ * table taxonomy_index which we can use for more speed. Thanks to the taxonews
+ * module.
+ *
+ * @param string $tid
+ *   The term's ID.
+ *
+ * @return string
+ *   An integer representing a number of nodes. Results are statically cached.
+ */
+function sitemap_taxonomy_term_count_nodes($tid) {
+  $query = \Drupal::database()->select('taxonomy_index', 'ti');
+  $query->addExpression('COUNT(ti.nid)');
+  $count = $query
+    ->condition('ti.tid', $tid)
+    ->execute()->fetchCol();
+  return $count[0];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function sitemap_taxonomy_vocabulary_insert(VocabularyInterface $vocabulary) {
+  _sitemap_clear_plugin_cache();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function sitemap_taxonomy_vocabulary_delete(VocabularyInterface $vocabulary) {
+  _sitemap_clear_plugin_cache();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function sitemap_menu_delete(MenuInterface $menu) {
+  // @todo fix this.
+  // _sitemap_clear_plugin_cache();
+}
+
+/**
+ * Clears the sitemap plugin cache.
+ */
+function _sitemap_clear_plugin_cache() {
+  \Drupal::service('plugin.manager.sitemap')->clearCachedDefinitions();
+}

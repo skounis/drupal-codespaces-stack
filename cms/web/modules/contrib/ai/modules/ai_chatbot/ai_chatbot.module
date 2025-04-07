@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Provides hook implementations for the AI Chatbot module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function ai_chatbot_theme(): array {
+  return [
+    'ai_chatbot' => [
+      'variables' => [
+        'header' => '',
+        'rendered_form' => '',
+        'messages' => [],
+      ],
+    ],
+    'ai_chatbot_message' => [
+      'variables' => [
+        'message' => [],
+        'username' => 'Chatbot',
+        'timestamp' => '',
+        'bot_image' => '',
+        'user' => '',
+        'assistant_id' => NULL,
+        'thread_id' => NULL,
+      ],
+    ],
+    'ai_deepchat' => [
+      'variables' => [
+        'settings' => [
+          'width' => '400px',
+          'height' => '500px',
+        ],
+        'deepchat_settings' => [],
+        'current_theme' => '',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements preprocess function for ai_chatbot_message theme.
+ */
+function template_preprocess_ai_chatbot_message(&$variables) {
+
+}

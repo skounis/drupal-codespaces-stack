@@ -1,0 +1,32 @@
+chat-print:
+  css:
+    base:
+      css/chat-print.css: { media: print }
+chat:
+  css:
+    theme:
+      css/chat.css: {}
+  dependencies:
+    - ai_chatbot/chat-print
+form-stream:
+  js:
+    js/showdown.min.js: {}
+    js/form-stream.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+deepchat:
+  css:
+    theme:
+      css/deepchat.css: { }
+  js:
+    deepchat/deepchat.bundle.js: {  attributes: { type: module } }
+    js/deepchat-init.js : {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.ajax
+    - core/drupal.dialog.ajax
+    - ai_chatbot/chat-print

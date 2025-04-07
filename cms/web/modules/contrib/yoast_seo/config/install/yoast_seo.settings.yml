@@ -1,0 +1,6 @@
+score_rules:
+  0: 'Not available'
+  8: 'Good'
+  1: 'Bad'
+  5: 'Okay'
+auto_refresh_seo_result: false

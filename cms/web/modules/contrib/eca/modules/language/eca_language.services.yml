@@ -1,0 +1,7 @@
+services:
+  eca_language.manager:
+    decorates: language_manager
+    parent: language_manager
+    class: Drupal\eca_language\EcaLanguageManager
+    calls:
+      - [setDecoratedLanguageManager, ['@eca_language.manager.inner']]

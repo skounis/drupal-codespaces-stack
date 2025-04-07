@@ -1,0 +1,62 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_content
+id: eca_test_0008
+modeller: bpmn_io
+label: 'Save new entity'
+version: v1
+weight: null
+events:
+  insert_article:
+    plugin: 'content_entity:insert'
+    label: 'Node inserted'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_0rt55gb
+        condition: ''
+conditions: {  }
+gateways: {  }
+actions:
+  Activity_0rt55gb:
+    plugin: eca_token_load_entity
+    label: 'Load node'
+    configuration:
+      token_name: article
+      from: current
+      entity_type: _none
+      entity_id: ''
+      revision_id: ''
+      properties: ''
+      langcode: _interface
+      latest_revision: false
+      unchanged: false
+      object: ''
+    successors:
+      -
+        id: create_tag
+        condition: ''
+  create_tag:
+    plugin: eca_new_entity
+    label: 'Create new tag'
+    configuration:
+      token_name: tag
+      type: 'taxonomy_term tags'
+      langcode: ''
+      label: 'Tag: [article:title]'
+      published: true
+      owner: ''
+      object: ''
+    successors:
+      -
+        id: save_tag
+        condition: ''
+  save_tag:
+    plugin: eca_save_entity
+    label: 'Save tag'
+    configuration:
+      object: tag
+    successors: {  }

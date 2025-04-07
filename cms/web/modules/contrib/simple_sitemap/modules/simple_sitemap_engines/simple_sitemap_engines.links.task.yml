@@ -1,0 +1,17 @@
+simple_sitemap.engines:
+  route_name: simple_sitemap.engines.status
+  title: 'Search engines'
+  base_route: entity.simple_sitemap.collection
+  weight: 0
+
+simple_sitemap.engines.status:
+  route_name: simple_sitemap.engines.status
+  title: 'Status'
+  parent_id: simple_sitemap.engines
+  weight: -1
+
+simple_sitemap.engines.settings:
+  route_name: simple_sitemap.engines.settings
+  title: 'Settings'
+  parent_id: simple_sitemap.engines
+  weight: 1

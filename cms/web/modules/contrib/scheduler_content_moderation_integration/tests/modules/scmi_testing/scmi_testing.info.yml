@@ -1,0 +1,11 @@
+name: 'Scheduler Content Moderation Integration Testing'
+type: module
+description: 'Support module for SCMI testing.'
+package: Testing
+dependencies:
+  - scheduler_content_moderation_integration:scheduler_content_moderation_integration
+
+# Information added by Drupal.org packaging script on 2025-02-04
+version: '3.0.4'
+project: 'scheduler_content_moderation_integration'
+datestamp: 1738679098

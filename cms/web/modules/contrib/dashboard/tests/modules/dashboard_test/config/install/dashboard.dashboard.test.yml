@@ -1,0 +1,44 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test
+label: Test
+description: ''
+layout:
+  -
+    layout_id: layout_twocol_section
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+      column_widths: 50-50
+    components:
+      d60774d6-0f62-440e-8526-2a318ac4fef8:
+        uuid: d60774d6-0f62-440e-8526-2a318ac4fef8
+        region: first
+        configuration:
+          id: dashboard_text_block
+          label: 'Dashboard Text 1'
+          label_display: visible
+          provider: dashboard
+          context_mapping: {  }
+          text:
+            value: '<p>Text 1</p>'
+            format: basic_html
+        weight: 0
+        additional: {  }
+      e4654a62-9bfb-40ac-923b-e49f9faf2314:
+        uuid: e4654a62-9bfb-40ac-923b-e49f9faf2314
+        region: second
+        configuration:
+          id: dashboard_text_block
+          label: 'Dashboard Text 2'
+          label_display: visible
+          provider: dashboard
+          context_mapping: {  }
+          text:
+            value: '<p>Text 2</p>'
+            format: basic_html
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+weight: -10

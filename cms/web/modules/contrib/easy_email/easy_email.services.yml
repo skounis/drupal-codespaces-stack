@@ -1,0 +1,24 @@
+services:
+  logger.channel.easy_email:
+    parent: logger.channel_base
+    arguments: ['easy_email']
+  easy_email.handler:
+    class: Drupal\easy_email\Service\EmailHandler
+    arguments: ['@entity_type.manager', '@plugin.manager.mail', '@language_manager', '@renderer', '@datetime.time', '@easy_email.token_evaluator', '@easy_email.user_evaluator', '@easy_email.attachment_evaluator', '@event_dispatcher']
+  easy_email.token_evaluator:
+    class: Drupal\easy_email\Service\EmailTokenEvaluator
+    arguments: ['@event_dispatcher', '@token']
+  easy_email.user_evaluator:
+    class: Drupal\easy_email\Service\EmailUserEvaluator
+    arguments: ['@event_dispatcher', '@entity_type.manager']
+  easy_email.attachment_evaluator:
+    class: Drupal\easy_email\Service\EmailAttachmentEvaluator
+    arguments: ['@event_dispatcher', '@file_system', '@file.mime_type.guesser', '@logger.channel.easy_email', '@config.factory']
+  easy_email.purger:
+    class: Drupal\easy_email\Service\EasyEmailPurger
+    arguments: ['@entity_type.manager', '@datetime.time']
+  easy_email.email_collection_access_checker:
+    class: Drupal\easy_email\Access\EmailCollectionAccess
+    arguments: ['@config.factory']
+    tags:
+      - { name: access_check, applies_to: _easy_email_collection_access }

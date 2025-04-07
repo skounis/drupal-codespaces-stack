@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autoconfigure: true
+  ai_agents_form_integration.subscriber:
+    class: Drupal\ai_agents_form_integration\Routing\RouteSubscriber
+    arguments: ['@entity_type.manager']
+  ai_agents_form_integration.form_helper:
+    class: Drupal\ai_agents_form_integration\Service\FormHelper
+    arguments: ['@ai.provider']

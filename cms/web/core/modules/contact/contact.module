@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Form submission handler for \Drupal\user\ProfileForm.
+ *
+ * Saves the contact page setting.
+ */
+function contact_user_profile_form_submit($form, FormStateInterface $form_state) {
+  $account = $form_state->getFormObject()->getEntity();
+  if ($account->id() && $form_state->hasValue('contact')) {
+    \Drupal::service('user.data')->set('contact', $account->id(), 'enabled', (int) $form_state->getValue('contact'));
+  }
+}
+
+/**
+ * Form submission handler for \Drupal\user\AccountSettingsForm.
+ *
+ * @see contact_form_user_admin_settings_alter()
+ */
+function contact_form_user_admin_settings_submit($form, FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('contact.settings')
+    ->set('user_default_enabled', $form_state->getValue('contact_default_status'))
+    ->save();
+}

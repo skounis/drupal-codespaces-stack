@@ -1,0 +1,24 @@
+
+ai_agents.settings_form:
+  path: '/admin/config/ai/agents'
+  defaults:
+    _form: '\Drupal\ai_agents\Form\AiAgentsSettingsForm'
+    _title: 'AI Agents Settings'
+  requirements:
+    _permission: 'administer ai'
+
+ai_agents.setting_form:
+  path: '/admin/config/ai/agents/settings/{agent_id}'
+  defaults:
+    _form: '\Drupal\ai_agents\Form\AiAgentSettingsForm'
+    _title: 'AI Agent Settings'
+  requirements:
+    _permission: 'administer ai'
+
+ai_agents.prompt_changer:
+  path: '/admin/config/ai/agents/settings/{agent_id}/{file}'
+  defaults:
+    _form: '\Drupal\ai_agents\Form\AiAgentPromptChanger'
+    _title: 'AI Agent Settings'
+  requirements:
+    _permission: 'administer ai'

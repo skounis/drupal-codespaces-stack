@@ -1,0 +1,18 @@
+services:
+  logger.channel.geofield:
+    parent: logger.channel_base
+    arguments: ['geofield']
+
+  plugin.manager.geofield_backend:
+    class: Drupal\geofield\Plugin\GeofieldBackendManager
+    parent: default_plugin_manager
+
+  geofield.wkt_generator:
+    class: Drupal\geofield\WktGenerator
+
+  geofield.geophp:
+    class: Drupal\geofield\GeoPHP\GeoPHPWrapper
+
+  plugin.manager.geofield_proximity_source:
+    class: Drupal\geofield\Plugin\GeofieldProximitySourceManager
+    parent: default_plugin_manager

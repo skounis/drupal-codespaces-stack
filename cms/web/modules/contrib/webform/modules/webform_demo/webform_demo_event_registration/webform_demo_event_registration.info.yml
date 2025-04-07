@@ -1,0 +1,19 @@
+name: 'Webform Demo: Event Registration System'
+type: module
+description: 'Demonstrates how to use the Webform module to build an event registration system with email reminders.'
+package: 'Webform Demo'
+core_version_requirement: ^10.3 || ^11.0
+dependencies:
+  - 'drupal:datetime'
+  - 'drupal:views'
+  - 'token:token'
+  - 'webform:webform'
+  - 'webform:webform_node'
+  - 'webform:webform_options_limit'
+  - 'webform:webform_scheduled_email'
+  - 'webform:webform_share'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

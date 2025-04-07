@@ -1,0 +1,44 @@
+---
+title: "{{ label|raw }}"
+tags:
+- {{ type }}
+- {{ provider }}
+- {% if extension_info.standalone %}{{ provider }}{% else %}{{ extension_info.module }}{% endif %} {{ type }} {{ eca_version_introduced }}
+---
+# {{ label|raw }}
+
+Available since: {{ eca_version_introduced }}
+
+{{ description|raw }}
+{% if tokens %}
+{% macro mProperty(prefix, token) %}{% import _self as macros %}{% for property in token %}{% set name = prefix ~ ':' ~ property.name %}
+    | `[{{ name }}]` | {{ property.description }}{% if property.aliases %}<br /> Alias: `{{ property.aliases|join(', ') }}`{% endif %} |
+{% if property.properties %}{{ macros.mProperty(name, property.properties) }}{% endif %}{% endfor %}{% endmacro %}
+{% import _self as macros %}
+
+!!! tip "Provided tokens"
+
+    | Token | Description |
+    | ----- | ----------- |
+{% for token in tokens %}
+    | `[{{ token.name }}]` | {{ token.description }}{% if token.aliases %}<br /> Alias: `{{ token.aliases|join(', ') }}`{% endif %} |
+{{ macros.mProperty(token.name, token.properties) }}{% endfor %}
+{% endif %}
+
+{!include/plugins/{{ provider }}/{{ type }}/{{ id_fs }}.md!}
+
+{% if fields or extraDescriptions %}
+## Fields
+{% for extraDescription in extraDescriptions %}
+
+{{ extraDescription }}
+{% endfor %}
+{% for field in fields %}
+
+`{{ field.label|raw }}`
+
+:   {{ field.description|raw }}
+
+    {!include/plugins/{{ provider }}/{{ type }}/{{ id_fs }}/{{ field.name }}.md!}
+{% endfor %}
+{% endif %}

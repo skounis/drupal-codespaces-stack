@@ -1,0 +1,32 @@
+{
+    "name": "wpai-inc/anthropic-sdk-php",
+    "description": "This library provides convenient access to the Anthropic REST API from server-side PHP",
+    "type": "library",
+    "require": {
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.8",
+        "illuminate/support": "^9.52|^10.0|^11.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "WpAi\\Anthropic\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "WpAi\\Anthropic\\Providers\\AnthropicServiceProvider"
+            ],
+            "aliases": {
+                "Anthropic": "WpAi\\Anthropic\\Facades\\Anthropic"
+            }
+        }
+    },
+    "authors": [
+        {
+            "name": "Greg Hunt",
+            "email": "greg@codewp.ai"
+        }
+    ]
+}

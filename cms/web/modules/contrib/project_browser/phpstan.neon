@@ -1,0 +1,79 @@
+includes:
+  - phpstan-drupal-core-bc-layer.neon.php
+parameters:
+  level: 8
+  universalObjectCratesClasses:
+    - Drupal\Core\Extension\Extension
+  reportUnmatchedIgnoredErrors: true
+  excludePaths:
+    - phpstan-drupal-core-bc-layer.neon.php
+    # The scripts directory does not contain runtime code.
+    - scripts
+    # The node_modules contains some PHP to ignore.
+    - sveltejs
+    # The recipe form contains a couple of errors that cannot be ignored.
+    # @todo Remove this exclusion when support for Drupal 10 is dropped in https://www.drupal.org/i/3494848.
+    - src/Form/RecipeForm.php
+  # Every ignore should be documented.
+  ignoreErrors:
+    # Ignore errors when using `array` as a return type.
+    -
+      identifier: missingType.iterableValue
+      reportUnmatched: false
+
+    ### Core testing suite
+    # Caused by missing return type on \Drupal\FunctionalJavascriptTests\WebDriverTestBase::assertSession().
+    -
+      message: "#^Call to an undefined method Drupal\\\\Tests\\\\WebAssert\\:\\:assert[a-zA-Z]+\\(\\)\\.$#"
+      identifier: method.notFound
+      paths:
+        - tests/src/FunctionalJavascript
+      reportUnmatched: false
+    # Caused by missing return type on \Drupal\FunctionalJavascriptTests\WebDriverTestBase::assertSession().
+    -
+      message: "#^Call to an undefined method Drupal\\\\Tests\\\\WebAssert\\:\\:wait[a-zA-Z]+\\(\\)\\.$#"
+      identifier: method.notFound
+      paths:
+        - tests/src/FunctionalJavascript
+      reportUnmatched: false
+    # Caused by \Drupal\KernelTests\KernelTestBase::$container having the wrong type.
+    -
+      message: "#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#"
+      identifier: assign.propertyType
+      paths:
+        - tests/src/Kernel/DatabaseTablesTest.php
+      reportUnmatched: false
+    # Caused by \Drupal\Tests\user\Traits\UserCreationTrait::createUser() returning FALSE instead of throwing an exception.
+    -
+      message: "#^Parameter \\#1 \\$account of method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:drupalLogin\\(\\) expects Drupal\\\\Core\\\\Session\\\\AccountInterface, Drupal\\\\user\\\\Entity\\\\User\\|false given\\.$#"
+      identifier: argument.type
+      paths:
+        - tests/src/Functional
+        - tests/src/FunctionalJavascript
+      reportUnmatched: false
+
+    ### Package Manager
+    # @todo Remove after resolving https://www.drupal.org/i/3501836.
+    # Caused by using self instead of static as a return type in \Drupal\fixture_manipulator\FixtureManipulator.
+    -
+      message: "#^Method Drupal\\\\fixture_manipulator\\\\FixtureManipulator\\:\\:commitChanges\\(\\) invoked with 0 parameters, 1 required\\.$#"
+      identifier: arguments.count
+      paths:
+        - tests/src/Kernel/InstallerTest.php
+        - tests/src/Kernel/CoreNotUpdatedValidatorTest.php
+        - tests/src/Kernel/PackageNotInstalledValidatorTest.php
+      reportUnmatched: false
+    # Caused by missing return type on \Drupal\Tests\package_manager\Traits\FixtureManipulatorTrait::getStageFixtureManipulator().
+    -
+      message: "#^Call to an undefined method object\\:\\:setCorePackageVersion\\(\\)\\.$#"
+      identifier: method.notFound
+      paths:
+        - tests/src/Kernel/CoreNotUpdatedValidatorTest.php
+      reportUnmatched: false
+    # Caused by missing @throws on \Drupal\package_manager\StageBase::apply().
+    -
+      message: "#^Dead catch \\- Drupal\\\\package_manager\\\\Exception\\\\StageEventException is never thrown in the try block\\.$#"
+      identifier: catch.neverThrown
+      paths:
+        - tests/src/Kernel/CoreNotUpdatedValidatorTest.php
+      reportUnmatched: false

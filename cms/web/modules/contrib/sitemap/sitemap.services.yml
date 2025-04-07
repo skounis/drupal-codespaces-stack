@@ -1,0 +1,19 @@
+services:
+
+  # Provides a Sitemap plugin manager.
+  plugin.manager.sitemap:
+    class: Drupal\sitemap\SitemapManager
+    parent: default_plugin_manager
+
+  # Implements the loading, transforming and rendering of menu link trees.
+  sitemap.menu.link_tree:
+    class: Drupal\sitemap\Menu\SitemapMenuLinkTree
+    parent: menu.link_tree
+
+  # Alter routes provided by this module, i.e.: to add a custom sitemap path.
+  sitemap.route_subscriber:
+    class: Drupal\sitemap\EventSubscriber\RouteSubscriber
+    factory: Drupal\sitemap\EventSubscriber\RouteSubscriber::create
+    arguments: ['@service_container']
+    tags:
+      - { name: 'event_subscriber' }

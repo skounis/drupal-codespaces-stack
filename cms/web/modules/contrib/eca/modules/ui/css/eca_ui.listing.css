@@ -1,0 +1,22 @@
+ul.eca-event-list li {
+  display: none;
+}
+ul.eca-event-list li:nth-of-type(1),
+ul.eca-event-list li:nth-of-type(2),
+ul.eca-event-list li:nth-of-type(3) {
+  display: list-item;
+}
+ul.eca-event-list li:nth-of-type(4) {
+  display: block;
+  overflow: hidden;
+  height: 1rem;
+  line-height: 3rem;
+}
+ul.eca-event-list li:nth-of-type(4)::before {
+  display: block;
+  content: "...";
+  line-height: 1rem;
+}
+ul.eca-event-list li:nth-of-type(4):hover {
+  cursor: pointer;
+}

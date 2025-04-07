@@ -1,0 +1,47 @@
+fieldset.easy-email-type-preview:not(.fieldgroup) {
+  background-color: #ffffcc;
+}
+fieldset.easy-email-resizable {
+  border: 1px solid #ccc;
+  height: 300px;
+  padding-bottom: 30px !important;
+}
+fieldset {
+  padding-top: 40px !important;
+}
+.easy-email-resizable iframe {
+  border: 1px solid #ccc;
+}
+fieldset label {
+  font-weight: bold;
+  display: inline;
+}
+.inbox-preview-resizable {
+  background: white;
+  border: 1px solid #ccc;
+  width: 320px;
+  max-height: 5em;
+  height: 5em;
+  padding: 1em;
+}
+.inbox-preview-view {
+  line-height: 1.3em;
+  height: 5em;
+  max-height: 5em;
+  color: black;
+  overflow: hidden;
+}
+.inbox-preview-view .from-name {
+  font-weight: bold;
+  font-size: 110%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.inbox-preview-view .subject {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.inbox-preview-view .body-preview {
+  color: #888;
+  overflow: hidden;
+}

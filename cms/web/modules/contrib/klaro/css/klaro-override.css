@@ -1,0 +1,335 @@
+.klaro {
+  --klaro-primary-color: #12285f;
+  --klaro-link-color: var(--klaro-primary-color);
+  --klaro-link-color-hover: var(--klaro-primary-color);
+  --klaro-link-decoration: inherit;
+  --klaro-link-decoration-hover: inherit;
+  --klaro-link-decoration-line: inherit;
+  --klaro-link-decoration-line-hover: inherit;
+  --klaro-button-bg: var(--klaro-primary-color);
+  --klaro-button-text-color: #fff;
+  --klaro-button-border: 3px solid var(--klaro-primary-color);
+  --klaro-button-border-radius: 6px;
+  --klaro-button-padding: 13px 17px;
+  --klaro-button-font-size: inherit;
+  --klaro-button-font-weight: inherit;
+  --klaro-button-line-height: 1rem;
+  --klaro-button-box-shadow: inherit;
+  --klaro-button-bg-hover: #fff;
+  --klaro-button-text-color-hover: var(--klaro-primary-color);
+  --klaro-button-border-hover: 3px solid var(--klaro-primary-color);
+  --klaro-button-focus-outline: 2px solid var(--klaro-primary-color);
+  --klaro-button-focus-outline-offset: 2px;
+  --klaro-button-focus-box-shadow: inherit;
+  --klaro-dialog-focus-outline: auto;
+  --klaro-dialog-focus-box-shadow: 0 0 0 2px var(--klaro-primary-color),
+    0 4px 6px 0 rgba(0, 0, 0, 0.2), 5px 5px 10px 0 rgba(0, 0, 0, 0.19);
+  --font-size: 14px;
+  --font-family: inherit;
+  --title-font-family: inherit;
+  --klaro-slider-bg: var(--white2);
+  --klaro-slider-bg-active: var(--klaro-primary-color);
+  --klaro-slider-bg-required: var(--klaro-primary-color);
+  --green1: var(--klaro-link-color);
+  --green2: var(--klaro-link-color);
+  --green3: var(--klaro-link-color);
+
+  .cookie-modal .cm-btn,
+  .cookie-modal .cm-btn.cm-btn-info,
+  .cookie-modal .cm-btn.cm-btn-success,
+  .cookie-modal .cm-btn.cm-btn-decline,
+  .cookie-modal .cm-btn.cm-btn-danger,
+  .context-notice .cm-btn,
+  .context-notice .cm-btn.cm-btn-info,
+  .context-notice .cm-btn.cm-btn-success,
+  .context-notice .cm-btn.cm-btn-decline,
+  .context-notice .cm-btn.cm-btn-danger,
+  .cookie-notice .cm-btn,
+  .cookie-notice .cm-btn.cm-btn-info,
+  .cookie-notice .cm-btn.cm-btn-success,
+  .cookie-notice .cm-btn.cm-btn-decline,
+  .cookie-notice .cm-btn.cm-btn-danger,
+  &.learn-more-as-button
+    .cookie-notice:not(.cookie-modal-notice)
+    a.cm-link.cn-learn-more {
+    display: inline-block;
+    width: fit-content;
+    padding: var(--klaro-button-padding);
+    color: var(--klaro-button-text-color);
+    border: var(--klaro-button-border);
+    border-radius: var(--klaro-button-border-radius);
+    background-color: var(--klaro-button-bg);
+    box-shadow: var(--klaro-button-box-shadow);
+    font-size: var(--klaro-button-font-size);
+    font-weight: var(--klaro-button-font-weight);
+    line-height: var(--klaro-button-line-height);
+
+    &:hover {
+      color: var(--klaro-button-text-color-hover);
+      border: var(--klaro-button-border-hover);
+      background-color: var(--klaro-button-bg-hover);
+    }
+
+    &:focus {
+      outline: var(--klaro-button-focus-outline);
+      outline-offset: var(--klaro-button-focus-outline-offset);
+      box-shadow: var(--klaro-button-focus-box-shadow);
+    }
+  }
+
+  &.learn-more-as-button
+    .cookie-notice:not(.cookie-modal-notice)
+    a.cm-link.cn-learn-more {
+    flex-grow: unset;
+    margin-right: auto;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .cookie-modal,
+  .context-notice,
+  .cookie-notice {
+    a {
+      color: var(--klaro-link-color);
+      text-decoration-style: var(--klaro-link-decoration);
+      text-decoration-line: var(--klaro-link-decoration-line);
+    }
+
+    a:hover {
+      color: var(--klaro-link-color-hover);
+      text-decoration-style: var(--klaro-link-decoration-hover);
+      text-decoration-line: var(--klaro-link-decoration-line-hover);
+    }
+
+    a:focus {
+      outline: solid 2px currentColor;
+      outline-offset: 2px;
+    }
+
+    .cm-list-input:focus + .cm-list-label .slider {
+      outline: var(--klaro-button-focus-outline);
+      outline-offset: var(--klaro-button-focus-outline-offset);
+      box-shadow: var(--klaro-button-focus-box-shadow);
+    }
+    .cm-list-label .slider {
+      transition: none;
+      background-color: var(--klaro-slider-bg);
+    }
+    .cm-list-input:checked + .cm-list-label .slider {
+      background-color: var(--klaro-slider-bg-active);
+    }
+    .cm-list-input.required:checked + .cm-list-label .slider {
+      background-color: var(--klaro-slider-bg-required);
+    }
+    .cm-list-input.half-checked:checked + .cm-list-label .slider {
+      opacity: 0.6;
+      background-color: var(--klaro-slider-bg-active);
+    }
+  }
+
+  .cm-modal.cm-klaro:focus,
+  .cm-modal.cm-klaro:focus-visible,
+  .context-notice:focus,
+  .context-notice:focus-visible,
+  .cookie-notice:focus,
+  .cookie-notice:focus-visible {
+    outline: var(--klaro-dialog-focus-outline);
+    box-shadow:
+      var(--klaro-dialog-focus-box-shadow),
+      0 0 0 10px #fff;
+  }
+}
+
+.klaro.klaro-theme-olivero {
+  --klaro-primary-color: var(--color-text-primary-medium);
+  --klaro-link-color-hover: var(--color--primary-50);
+  --klaro-link-decoration: var(--gin-link-decoration-style);
+  --klaro-link-decoration-hover: none;
+  --klaro-link-decoration-line: underline;
+  --klaro-link-decoration-line-hover: underline;
+  --klaro-button-bg: var(--color--primary-40);
+  --klaro-button-border: solid 2px var(--color--primary-40);
+  --klaro-button-border-radius: var(--border-radius);
+  --klaro-button-padding: 0 var(--sp1-5);
+  --klaro-button-font-size: var(--font-size-m);
+  --klaro-button-font-weight: 700;
+  --klaro-button-line-height: var(--sp2-5);
+  --klaro-button-bg-hover: var(--color--primary-30);
+  --klaro-button-text-color-hover: var(--klaro-button-text-color);
+  --klaro-button-border-hover: solid 2px var(--color--primary-30);
+  --klaro-button-focus-outline: 2px solid var(--color--primary-60);
+  --klaro-button-focus-outline-offset: 2px;
+  --klaro-dialog-focus-outline: 2px solid var(--color--primary-60);
+  --klaro-dialog-focus-box-shadow: 0 0 0 2px var(--color--primary-60),
+    0 4px 6px 0 rgba(0, 0, 0, 0.2), 5px 5px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+.klaro.klaro-theme-claro {
+  --klaro-primary-color: var(--color-absolutezero);
+  --klaro-link-decoration-line: underline;
+  --klaro-link-decoration-line-hover: none;
+  --klaro-button-bg: var(--button-bg-color--primary);
+  --klaro-button-text-color: var(--button-fg-color--primary);
+  --klaro-button-border: 1px solid transparent;
+  --klaro-button-border-radius: var(--button-border-radius-size);
+  --klaro-button-font-weight: 700;
+  --klaro-button-padding: calc(var(--space-m) - 1px) calc(var(--space-l) - 1px);
+  --klaro-button-bg-hover: var(--button--hover-bg-color--primary);
+  --klaro-button-text-color-hover: var(--button-fg-color--primary);
+  --klaro-button-border-hover: var(--klaro-button-border);
+  --klaro-button-focus-outline: var(--focus-outline);
+  --klaro-button-focus-box-shadow: var(--focus-box-shadow);
+  --klaro-dialog-focus-outline: var(--jui-dialog--focus-outline);
+  --klaro-dialog-focus-box-shadow: var(--jui-dialog--focus-box-shadow);
+
+  .cookie-modal,
+  .context-notice,
+  .cookie-notice {
+    .hide:active,
+    .hide:focus,
+    .hide:focus-visible,
+    button.klaro-close:active,
+    button.klaro-close:focus,
+    button.klaro-close:focus-visible,
+    a:focus {
+      outline: var(--focus-outline);
+      box-shadow: var(--focus-box-shadow);
+    }
+  }
+  @media (prefers-contrast: more) {
+    --focus-outline: 1px dotted #fff;
+  }
+}
+
+.klaro.klaro-theme-gin {
+  --klaro-primary-color: var(--gin-color-primary);
+  --klaro-link-decoration: var(--gin-link-decoration-style);
+  --klaro-link-decoration-hover: none;
+  --klaro-link-decoration-line: underline;
+  --klaro-link-decoration-line-hover: none;
+  --klaro-button-bg: var(--klaro-primary-color);
+  --klaro-button-text-color: var(--gin-color-button-text);
+  --klaro-button-border: 2px solid var(--gin-color-primary) !important;
+  --klaro-button-border-radius: var(--gin-border-m);
+  --klaro-button-font-size: var(--gin-font-size-s);
+  --klaro-button-font-weight: var(--gin-font-weight-semibold);
+  --klaro-button-padding: calc(var(--gin-spacing-s) - 2px) var(--gin-spacing-m);
+  --klaro-button-box-shadow: 0.1em 0.25em 0.5em var(--gin-color-primary-light);
+  --klaro-button-bg-hover: var(--gin-color-primary-hover) !important;
+  --klaro-button-text-color-hover: var(--gin-color-button-text);
+  --klaro-button-border-hover: var(--klaro-button-border);
+  --klaro-button-focus-outline: none;
+  --klaro-button-focus-box-shadow: 0 0 0 1px var(--gin-color-focus-border),
+    0 0 0 4px var(--gin-color-focus);
+  --klaro-dialog-focus-outline: var(--klaro-button-focus-outline);
+  --klaro-dialog-focus-box-shadow: var(--klaro-button-focus-box-shadow);
+  --klaro-slider-bg: var(--gin-color-disabled);
+  --klaro-slider-bg-active: var(--gin-switch);
+  --klaro-slider-bg-required: var(--gin-switch);
+  --light1: var(--gin-color-text-light);
+  --light3: var(--gin-color-text-light);
+  --white2: var(--gin-color-disabled);
+
+  .cookie-modal,
+  .context-notice,
+  .cookie-notice {
+    p,
+    strong,
+    h2,
+    ul,
+    li {
+      color: var(--gin-color-text);
+    }
+    .cm-modal .cm-body {
+      ul.cm-services li.cm-purpose,
+      ul.cm-services li.cm-service,
+      ul.cm-purposes li.cm-service,
+      ul.cm-purposes li.cm-purpose {
+        span.cm-opt-out,
+        span.cm-required {
+          color: var(--gin-color-text-light);
+        }
+      }
+    }
+    button.klaro-close:focus,
+    .hide:active,
+    .hide:focus,
+    a:focus {
+      outline: none;
+      box-shadow:
+        0 0 0 1px var(--gin-color-focus-border),
+        0 0 0 4px var(--gin-color-focus);
+      @media (prefers-contrast: more) {
+        outline: solid 2px currentColor;
+        box-shadow: unset;
+      }
+    }
+  }
+
+  h1.title {
+    margin-block-start: 0;
+    padding: var(--gin-spacing-m) var(--gin-spacing-l);
+    color: var(--gin-color-primary-active);
+    border: 0 none;
+    border-radius: var(--gin-border-m);
+    background: var(--gin-bg-header);
+    font-size: var(--gin-font-size-l);
+    font-weight: var(--gin-font-weight-bold);
+  }
+
+  .cookie-modal .cm-modal .hide {
+    top: 15px;
+    right: 2px;
+    .cm-header {
+      padding-right: 30px;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .klaro.klaro-theme-gin {
+    --white3: var(--gin-color-primary-hover);
+    --klaro-slider-bg: var(--gin-bg-input);
+    --klaro-slider-bg-active: var(--gin-color-primary-light-active);
+    --klaro-slider-bg-required: var(--gin-color-primary-light-active);
+    .context-notice,
+    .cookie-notice,
+    .cm-modal.cm-klaro {
+      border: 1px solid #fff;
+      background: var(--gin-bg-layer);
+    }
+    .cm-modal.cm-klaro:focus,
+    .cm-modal.cm-klaro:focus-visible,
+    .context-notice:focus,
+    .context-notice:focus-visible,
+    .cookie-notice:focus,
+    .cookie-notice:focus-visible {
+      box-shadow:
+        var(--klaro-dialog-focus-box-shadow),
+        0 0 0 10px var(--gin-bg-layer);
+    }
+  }
+}
+
+.gin--dark-mode .klaro.klaro-theme-gin {
+  --white3: var(--gin-color-primary-hover);
+  --klaro-slider-bg: var(--gin-bg-input);
+  --klaro-slider-bg-active: var(--gin-color-primary-light-active);
+  --klaro-slider-bg-required: var(--gin-color-primary-light-active);
+  .context-notice,
+  .cookie-notice,
+  .cm-modal.cm-klaro {
+    border: 1px solid #fff;
+    background: var(--gin-bg-layer);
+  }
+  .cm-modal.cm-klaro:focus,
+  .cm-modal.cm-klaro:focus-visible,
+  .context-notice:focus,
+  .context-notice:focus-visible,
+  .cookie-notice:focus,
+  .cookie-notice:focus-visible {
+    box-shadow:
+      var(--klaro-dialog-focus-box-shadow),
+      0 0 0 10px var(--gin-bg-layer);
+  }
+}

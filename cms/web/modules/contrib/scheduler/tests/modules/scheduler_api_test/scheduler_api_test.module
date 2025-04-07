@@ -1,0 +1,582 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations of the Scheduler API Test module.
+ *
+ * Scheduler provides eight hook functions. Each has a non-specific version with
+ * no _{type}_ in the name, which is invoked for all entity types, and a version
+ * with _{type}_ in the name, which is invoked only when that entity types is
+ * being processed. Hence for complete test coverage this module has eight plain
+ * implementations, and eight implementations for Nodes, Media, Products and
+ * Taxonomy Terms.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductInterface;
+use Drupal\media\Entity\Media;
+use Drupal\media\MediaInterface;
+use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
+
+/**
+ * Helper function to return all entities of a given type.
+ */
+function _scheduler_api_test_get_entities($entityTypeId) {
+  switch ($entityTypeId) {
+    case 'node':
+      $results = Node::loadMultiple(\Drupal::entityQuery('node')->accessCheck(FALSE)->execute());
+      break;
+
+    case 'media':
+      $results = Media::loadMultiple(\Drupal::entityQuery('media')->accessCheck(FALSE)->execute());
+      break;
+
+    case 'commerce_product':
+      $results = Product::loadMultiple(\Drupal::entityQuery('commerce_product')->accessCheck(FALSE)->execute());
+      break;
+
+    case 'taxonomy_term':
+      $results = Term::loadMultiple(\Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->execute());
+      break;
+
+    default:
+      throw new \Exception("Entity type id '{$entityTypeId}' is unrecognized in _scheduler_api_test_get_entities().");
+  }
+  return $results;
+}
+
+/**
+ * Implements hook_scheduler_list().
+ */
+function scheduler_api_test_scheduler_list($process, $entityTypeId) {
+  $ids = [];
+  $request_time = \Drupal::time()->getRequestTime();
+  $results = _scheduler_api_test_get_entities($entityTypeId);
+  foreach ($results as $id => $entity) {
+    // If publishing and this is the 'publish me' test entity, set the date and
+    // add the id to the list.
+    if ($process == 'publish' && !$entity->isPublished() && $entity->label() == "Pink $entityTypeId list publish me") {
+      $entity->set('publish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+    // If unpublishing and this is the 'unpublish me' test entity, set the date
+    // and add the id to the list.
+    if ($process == 'unpublish' && $entity->isPublished() && $entity->label() == "Pink $entityTypeId list unpublish me") {
+      $entity->set('unpublish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+  }
+  return $ids;
+}
+
+/**
+ * Implements hook_scheduler_node_list().
+ */
+function scheduler_api_test_scheduler_node_list($process, $entityTypeId) {
+  $ids = [];
+  $request_time = \Drupal::time()->getRequestTime();
+  $results = _scheduler_api_test_get_entities($entityTypeId);
+  foreach ($results as $id => $entity) {
+    // If publishing and this is the 'publish me' test entity, set the date and
+    // add the id to the list.
+    if ($process == 'publish' && !$entity->isPublished() && $entity->label() == "Purple $entityTypeId list publish me") {
+      $entity->set('publish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+    // If unpublishing and this is the 'unpublish me' test entity, set the date
+    // and add the id to the list.
+    if ($process == 'unpublish' && $entity->isPublished() && $entity->label() == "Purple $entityTypeId list unpublish me") {
+      $entity->set('unpublish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+  }
+  return $ids;
+}
+
+/**
+ * Implements hook_scheduler_media_list().
+ */
+function scheduler_api_test_scheduler_media_list($process, $entityTypeId) {
+  // This hook does exactly the same as the node version, so re-use that.
+  return scheduler_api_test_scheduler_node_list($process, $entityTypeId);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_list().
+ */
+function scheduler_api_test_scheduler_commerce_product_list($process, $entityTypeId) {
+  // This hook does exactly the same as the node version, so re-use that.
+  return scheduler_api_test_scheduler_node_list($process, $entityTypeId);
+}
+
+/**
+ * Implements hook_scheduler_taxonomy_term_list().
+ */
+function scheduler_api_test_scheduler_taxonomy_term_list($process, $entityTypeId) {
+  // This hook does exactly the same as the node version, so re-use that.
+  return scheduler_api_test_scheduler_node_list($process, $entityTypeId);
+}
+
+/**
+ * Implements hook_scheduler_list_alter().
+ */
+function scheduler_api_test_scheduler_list_alter(&$ids, $process, $entityTypeId) {
+  $request_time = \Drupal::time()->getRequestTime();
+  $results = _scheduler_api_test_get_entities($entityTypeId);
+  foreach ($results as $id => $entity) {
+    if ($process == 'publish' && $entity->label() == "Pink $entityTypeId list_alter do not publish me") {
+      // Remove the id.
+      $ids = array_diff($ids, [$id]);
+    }
+    if ($process == 'publish' && $entity->label() == "Pink $entityTypeId list_alter publish me") {
+      // Set a publish_on date and add the id.
+      $entity->set('publish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+    if ($process == 'unpublish' && $entity->label() == "Pink $entityTypeId list_alter do not unpublish me") {
+      // Remove the id.
+      $ids = array_diff($ids, [$id]);
+    }
+    if ($process == 'unpublish' && $entity->label() == "Pink $entityTypeId list_alter unpublish me") {
+      // Set an unpublish_on date and add the id.
+      $entity->set('unpublish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+  }
+}
+
+/**
+ * Implements hook_scheduler_node_list_alter().
+ */
+function scheduler_api_test_scheduler_node_list_alter(&$ids, $process, $entityTypeId) {
+  $request_time = \Drupal::time()->getRequestTime();
+  $results = _scheduler_api_test_get_entities($entityTypeId);
+  foreach ($results as $id => $entity) {
+    if ($process == 'publish' && $entity->label() == "Purple $entityTypeId list_alter do not publish me") {
+      // Remove the id.
+      $ids = array_diff($ids, [$id]);
+    }
+    if ($process == 'publish' && $entity->label() == "Purple $entityTypeId list_alter publish me") {
+      // Set a publish_on date and add the id.
+      $entity->set('publish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+    if ($process == 'unpublish' && $entity->label() == "Purple $entityTypeId list_alter do not unpublish me") {
+      // Remove the id.
+      $ids = array_diff($ids, [$id]);
+    }
+    if ($process == 'unpublish' && $entity->label() == "Purple $entityTypeId list_alter unpublish me") {
+      // Set an unpublish_on date and add the id.
+      $entity->set('unpublish_on', $request_time)->save();
+      $ids[] = $id;
+    }
+  }
+}
+
+/**
+ * Implements hook_scheduler_media_list_alter().
+ */
+function scheduler_api_test_scheduler_media_list_alter(&$ids, $process, $entityTypeId) {
+  // This hook does exactly the same as the node version, so re-use that.
+  scheduler_api_test_scheduler_node_list_alter($ids, $process, $entityTypeId);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_list_alter().
+ */
+function scheduler_api_test_scheduler_commerce_product_list_alter(&$ids, $process, $entityTypeId) {
+  // This hook does exactly the same as the node version, so re-use that.
+  scheduler_api_test_scheduler_node_list_alter($ids, $process, $entityTypeId);
+}
+
+/**
+ * Implements hook_scheduler_taxonomy_term_list_alter().
+ */
+function scheduler_api_test_scheduler_taxonomy_term_list_alter(&$ids, $process, $entityTypeId) {
+  // This hook does exactly the same as the node version, so re-use that.
+  scheduler_api_test_scheduler_node_list_alter($ids, $process, $entityTypeId);
+}
+
+/**
+ * Implements hook_scheduler_publishing_allowed().
+ */
+function scheduler_api_test_scheduler_publishing_allowed(EntityInterface $entity) {
+  // @todo Fill in this function and add test coverage.
+}
+
+/**
+ * Generic function to check if the entity is allowed to be published.
+ */
+function _scheduler_api_test_publishing_allowed(EntityInterface $entity) {
+  // If there is no 'Approved for Publishing' field or we are not dealing with
+  // an entity designed for this test then allow publishing.
+  if (!isset($entity->field_approved_publishing) || !stristr($entity->label(), "blue {$entity->getEntityTypeId()}")) {
+    $allowed = TRUE;
+  }
+  else {
+    // Only publish entities that have 'Approved for Publishing' set.
+    $allowed = $entity->field_approved_publishing->value;
+    // If publishing is denied then inform the user why.
+    if (!$allowed) {
+      // Show a message when the entity is saved.
+      \Drupal::messenger()->addMessage(t('%title is scheduled for publishing @publish_time, but will not be published until approved.', [
+        '%title' => $entity->label(),
+        '@publish_time' => \Drupal::service('date.formatter')->format($entity->publish_on->value, 'long'),
+      ]), 'status', FALSE);
+      // If the time is in the past it means that the action has been prevented.
+      // Write a dblog message to show this. Give a link to view the entity but
+      // cater for no id as the entity may be new and not yet saved.
+      if ($entity->publish_on->value <= \Drupal::time()->getRequestTime()) {
+        if ($entity->id() && $entity->hasLinkTemplate('canonical')) {
+          $link = $entity->toLink(t('View'))->toString();
+        }
+        \Drupal::logger('scheduler_api_test')->warning('Publishing of "%title" is prevented until approved.', [
+          '%title' => $entity->label(),
+          'link' => $link ?? NULL,
+        ]);
+      }
+    }
+  }
+  return $allowed;
+}
+
+/**
+ * Implements hook_scheduler_node_publishing_allowed().
+ */
+function scheduler_api_test_scheduler_node_publishing_allowed(NodeInterface $node) {
+  // Use the generic publishing_allowed helper function.
+  return _scheduler_api_test_publishing_allowed($node);
+}
+
+/**
+ * Implements hook_scheduler_media_publishing_allowed().
+ */
+function scheduler_api_test_scheduler_media_publishing_allowed(MediaInterface $media) {
+  // Use the generic publishing_allowed helper function.
+  return _scheduler_api_test_publishing_allowed($media);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_publishing_allowed().
+ */
+function scheduler_api_test_scheduler_commerce_product_publishing_allowed(ProductInterface $product) {
+  // Use the generic publishing_allowed helper function.
+  return _scheduler_api_test_publishing_allowed($product);
+}
+
+/**
+ * Implements hook_scheduler_unpublishing_allowed().
+ */
+function scheduler_api_test_scheduler_unpublishing_allowed(EntityInterface $entity) {
+  // @todo Fill in this function and add test coverage.
+}
+
+/**
+ * Generic function to check if the entity is allowed to be unpublished.
+ */
+function _scheduler_api_test_unpublishing_allowed(EntityInterface $entity) {
+  // If there is no 'Approved for Unpublishing' field or we are not dealing with
+  // an entity designed for this test then allow unpublishing.
+  if (!isset($entity->field_approved_unpublishing) || !stristr($entity->label(), "red {$entity->getEntityTypeId()}")) {
+    $allowed = TRUE;
+  }
+  else {
+    // Only unpublish entities that have 'Approved for Unpublishing' set.
+    $allowed = $entity->field_approved_unpublishing->value;
+    // If unpublishing is denied then inform the user why.
+    if (!$allowed) {
+      // Show a message when the entity is saved.
+      \Drupal::messenger()->addMessage(t('%title is scheduled for unpublishing @unpublish_time, but will not be unpublished until approved.', [
+        '%title' => $entity->label(),
+        '@unpublish_time' => \Drupal::service('date.formatter')->format($entity->unpublish_on->value, 'long'),
+      ]), 'status', FALSE);
+      // If the time is in the past it means that the action has been prevented.
+      // Write a dblog message to show this. Give a link to view the entity but
+      // cater for no id as the entity may be new and not yet saved.
+      if ($entity->unpublish_on->value <= \Drupal::time()->getRequestTime()) {
+        if ($entity->id() && $entity->hasLinkTemplate('canonical')) {
+          $link = $entity->toLink(t('View'))->toString();
+        }
+        \Drupal::logger('scheduler_api_test')->warning('Unpublishing of "%title" is prevented until approved.', [
+          '%title' => $entity->label(),
+          'link' => $link ?? NULL,
+        ]);
+      }
+    }
+  }
+  return $allowed;
+}
+
+/**
+ * Implements hook_scheduler_node_unpublishing_allowed().
+ */
+function scheduler_api_test_scheduler_node_unpublishing_allowed(NodeInterface $node) {
+  // Use the generic unpublishing_allowed helper function.
+  return _scheduler_api_test_unpublishing_allowed($node);
+}
+
+/**
+ * Implements hook_scheduler_media_unpublishing_allowed().
+ */
+function scheduler_api_test_scheduler_media_unpublishing_allowed(MediaInterface $media) {
+  // Use the generic unpublishing_allowed helper function.
+  return _scheduler_api_test_unpublishing_allowed($media);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_unpublishing_allowed().
+ */
+function scheduler_api_test_scheduler_commerce_product_unpublishing_allowed(ProductInterface $product) {
+  // Use the generic unpublishing_allowed helper function.
+  return _scheduler_api_test_unpublishing_allowed($product);
+}
+
+/**
+ * Implements hook_scheduler_hide_publish_date().
+ */
+function scheduler_api_test_scheduler_hide_publish_date($form, $form_state, $entity) {
+  // Hide the publish_on field if the title contains 'orange {type}'.
+  if (stristr($entity->label() ?? '', "orange {$entity->getEntityTypeId()}")) {
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: The publish_on field is hidden for orange.'), 'status', FALSE);
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Generic function to hide the publish_on date field.
+ */
+function _scheduler_api_test_hide_publish_date($form, $form_state, $entity) {
+  // Hide the publish_on field if the title contains 'green {type}'.
+  if (stristr($entity->label() ?? '', "green {$entity->getEntityTypeId()}")) {
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: The publish_on field is hidden for green.'), 'status', FALSE);
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_scheduler_node_hide_publish_date().
+ */
+function scheduler_api_test_scheduler_node_hide_publish_date($form, $form_state, $entity) {
+  // Use the generic hide_publish_date helper function.
+  return _scheduler_api_test_hide_publish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_media_hide_publish_date().
+ */
+function scheduler_api_test_scheduler_media_hide_publish_date($form, $form_state, $entity) {
+  // Use the generic hide_publish_date helper function.
+  return _scheduler_api_test_hide_publish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_hide_publish_date().
+ */
+function scheduler_api_test_scheduler_commerce_product_hide_publish_date($form, $form_state, $entity) {
+  // Use the generic hide_publish_date helper function.
+  return _scheduler_api_test_hide_publish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_taxonomy_term_hide_publish_date().
+ */
+function scheduler_api_test_scheduler_taxonomy_term_hide_publish_date($form, $form_state, $entity) {
+  // Use the generic hide_publish_date helper function.
+  return _scheduler_api_test_hide_publish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_hide_unpublish_date().
+ */
+function scheduler_api_test_scheduler_hide_unpublish_date($form, $form_state, $entity) {
+  // Hide the unpublish_on field if the title contains 'yellow {type}'.
+  if (stristr($entity->label() ?? '', "yellow {$entity->getEntityTypeId()}")) {
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: The unpublish_on field is hidden for yellow.'), 'status', FALSE);
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Generic function to hide the unpublish_on date field.
+ */
+function _scheduler_api_test_hide_unpublish_date($form, $form_state, $entity) {
+  // Hide the unpublish_on field if the title contains 'green {type}'.
+  if (stristr($entity->label() ?? '', "green {$entity->getEntityTypeId()}")) {
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: The unpublish_on field is hidden for green.'), 'status', FALSE);
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_scheduler_node_hide_unpublish_date().
+ */
+function scheduler_api_test_scheduler_node_hide_unpublish_date($form, $form_state, $entity) {
+  // Use the generic hide_unpublish_date helper function.
+  return _scheduler_api_test_hide_unpublish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_media_hide_unpublish_date().
+ */
+function scheduler_api_test_scheduler_media_hide_unpublish_date($form, $form_state, $entity) {
+  // Use the generic hide_unpublish_date helper function.
+  return _scheduler_api_test_hide_unpublish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_hide_unpublish_date().
+ */
+function scheduler_api_test_scheduler_commerce_product_hide_unpublish_date($form, $form_state, $entity) {
+  // Use the generic hide_unpublish_date helper function.
+  return _scheduler_api_test_hide_unpublish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_taxonomy_term_hide_unpublish_date().
+ */
+function scheduler_api_test_scheduler_taxonomy_term_hide_unpublish_date($form, $form_state, $entity) {
+  // Use the generic hide_unpublish_date helper function.
+  return _scheduler_api_test_hide_unpublish_date($form, $form_state, $entity);
+}
+
+/**
+ * Implements hook_scheduler_publish_process().
+ */
+function scheduler_api_test_scheduler_publish_process(EntityInterface $entity) {
+  // Any entity with 'red {type}' in the title is simulated to cause a failure
+  // and should then be skipped by Scheduler.
+  if (stristr($entity->label(), "red {$entity->getEntityTypeId()}")) {
+    $label_field = $entity->getEntityType()->getKey('label');
+    $entity->set($label_field, $entity->label() . ' - publishing failed in API test module')->save();
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: Red should cause Scheduler to abandon publishing.'), 'status', FALSE);
+    return -1;
+  }
+  return 0;
+}
+
+/**
+ * Generic function to process third-party publishing.
+ */
+function _scheduler_api_test_publish_process(EntityInterface $entity) {
+  // Entities with 'yellow {type}' in the title are simulated to be processed
+  // by this hook, and will not be published by Scheduler.
+  if (stristr($entity->label(), "yellow {$entity->getEntityTypeId()}")) {
+    $label_field = $entity->getEntityType()->getKey('label');
+    $entity->set($label_field, $entity->label() . ' - publishing processed by API test module');
+    $entity->setPublished()->save();
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: Yellow should not have publishing processed by Scheduler.'), 'status', FALSE);
+    return 1;
+  }
+  return 0;
+}
+
+/**
+ * Implements hook_scheduler_node_publish_process().
+ */
+function scheduler_api_test_scheduler_node_publish_process(NodeInterface $node) {
+  // Use the generic publish_process helper function.
+  return _scheduler_api_test_publish_process($node);
+}
+
+/**
+ * Implements hook_scheduler_media_publish_process().
+ */
+function scheduler_api_test_scheduler_media_publish_process(MediaInterface $media) {
+  // Use the generic publish_process helper function.
+  return _scheduler_api_test_publish_process($media);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_publish_process().
+ */
+function scheduler_api_test_scheduler_commerce_product_publish_process(ProductInterface $product) {
+  // Use the generic publish_process helper function.
+  return _scheduler_api_test_publish_process($product);
+}
+
+/**
+ * Implements hook_scheduler_taxonomy_term_publish_process().
+ */
+function scheduler_api_test_scheduler_taxonomy_term_publish_process(TermInterface $term) {
+  // Use the generic publish_process helper function.
+  return _scheduler_api_test_publish_process($term);
+}
+
+/**
+ * Implements hook_scheduler_unpublish_process().
+ */
+function scheduler_api_test_scheduler_unpublish_process(EntityInterface $entity) {
+  // Any entity with 'blue {type}' in the title is simulated to cause a failure
+  // and should then be skipped by Scheduler.
+  if (stristr($entity->label(), "blue {$entity->getEntityTypeId()}")) {
+    $label_field = $entity->getEntityType()->getKey('label');
+    $entity->set($label_field, $entity->label() . ' - unpublishing failed in API test module')->save();
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: Blue should cause Scheduler to abandon unpublishing.'), 'status', FALSE);
+    return -1;
+  }
+  return 0;
+}
+
+/**
+ * Generic function to process third-party unpublishing.
+ */
+function _scheduler_api_test_unpublish_process(EntityInterface $entity) {
+  // Entities with 'orange {type}' in the title are simulated to be processed by
+  // this hook, and will not be unpublished by Scheduler.
+  if (stristr($entity->label(), "orange {$entity->getEntityTypeId()}")) {
+    $label_field = $entity->getEntityType()->getKey('label');
+    $entity->set($label_field, $entity->label() . ' - unpublishing processed by API test module')->save();
+    $entity->setUnpublished()->save();
+    \Drupal::messenger()->addMessage(t('Scheduler_Api_Test: Orange should not have unpublishing processed by Scheduler.'), 'status', FALSE);
+    return 1;
+  }
+  return 0;
+}
+
+/**
+ * Implements hook_scheduler_node_unpublish_process().
+ */
+function scheduler_api_test_scheduler_node_unpublish_process(NodeInterface $node) {
+  // Use the generic unpublish_process helper function.
+  return _scheduler_api_test_unpublish_process($node);
+}
+
+/**
+ * Implements hook_scheduler_media_unpublish_process().
+ */
+function scheduler_api_test_scheduler_media_unpublish_process(MediaInterface $media) {
+  // Use the generic unpublish_process helper function.
+  return _scheduler_api_test_unpublish_process($media);
+}
+
+/**
+ * Implements hook_scheduler_commerce_product_unpublish_process().
+ */
+function scheduler_api_test_scheduler_commerce_product_unpublish_process(ProductInterface $product) {
+  // Use the generic unpublish_process helper function.
+  return _scheduler_api_test_unpublish_process($product);
+}
+
+/**
+ * Implements hook_scheduler_taxonomy_term_unpublish_process().
+ */
+function scheduler_api_test_scheduler_taxonomy_term_unpublish_process(TermInterface $term) {
+  // Use the generic unpublish_process helper function.
+  return _scheduler_api_test_unpublish_process($term);
+}

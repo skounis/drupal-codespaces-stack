@@ -1,0 +1,15 @@
+<?php
+
+namespace Drupal\views\Plugin\views;
+
+use Drupal\Core\Form\FormStateInterface;
+
+interface ViewsPluginInterface {
+
+  /**
+   * @param string[] $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   */
+  public function buildOptionsForm(array &$form, FormStateInterface $form_state): void;
+
+}

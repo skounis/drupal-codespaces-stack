@@ -1,0 +1,4 @@
+friendlycaptcha.admin_settings_form:
+  route_name: friendlycaptcha.admin_settings_form
+  title: Friendly Captcha
+  base_route: captcha_settings

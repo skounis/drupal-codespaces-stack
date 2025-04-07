@@ -1,0 +1,24 @@
+ai.admin_settings:
+    title: 'AI'
+    description: 'Settings for Drupal AI'
+    parent: system.admin_config
+    route_name: ai.settings.menu
+
+ai.admin_settings_page:
+  title: 'AI Default Settings'
+  description: 'Configure the core AI Settings.'
+  parent: ai.admin_settings
+  route_name: ai.settings_form
+  weight: -99
+
+ai.admin_providers:
+  title: 'Provider Settings'
+  description: 'Configure the core Provider Settings.'
+  parent: ai.admin_settings
+  route_name: ai.admin_providers
+
+ai.admin_vdb_providers:
+  title: 'Vector DBs Settings'
+  description: 'Configure the core Vector DB Settings.'
+  parent: ai.admin_settings
+  route_name: ai.admin_vdb_providers

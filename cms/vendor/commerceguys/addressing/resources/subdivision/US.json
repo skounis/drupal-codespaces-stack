@@ -1,0 +1,253 @@
+{
+	"country_code": "US",
+	"subdivisions": {
+		"AL": {
+			"code": "AL",
+			"name": "Alabama"
+		},
+		"AK": {
+			"code": "AK",
+			"name": "Alaska"
+		},
+		"AS": {
+			"code": "AS",
+			"name": "American Samoa"
+		},
+		"AZ": {
+			"code": "AZ",
+			"name": "Arizona"
+		},
+		"AR": {
+			"code": "AR",
+			"name": "Arkansas"
+		},
+		"AA": {
+			"code": "AA",
+			"name": "Armed Forces (AA)"
+		},
+		"AE": {
+			"code": "AE",
+			"name": "Armed Forces (AE)"
+		},
+		"AP": {
+			"code": "AP",
+			"name": "Armed Forces (AP)"
+		},
+		"CA": {
+			"code": "CA",
+			"name": "California"
+		},
+		"CO": {
+			"code": "CO",
+			"name": "Colorado"
+		},
+		"CT": {
+			"code": "CT",
+			"name": "Connecticut"
+		},
+		"DE": {
+			"code": "DE",
+			"name": "Delaware"
+		},
+		"DC": {
+			"code": "DC",
+			"name": "District of Columbia"
+		},
+		"FL": {
+			"code": "FL",
+			"name": "Florida"
+		},
+		"GA": {
+			"code": "GA",
+			"name": "Georgia"
+		},
+		"GU": {
+			"code": "GU",
+			"name": "Guam"
+		},
+		"HI": {
+			"code": "HI",
+			"name": "Hawaii"
+		},
+		"ID": {
+			"code": "ID",
+			"name": "Idaho"
+		},
+		"IL": {
+			"code": "IL",
+			"name": "Illinois"
+		},
+		"IN": {
+			"code": "IN",
+			"name": "Indiana"
+		},
+		"IA": {
+			"code": "IA",
+			"name": "Iowa"
+		},
+		"KS": {
+			"code": "KS",
+			"name": "Kansas"
+		},
+		"KY": {
+			"code": "KY",
+			"name": "Kentucky"
+		},
+		"LA": {
+			"code": "LA",
+			"name": "Louisiana"
+		},
+		"ME": {
+			"code": "ME",
+			"name": "Maine"
+		},
+		"MH": {
+			"code": "MH",
+			"name": "Marshall Islands"
+		},
+		"MD": {
+			"code": "MD",
+			"name": "Maryland"
+		},
+		"MA": {
+			"code": "MA",
+			"name": "Massachusetts"
+		},
+		"MI": {
+			"code": "MI",
+			"name": "Michigan"
+		},
+		"FM": {
+			"code": "FM",
+			"name": "Micronesia"
+		},
+		"MN": {
+			"code": "MN",
+			"name": "Minnesota"
+		},
+		"MS": {
+			"code": "MS",
+			"name": "Mississippi"
+		},
+		"MO": {
+			"code": "MO",
+			"name": "Missouri"
+		},
+		"MT": {
+			"code": "MT",
+			"name": "Montana"
+		},
+		"NE": {
+			"code": "NE",
+			"name": "Nebraska"
+		},
+		"NV": {
+			"code": "NV",
+			"name": "Nevada"
+		},
+		"NH": {
+			"code": "NH",
+			"name": "New Hampshire"
+		},
+		"NJ": {
+			"code": "NJ",
+			"name": "New Jersey"
+		},
+		"NM": {
+			"code": "NM",
+			"name": "New Mexico"
+		},
+		"NY": {
+			"code": "NY",
+			"name": "New York"
+		},
+		"NC": {
+			"code": "NC",
+			"name": "North Carolina"
+		},
+		"ND": {
+			"code": "ND",
+			"name": "North Dakota"
+		},
+		"MP": {
+			"code": "MP",
+			"name": "Northern Mariana Islands"
+		},
+		"OH": {
+			"code": "OH",
+			"name": "Ohio"
+		},
+		"OK": {
+			"code": "OK",
+			"name": "Oklahoma"
+		},
+		"OR": {
+			"code": "OR",
+			"name": "Oregon"
+		},
+		"PW": {
+			"code": "PW",
+			"name": "Palau"
+		},
+		"PA": {
+			"code": "PA",
+			"name": "Pennsylvania"
+		},
+		"PR": {
+			"code": "PR",
+			"name": "Puerto Rico"
+		},
+		"RI": {
+			"code": "RI",
+			"name": "Rhode Island"
+		},
+		"SC": {
+			"code": "SC",
+			"name": "South Carolina"
+		},
+		"SD": {
+			"code": "SD",
+			"name": "South Dakota"
+		},
+		"TN": {
+			"code": "TN",
+			"name": "Tennessee"
+		},
+		"TX": {
+			"code": "TX",
+			"name": "Texas"
+		},
+		"UT": {
+			"code": "UT",
+			"name": "Utah"
+		},
+		"VT": {
+			"code": "VT",
+			"name": "Vermont"
+		},
+		"VI": {
+			"code": "VI",
+			"name": "Virgin Islands"
+		},
+		"VA": {
+			"code": "VA",
+			"name": "Virginia"
+		},
+		"WA": {
+			"code": "WA",
+			"name": "Washington"
+		},
+		"WV": {
+			"code": "WV",
+			"name": "West Virginia"
+		},
+		"WI": {
+			"code": "WI",
+			"name": "Wisconsin"
+		},
+		"WY": {
+			"code": "WY",
+			"name": "Wyoming"
+		}
+	}
+}

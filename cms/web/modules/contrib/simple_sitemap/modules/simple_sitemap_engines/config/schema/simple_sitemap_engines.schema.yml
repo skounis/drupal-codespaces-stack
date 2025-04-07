@@ -1,0 +1,50 @@
+simple_sitemap_engines.simple_sitemap_engine.*:
+  type: config_entity
+  label: 'Search engine'
+  mapping:
+    id:
+      type: string
+      label: 'Search engine ID'
+    label:
+      type: label
+      label: 'Label'
+    url:
+      type: string
+      label: 'Submission URL'
+    index_now_url:
+      type: string
+      label: 'IndexNow URL'
+    sitemap_variants:
+      type: sequence
+      label: 'Sitemap variants'
+      sequence:
+        type: string
+        label: 'Sitemap variant'
+
+simple_sitemap_engines.bundle_settings.*.*:
+  label: 'IndexNow bundle settings'
+  type: config_object
+  mapping:
+    index_now:
+      label: 'IndexNow'
+      type: boolean
+
+simple_sitemap_engines.settings:
+  type: config_object
+  label: 'Sitemap search engine submission settings'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Sitemap submission enabled'
+    submission_interval:
+      type: integer
+      label: 'Sitemap submission frequency'
+    index_now_enabled:
+      type: boolean
+      label: 'IndexNow submission enabled'
+    index_now_preferred_engine:
+      type: string
+      label: 'Selected engine for IndexNow submissions'
+    index_now_on_entity_save:
+      type: boolean
+      label: 'IndexNow on entity save'

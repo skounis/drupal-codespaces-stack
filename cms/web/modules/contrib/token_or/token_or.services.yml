@@ -1,0 +1,4 @@
+services:
+  token_or.tokens_pre_alter:
+    class: Drupal\token_or\TokenOrTokensPreAlter
+    arguments: ['@token']

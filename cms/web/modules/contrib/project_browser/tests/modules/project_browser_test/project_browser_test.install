@@ -1,0 +1,187 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for testing Project Browser.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_schema().
+ *
+ * Database Table storing.
+ */
+function project_browser_test_schema(): array {
+  return [
+    'project_browser_projects' => [
+      'description' => 'Project browser project',
+      'fields' => [
+        'nid' => [
+          'description' => 'Primary Key: Project ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'title' => [
+          'description' => 'Title',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'created' => [
+          'description' => 'Created timestamp',
+          'type' => 'int',
+          'not null' => TRUE,
+        ],
+        'project_usage_total' => [
+          'description' => 'Project usage total',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'maintenance_status' => [
+          'description' => 'The value of taxonomy_vocabulary_44',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'development_status' => [
+          'description' => 'The value of taxonomy_vocabulary_46',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'status' => [
+          'description' => 'Project status',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'field_security_advisory_coverage' => [
+          'description' => 'Security advisory coverage ',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+        ],
+        'field_project_type' => [
+          'description' => 'Project type ',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'project_data' => [
+          'description' => 'The entire project array, serialized',
+          'type' => 'blob',
+          'not null' => FALSE,
+          'size' => 'big',
+        ],
+        'field_project_machine_name' => [
+          'description' => 'Project machine name',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+      ],
+      'primary key' => ['nid'],
+    ],
+    'project_browser_categories' => [
+      'description' => 'project browser project categories',
+      'fields' => [
+        'tid' => [
+          'description' => ' Category TID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'pid' => [
+          'description' => 'Project nid',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['tid', 'pid'],
+    ],
+  ];
+}
+
+/**
+ * Replace Project Browser data with test data.
+ */
+function project_browser_test_install(): void {
+  $connection = Database::getConnection();
+  $connection->truncate('project_browser_projects')->execute();
+  $connection->truncate('project_browser_categories')->execute();
+
+  $module_path = \Drupal::service('module_handler')->getModule('project_browser')->getPath();
+
+  $category_values = [];
+  $contents = file_get_contents($module_path . '/tests/fixtures/projects_fixture.json');
+  assert(is_string($contents));
+  $projects = Json::decode($contents);
+  // Insert fixture data to the database.
+  $query = $connection->insert('project_browser_projects')->fields([
+    'nid',
+    'title',
+    'created',
+    'project_usage_total',
+    'maintenance_status',
+    'development_status',
+    'status',
+    'field_security_advisory_coverage',
+    'field_project_type',
+    'project_data',
+    'field_project_machine_name',
+  ]);
+  foreach ($projects as $project) {
+    $project_data = $project['project_data'];
+
+    $project['maintenance_status'] = $project_data['taxonomy_vocabulary_44']['id'];
+    $project['development_status'] = $project_data['taxonomy_vocabulary_46']['id'];
+    $project['field_project_machine_name'] = $project_data['field_project_machine_name'];
+
+    // Gather the module categories.
+    if (!empty($project_data['taxonomy_vocabulary_3'])) {
+      foreach ($project_data['taxonomy_vocabulary_3'] as $category) {
+        $category_values[$category['id'] . '.' . $project['nid']] = [
+          'tid' => $category['id'],
+          'pid' => $project['nid'],
+        ];
+      }
+    }
+    // Compute total project usage.
+    $project_usage_total = 0;
+    foreach ($project_data['project_usage'] as $usage) {
+      $project_usage_total += $usage;
+    }
+    $project['project_usage_total'] = $project_usage_total;
+    // Serialize all the project data.
+    unset($project['project_data']);
+    $project['project_data'] = serialize($project_data + $project);
+    $query->values($project);
+  }
+  $query->execute();
+
+  $category_query = $connection->insert('project_browser_categories')->fields([
+    'tid',
+    'pid',
+  ]);
+  foreach ($category_values as $category) {
+    $category_query->values($category);
+  }
+  $category_query->execute();
+
+  // Enable the test mock source.
+  $config = \Drupal::configFactory()
+    ->getEditable('project_browser.admin_settings');
+  $enabled_sources = $config->get('enabled_sources');
+  $enabled_sources[] = 'project_browser_test_mock';
+  $config->set('enabled_sources', $enabled_sources)->save();
+}

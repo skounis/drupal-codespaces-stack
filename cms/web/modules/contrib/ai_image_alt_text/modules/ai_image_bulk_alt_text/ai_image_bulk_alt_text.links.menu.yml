@@ -1,0 +1,5 @@
+ai_image_bulk_alt_text.main:
+  title: Bulk Generate Alt Text with AI
+  description: Get a list of fields missing alt texts and fix them en masse.
+  parent: system.admin_config_media
+  route_name: ai_image_bulk_alt_text.fix_alt_text

@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall function for AI Automator.
+ */
+
+use Drupal\Core\Site\Settings;
+use Drupal\ai_automators\AiAutomatorStatusField;
+
+/**
+ * Implements hook_install().
+ */
+function ai_automators_install($is_syncing): void {
+
+  // Let people know about undeclared dependencies.
+  $module_handler = \Drupal::moduleHandler();
+  $messenger = \Drupal::messenger();
+
+  if (!$module_handler->moduleExists('ai_ckeditor')) {
+    if (!Settings::get('ai_automator_advanced_mode_enabled', FALSE)) {
+      $messenger->addMessage("The AI Automator module's advanced features require either the AI CK Editor Integration module to be enabled, or for the ai_automator_advanced_mode_enabled setting to be set to TRUE in your settings.php file. These have been disabled but will become available if you enable the module or set the setting. Please see the instructions at https://project.pages.drupalcode.org/ai/modules/ai_automators/ for more information.");
+    }
+  }
+  if (!$module_handler->moduleExists('field_ui')) {
+    $messenger->addMessage("The AI Automators are configured directly on each compatible field's field settings form: if you wish to add or alter your AI Automators, we recommend you enable Field UI. If you have already configured your AI Automators, they will continue to work without Field UI enabled.");
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ai_automators_uninstall($is_syncing): void {
+  // Don't run delete hooks.
+  ai_automators_entity_can_save_toggle(FALSE);
+  // Delete any lingering status fields.
+  foreach (['field_config', 'field_storage_config'] as $type) {
+    $loader = \Drupal::entityTypeManager()->getStorage($type);
+    $query = $loader->getQuery();
+    $query->condition('label', AiAutomatorStatusField::FIELD_NAME);
+    foreach ($query->execute() as $id) {
+      $entity = $loader->load($id);
+      $entity->delete();
+    }
+  }
+  ai_automators_entity_can_save_toggle(TRUE);
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function ai_automators_update_10200(): void {
+  // Add the Automator Chain base tables if they do not exist.
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $entity_type_definition = $entity_type_manager->getDefinition('automator_chain');
+  \Drupal::entityDefinitionUpdateManager()->installEntityType($entity_type_definition);
+
+  // Log a message indicating the update was successful.
+  \Drupal::messenger()->addMessage(t('Base tables for the new entity type "automator_chain" have been created successfully.'));
+}

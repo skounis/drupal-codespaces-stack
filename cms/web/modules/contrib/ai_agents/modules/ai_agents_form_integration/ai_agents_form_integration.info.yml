@@ -1,0 +1,18 @@
+name: AI Agents Form Integration
+type: module
+description: The AI Agents For Integration provides assist in different parts of the website to generate configurations and content using forms.
+package: AI Tools
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+
+dependencies:
+  - ai_agents:ai_agents
+
+optional_dependencies:
+  - simple_crawler:simple_crawler
+  - unstructured:unstructured
+
+# Information added by Drupal.org packaging script on 2025-02-07
+version: '1.0.2'
+project: 'ai_agents'
+datestamp: 1738909481

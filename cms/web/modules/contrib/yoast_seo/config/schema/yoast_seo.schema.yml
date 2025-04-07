@@ -1,0 +1,69 @@
+yoast_seo.settings:
+  type: config_object
+  label: 'Real-Time SEO Settings'
+  mapping:
+    score_rules:
+      type: sequence
+      label: 'Labels for the scores, indexed by the minimum required score for that label'
+      sequence:
+        type: string
+        label: 'Score Label'
+    auto_refresh_seo_result:
+      type: boolean
+      label: 'Enable auto refresh Real Time SEO result'
+
+# Field instance.
+field.field_settings.yoast_seo:
+  type: mapping
+  label: 'Real-time SEO field settings'
+
+# Default value.
+field.value.yoast_seo:
+  type: mapping
+  label: 'Default value'
+  mapping:
+    focus_keyword:
+      type: string
+      label: 'Focus Keyword'
+    status:
+      type: string
+      label: 'Status'
+    edit_title:
+      type: string
+      label: 'Title Editing'
+    edit_description:
+      type: string
+      label: 'Description Editing'
+    title:
+      type: string
+      label: 'Edited title'
+    description:
+      type: string
+      label: 'Edited description'
+
+# Field formatter.
+field.formatter.settings.yoastseo_formatter:
+  type: mapping
+  label: 'Real-timeSeo formatter settings'
+
+field.formatter.settings.yoastseo_empty_formatter:
+  type: mapping
+  label: 'Empty formatter settings'
+
+# Field widget.
+field.widget.settings.yoast_seo_widget:
+  type: mapping
+  label: 'Real-Time SEO Analysis widget settings'
+  mapping:
+    edit_title:
+      type: boolean
+      label: 'Title Editing'
+    edit_description:
+      type: boolean
+      label: 'Description Editing'
+    render_theme:
+      type: string
+      label: 'The theme that the preview will be rendered in'
+    render_view_mode:
+      type: string
+      label: 'The view mode that the preview will be rendered in'

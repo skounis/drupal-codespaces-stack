@@ -1,0 +1,12 @@
+form:
+  version: VERSION
+  css:
+    theme:
+      css/address.form.css: {}
+
+field-icon:
+  css:
+    theme:
+      css/address.field-icon.css: {}
+  dependencies:
+    - field_ui/drupal.field_ui.manage_fields

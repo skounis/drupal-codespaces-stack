@@ -1,0 +1,11 @@
+name: 'Test recipe'
+description: 'Tests that Simple Sitemap modules can be installed by a recipe.'
+install:
+  - simple_sitemap
+  - simple_sitemap_engines
+  - simple_sitemap_views
+config:
+  import:
+    simple_sitemap: '*'
+    simple_sitemap_engines: '*'
+    simple_sitemap_views: '*'

@@ -1,0 +1,11 @@
+project_browser.test_page:
+  path: '/project-browser/{source}'
+  defaults:
+    _controller: '\Drupal\project_browser_test\Controller\TestPageController::render'
+    _title: 'Project Browser Test Page'
+  requirements:
+    _permission: 'administer modules'
+  options:
+    parameters:
+      source:
+        project_browser.source: true

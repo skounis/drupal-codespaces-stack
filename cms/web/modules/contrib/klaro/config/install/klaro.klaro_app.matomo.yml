@@ -1,0 +1,23 @@
+id: matomo
+label: 'Matomo'
+description: 'Tracks online visits of the website.'
+langcode: en
+status: false
+default: false
+purposes:
+  - analytics
+cookies:
+  - { regex: '^_pk_.*$', path: '', domain: ''}
+  - { regex: '^matomo.*$', path: '', domain: ''}
+  - { regex: '^mtm_.*$', path: '', domain: ''}
+  - { regex: 'piwik_ignore', path: '', domain: ''}
+required: false
+opt_out: false
+only_once: false
+weight: 3
+info_url: 'https://matomo.org'
+privacy_policy_url: 'https://matomo.org/privacy-policy'
+javascripts:
+  - matomo.js
+attachments:
+  - matomo_tracking_script

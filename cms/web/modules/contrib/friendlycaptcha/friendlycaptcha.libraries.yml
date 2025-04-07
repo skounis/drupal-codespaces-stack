@@ -1,0 +1,9 @@
+friendly-challenge:
+  version: 0.8.11
+  license:
+    name: MIT
+    url: https://github.com/FriendlyCaptcha/friendly-challenge/blob/master/LICENSE.md
+    gpl-compatible: true
+  js:
+    /libraries/friendly-challenge/widget.min.js: { attributes: { async: true, defer: true }, minified: true }
+    js/friendlycaptcha.setup.js: {}

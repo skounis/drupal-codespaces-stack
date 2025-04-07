@@ -1,0 +1,95 @@
+easy_email.easy_email_type.*:
+  type: config_entity
+  label: 'Email template config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    key:
+      type: string
+    recipient:
+      type: sequence
+      label: 'Recipients'
+      orderby: key
+      sequence:
+        type: string
+        label: 'Recipient'
+        translatable: true
+    cc:
+      type: sequence
+      label: 'CC'
+      orderby: key
+      sequence:
+        type: string
+        label: 'CC recipient'
+        translatable: true
+    bcc:
+      type: sequence
+      label: 'BCC'
+      orderby: key
+      sequence:
+        type: string
+        label: 'BCC recipient'
+        translatable: true
+    fromName:
+      type: text
+      label: 'From name'
+    fromAddress:
+      type: string
+      label: 'From address'
+      translatable: true
+    replyToAddress:
+      type: string
+      label: 'Reply to address'
+      translatable: true
+    subject:
+      type: text
+      label: 'Subject'
+    inboxPreview:
+      type: text
+      label: 'Inbox preview'
+    bodyHtml:
+      type: text_format
+      label: 'HTML body'
+    bodyPlain:
+      type: text
+      label: 'Plain text body'
+    generateBodyPlain:
+      type: boolean
+      label: 'Generate plain text body from HTML body'
+    attachment:
+      type: sequence
+      label: 'Attachments'
+      orderby: key
+      sequence:
+        type: string
+        label: 'Attachment'
+    saveAttachment:
+      type: boolean
+      label: 'Save attachments'
+    attachmentScheme:
+      type: string
+      label: 'Attachment URI scheme'
+    attachmentDirectory:
+      type: string
+      label: 'Attachment directory'
+    saveEmail:
+      type: boolean
+      label: 'Save emails by default'
+    allowSavingEmail:
+      type: boolean
+      label: 'Allow emails to be saved'
+    purgeEmails:
+      type: boolean
+      label: 'Purge emails'
+    purgeInterval:
+      type: integer
+      label: 'Purge interval'
+    purgePeriod:
+      type: string
+      label: 'Purge period'

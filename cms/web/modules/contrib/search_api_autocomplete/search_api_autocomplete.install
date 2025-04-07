@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * Install/update/uninstall functions for the Search API Autocomplete module.
+ */
+
+use Drupal\search_api\SearchApiException;
+use Drupal\search_api_autocomplete\Entity\Search;
+use Drupal\search_api_autocomplete\SearchApiAutocompleteException;
+use Drupal\search_api_solr\SolrBackendInterface;
+
+/**
+ * Implements hook_requirements().
+ *
+ * This checks whether there is a Solr server with an attached autocomplete
+ * search set up on this site, and in this case returns a warning if the
+ * "search_api_solr_autocomplete" module is not also enabled.
+ */
+function search_api_autocomplete_requirements(string $phase): array {
+  // Only execute this during runtime. Also, nothing to do if either the Solr
+  // module is not installed, or the "search_api_solr_autocomplete" module is
+  // also installed.
+  if ($phase !== 'runtime'
+      || !interface_exists(SolrBackendInterface::class)
+      || \Drupal::moduleHandler()->moduleExists('search_api_solr_autocomplete')) {
+    return [];
+  }
+
+  // We also have to make sure that the "search_api_solr_autocomplete" module
+  // would even be available. Easiest way to do this is by checking the current
+  // schema version number. However, since that constant was removed in later
+  // versions of the "search_api_solr" module, we also check for the existence
+  // of a method that was added in a later version. Both the existence of the
+  // SolrBackendInterface::getPreferredSchemaVersion() or a schema version of
+  // at least 4.2.5 would mean that the "search_api_solr_autocomplete" module
+  // is available for installation.
+  if (!method_exists(SolrBackendInterface::class, 'getPreferredSchemaVersion')
+      && version_compare(SolrBackendInterface::SEARCH_API_SOLR_SCHEMA_VERSION, '4.2.5', '<')) {
+    return [];
+  }
+
+  // Check that there really is at least one autocomplete search set up with a
+  // Solr server.
+  $searches = Search::loadMultiple();
+  foreach ($searches as $search) {
+    try {
+      $index = $search->getIndex();
+      if ($index->status()
+        && $index->hasValidServer()
+        && $index->getServerInstance()
+          ->getBackend() instanceof SolrBackendInterface) {
+        return [
+          'search_api_solr_autocomplete' => [
+            'title' => 'Search API Solr Autocomplete',
+            'value' => t('When using a Solr server as the search backend, it is recommended to enable the "Search API Solr Autocomplete" module for improved autocomplete functionality.'),
+            'severity' => REQUIREMENT_WARNING,
+          ],
+        ];
+      }
+    }
+    catch (SearchApiException | SearchApiAutocompleteException $e) {
+      // Ignore.
+    }
+  }
+
+  return [];
+}

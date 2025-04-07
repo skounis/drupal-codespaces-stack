@@ -1,0 +1,7 @@
+page_title: 'Sitemap'
+path: 'sitemap'
+message:
+  format: 'plain_text'
+  value: ''
+plugins: []
+include_css: true

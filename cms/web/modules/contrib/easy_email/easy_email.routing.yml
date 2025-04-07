@@ -1,0 +1,35 @@
+entity.easy_email_type.preview:
+  path: '/admin/structure/email-templates/templates/{easy_email_type}/preview'
+  defaults:
+    _entity_form: 'easy_email.add'
+    entity_type_id: 'easy_email'
+    bundle_parameter: 'easy_email_type'
+    _title_callback: '\Drupal\easy_email\Controller\EasyEmailController::previewPageTitle'
+  options:
+    parameters:
+      easy_email_type:
+        type: 'entity:easy_email_type'
+  requirements:
+    _entity_access: 'easy_email_type.preview'
+
+entity.easy_email_type.preview_html:
+  path: '/admin/structure/email-templates/templates/{easy_email_type}/preview-html'
+  defaults:
+    _controller: '\Drupal\easy_email\Controller\EasyEmailController::previewType'
+  requirements:
+    _entity_access: 'easy_email_type.preview'
+
+entity.easy_email_type.preview_plain:
+  path: '/admin/structure/email-templates/templates/{easy_email_type}/preview-plain'
+  defaults:
+    _controller: '\Drupal\easy_email\Controller\EasyEmailController::previewTypePlain'
+  requirements:
+    _entity_access: 'easy_email_type.preview'
+
+easy_email.settings:
+  path: '/admin/structure/email-templates/settings'
+  defaults:
+    _form: '\Drupal\easy_email\Form\EasyEmailSettingsForm'
+    _title: 'Email settings'
+  requirements:
+    _permission: 'access easy email settings'

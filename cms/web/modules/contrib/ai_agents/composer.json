@@ -1,0 +1,20 @@
+{
+  "name": "drupal/ai_agents",
+  "description": "Allows AI agents to be used on Drupal websites to do changes and lookup things.",
+  "type": "drupal-module",
+  "keywords": [
+    "Drupal"
+  ],
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^10.2 || ^11",
+    "drupal/ai": "^1.0.0"
+  },
+  "require-dev": {
+    "drupal/webform": "^6.0"
+  },
+  "suggest": {
+    "drupal/unstructured": "Makes the AI Form integrations work better by allowing many file contexts.",
+    "drupal/simple_crawler": "Allows the AI Form integrations to crawl websites."
+  }
+}

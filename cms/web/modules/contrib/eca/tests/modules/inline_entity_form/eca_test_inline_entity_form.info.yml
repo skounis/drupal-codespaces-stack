@@ -1,0 +1,26 @@
+name: 'ECA model test: Inline entity form'
+type: module
+description: 'Inline entity form test module for ECA.'
+package: Testing
+dependencies:
+  - eca:eca_form
+  - drupal:node
+  - entity_reference_revisions:entity_reference_revisions
+  - paragraphs:paragraphs
+
+config_devel:
+  - eca.eca.inline_entity_forms_in_article
+  - field.field.node.article.field_pages
+  - field.storage.node.field_pages
+  - node.type.article
+  - node.type.page
+  - field.field.node.article.field_paragraphs
+  - field.storage.node.field_paragraphs
+  - paragraphs.paragraphs_type.text
+  - field.field.paragraph.text.field_text
+  - field.storage.paragraph.field_text
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

@@ -1,0 +1,11 @@
+/composer.spoons.json
+/composer.spoons.lock
+/vendor/
+/web/
+/.env
+.envrc
+.envrc.local
+/.editorconfig
+/.gitattributes
+/.ahoy.*
+/.ahoy.l3d

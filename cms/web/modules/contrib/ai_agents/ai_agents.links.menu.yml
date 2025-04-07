@@ -1,0 +1,5 @@
+ai_agents.admin_settings_page:
+  title: 'AI Agent Settings'
+  description: 'Configure the AI Agents Settings.'
+  parent: ai.admin_settings
+  route_name: ai_agents.settings_form

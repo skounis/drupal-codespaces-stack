@@ -1,0 +1,13 @@
+name: Address
+type: module
+description: 'Provides functionality for handling postal addresses.'
+package: Field types
+core_version_requirement: ^9.5 || ^10 || ^11
+config: entity.address_format.collection
+dependencies:
+  - drupal:field
+
+# Information added by Drupal.org packaging script on 2025-01-13
+version: '2.0.3'
+project: 'address'
+datestamp: 1736773035

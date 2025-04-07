@@ -1,0 +1,11 @@
+services:
+  access_check.checklistapi:
+    class: Drupal\checklistapi\Access\ChecklistapiAccessCheck
+    tags:
+      - { name: access_check, applies_to: _checklistapi_access }
+  checklistapi_storage.config:
+    class: Drupal\checklistapi\Storage\ConfigStorage
+    arguments: ["@config.factory"]
+  checklistapi_storage.state:
+    class: Drupal\checklistapi\Storage\StateStorage
+    arguments: ["@state"]

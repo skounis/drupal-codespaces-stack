@@ -1,0 +1,6 @@
+ai_external_moderation.admin_settings_page:
+  title: 'AI External Moderation'
+  description: 'Configure moderation models from one provider before chat models from another provider.'
+  parent: ai.admin_settings
+  route_name: ai_external_moderation.settings_form
+  weight: 10

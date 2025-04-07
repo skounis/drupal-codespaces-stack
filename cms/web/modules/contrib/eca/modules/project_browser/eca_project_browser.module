@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * ECA Misc submodule.
+ */
+
+use Drupal\eca_project_browser\HookHandler;
+
+/**
+ * Helper function to return the hook handler service.
+ *
+ * @return \Drupal\eca_project_browser\HookHandler
+ *   The hook handler service.
+ */
+function _eca_project_browser_hook_handler(): HookHandler {
+  return \Drupal::service('eca_project_browser.hook_handler');
+}
+
+/**
+ * Implements hook_project_browser_source_info_alter().
+ */
+function eca_project_browser_project_browser_source_info_alter(array &$definitions): void {
+  _eca_project_browser_hook_handler()->projectBrowserSourceInfo($definitions);
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function eca_project_browser_module_implements_alter(array &$implementations, string $hook): void {
+  if ($hook == 'project_browser_source_info_alter') {
+    // Make sure that this hook gets called last.
+    $org = $implementations['eca_project_browser'];
+    unset($implementations['eca_project_browser']);
+    $implementations['eca_project_browser'] = $org;
+  }
+
+}

@@ -1,0 +1,8 @@
+create ai assisted webforms:
+  title: 'Create AI Assisted Webforms'
+  description: 'This permission allows users to create AI assisted webforms.'
+  restrict access: true
+create ai assisted field types:
+  title: 'Create AI Assisted Field Types'
+  description: 'This permission allows users to create AI assisted field types.'
+  restrict access: true

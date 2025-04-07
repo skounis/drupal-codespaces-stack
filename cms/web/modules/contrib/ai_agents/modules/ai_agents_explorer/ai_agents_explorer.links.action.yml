@@ -1,0 +1,5 @@
+ai_agent_decision.add_form:
+  title: 'Add agent decision'
+  route_name: entity.ai_agent_decision.add_form
+  appears_on:
+    - entity.ai_agent_decision.collection

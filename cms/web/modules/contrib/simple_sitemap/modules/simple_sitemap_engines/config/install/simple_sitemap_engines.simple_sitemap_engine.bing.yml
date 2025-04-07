@@ -1,0 +1,7 @@
+id: bing
+label: 'Bing'
+url: null
+index_now_url: https://www.bing.com/indexnow?url=[url]&key=[key]
+sitemap_variants: {  }
+status: true
+langcode: en

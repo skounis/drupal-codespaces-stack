@@ -1,0 +1,676 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\Utility\Environment;
+use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\StatementInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeInterface;
+use Drupal\node\NodeTypeInterface;
+
+/**
+ * Gathers a listing of links to nodes.
+ *
+ * @param \Drupal\Core\Database\StatementInterface $result
+ *   A database result object from a query to fetch node entities. If your
+ *   query joins the {comment_entity_statistics} table so that the comment_count
+ *   field is available, a title attribute will be added to show the number of
+ *   comments.
+ * @param $title
+ *   (optional) A heading for the resulting list.
+ *
+ * @return array|false
+ *   A renderable array containing a list of linked node titles fetched from
+ *   $result, or FALSE if there are no rows in $result.
+ */
+function node_title_list(StatementInterface $result, $title = NULL) {
+  $items = [];
+  $num_rows = FALSE;
+  $nids = [];
+  foreach ($result as $row) {
+    // Do not use $node->label() or $node->toUrl() here, because we only have
+    // database rows, not actual nodes.
+    $nids[] = $row->nid;
+    $options = !empty($row->comment_count) ? ['attributes' => ['title' => \Drupal::translation()->formatPlural($row->comment_count, '1 comment', '@count comments')]] : [];
+    $items[] = Link::fromTextAndUrl($row->title, Url::fromRoute('entity.node.canonical', ['node' => $row->nid], $options))->toString();
+    $num_rows = TRUE;
+  }
+
+  return $num_rows ? ['#theme' => 'item_list__node', '#items' => $items, '#title' => $title, '#cache' => ['tags' => Cache::mergeTags(['node_list'], Cache::buildTags('node', $nids))]] : FALSE;
+}
+
+/**
+ * Determines the type of marker to be displayed for a given node.
+ *
+ * @param int $nid
+ *   Node ID whose history supplies the "last viewed" timestamp.
+ * @param int $timestamp
+ *   Time which is compared against node's "last viewed" timestamp.
+ *
+ * @return int
+ *   One of the MARK constants.
+ */
+function node_mark($nid, $timestamp) {
+  if (\Drupal::currentUser()->isAnonymous() || !\Drupal::moduleHandler()->moduleExists('history')) {
+    return MARK_READ;
+  }
+  $read_timestamp = history_read($nid);
+  if ($read_timestamp === 0 && $timestamp > HISTORY_READ_LIMIT) {
+    return MARK_NEW;
+  }
+  elseif ($timestamp > $read_timestamp && $timestamp > HISTORY_READ_LIMIT) {
+    return MARK_UPDATED;
+  }
+  return MARK_READ;
+}
+
+/**
+ * Returns a list of available node type names.
+ *
+ * This list can include types that are queued for addition or deletion.
+ *
+ * @return string[]
+ *   An array of node type labels, keyed by the node type name.
+ */
+function node_type_get_names() {
+  return array_map(function ($bundle_info) {
+    return $bundle_info['label'];
+  }, \Drupal::service('entity_type.bundle.info')->getBundleInfo('node'));
+}
+
+/**
+ * Returns the node type label for the passed node.
+ *
+ * @param \Drupal\node\NodeInterface $node
+ *   A node entity to return the node type's label for.
+ *
+ * @return string|false
+ *   The node type label or FALSE if the node type is not found.
+ *
+ * @todo Add this as generic helper method for config entities representing
+ *   entity bundles.
+ */
+function node_get_type_label(NodeInterface $node) {
+  $type = NodeType::load($node->bundle());
+  return $type ? $type->label() : FALSE;
+}
+
+/**
+ * Description callback: Returns the node type description.
+ *
+ * @param \Drupal\node\NodeTypeInterface $node_type
+ *   The node type object.
+ *
+ * @return string
+ *   The node type description.
+ */
+function node_type_get_description(NodeTypeInterface $node_type) {
+  return $node_type->getDescription();
+}
+
+/**
+ * Adds the default body field to a node type.
+ *
+ * @param \Drupal\node\NodeTypeInterface $type
+ *   A node type object.
+ * @param string $label
+ *   (optional) The label for the body instance.
+ *
+ * @return \Drupal\field\Entity\FieldConfig
+ *   A Body field object.
+ */
+function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
+  // Add or remove the body field, as needed.
+  $field_storage = FieldStorageConfig::loadByName('node', 'body');
+  $field = FieldConfig::loadByName('node', $type->id(), 'body');
+  if (empty($field)) {
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => $type->id(),
+      'label' => $label,
+      'settings' => [
+        'display_summary' => TRUE,
+        'allowed_formats' => [],
+      ],
+    ]);
+    $field->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+
+    // Assign widget settings for the default form mode.
+    $display_repository->getFormDisplay('node', $type->id())
+      ->setComponent('body', [
+        'type' => 'text_textarea_with_summary',
+      ])
+      ->save();
+
+    // Assign display settings for the 'default' and 'teaser' view modes.
+    $display_repository->getViewDisplay('node', $type->id())
+      ->setComponent('body', [
+        'label' => 'hidden',
+        'type' => 'text_default',
+      ])
+      ->save();
+
+    // The teaser view mode is created by the Standard profile and therefore
+    // might not exist.
+    $view_modes = \Drupal::service('entity_display.repository')->getViewModes('node');
+    if (isset($view_modes['teaser'])) {
+      $display_repository->getViewDisplay('node', $type->id(), 'teaser')
+        ->setComponent('body', [
+          'label' => 'hidden',
+          'type' => 'text_summary_or_trimmed',
+        ])
+        ->save();
+    }
+  }
+
+  return $field;
+}
+
+/**
+ * Checks whether the current page is the full page view of the passed-in node.
+ *
+ * @param \Drupal\node\NodeInterface $node
+ *   A node entity.
+ *
+ * @return bool
+ *   TRUE if this is a full page view, otherwise FALSE.
+ */
+function node_is_page(NodeInterface $node) {
+  $route_match = \Drupal::routeMatch();
+  if ($route_match->getRouteName() == 'entity.node.canonical') {
+    $page_node = $route_match->getParameter('node');
+  }
+  return (!empty($page_node) ? $page_node->id() == $node->id() : FALSE);
+}
+
+/**
+ * Prepares variables for list of available node type templates.
+ *
+ * Default template: node-add-list.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - content: An array of content types.
+ *
+ * @see \Drupal\node\Controller\NodeController::addPage()
+ */
+function template_preprocess_node_add_list(&$variables): void {
+  $variables['types'] = [];
+  if (!empty($variables['content'])) {
+    foreach ($variables['content'] as $type) {
+      $variables['types'][$type->id()] = [
+        'type' => $type->id(),
+        'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('node.add', ['node_type' => $type->id()]))->toString(),
+        'description' => [
+          '#markup' => $type->getDescription(),
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for HTML document templates.
+ */
+function node_preprocess_html(&$variables): void {
+  // If on an individual node page or node preview page, add the node type to
+  // the body classes.
+  if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
+    if ($node instanceof NodeInterface) {
+      $variables['node_type'] = $node->getType();
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for block templates.
+ */
+function node_preprocess_block(&$variables): void {
+  if ($variables['configuration']['provider'] == 'node') {
+    switch ($variables['elements']['#plugin_id']) {
+      case 'node_syndicate_block':
+        $variables['attributes']['role'] = 'complementary';
+        break;
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node field templates.
+ */
+function node_preprocess_field__node(&$variables): void {
+  // Set a variable 'is_inline' in cases where inline markup is required,
+  // without any block elements such as <div>.
+
+  if ($variables['element']['#is_page_title'] ?? FALSE) {
+    // Page title is always inline because it will be displayed inside <h1>.
+    $variables['is_inline'] = TRUE;
+  }
+  elseif (in_array($variables['field_name'], ['created', 'uid', 'title'], TRUE)) {
+    // Display created, uid and title fields inline because they will be
+    // displayed inline by node.html.twig. Skip this if the field
+    // display is configurable and skipping has been enabled.
+    // @todo Delete as part of https://www.drupal.org/node/3015623
+
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $variables['element']['#object'];
+    $skip_custom_preprocessing = $node->getEntityType()->get('enable_base_field_custom_preprocess_skipping');
+    $variables['is_inline'] = !$skip_custom_preprocessing || !$node->getFieldDefinition($variables['field_name'])->isDisplayConfigurable('view');
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function node_theme_suggestions_node(array $variables) {
+  $suggestions = [];
+  $node = $variables['elements']['#node'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'node__' . $sanitized_view_mode;
+  $suggestions[] = 'node__' . $node->bundle();
+  $suggestions[] = 'node__' . $node->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'node__' . $node->id();
+  $suggestions[] = 'node__' . $node->id() . '__' . $sanitized_view_mode;
+
+  return $suggestions;
+}
+
+/**
+ * Prepares variables for node templates.
+ *
+ * Default template: node.html.twig.
+ *
+ * Most themes use their own copy of node.html.twig. The default is located
+ * inside "/core/modules/node/templates/node.html.twig". Look in there for the
+ * full list of variables.
+ *
+ * By default this function performs special preprocessing of some base fields
+ * so they are available as variables in the template. For example 'title'
+ * appears as 'label'. This preprocessing is skipped if:
+ * - a module makes the field's display configurable via the field UI by means
+ *   of BaseFieldDefinition::setDisplayConfigurable()
+ * - AND the additional entity type property
+ *   'enable_base_field_custom_preprocess_skipping' has been set using
+ *   hook_entity_type_build().
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An array of elements to display in view mode.
+ *   - node: The node object.
+ *   - view_mode: View mode; e.g., 'full', 'teaser', etc.
+ *
+ * @see hook_entity_type_build()
+ * @see \Drupal\Core\Field\BaseFieldDefinition::setDisplayConfigurable()
+ */
+function template_preprocess_node(&$variables): void {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+
+  // The teaser variable is deprecated.
+  $variables['deprecations']['teaser'] = "'teaser' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458185";
+  $variables['teaser'] = $variables['view_mode'] == 'teaser';
+
+  // The 'metadata' variable was originally added to support RDF, which has now
+  // been moved to contrib. It was needed because it is not possible to
+  // extend the markup of the 'submitted' variable generically.
+  $variables['deprecations']['metadata'] = "'metadata' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3458638";
+
+  $variables['node'] = $variables['elements']['#node'];
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+  $skip_custom_preprocessing = $node->getEntityType()->get('enable_base_field_custom_preprocess_skipping');
+
+  // Make created, uid and title fields available separately. Skip this custom
+  // preprocessing if the field display is configurable and skipping has been
+  // enabled.
+  // @todo https://www.drupal.org/project/drupal/issues/3015623
+  //   Eventually delete this code and matching template lines. Using
+  //   $variables['content'] is more flexible and consistent.
+  $submitted_configurable = $node->getFieldDefinition('created')->isDisplayConfigurable('view') || $node->getFieldDefinition('uid')->isDisplayConfigurable('view');
+  if (!$skip_custom_preprocessing || !$submitted_configurable) {
+    $variables['date'] = \Drupal::service('renderer')->render($variables['elements']['created']);
+    unset($variables['elements']['created']);
+    $variables['author_name'] = \Drupal::service('renderer')->render($variables['elements']['uid']);
+    unset($variables['elements']['uid']);
+  }
+
+  if (isset($variables['elements']['title']) && (!$skip_custom_preprocessing || !$node->getFieldDefinition('title')->isDisplayConfigurable('view'))) {
+    $variables['label'] = $variables['elements']['title'];
+    unset($variables['elements']['title']);
+  }
+
+  $variables['url'] = !$node->isNew() ? $node->toUrl('canonical')->toString() : NULL;
+
+  // The 'page' variable is set to TRUE in two occasions:
+  // - The view mode is 'full' and we are on the 'node.view' route.
+  // - The node is in preview and view mode is either 'full' or 'default'.
+  $variables['page'] = ($variables['view_mode'] == 'full' && (node_is_page($node)) || (isset($node->in_preview) && in_array($node->preview_view_mode, ['full', 'default'])));
+
+  // Helpful $content variable for templates.
+  $variables += ['content' => []];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+
+  if (isset($variables['date'])) {
+    // Display post information on certain node types. This only occurs if
+    // custom preprocessing occurred for both of the created and uid fields.
+    // @todo https://www.drupal.org/project/drupal/issues/3015623
+    //   Eventually delete this code and matching template lines. Using a field
+    //   formatter is more flexible and consistent.
+    $node_type = $node->type->entity;
+    $variables['author_attributes'] = new Attribute();
+    $variables['display_submitted'] = $node_type->displaySubmitted();
+    if ($variables['display_submitted']) {
+      if (theme_get_setting('features.node_user_picture')) {
+        // To change user picture settings (e.g. image style), edit the
+        // 'compact' view mode on the User entity. Note that the 'compact'
+        // view mode might not be configured, so remember to always check the
+        // theme setting first.
+        if ($node_owner = $node->getOwner()) {
+          $variables['author_picture'] = \Drupal::entityTypeManager()
+            ->getViewBuilder('user')
+            ->view($node_owner, 'compact');
+        }
+      }
+    }
+  }
+
+}
+
+/**
+ * Form submission handler for system_themes_admin_form().
+ *
+ * @see node_form_system_themes_admin_form_alter()
+ */
+function node_form_system_themes_admin_form_submit($form, FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('node.settings')
+    ->set('use_admin_theme', $form_state->getValue('use_admin_theme'))
+    ->save();
+}
+
+/**
+ * Fetches an array of permission IDs granted to the given user ID.
+ *
+ * The implementation here provides only the universal "all" grant. A node
+ * access module should implement hook_node_grants() to provide a grant list for
+ * the user.
+ *
+ * After the default grants have been loaded, we allow modules to alter the
+ * grants array by reference. This hook allows for complex business logic to be
+ * applied when integrating multiple node access modules.
+ *
+ * @param string $operation
+ *   The operation that the user is trying to perform.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The account object for the user performing the operation.
+ *
+ * @return array
+ *   An associative array in which the keys are realms, and the values are
+ *   arrays of grants for those realms.
+ */
+function node_access_grants($operation, AccountInterface $account) {
+  // Fetch node access grants from other modules.
+  $grants = \Drupal::moduleHandler()->invokeAll('node_grants', [$account, $operation]);
+  // Allow modules to alter the assigned grants.
+  \Drupal::moduleHandler()->alter('node_grants', $grants, $account, $operation);
+
+  return array_merge(['all' => [0]], $grants);
+}
+
+/**
+ * Determines whether the user has a global viewing grant for all nodes.
+ *
+ * Checks to see whether any module grants global 'view' access to a user
+ * account; global 'view' access is encoded in the {node_access} table as a
+ * grant with nid=0. If no node access modules are enabled, node.module defines
+ * such a global 'view' access grant.
+ *
+ * This function is called when a node listing query is tagged with
+ * 'node_access'; when this function returns TRUE, no node access joins are
+ * added to the query.
+ *
+ * @param $account
+ *   (optional) The user object for the user whose access is being checked. If
+ *   omitted, the current user is used. Defaults to NULL.
+ *
+ * @return bool
+ *   TRUE if 'view' access to all nodes is granted, FALSE otherwise.
+ *
+ * @see hook_node_grants()
+ * @see node_query_node_access_alter()
+ */
+function node_access_view_all_nodes($account = NULL) {
+
+  if (!$account) {
+    $account = \Drupal::currentUser();
+  }
+
+  // Statically cache results in an array keyed by $account->id().
+  $access = &drupal_static(__FUNCTION__);
+  if (isset($access[$account->id()])) {
+    return $access[$account->id()];
+  }
+
+  // If no modules implement the node access system, access is always TRUE.
+  if (!\Drupal::moduleHandler()->hasImplementations('node_grants')) {
+    $access[$account->id()] = TRUE;
+  }
+  else {
+    $access[$account->id()] = \Drupal::entityTypeManager()->getAccessControlHandler('node')->checkAllGrants($account);
+  }
+
+  return $access[$account->id()];
+}
+
+/**
+ * Toggles or reads the value of a flag for rebuilding the node access grants.
+ *
+ * When the flag is set, a message is displayed to users with 'access
+ * administration pages' permission, pointing to the 'rebuild' confirm form.
+ * This can be used as an alternative to direct node_access_rebuild calls,
+ * allowing administrators to decide when they want to perform the actual
+ * (possibly time consuming) rebuild.
+ *
+ * When unsure if the current user is an administrator, node_access_rebuild()
+ * should be used instead.
+ *
+ * @param $rebuild
+ *   (optional) The boolean value to be written.
+ *
+ * @return bool|null
+ *   The current value of the flag if no value was provided for $rebuild. If a
+ *   value was provided for $rebuild, nothing (NULL) is returned.
+ *
+ * @see node_access_rebuild()
+ */
+function node_access_needs_rebuild($rebuild = NULL) {
+  if (!isset($rebuild)) {
+    return \Drupal::state()->get('node.node_access_needs_rebuild', FALSE);
+  }
+  elseif ($rebuild) {
+    \Drupal::state()->set('node.node_access_needs_rebuild', TRUE);
+  }
+  else {
+    \Drupal::state()->delete('node.node_access_needs_rebuild');
+  }
+}
+
+/**
+ * Rebuilds the node access database.
+ *
+ * This rebuild is occasionally needed by modules that make system-wide changes
+ * to access levels. When the rebuild is required by an admin-triggered action
+ * (e.g module settings form), calling node_access_needs_rebuild(TRUE) instead
+ * of node_access_rebuild() lets the user perform changes and actually rebuild
+ * only once done.
+ *
+ * Note : As of Drupal 6, node access modules are not required to (and actually
+ * should not) call node_access_rebuild() in hook_install/uninstall anymore.
+ *
+ * @param $batch_mode
+ *   (optional) Set to TRUE to process in 'batch' mode, spawning processing over
+ *   several HTTP requests (thus avoiding the risk of PHP timeout if the site
+ *   has a large number of nodes). hook_update_N() and any form submit handler
+ *   are safe contexts to use the 'batch mode'. Less decidable cases (such as
+ *   calls from hook_user(), hook_taxonomy(), etc.) might consider using the
+ *   non-batch mode. Defaults to FALSE.
+ *
+ * @see node_access_needs_rebuild()
+ */
+function node_access_rebuild($batch_mode = FALSE) {
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  /** @var \Drupal\node\NodeAccessControlHandlerInterface $access_control_handler */
+  $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
+  $access_control_handler->deleteGrants();
+  // Only recalculate if the site is using a node_access module.
+  if (\Drupal::moduleHandler()->hasImplementations('node_grants')) {
+    if ($batch_mode) {
+      $batch_builder = (new BatchBuilder())
+        ->setTitle(t('Rebuilding content access permissions'))
+        ->addOperation('_node_access_rebuild_batch_operation', [])
+        ->setFinishCallback('_node_access_rebuild_batch_finished');
+      batch_set($batch_builder->toArray());
+    }
+    else {
+      // Try to allocate enough time to rebuild node grants
+      Environment::setTimeLimit(240);
+
+      // Rebuild newest nodes first so that recent content becomes available
+      // quickly.
+      $entity_query = \Drupal::entityQuery('node');
+      $entity_query->sort('nid', 'DESC');
+      // Disable access checking since all nodes must be processed even if the
+      // user does not have access. And unless the current user has the bypass
+      // node access permission, no nodes are accessible since the grants have
+      // just been deleted.
+      $entity_query->accessCheck(FALSE);
+      $nids = $entity_query->execute();
+      foreach ($nids as $nid) {
+        $node_storage->resetCache([$nid]);
+        $node = Node::load($nid);
+        // To preserve database integrity, only write grants if the node
+        // loads successfully.
+        if (!empty($node)) {
+          $grants = $access_control_handler->acquireGrants($node);
+          \Drupal::service('node.grant_storage')->write($node, $grants);
+        }
+      }
+    }
+  }
+  else {
+    // Not using any node_access modules. Add the default grant.
+    $access_control_handler->writeDefaultGrant();
+  }
+
+  if (!isset($batch_builder)) {
+    \Drupal::messenger()->addStatus(t('Content permissions have been rebuilt.'));
+    node_access_needs_rebuild(FALSE);
+  }
+}
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * Performs batch operation for node_access_rebuild().
+ *
+ * This is a multistep operation: we go through all nodes by packs of 20. The
+ * batch processing engine interrupts processing and sends progress feedback
+ * after 1 second execution time.
+ *
+ * @param array $context
+ *   An array of contextual key/value information for rebuild batch process.
+ */
+function _node_access_rebuild_batch_operation(&$context) {
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  if (empty($context['sandbox'])) {
+    // Initiate multistep processing.
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['current_node'] = 0;
+    $context['sandbox']['max'] = \Drupal::entityQuery('node')->accessCheck(FALSE)->count()->execute();
+  }
+
+  // Process the next 20 nodes.
+  $limit = 20;
+  $nids = \Drupal::entityQuery('node')
+    ->condition('nid', $context['sandbox']['current_node'], '>')
+    ->sort('nid', 'ASC')
+    // Disable access checking since all nodes must be processed even if the
+    // user does not have access. And unless the current user has the bypass
+    // node access permission, no nodes are accessible since the grants have
+    // just been deleted.
+    ->accessCheck(FALSE)
+    ->range(0, $limit)
+    ->execute();
+  $node_storage->resetCache($nids);
+  $nodes = Node::loadMultiple($nids);
+  foreach ($nids as $nid) {
+    // To preserve database integrity, only write grants if the node
+    // loads successfully.
+    if (!empty($nodes[$nid])) {
+      $node = $nodes[$nid];
+      /** @var \Drupal\node\NodeAccessControlHandlerInterface $access_control_handler */
+      $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
+      $grants = $access_control_handler->acquireGrants($node);
+      \Drupal::service('node.grant_storage')->write($node, $grants);
+    }
+    $context['sandbox']['progress']++;
+    $context['sandbox']['current_node'] = $nid;
+  }
+
+  // Multistep processing : report progress.
+  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+}
+
+/**
+ * Implements callback_batch_finished().
+ *
+ * Performs post-processing for node_access_rebuild().
+ *
+ * @param bool $success
+ *   A boolean indicating whether the re-build process has completed.
+ * @param array $results
+ *   An array of results information.
+ * @param array $operations
+ *   An array of function calls (not used in this function).
+ */
+function _node_access_rebuild_batch_finished($success, $results, $operations) {
+  if ($success) {
+    \Drupal::messenger()->addStatus(t('The content access permissions have been rebuilt.'));
+    node_access_needs_rebuild(FALSE);
+  }
+  else {
+    \Drupal::messenger()->addError(t('The content access permissions have not been properly rebuilt.'));
+  }
+}
+
+/**
+ * Marks a node to be re-indexed by the node_search plugin.
+ *
+ * @param int $nid
+ *   The node ID.
+ */
+function node_reindex_node_search($nid) {
+  if (\Drupal::moduleHandler()->moduleExists('search')) {
+    // Reindex node context indexed by the node module search plugin.
+    \Drupal::service('search.index')->markForReindex('node_search', $nid);
+  }
+}

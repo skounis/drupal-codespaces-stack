@@ -1,0 +1,441 @@
+<?php
+
+/**
+ * @file
+ * Editorially install file.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function editoria11y_install() {
+  // Assign default access to roles likely to have content editing access.
+  /** @var \Drupal\user\RoleInterface $role */
+  foreach (Role::loadMultiple() as $role) {
+    if ($role->hasPermission('view own unpublished content') ||
+      $role->hasPermission('access content overview') || $role->hasPermission('access in place editing')) {
+      $role->grantPermission('view editoria11y checker');
+      $role->grantPermission('mark as hidden in editoria11y');
+      $role->save();
+    }
+  }
+
+  // Display a help message once after it is installed:
+  \Drupal::state()->set('editoria11y.show_help_message', TRUE);
+}
+
+/**
+ * Results table definition.
+ */
+function editoria11y_results_table(): array {
+  return [
+    'description' => 'Stores Editoria11y issue list',
+    'fields' => [
+      'id' => [
+        'description' => 'Test result',
+        'type' => 'serial',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'entity_id' => [
+        'description' => 'The {node}.nid this record affects.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'entity_type' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'node',
+        'length' => 32,
+        'description' => 'The entity type; "route" if no type found.',
+      ],
+      'route_name' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 255,
+        'description' => 'Route name for page..',
+      ],
+      'page_path' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 1024,
+        'description' => 'Internal, relative page path.',
+      ],
+      'page_language' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 64,
+        'description' => 'Active translation.',
+      ],
+      'page_url' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 1024,
+        'description' => 'Raw URL.',
+      ],
+      'page_title' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 1024,
+        'description' => 'The name of the route where this was last seen.',
+      ],
+      'page_result_count' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The total number of issues on this page.',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the first time this record was flagged.',
+      ],
+      'updated' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the last update.',
+      ],
+      'result_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'description' => 'The name of the test as reported by Editoria11y JS',
+      ],
+      'result_name_count' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The number of hits for this test type on this page',
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+    'unique_keys' => [
+      'ed11y' => [
+        'page_path',
+        'page_language',
+      ],
+    ],
+    'indexes' => [
+      'entity_type' => ['entity_type'],
+      'result_name' => ['result_name'],
+      'route_name' => ['route_name'],
+      'page_path' => ['page_path'],
+      'page_language' => ['page_language'],
+      'entity_id' => ['entity_id'],
+    ],
+  ];
+}
+
+/**
+ * Returns dismissals array.
+ */
+function editoria11y_dismissals_table(): array {
+  return [
+    'description' => 'Stores Editoria11y warnings and dismissals',
+    'fields' => [
+      'id' => [
+        'description' => 'Element affected',
+        'type' => 'serial',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'entity_id' => [
+        'description' => 'The {node}.nid this record affects.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'uid' => [
+        'description' => 'The {users}.uid this record affects.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'element_id' => [
+        'type' => 'varchar',
+        'length' => 2048,
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'description' => 'Code sample to identify the flagged element.',
+      ],
+      'entity_type' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'node',
+        'length' => EntityTypeInterface::ID_MAX_LENGTH,
+        'description' => 'The entity type of the route where this was dismissed',
+      ],
+      'page_path' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 1024,
+        'description' => 'The name of the route where this was last seen.',
+      ],
+      'page_language' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 64,
+        'description' => 'Active translation.',
+      ],
+      'page_title' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 1024,
+        'description' => 'The name of the route where this was last seen.',
+      ],
+      'route_name' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'length' => 256,
+        'description' => 'The entity type of the route where this was dismissed',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the first time this record was flagged.',
+      ],
+      'updated' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the last',
+      ],
+      'result_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'description' => 'The title of the test as reported by editoria11y JS',
+      ],
+      'result_key' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'description' => 'The name of the test as reported by editoria11y JS',
+      ],
+      'dismissal_status' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => 'unknown',
+        'description' => 'The type of dismissal (e.g., OK, Ignore)',
+      ],
+      'stale' => [
+        'description' => 'Not seen on most recent page check',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+    'unique_keys' => [
+      'ed11y' => [
+        'page_path',
+        'page_language',
+        'result_name',
+        'element_id',
+        'dismissal_status',
+        'uid',
+      ],
+    ],
+    'indexes' => [
+      'element_id' => ['element_id'],
+      'result_name' => ['result_name'],
+      'page_path' => ['page_path'],
+      'uid' => ['uid'],
+      'page_language' => ['page_language'],
+      'entity_id' => ['entity_id'],
+    ],
+    'foreign keys' => [
+      'data_user' => [
+        'table' => 'users',
+        'columns' => [
+          'uid' => 'uid',
+        ],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_schema().
+ */
+function editoria11y_schema(): array {
+  $schema['editoria11y_results'] = editoria11y_results_table();
+  $schema['editoria11y_dismissals'] = editoria11y_dismissals_table();
+  return $schema;
+}
+
+/**
+ * Add new config options.
+ *
+ * Note that "Ignore containers" has become
+ * "Ignore elements." Make a note of your setting
+ * before proceeding as it will need to be rewritten.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function editoria11y_update_9001() {
+  // Add ability to hide results to current viewers.
+  /** @var \Drupal\user\RoleInterface $role */
+  foreach (Role::loadMultiple() as $role) {
+    if ($role->hasPermission('view editoria11y checker')) {
+      $role->grantPermission('mark as hidden in editoria11y');
+      $role->save();
+    }
+  }
+
+  // Set defaults for new config items.
+  $config_factory = Drupal::configFactory();
+  $config = $config_factory->getEditable('editoria11y.settings');
+  $config->set('ed11y_theme', 'lightTheme');
+  $config->set('disable_sync', FALSE);
+  $config->save(TRUE);
+
+  // Create new DB tables.
+  /*
+  // ====== Removed; 9003 resets these tables.
+   */
+
+}
+
+/**
+ * Store page alias in reports for future dashboard filtering.
+ */
+/*function editoria11y_update_9002(&$sandbox) {
+// ====== Removed; 9003 resets these tables.
+}*/
+
+/**
+ * Creates tables for dashboard data using new schema.
+ *
+ * Note when updating between 2.x Betas that this will restore any previously
+ * hidden alerts.
+ */
+function editoria11y_update_9003() {
+
+  $config_factory = Drupal::configFactory();
+  $config = $config_factory->getEditable('editoria11y.settings');
+  $config->set('preserve_params', 'search,keys,page,language,language_content_entity');
+  $config->save(TRUE);
+
+  // Create new DB tables.
+  $database = Drupal::database();
+  $schema = $database->schema();
+
+  if ($schema->tableExists('editoria11y_results')) {
+    $schema->dropTable('editoria11y_results');
+  }
+
+  if ($schema->tableExists('editoria11y_dismissals')) {
+    $schema->dropTable('editoria11y_dismissals');
+  }
+
+  $table_name_results = 'editoria11y_results';
+  $table_schema_results = editoria11y_results_table();
+  $schema->createTable($table_name_results, $table_schema_results);
+
+  $table_name_dismissals = 'editoria11y_dismissals';
+  $table_schema_dismissals = editoria11y_dismissals_table();
+  $schema->createTable($table_name_dismissals, $table_schema_dismissals);
+}
+
+/**
+ * Adds entity IDs, node delete hooks and admin-editable Views.
+ */
+function editoria11y_update_9004() {
+  $schema = Drupal::database()->schema();
+
+  // Only needed on sites installed at 2.x versions between 9003 and 9004.
+  if (!$schema->fieldExists('editoria11y_results', 'entity_id')) {
+    // Partial schema for index calculation.
+    $specs = [
+      'fields' => [
+        'entity_id' => [
+          'description' => 'The NID or TID this record affects.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+      ],
+      'indexes' => [
+        'entity_id' => ['entity_id'],
+      ],
+    ];
+    $fields = ['entity_id'];
+    $schema->addField('editoria11y_results', 'entity_id', $specs['fields']['entity_id']);
+    $schema->addIndex('editoria11y_results', 'entity_id', $fields, $specs);
+    $schema->addField('editoria11y_dismissals', 'entity_id', $specs['fields']['entity_id']);
+    $schema->addIndex('editoria11y_dismissals', 'entity_id', $fields, $specs);
+  }
+}
+
+/**
+ * Updates default config for Link Purpose compatibility.
+ */
+function editoria11y_update_9005() {
+
+  $config_factory = Drupal::configFactory();
+  $config = $config_factory->getEditable('editoria11y.settings');
+  $config->set('link_ignore_selector', 'svg.ext, svg.mailto, .link-purpose-text');
+  $config->save(TRUE);
+}
+
+/**
+ * Issue 3422440: Fix config schema error.
+ */
+function editoria11y_update_9006() {
+  $config_factory = Drupal::configFactory();
+  $config = $config_factory->getEditable('editoria11y.configuration');
+  $config->delete();
+}
+
+/**
+ * Enable live checking and set default heading level for body fields.
+ */
+function editoria11y_update_9007() {
+  $config_factory = Drupal::configFactory();
+  $config = $config_factory->getEditable('editoria11y.settings');
+  $config->set('live_h2', 'form[id^="node-"] #edit-body-wrapper');
+  $config->set('disable_live', FALSE);
+  $config->save();
+}
+
+/**
+ * Reset value for selector for first heading level.
+ */
+function editoria11y_update_9008() {
+  $config_factory = Drupal::configFactory();
+  $config = $config_factory->getEditable('editoria11y.settings');
+  $config->set('live_h2', 'form[id^="node-"] #edit-body-wrapper .ck-content');
+  $config->save();
+}

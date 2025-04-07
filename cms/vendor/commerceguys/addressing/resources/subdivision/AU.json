@@ -1,0 +1,37 @@
+{
+	"country_code": "AU",
+	"subdivisions": {
+		"ACT": {
+			"code": "ACT",
+			"name": "Australian Capital Territory"
+		},
+		"NSW": {
+			"code": "NSW",
+			"name": "New South Wales"
+		},
+		"NT": {
+			"code": "NT",
+			"name": "Northern Territory"
+		},
+		"QLD": {
+			"code": "QLD",
+			"name": "Queensland"
+		},
+		"SA": {
+			"code": "SA",
+			"name": "South Australia"
+		},
+		"TAS": {
+			"code": "TAS",
+			"name": "Tasmania"
+		},
+		"VIC": {
+			"code": "VIC",
+			"name": "Victoria"
+		},
+		"WA": {
+			"code": "WA",
+			"name": "Western Australia"
+		}
+	}
+}

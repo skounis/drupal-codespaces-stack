@@ -1,0 +1,152 @@
+eca.settings:
+  type: config_object
+  label: 'ECA settings'
+  mapping:
+    log_level:
+      type: integer
+      label: 'Log level'
+    documentation_domain:
+      type: string
+      label: 'Documentation domain'
+    user:
+      type: string
+      label: 'Execute models with user'
+    service_user:
+      type: string
+      label: 'Service user'
+    dependency_calculation:
+      type: sequence
+      label: 'Config dependency calculation'
+      sequence:
+        type: string
+        label: 'Enabled calculation setting'
+
+eca.eca.*:
+  type: config_entity
+  label: ECA
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    modeller:
+      type: string
+      label: 'Modeller'
+    label:
+      type: label
+      label: 'Label'
+    version:
+      type: string
+      label: 'Version'
+    weight:
+      type: integer
+      label: 'Weight'
+    events:
+      type: sequence
+      label: 'Events'
+      sequence:
+        type: mapping
+        label: 'Event'
+        mapping:
+          plugin:
+            type: string
+            label: 'Plugin ID'
+          label:
+            type: string
+            label: 'Label'
+          configuration:
+            type: ignore
+            label: 'Configuration'
+          successors:
+            type: sequence
+            label: 'Successors'
+            sequence:
+              type: eca.wrapper.successor
+    conditions:
+      type: sequence
+      label: 'Conditions'
+      sequence:
+        type: mapping
+        label: 'Condition'
+        mapping:
+          plugin:
+            type: string
+            label: 'Plugin ID'
+          configuration:
+            type: ignore
+            label: 'Configuration'
+    gateways:
+      type: sequence
+      label: 'Gateways'
+      sequence:
+        type: mapping
+        label: 'Gateway'
+        mapping:
+          type:
+            type: integer
+            label: 'Type'
+          successors:
+            type: sequence
+            label: 'Successors'
+            sequence:
+              type: eca.wrapper.successor
+    actions:
+      type: sequence
+      label: 'Actions'
+      sequence:
+        type: mapping
+        label: 'Action'
+        mapping:
+          plugin:
+            type: string
+            label: 'Plugin ID'
+          label:
+            type: string
+            label: 'Label'
+          configuration:
+            type: ignore
+            label: 'Configuration'
+          successors:
+            type: sequence
+            label: 'Successors'
+            sequence:
+              type: eca.wrapper.successor
+
+eca.model.*:
+  type: config_entity
+  label: ECA
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    tags:
+      type: sequence
+      label: 'tags'
+      sequence:
+        type: string
+    documentation:
+      type: string
+      label: 'Documentation'
+    filename:
+      type: string
+      label: 'Filename'
+    modeldata:
+      type: string
+      label: 'Raw model data'
+
+eca.wrapper.successor:
+  type: mapping
+  label: 'Successor'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    condition:
+      type: string
+      label: 'Condition'
+
+eca_action_configuration:
+  type: ignore
+  label: 'ECA action configuration'

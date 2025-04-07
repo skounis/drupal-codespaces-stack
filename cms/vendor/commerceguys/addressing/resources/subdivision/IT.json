@@ -1,0 +1,433 @@
+{
+	"country_code": "IT",
+	"subdivisions": {
+		"AG": {
+			"code": "AG",
+			"name": "Agrigento"
+		},
+		"AL": {
+			"code": "AL",
+			"name": "Alessandria"
+		},
+		"AN": {
+			"code": "AN",
+			"name": "Ancona"
+		},
+		"AO": {
+			"code": "AO",
+			"name": "Aosta"
+		},
+		"AR": {
+			"code": "AR",
+			"name": "Arezzo"
+		},
+		"AP": {
+			"code": "AP",
+			"name": "Ascoli Piceno"
+		},
+		"AT": {
+			"code": "AT",
+			"name": "Asti"
+		},
+		"AV": {
+			"code": "AV",
+			"name": "Avellino"
+		},
+		"BA": {
+			"code": "BA",
+			"name": "Bari"
+		},
+		"BT": {
+			"code": "BT",
+			"name": "Barletta-Andria-Trani"
+		},
+		"BL": {
+			"code": "BL",
+			"name": "Belluno"
+		},
+		"BN": {
+			"code": "BN",
+			"name": "Benevento"
+		},
+		"BG": {
+			"code": "BG",
+			"name": "Bergamo"
+		},
+		"BI": {
+			"code": "BI",
+			"name": "Biella"
+		},
+		"BO": {
+			"code": "BO",
+			"name": "Bologna"
+		},
+		"BZ": {
+			"code": "BZ",
+			"name": "Bolzano"
+		},
+		"BS": {
+			"code": "BS",
+			"name": "Brescia"
+		},
+		"BR": {
+			"code": "BR",
+			"name": "Brindisi"
+		},
+		"CA": {
+			"code": "CA",
+			"name": "Cagliari"
+		},
+		"CL": {
+			"code": "CL",
+			"name": "Caltanissetta"
+		},
+		"CB": {
+			"code": "CB",
+			"name": "Campobasso"
+		},
+		"CE": {
+			"code": "CE",
+			"name": "Caserta"
+		},
+		"CT": {
+			"code": "CT",
+			"name": "Catania"
+		},
+		"CZ": {
+			"code": "CZ",
+			"name": "Catanzaro"
+		},
+		"CH": {
+			"code": "CH",
+			"name": "Chieti"
+		},
+		"CO": {
+			"code": "CO",
+			"name": "Como"
+		},
+		"CS": {
+			"code": "CS",
+			"name": "Cosenza"
+		},
+		"CR": {
+			"code": "CR",
+			"name": "Cremona"
+		},
+		"KR": {
+			"code": "KR",
+			"name": "Crotone"
+		},
+		"CN": {
+			"code": "CN",
+			"name": "Cuneo"
+		},
+		"EN": {
+			"code": "EN",
+			"name": "Enna"
+		},
+		"FM": {
+			"code": "FM",
+			"name": "Fermo"
+		},
+		"FE": {
+			"code": "FE",
+			"name": "Ferrara"
+		},
+		"FI": {
+			"code": "FI",
+			"name": "Firenze"
+		},
+		"FG": {
+			"code": "FG",
+			"name": "Foggia"
+		},
+		"FC": {
+			"code": "FC",
+			"name": "Forlì-Cesena"
+		},
+		"FR": {
+			"code": "FR",
+			"name": "Frosinone"
+		},
+		"GE": {
+			"code": "GE",
+			"name": "Genova"
+		},
+		"GO": {
+			"code": "GO",
+			"name": "Gorizia"
+		},
+		"GR": {
+			"code": "GR",
+			"name": "Grosseto"
+		},
+		"IM": {
+			"code": "IM",
+			"name": "Imperia"
+		},
+		"IS": {
+			"code": "IS",
+			"name": "Isernia"
+		},
+		"AQ": {
+			"code": "AQ",
+			"name": "L'Aquila"
+		},
+		"SP": {
+			"code": "SP",
+			"name": "La Spezia"
+		},
+		"LT": {
+			"code": "LT",
+			"name": "Latina"
+		},
+		"LE": {
+			"code": "LE",
+			"name": "Lecce"
+		},
+		"LC": {
+			"code": "LC",
+			"name": "Lecco"
+		},
+		"LI": {
+			"code": "LI",
+			"name": "Livorno"
+		},
+		"LO": {
+			"code": "LO",
+			"name": "Lodi"
+		},
+		"LU": {
+			"code": "LU",
+			"name": "Lucca"
+		},
+		"MC": {
+			"code": "MC",
+			"name": "Macerata"
+		},
+		"MN": {
+			"code": "MN",
+			"name": "Mantova"
+		},
+		"MS": {
+			"code": "MS",
+			"name": "Massa-Carrara"
+		},
+		"MT": {
+			"code": "MT",
+			"name": "Matera"
+		},
+		"ME": {
+			"code": "ME",
+			"name": "Messina"
+		},
+		"MI": {
+			"code": "MI",
+			"name": "Milano"
+		},
+		"MO": {
+			"code": "MO",
+			"name": "Modena"
+		},
+		"MB": {
+			"code": "MB",
+			"name": "Monza e Brianza"
+		},
+		"NA": {
+			"code": "NA",
+			"name": "Napoli"
+		},
+		"NO": {
+			"code": "NO",
+			"name": "Novara"
+		},
+		"NU": {
+			"code": "NU",
+			"name": "Nuoro"
+		},
+		"OR": {
+			"code": "OR",
+			"name": "Oristano"
+		},
+		"PD": {
+			"code": "PD",
+			"name": "Padova"
+		},
+		"PA": {
+			"code": "PA",
+			"name": "Palermo"
+		},
+		"PR": {
+			"code": "PR",
+			"name": "Parma"
+		},
+		"PV": {
+			"code": "PV",
+			"name": "Pavia"
+		},
+		"PG": {
+			"code": "PG",
+			"name": "Perugia"
+		},
+		"PU": {
+			"code": "PU",
+			"name": "Pesaro e Urbino"
+		},
+		"PE": {
+			"code": "PE",
+			"name": "Pescara"
+		},
+		"PC": {
+			"code": "PC",
+			"name": "Piacenza"
+		},
+		"PI": {
+			"code": "PI",
+			"name": "Pisa"
+		},
+		"PT": {
+			"code": "PT",
+			"name": "Pistoia"
+		},
+		"PN": {
+			"code": "PN",
+			"name": "Pordenone"
+		},
+		"PZ": {
+			"code": "PZ",
+			"name": "Potenza"
+		},
+		"PO": {
+			"code": "PO",
+			"name": "Prato"
+		},
+		"RG": {
+			"code": "RG",
+			"name": "Ragusa"
+		},
+		"RA": {
+			"code": "RA",
+			"name": "Ravenna"
+		},
+		"RC": {
+			"code": "RC",
+			"name": "Reggio Calabria"
+		},
+		"RE": {
+			"code": "RE",
+			"name": "Reggio Emilia"
+		},
+		"RI": {
+			"code": "RI",
+			"name": "Rieti"
+		},
+		"RN": {
+			"code": "RN",
+			"name": "Rimini"
+		},
+		"RM": {
+			"code": "RM",
+			"name": "Roma"
+		},
+		"RO": {
+			"code": "RO",
+			"name": "Rovigo"
+		},
+		"SA": {
+			"code": "SA",
+			"name": "Salerno"
+		},
+		"SS": {
+			"code": "SS",
+			"name": "Sassari"
+		},
+		"SV": {
+			"code": "SV",
+			"name": "Savona"
+		},
+		"SI": {
+			"code": "SI",
+			"name": "Siena"
+		},
+		"SR": {
+			"code": "SR",
+			"name": "Siracusa"
+		},
+		"SO": {
+			"code": "SO",
+			"name": "Sondrio"
+		},
+		"SU": {
+			"code": "SU",
+			"name": "Sud Sardegna"
+		},
+		"TA": {
+			"code": "TA",
+			"name": "Taranto"
+		},
+		"TE": {
+			"code": "TE",
+			"name": "Teramo"
+		},
+		"TR": {
+			"code": "TR",
+			"name": "Terni"
+		},
+		"TO": {
+			"code": "TO",
+			"name": "Torino"
+		},
+		"TP": {
+			"code": "TP",
+			"name": "Trapani"
+		},
+		"TN": {
+			"code": "TN",
+			"name": "Trento"
+		},
+		"TV": {
+			"code": "TV",
+			"name": "Treviso"
+		},
+		"TS": {
+			"code": "TS",
+			"name": "Trieste"
+		},
+		"UD": {
+			"code": "UD",
+			"name": "Udine"
+		},
+		"VA": {
+			"code": "VA",
+			"name": "Varese"
+		},
+		"VE": {
+			"code": "VE",
+			"name": "Venezia"
+		},
+		"VB": {
+			"code": "VB",
+			"name": "Verbano-Cusio-Ossola"
+		},
+		"VC": {
+			"code": "VC",
+			"name": "Vercelli"
+		},
+		"VR": {
+			"code": "VR",
+			"name": "Verona"
+		},
+		"VV": {
+			"code": "VV",
+			"name": "Vibo Valentia"
+		},
+		"VI": {
+			"code": "VI",
+			"name": "Vicenza"
+		},
+		"VT": {
+			"code": "VT",
+			"name": "Viterbo"
+		}
+	}
+}

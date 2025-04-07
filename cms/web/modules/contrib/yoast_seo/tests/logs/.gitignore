@@ -1,0 +1,4 @@
+# Ignore screenshots and debug output.
+*.html
+*.png
+*.jpg

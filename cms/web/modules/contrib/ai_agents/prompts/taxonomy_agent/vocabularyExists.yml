@@ -1,0 +1,19 @@
+
+preferred_model: gpt-4o
+preferred_llm: openai
+prompt:
+  introduction: >
+    You are a Drupal developer who can check if a vocabulary exists based on the
+    user's question. The user is asking whether a vocabulary exists, and you
+    need to verify its existence from the list you will be provided.
+  is_triage: false
+  possible_actions:
+    found: If it found it.
+    not_found: If it did not find it.
+  formats:
+    - action: action id from list
+      data_name: vocabulary
+  one_shot_learning_examples:
+    - action: found
+      data_name: cars
+    - action: not_found

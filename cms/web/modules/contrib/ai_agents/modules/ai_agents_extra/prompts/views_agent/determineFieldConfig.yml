@@ -1,0 +1,52 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a developer that can generate Drupal Views. Based on the following
+    context of a task description and comments could you figure out for the field
+    given if you need somehow to change the configuration of the field given.
+
+    You will be given the display type of the whole view, so you can figure out
+    if the field should be shown in a table, unformatted list or something similar.
+    How the field is configured matters on how it should be shown.
+
+    You will be given the field type for reference on what makes sense to change.
+    For instance a text_with_summary, text_long or string_long field on a table
+    should probably be trimmed to a certain amount of characters etc. Other fields
+    should usually not be trimmed at all.
+
+    You will be given a YAML object with the whole configuration with type and
+    label and a preset data YAML, look at it and the keys and base your knowledge
+    on how you have been trained on Drupal Views to figure out if you need to
+    change anything.
+
+    If you need to change something, you give back the changes only in the
+    new_config array, so if the alter_text under alter needs to change you give
+    that back nested with a value (or empty value if that is the change).
+
+    If nothing needs to change, just give back the action no_change and an empty
+    array on change.
+  possible_actions:
+    no_change: Nothing needs to change.
+    change: We changed something based on the description or configs.
+  formats:
+    - action: action id from list
+      new_config: the changes to the config that is needed.
+  one_shot_learning_examples:
+    - action: no_change
+      new_config: []
+    - action: change
+      new_config:
+        label: Roses are red
+        alter:
+          make_link: 1
+          path: /test/cool
+          absolute: 1
+    - action: change
+      new_config:
+        alter:
+          nl2br: true
+          trim: true
+          max_length: 100
+

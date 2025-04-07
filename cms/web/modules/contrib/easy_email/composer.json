@@ -1,0 +1,27 @@
+{
+    "name": "drupal/easy_email",
+    "description": "Easy Email is an HTML email system for Drupal, designed to be as simple as possible to configure, with a robust set of features.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/easy_email",
+    "support": {
+        "source": "https://git.drupalcode.org/project/easy_email"
+    },
+    "require": {
+        "drupal/core": "^10.1 || ^11",
+        "drupal/jquery_ui_resizable": "^2.0",
+        "drupal/token": "^1.0"
+    },
+    "require-dev": {
+        "drupal/commerce": "^2.0",
+        "drupal/symfony_mailer_lite": "^1.0",
+        "drupal/mailsystem": "^4.0"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+              "drush.services.yml": "^10"
+            }
+        }
+    }
+}

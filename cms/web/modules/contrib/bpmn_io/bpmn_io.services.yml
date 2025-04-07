@@ -1,0 +1,7 @@
+services:
+  bpmn_io.services.converter:
+    class: Drupal\bpmn_io\Services\Converter\Converter
+    arguments:
+      - '@eca.service.modeller'
+      - '@messenger'
+      - '@current_user'

@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the checklistapiexample module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function checklistapiexample_uninstall() {
+  /** @var \Drupal\checklistapi\Storage\StateStorage $storage */
+  $storage = \Drupal::service('checklistapi_storage.state');
+  $storage->setChecklistId('example_checklist')->deleteSavedProgress();
+}
+
+/**
+ * Move saved progress from old config storage to new state storage.
+ */
+function checklistapiexample_update_8101() {
+  $checklist_id = 'example_checklist';
+
+  // Get saved progress from old config storage.
+  /** @var \Drupal\checklistapi\Storage\ConfigStorage $old_config_storage */
+  $old_config_storage = \Drupal::service('checklistapi_storage.config');
+  $saved_progress = $old_config_storage->setChecklistId($checklist_id)
+    ->getSavedProgress();
+
+  if (!$saved_progress) {
+    return;
+  }
+
+  // Copy saved progress to new state storage.
+  /** @var \Drupal\checklistapi\Storage\StateStorage $new_state_storage */
+  $new_state_storage = \Drupal::service('checklistapi_storage.state');
+  $new_state_storage->setChecklistId($checklist_id)
+    ->setSavedProgress($saved_progress);
+
+  // Delete old config storage.
+  $old_config_storage->deleteSavedProgress();
+}

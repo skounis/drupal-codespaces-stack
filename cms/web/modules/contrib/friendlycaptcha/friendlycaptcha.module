@@ -1,0 +1,183 @@
+<?php
+
+/**
+ * @file
+ * Friendly Captcha integration module.
+ */
+
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function friendlycaptcha_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.friendlycaptcha':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('<a href=":url">Friendly Captcha</a> is a service to protect your website from spam and abuse.', [':url' => 'https://friendlycaptcha.com/']) . '</p>';
+      $output .= '<h3>' . t('Configuration') . '</h3>';
+      $output .= '<ol>';
+      $output .= '<li>' . t('Enable Friendly Captcha and CAPTCHA modules in Adminstration > Extend') . '</li>';
+      $output .= '<li>' . t('You will now find a Friendly Captcha tab in the CAPTCHA administration page available at: Administration > Configuration > People > CAPTCHA module settings > Friendly Captcha') . '</li>';
+      $output .= '<li>' . t('Register your web site at <a href=":url">https://app.friendlycaptcha.com/account</a>', [':url' => 'https://app.friendlycaptcha.com/account']) . '</li>';
+      $output .= '<li>' . t('Input the sitekey and API Key into the Friendly Captcha settings.') . '</li>';
+      $output .= '<li>' . t('Visit the Captcha administration page and set where you want the Friendly Captcha form to be presented: Administration > Configuration > People > CAPTCHA module settings') . '</li>';
+      $output .= '</ol>';
+      return $output;
+  }
+}
+
+/**
+ * Helper function to return a library missing message.
+ */
+function _friendlycaptcha_get_library_missing_message() {
+  return t('"friendly-challenge" library not
+      found in the "libraries" directory. You have three ways to require the
+      library:<br>1. Download the file from
+      <a href="@link1">here</a> and  drop it into
+      "/libraries/friendly-challenge/"<br>2. Require the library via
+      "composer require npm-asset/friendly-challenge"and make sure, you have
+      npm-assets enabled inside your composer file. Click
+      <a href="@link2">here</a> for more information.<br>3. Use NPM and require
+      the library from <a href="@link3">here</a>.',
+      [
+        '@link1' => 'https://unpkg.com/friendly-challenge@0.9.7/widget.min.js',
+        '@link2' => 'https://www.drupal.org/docs/develop/using-composer/manage-dependencies#third-party-libraries',
+        '@link3' => 'https://www.npmjs.com/package/friendly-challenge',
+      ]);
+}
+
+/**
+ * Implements hook_captcha().
+ */
+function friendlycaptcha_captcha($op, $captcha_type = '') {
+
+  switch ($op) {
+    case 'list':
+      return ['friendlycaptcha'];
+
+    case 'generate':
+      $captcha = [];
+      if ($captcha_type == 'friendlycaptcha') {
+        $config = \Drupal::config('friendlycaptcha.settings');
+        $renderer = \Drupal::service('renderer');
+        $friendlycaptcha_site_key = $config->get('site_key');
+        $friendlycaptcha_api_key = $config->get('api_key');
+        $friendlycaptcha_api_endpoint = $config->get('api_endpoint');
+        $friendlycaptcha_puzzle_endpoint = NULL;
+        if ($friendlycaptcha_api_endpoint === 'eu') {
+          $friendlycaptcha_puzzle_endpoint = 'https://eu-api.friendlycaptcha.eu/api/v1/puzzle';
+        }
+        elseif ($friendlycaptcha_api_endpoint === 'eu_fallback') {
+          $friendlycaptcha_puzzle_endpoint = 'https://eu-api.friendlycaptcha.eu/api/v1/puzzle,https://api.friendlycaptcha.com/api/v1/puzzle';
+        }
+        elseif ($friendlycaptcha_api_endpoint === 'local') {
+          $friendlycaptcha_puzzle_endpoint = Url::fromRoute('friendlycaptcha.api_puzzle', [], ['absolute' => TRUE])->toString();
+        }
+
+        if (!empty($friendlycaptcha_site_key) && !empty($friendlycaptcha_api_key)) {
+          // Build the friendlycaptcha captcha form if site_key and api_key are
+          // configured. Captcha requires TRUE to be returned in solution.
+          $captcha['solution'] = TRUE;
+          $captcha['captcha_validate'] = 'friendlycaptcha_captcha_validation';
+          $captcha['form']['captcha_response'] = [
+            '#type' => 'hidden',
+            '#value' => 'Friendly Captcha no captcha',
+          ];
+
+          // As the validate callback does not depend on sid or solution, this
+          // captcha type can be displayed on cached pages.
+          $captcha['cacheable'] = TRUE;
+
+          $attributes = [
+            'class' => 'frc-captcha',
+            'data-sitekey' => $friendlycaptcha_site_key,
+            'data-lang' => \Drupal::service('language_manager')->getCurrentLanguage()->getId(),
+            'data-puzzle-endpoint' => $friendlycaptcha_puzzle_endpoint,
+          ];
+          $attributes = array_filter($attributes);
+
+          $captcha['form']['friendlycaptcha_widget'] = [
+            '#markup' => '<div' . new Attribute($attributes) . '></div>',
+            '#suffix' => Markup::create('<noscript>' . t('You need Javascript for CAPTCHA verification to submit this form.') . '</noscript>'),
+            '#attached' => [
+              'library' => [
+                'friendlycaptcha/friendly-challenge',
+              ],
+            ],
+          ];
+        }
+        else {
+          if (\Drupal::currentUser()->hasPermission('administer CAPTCHA settings')) {
+            \Drupal::messenger()->addWarning(t('Friendly captcha is not configured! Click <a href="@link">here</a> to configure Friendly Captcha. In the meantime challenge type "math" is used as the example fallback.', ['@link' => Url::fromRoute('friendlycaptcha.admin_settings_form')->toString()]));
+          }
+          // Fallback to Math captcha as friendlycaptcha is not configured.
+          $captcha = captcha_captcha('generate', 'Math');
+        }
+
+        // If module configuration changes the form cache need to be refreshed.
+        $renderer->addCacheableDependency($captcha['form'], $config);
+      }
+      return $captcha;
+  }
+}
+
+/**
+ * CAPTCHA Callback; Validates the friendlycaptcha code.
+ */
+function friendlycaptcha_captcha_validation($solution, $response, $element, $form_state) {
+  $config = \Drupal::config('friendlycaptcha.settings');
+  $requestStack = \Drupal::service('request_stack');
+  $captchaSolution = $requestStack->getCurrentRequest()->request->get('frc-captcha-solution');
+
+  $friendlycaptcha_api_key = $config->get('api_key');
+  if (empty($captchaSolution) || empty($friendlycaptcha_api_key)) {
+    return FALSE;
+  }
+
+  if ($config->get('api_endpoint') === 'local') {
+    $result = \Drupal::service('friendlycaptcha.siteverify')->verify($captchaSolution);
+    $errorId = $result['error_id'] ?? 'None';
+    $errorMessage = $result['error'] ?? 'None';
+    $loggerContent = new FormattableMarkup('Captcha validation failed! ID: "@error_id" Message: "@error".', [
+      '@error_id' => $errorId,
+      '@error' => $errorMessage,
+    ]);
+    $loggerContentString = $loggerContent->__toString();
+  }
+  else {
+    $options = [
+      'json' => [
+        'solution' => $captchaSolution,
+        'secret' => $config->get('api_key'),
+        'sitekey' => $config->get('site_key'),
+      ],
+      // Stop firing exception on response status code >= 300.
+      // See http://docs.guzzlephp.org/en/stable/handlers-and-middleware.html
+      'http_errors' => FALSE,
+    ];
+    $apiResponse = \Drupal::httpClient()->post('https://api.friendlycaptcha.com/api/v1/siteverify', $options);
+    $apiResponseContent = $apiResponse->getBody()->getContents();
+    $result = json_decode($apiResponseContent, TRUE);
+    $loggerContent = new FormattableMarkup('Captcha validation failed: "@errors". Status code: "@status_code".', [
+      '@status_code' => $apiResponse->getStatusCode(),
+      '@errors' => isset($result['errors']) ? implode(', ', $result['errors']) : 'None',
+    ]);
+    $loggerContentString = $loggerContent->__toString();
+  }
+
+  if (isset($result['success']) && $result['success'] == TRUE) {
+    return TRUE;
+  }
+
+  // Log any failed validation attempts, if validation logging is enabled:
+  if ($config->get('enable_validation_logging')) {
+    \Drupal::logger('friendlycaptcha')->info($loggerContentString);
+  }
+  return FALSE;
+}

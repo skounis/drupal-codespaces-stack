@@ -1,0 +1,54 @@
+{
+    "name": "geocoder-php/common-http",
+    "type": "library",
+    "description": "Common files for HTTP based Geocoders",
+    "keywords": [
+        "http geocoder"
+    ],
+    "homepage": "http://geocoder-php.org",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tobias Nyholm",
+            "email": "tobias.nyholm@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "php-http/discovery": "^1.17",
+        "psr/http-client-implementation": "^1.0",
+        "psr/http-factory-implementation": "^1.0",
+        "willdurand/geocoder": "^4.0"
+    },
+    "require-dev": {
+        "nyholm/psr7": "^1.0",
+        "php-http/message": "^1.0",
+        "php-http/mock-client": "^1.0",
+        "phpunit/phpunit": "^9.5",
+        "symfony/stopwatch": "~2.5 || ~5.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.0-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Geocoder\\Http\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-ci": "vendor/bin/phpunit --coverage-text --coverage-clover=build/coverage.xml"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
+    }
+}

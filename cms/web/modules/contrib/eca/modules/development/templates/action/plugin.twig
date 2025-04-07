@@ -1,0 +1,68 @@
+{{ php_prefix|raw }}
+
+namespace Drupal\{{ machine_name }}\Plugin\Action;
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\eca\Plugin\Action\ConfigurableActionBase;
+
+/**
+ * Describes the {{ machine_name }} {{ id }} action.
+ *
+ * @Action(
+ *   id = "{{ machine_name }}_{{ id }}",
+ *   label = @Translation("{{ purpose }}"),
+ *   description = @Translation("{{ description }}"),
+ *   eca_version_introduced = "{{ module_version }}"{% if type %},
+ *   type = "{{ type }}"{% endif %}
+ * )
+ */
+class {{ class }} extends ConfigurableActionBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
+    $access_result = AccessResult::allowed();
+    return $return_as_object ? $access_result : $access_result->isAllowed();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function execute({% if type %}${{ type }} = NULL{% endif %}): void {
+    // @todo implement the required action.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration(): array {
+    return [
+      'field1' => '',
+    ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
+    $form['field1'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Label of field 1'),
+      '#default_value' => $this->configuration['field1'],
+    ];
+    return parent::buildConfigurationForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
+    $this->configuration['field1'] = $form_state->getValue('field1');
+    parent::submitConfigurationForm($form, $form_state);
+  }
+
+}

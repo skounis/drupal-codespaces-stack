@@ -1,0 +1,89 @@
+body {
+  background-color: #fff;
+  font-family: Verdana, sans-serif;
+}
+
+h1 {
+  font-size: 1.25em;
+}
+
+table.sitemap {
+  width: 100%;
+  margin: 10px 0 15px;
+  text-align: left;
+  background-color: #cdcdcd;
+}
+
+table.sitemap thead tr th,
+table.sitemap tfoot tr th {
+  padding: 3px;
+  border: 1px solid #fff;
+  background-color: #e6eeee;
+}
+
+table.sitemap thead tr .tablesorter-header:not(.sorter-false) {
+  cursor: pointer;
+}
+
+table.sitemap thead tr .tablesorter-header .tablesorter-header-inner {
+  position: relative;
+  display: inline-block;
+  padding-right: 15px;
+}
+
+table.sitemap tbody td {
+  padding: 3px;
+  vertical-align: top;
+  color: #3d3d3d;
+  background-color: #fff;
+}
+
+table.sitemap tbody .odd td {
+  background-color: #efefef;
+}
+
+table.sitemap thead tr .tablesorter-headerAsc,
+table.sitemap thead tr .tablesorter-headerDesc {
+  color: #fff;
+  background-color: #5050d3;
+  font-style: italic;
+}
+
+table.sitemap thead tr .tablesorter-headerAsc .tablesorter-header-inner::after {
+  position: absolute;
+  right: 0;
+  content: "\25b2";
+}
+
+/* stylelint-disable-next-line prettier/prettier */
+table.sitemap thead tr .tablesorter-headerDesc .tablesorter-header-inner::after {
+  position: absolute;
+  right: 0;
+  content: "\25bc";
+}
+
+table.sitemap tbody tr ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+table.sitemap tbody tr ul li:not(:first-of-type) {
+  margin-top: 5px;
+}
+
+table.sitemap tbody tr ul li span {
+  margin-right: 5px;
+}
+
+table.sitemap tbody tr ul li span::after {
+  content: ":";
+}
+
+table.sitemap tbody tr ul.translation-set li span {
+  text-transform: uppercase;
+}
+
+table.sitemap tbody tr ul.images li span {
+  font-style: italic;
+}

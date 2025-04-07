@@ -1,0 +1,10 @@
+name: 'Simple Search Form'
+type: module
+description: 'Implements search form block for redirecting to a path with a parameter.'
+package: Search
+core_version_requirement: ^8.8 || ^9 || ^10 || ^11
+
+# Information added by Drupal.org packaging script on 2024-11-12
+version: '8.x-1.6'
+project: 'simple_search_form'
+datestamp: 1731408950

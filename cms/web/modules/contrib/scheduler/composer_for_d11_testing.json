@@ -1,0 +1,66 @@
+{
+    "name": "drupal/scheduler",
+    "description": "Automatically publish and unpublish content at specified dates and times.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://drupal.org/project/scheduler",
+    "require-dev": {
+        "drupal/rules": "^3 || 4.0.x-dev",
+        "drush/drush": ">=9",
+        "drupal/devel_generate": ">=4",
+        "drupal/workbench_moderation": "*",
+        "drupal/workbench_moderation_actions": "dev-3435732-automated-drupal-11",
+        "drupal/entity": "1.x-dev as 1.0",
+        "drupal/inline_entity_form": "dev-3438428-automated-drupal-11 as 3.1.0",
+        "drupal/commerce": "^2 || ^3"
+    },
+    "repositories": {
+        "inline_entity_form": {
+            "type": "vcs",
+            "url": "https://git.drupalcode.org/issue/inline_entity_form-3438428.git"
+        },
+        "workbench_moderation_actions": {
+            "type": "vcs",
+            "url": "https://git.drupalcode.org/issue/workbench_moderation_actions-3435732.git"
+        },
+        "drupal": {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    },
+    "_comment": "cSpell:disable",
+    "authors": [
+        {
+            "name": "Eric Schaefer (Eric Schaefer)",
+            "homepage": "https://www.drupal.org/u/eric-schaefer",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Jonathan Smith (jonathan1055)",
+            "homepage": "https://www.drupal.org/u/jonathan1055",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Pieter Frenssen (pfrenssen)",
+            "homepage": "https://www.drupal.org/u/pfrenssen",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Rick Manelius (rickmanelius)",
+            "homepage": "https://www.drupal.org/u/rickmanelius",
+            "role": "Maintainer"
+        }
+    ],
+    "_comment": "cSpell:enable",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/scheduler",
+        "source": "https://git.drupalcode.org/project/scheduler"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9 || ^10"
+            }
+        }
+    }
+}

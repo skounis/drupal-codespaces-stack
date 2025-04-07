@@ -1,0 +1,8 @@
+administer sitemap settings:
+  title: 'Administer sitemap settings'
+  description: 'Administer Simple XML Sitemap settings, alter inclusion settings of content and generate sitemaps on demand.'
+  restrict access: true
+
+edit entity sitemap settings:
+  title: 'Edit entity sitemap settings'
+  description: 'Edit Simple XML Sitemap settings on entity forms.'

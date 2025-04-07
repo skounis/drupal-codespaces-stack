@@ -1,0 +1,13 @@
+name: Tagify Icons
+type: module
+description: Provides an alteration to get icons into Tagify widget.
+package: User interface
+core_version_requirement: ^11.0
+dependencies:
+  - ui_icons:ui_icons
+  - ui_icons:ui_icons_field
+
+# Information added by Drupal.org packaging script on 2025-03-18
+version: '1.2.37'
+project: 'tagify'
+datestamp: 1742287085

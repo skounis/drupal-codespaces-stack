@@ -1,0 +1,62 @@
+uuid: d956612a-0d5f-4057-b4cd-ab23e2aa29b1
+langcode: en
+status: true
+dependencies: {  }
+id: author
+label: Author
+description: 'Dashboard for author users.'
+layout:
+  -
+    layout_id: layout_onecol
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+    components:
+      82d9828e-0b0c-4f2a-98f8-fba69aeba68c:
+        uuid: 82d9828e-0b0c-4f2a-98f8-fba69aeba68c
+        region: content
+        configuration:
+          id: dashboard_text_block
+          label: 'Dashboard Text'
+          label_display: '0'
+          provider: dashboard
+          context_mapping: {  }
+          text:
+            value: '<p><strong>Welcome to the Author Dashboard!</strong></p>'
+            format: basic_html
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+  -
+    layout_id: layout_twocol_section
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+      column_widths: 50-50
+    components:
+      11e0075a-4565-4a47-b527-a2b34e48d49a:
+        uuid: 11e0075a-4565-4a47-b527-a2b34e48d49a
+        region: first
+        configuration:
+          id: 'views_block:dashboard_content-block_own_drafts'
+          label: ''
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: ''
+          items_per_page: none
+        weight: 0
+        additional: {  }
+      7f521fc0-5273-46f4-8519-a0b3a172f6c6:
+        uuid: 7f521fc0-5273-46f4-8519-a0b3a172f6c6
+        region: second
+        configuration:
+          id: shortcuts
+          label: Shortcuts
+          label_display: visible
+          provider: shortcut
+          context_mapping: {  }
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+weight: -8

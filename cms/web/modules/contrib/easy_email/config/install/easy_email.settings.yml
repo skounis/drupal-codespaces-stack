@@ -1,0 +1,5 @@
+purge_on_cron: true
+purge_cron_limit: 50
+allowed_attachment_paths:
+  - 'public://*'
+email_collection_access: true

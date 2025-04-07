@@ -1,0 +1,27 @@
+webform_cards:
+  css:
+    component:
+      css/webform_cards.css: { }
+  js:
+    js/webform_cards.js: { }
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once
+    - webform/webform.scroll
+
+webform_cards.admin:
+  js:
+    js/webform_cards.admin.js: { }
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once
+
+webform_cards.test:
+  js:
+    js/webform_cards.test.js: { }
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once

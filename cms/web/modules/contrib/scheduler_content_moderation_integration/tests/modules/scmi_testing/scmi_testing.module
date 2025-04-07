@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the SCMI Testing module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function scmi_testing_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
+  // Only continue if the form is for adding or editing the test entity types.
+  if (!in_array($form_id, [
+    'node_page_form',
+    'node_page_edit_form',
+    'media_soundtrack_add_form',
+    'media_soundtrack_edit_form',
+  ])) {
+    return;
+  }
+
+  // Hide the publish_state field.
+  if (isset($form['publish_state'])) {
+    $form['publish_state']['#access'] = FALSE;
+  }
+  if (isset($form['unpublish_state'])) {
+    $form['unpublish_state']['#access'] = FALSE;
+  }
+}

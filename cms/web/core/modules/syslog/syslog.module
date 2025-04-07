@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Form submission handler for system_logging_settings().
+ *
+ * @see syslog_form_system_logging_settings_alter()
+ */
+function syslog_logging_settings_submit($form, FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('syslog.settings')
+    ->set('identity', $form_state->getValue('syslog_identity'))
+    ->set('facility', $form_state->getValue('syslog_facility'))
+    ->set('format', $form_state->getValue('syslog_format'))
+    ->save();
+}
+
+/**
+ * Lists all possible syslog facilities for UNIX/Linux.
+ *
+ * @return array
+ *   An array of syslog facilities for UNIX/Linux.
+ */
+function syslog_facility_list() {
+  return [
+    LOG_LOCAL0 => 'LOG_LOCAL0',
+    LOG_LOCAL1 => 'LOG_LOCAL1',
+    LOG_LOCAL2 => 'LOG_LOCAL2',
+    LOG_LOCAL3 => 'LOG_LOCAL3',
+    LOG_LOCAL4 => 'LOG_LOCAL4',
+    LOG_LOCAL5 => 'LOG_LOCAL5',
+    LOG_LOCAL6 => 'LOG_LOCAL6',
+    LOG_LOCAL7 => 'LOG_LOCAL7',
+  ];
+}

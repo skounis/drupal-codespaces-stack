@@ -1,0 +1,13 @@
+<?php
+
+namespace Drupal\Core\TypedData\Plugin\DataType;
+
+class Map {
+
+  /**
+   * @param string $property_name
+   * @param mixed $value
+   */
+  protected function writePropertyValue(string $property_name, mixed $value): void {}
+
+}

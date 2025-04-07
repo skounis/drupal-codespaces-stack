@@ -1,0 +1,29 @@
+{
+  "name": "drupal/simple_sitemap",
+  "description": "Creates a standard conform hreflang XML sitemap of the site content and provides a framework for developing other sitemap types.",
+  "type": "drupal-module",
+  "homepage": "https://drupal.org/project/simple_sitemap",
+  "authors": [
+    {
+      "name": "Pawel Ginalski (gbyte)",
+      "email": "contact@gbyte.dev",
+      "homepage": "https://www.drupal.org/u/gbyte",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://drupal.org/project/issues/simple_sitemap",
+    "source": "https://cgit.drupalcode.org/simple_sitemap"
+  },
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "ext-xmlwriter": "*"
+  },
+  "require-dev": {
+    "drupal/paragraphs": "^1.18"
+  },
+  "conflict": {
+    "drush/drush": "<12.5.1"
+  }
+}

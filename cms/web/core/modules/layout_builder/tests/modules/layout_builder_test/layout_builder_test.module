@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Provides hook implementations for Layout Builder tests.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_entity_node_view().
+ */
+function layout_builder_test_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  if ($display->getComponent('layout_builder_test')) {
+    $build['layout_builder_test'] = [
+      '#markup' => 'Extra, Extra read all about it.',
+    ];
+  }
+  if ($display->getComponent('layout_builder_test_2')) {
+    $build['layout_builder_test_2'] = [
+      '#markup' => 'Extra Field 2 is hidden by default.',
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for one-column layout template.
+ */
+function layout_builder_test_preprocess_layout__onecol(&$vars): void {
+  if (!empty($vars['content']['#entity'])) {
+    $vars['content']['content'][\Drupal::service('uuid')->generate()] = [
+      '#type' => 'markup',
+      '#markup' => sprintf('Yes, I can access the %s', $vars['content']['#entity']->label()),
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for two-column layout template.
+ */
+function layout_builder_test_preprocess_layout__twocol_section(&$vars): void {
+  if (!empty($vars['content']['#entity'])) {
+    $vars['content']['first'][\Drupal::service('uuid')->generate()] = [
+      '#type' => 'markup',
+      '#markup' => sprintf('Yes, I can access the entity %s in two column', $vars['content']['#entity']->label()),
+    ];
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function layout_builder_test_module_implements_alter(&$implementations, $hook): void {
+  if ($hook === 'system_breadcrumb_alter') {
+    // Move our hook_system_breadcrumb_alter() implementation to run before
+    // layout_builder_system_breadcrumb_alter().
+    $group = $implementations['layout_builder_test'];
+    $implementations = [
+      'layout_builder_test' => $group,
+    ] + $implementations;
+  }
+}

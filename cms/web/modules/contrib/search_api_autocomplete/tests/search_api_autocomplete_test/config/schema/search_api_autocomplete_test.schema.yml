@@ -1,0 +1,9 @@
+plugin.plugin_configuration.search_api_autocomplete_suggester.search_api_autocomplete_test:
+  type: ignore
+
+plugin.plugin_configuration.search_api_autocomplete_search.search_api_autocomplete_test:
+  type: ignore
+
+views.exposed_form.search_api_autocomplete_test:
+  type: views.exposed_form.basic
+  label: 'Search API Autocomplete Test Exposed Form'

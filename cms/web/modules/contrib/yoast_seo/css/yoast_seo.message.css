@@ -1,0 +1,11 @@
+.messages--info {
+  background-color: #fdf8ed;
+  background-image: url(../misc/icons/puzzlepiece.svg) !important;
+  border-color: #0071b8 #0071b8 #0071b8 transparent;  /* LTR */
+  color: #007bc6;
+  box-shadow: -8px 0 0 #1e5c90; /* LTR */
+}
+[dir="rtl"] .messages--info {
+  border-color: #0071b8 transparent #0071b8 #0071b8;
+  box-shadow: 8px 0 0 #1e5c90;
+}

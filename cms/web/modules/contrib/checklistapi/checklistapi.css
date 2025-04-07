@@ -1,0 +1,28 @@
+#checklistapi-checklist-form div.description p {
+  margin: .5em 0;
+}
+#checklistapi-checklist-form span.completion-details {
+  opacity: 0.66;
+  font-style: italic;
+}
+#checklistapi-checklist-form.compact-mode div.form-item__description p {
+  display: none;
+}
+
+/**
+ * Progress bar.
+ *
+ * @see system.theme.css
+ */
+#checklistapi-checklist-form .progress {
+  margin-bottom: 0.5em;
+  font-weight: normal;
+}
+#checklistapi-checklist-form .progress__bar {
+  animation-name: none;
+  background-image: none;
+}
+#checklistapi-checklist-form .compact-link {
+  clear: both;
+  padding-top: 1em;
+}

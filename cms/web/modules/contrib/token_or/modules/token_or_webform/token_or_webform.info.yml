@@ -1,0 +1,12 @@
+name: Token Or Webform
+type: module
+description: Support for token_or in webform.
+core_version_requirement: ^9.2 || ^10 || ^11
+dependencies:
+  - webform:webform
+  - token_or:token_or
+
+# Information added by Drupal.org packaging script on 2024-11-05
+version: '2.3.0'
+project: 'token_or'
+datestamp: 1730828438

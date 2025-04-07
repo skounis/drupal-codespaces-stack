@@ -1,0 +1,236 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - eca.eca.eca_test_0007
+id: eca_test_0007
+label: 'Redirects for deleted entities'
+tags:
+  - 'test models'
+  - redirect
+  - 'create entity'
+documentation: 'When a node gets deleted, this model creates an automatic redirect config entity to redirect visitors who want to go to the deleted node to the contact form instead.'
+filename: ''
+modeldata: |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="eca_test_0007" name="Redirects for deleted entities" isExecutable="true" camunda:versionTag="v1">
+      <bpmn2:documentation>When a node gets deleted, this model creates an automatic redirect config entity to redirect visitors who want to go to the deleted node to the contact form instead.</bpmn2:documentation>
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="Tags" value="test models,redirect,create entity" />
+          <camunda:property name="Changelog v1" value="Initial version" />
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:startEvent id="Event_13udgh1" name="Delete node" camunda:modelerTemplate="org.drupal.event.content_entity:delete">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="content_entity:delete" />
+          </camunda:properties>
+          <camunda:field name="type">
+            <camunda:string>node _all</camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:outgoing>Flow_0ndljsg</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:task id="Activity_1fhsh60" name="Create redirect" camunda:modelerTemplate="org.drupal.action.eca_new_entity">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_new_entity" />
+          </camunda:properties>
+          <camunda:field name="token_name">
+            <camunda:string>redirect</camunda:string>
+          </camunda:field>
+          <camunda:field name="type">
+            <camunda:string>redirect redirect</camunda:string>
+          </camunda:field>
+          <camunda:field name="langcode">
+            <camunda:string>und</camunda:string>
+          </camunda:field>
+          <camunda:field name="label">
+            <camunda:string>ECA created for node [entity:nid]</camunda:string>
+          </camunda:field>
+          <camunda:field name="published">
+            <camunda:string>yes</camunda:string>
+          </camunda:field>
+          <camunda:field name="owner">
+            <camunda:string></camunda:string>
+          </camunda:field>
+          <camunda:field name="object">
+            <camunda:string></camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_0ndljsg</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_1e7yklp</bpmn2:outgoing>
+      </bpmn2:task>
+      <bpmn2:sequenceFlow id="Flow_0ndljsg" sourceRef="Event_13udgh1" targetRef="Activity_1fhsh60" />
+      <bpmn2:task id="Activity_1l6xott" name="Set source path" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_set_field_value" />
+          </camunda:properties>
+          <camunda:field name="field_name">
+            <camunda:string>redirect_source</camunda:string>
+          </camunda:field>
+          <camunda:field name="field_value">
+            <camunda:string>node/[entity:nid]</camunda:string>
+          </camunda:field>
+          <camunda:field name="save_entity">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="strip_tags">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="trim">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="object">
+            <camunda:string>redirect</camunda:string>
+          </camunda:field>
+          <camunda:field name="method">
+            <camunda:string>set:clear</camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_1e7yklp</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_1gixhcl</bpmn2:outgoing>
+      </bpmn2:task>
+      <bpmn2:sequenceFlow id="Flow_1e7yklp" sourceRef="Activity_1fhsh60" targetRef="Activity_1l6xott" />
+      <bpmn2:task id="Activity_1yzv4qk" name="Set destination" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_set_field_value" />
+          </camunda:properties>
+          <camunda:field name="field_name">
+            <camunda:string>redirect_redirect.uri</camunda:string>
+          </camunda:field>
+          <camunda:field name="field_value">
+            <camunda:string>internal:/contact</camunda:string>
+          </camunda:field>
+          <camunda:field name="save_entity">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="strip_tags">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="trim">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="object">
+            <camunda:string>redirect</camunda:string>
+          </camunda:field>
+          <camunda:field name="method">
+            <camunda:string>set:clear</camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_1gixhcl</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_0nyj60t</bpmn2:outgoing>
+      </bpmn2:task>
+      <bpmn2:sequenceFlow id="Flow_1gixhcl" sourceRef="Activity_1l6xott" targetRef="Activity_1yzv4qk" />
+      <bpmn2:task id="Activity_0yzp82f" name="Set title" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_set_field_value" />
+          </camunda:properties>
+          <camunda:field name="field_name">
+            <camunda:string>redirect_redirect.title</camunda:string>
+          </camunda:field>
+          <camunda:field name="field_value">
+            <camunda:string></camunda:string>
+          </camunda:field>
+          <camunda:field name="save_entity">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="strip_tags">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="trim">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="object">
+            <camunda:string>redirect</camunda:string>
+          </camunda:field>
+          <camunda:field name="method">
+            <camunda:string>set:clear</camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_0nyj60t</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_1172ynu</bpmn2:outgoing>
+      </bpmn2:task>
+      <bpmn2:sequenceFlow id="Flow_0nyj60t" sourceRef="Activity_1yzv4qk" targetRef="Activity_0yzp82f" />
+      <bpmn2:task id="Activity_0opq15l" name="Set status" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_set_field_value" />
+          </camunda:properties>
+          <camunda:field name="field_name">
+            <camunda:string>status_code</camunda:string>
+          </camunda:field>
+          <camunda:field name="field_value">
+            <camunda:string>301</camunda:string>
+          </camunda:field>
+          <camunda:field name="save_entity">
+            <camunda:string>yes</camunda:string>
+          </camunda:field>
+          <camunda:field name="strip_tags">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="trim">
+            <camunda:string>no</camunda:string>
+          </camunda:field>
+          <camunda:field name="object">
+            <camunda:string>redirect</camunda:string>
+          </camunda:field>
+          <camunda:field name="method">
+            <camunda:string>set:clear</camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_1172ynu</bpmn2:incoming>
+      </bpmn2:task>
+      <bpmn2:sequenceFlow id="Flow_1172ynu" sourceRef="Activity_0yzp82f" targetRef="Activity_0opq15l" />
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="sid-dff21b0c-4783-4dca-a9f5-97409e72cb12">
+      <bpmndi:BPMNPlane id="sid-0b83d9ad-2068-408d-b2b7-6bce91830b9b" bpmnElement="eca_test_0007">
+        <bpmndi:BPMNShape id="Event_13udgh1_di" bpmnElement="Event_13udgh1">
+          <dc:Bounds x="322" y="152" width="36" height="36" />
+          <bpmndi:BPMNLabel>
+            <dc:Bounds x="310" y="195" width="60" height="14" />
+          </bpmndi:BPMNLabel>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape id="Activity_1fhsh60_di" bpmnElement="Activity_1fhsh60">
+          <dc:Bounds x="410" y="130" width="100" height="80" />
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape id="Activity_1l6xott_di" bpmnElement="Activity_1l6xott">
+          <dc:Bounds x="570" y="130" width="100" height="80" />
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape id="Activity_1yzv4qk_di" bpmnElement="Activity_1yzv4qk">
+          <dc:Bounds x="730" y="130" width="100" height="80" />
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape id="Activity_0yzp82f_di" bpmnElement="Activity_0yzp82f">
+          <dc:Bounds x="890" y="130" width="100" height="80" />
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape id="Activity_0opq15l_di" bpmnElement="Activity_0opq15l">
+          <dc:Bounds x="1050" y="130" width="100" height="80" />
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNEdge id="Flow_0ndljsg_di" bpmnElement="Flow_0ndljsg">
+          <di:waypoint x="358" y="170" />
+          <di:waypoint x="410" y="170" />
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge id="Flow_1e7yklp_di" bpmnElement="Flow_1e7yklp">
+          <di:waypoint x="510" y="170" />
+          <di:waypoint x="570" y="170" />
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge id="Flow_1gixhcl_di" bpmnElement="Flow_1gixhcl">
+          <di:waypoint x="670" y="170" />
+          <di:waypoint x="730" y="170" />
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge id="Flow_0nyj60t_di" bpmnElement="Flow_0nyj60t">
+          <di:waypoint x="830" y="170" />
+          <di:waypoint x="890" y="170" />
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge id="Flow_1172ynu_di" bpmnElement="Flow_1172ynu">
+          <di:waypoint x="990" y="170" />
+          <di:waypoint x="1050" y="170" />
+        </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+  </bpmn2:definitions>

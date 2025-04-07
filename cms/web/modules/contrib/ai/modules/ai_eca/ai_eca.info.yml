@@ -1,0 +1,16 @@
+name: AI ECA integration
+type: module
+description: Adds integration with the ECA module.
+package: AI
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+dependencies:
+  - ai:ai
+  - drupal:file
+  - eca:eca
+  - eca_content:eca_content
+
+# Information added by Drupal.org packaging script on 2025-03-05
+version: '1.0.5'
+project: 'ai'
+datestamp: 1741174945

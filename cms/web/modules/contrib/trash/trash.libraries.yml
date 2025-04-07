@@ -1,0 +1,14 @@
+trash:
+  css:
+    base:
+      css/trash.css: {}
+
+trash.admin:
+  js:
+    js/trash.js: {}
+  css:
+    base:
+      css/trash.admin.css: {}
+  dependencies:
+    - core/drupal
+    - core/once

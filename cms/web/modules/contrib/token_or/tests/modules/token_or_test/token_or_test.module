@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * Token or test token info.
+ */
+
+use Drupal\Core\Render\BubbleableMetadata;
+
+/**
+ * Implements hook_token_info().
+ */
+function token_or_test_token_info() {
+  $info = [];
+  $info['tokens']['token_or']['test'] = [
+    'name' => t('A test token'),
+    'description' => NULL,
+  ];
+
+  $info['tokens']['token_or']['test2'] = [
+    'name' => t('Another test token'),
+    'description' => NULL,
+  ];
+
+  $info['tokens']['token_or']['empty'] = [
+    'name' => t('An empty token'),
+    'description' => NULL,
+  ];
+  $info['tokens']['token_or']['empty2'] = [
+    'name' => t('Another empty token'),
+    'description' => NULL,
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_token_info_alter().
+ */
+function token_or_test_token_info_alter(&$info) {
+  // Add missing name properties to tokens.
+  $info['types']['date']['name'] = 'date';
+  $info['tokens']['date']['custom']['name'] = 'date-custom';
+  $info['tokens']['user']['url']['name'] = 'user-url';
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function token_or_test_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = [];
+
+  if ($type == 'token_or') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'test':
+          $replacements[$original] = 'test';
+          break;
+
+        case 'test2':
+          $replacements[$original] = 'test2';
+          break;
+
+        case 'empty':
+        case 'empty2':
+          $replacements[$original] = '';
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}

@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * @file
+ * AI module file.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_modules_installed().
+ */
+function ai_modules_installed(array $modules) {
+  // Clear the provider cache when a module is installed.
+  \Drupal::cache('discovery')->delete('ai_provider_plugins');
+}
+
+/**
+ * Helper function to check if the current route is an admin route.
+ *
+ * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+ *   The route match interface.
+ *
+ * @return bool
+ *   TRUE if the route is an admin route, FALSE otherwise.
+ */
+function ai_is_admin_route(RouteMatchInterface $route_match) {
+  $route = $route_match->getRouteObject();
+  if ($route && $route->hasOption('_admin_route') && $route->getOption('_admin_route') == TRUE) {
+    return TRUE;
+  }
+
+  // Check if the route path starts with '/admin'.
+  $path = $route_match->getRouteObject()->getPath();
+  if (strpos($path, '/admin') === 0) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_module_preuninstall().
+ */
+function ai_module_preuninstall($module) {
+  // Check if the module has an ai provider plugin.
+  $plugin_manager = \Drupal::service('ai.provider');
+  $plugins = $plugin_manager->getDefinitions();
+  foreach ($plugins as $plugin) {
+    if ($plugin['provider'] == $module) {
+      \Drupal::service('ai.provider')->providerDisabled($plugin['id']);
+    }
+  }
+}
+
+/**
+ * Mapping from the provider submodules to the new external modules.
+ *
+ * To be removed when the internal providers are removed.
+ *
+ * @return string[]
+ *   The submodule providers mapped to the external module providers.
+ *
+ * @internal
+ */
+function _ai_providers_mapping(): array {
+  // @todo verify the destination ai providers are correct.
+  return [
+    'provider_anthropic' => 'ai_provider_anthropic',
+    'provider_groq' => 'ai_provider_groq',
+    'provider_huggingface' => 'ai_provider_huggingface',
+    'provider_lmstudio' => 'ai_provider_lmstudio',
+    'provider_mistral' => 'ai_provider_mistral',
+    'provider_ollama' => 'ai_provider_ollama',
+    'provider_openai' => 'ai_provider_openai',
+    'vdb_provider_pinecone' => 'ai_vdb_provider_pinecone',
+    'vdb_provider_milvus' => 'ai_vdb_provider_milvus',
+  ];
+}

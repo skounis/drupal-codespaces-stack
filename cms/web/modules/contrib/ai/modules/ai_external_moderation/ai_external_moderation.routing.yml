@@ -1,0 +1,7 @@
+ai_external_moderation.settings_form:
+  path: '/admin/config/ai/ai-external-moderation'
+  defaults:
+    _form: '\Drupal\ai_external_moderation\Form\ModerationConfigurations'
+    _title: 'AI Moderation Settings'
+  requirements:
+    _permission: 'administer ai'

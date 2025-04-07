@@ -1,0 +1,123 @@
+# Schema for the configuration file of the Sitemap module.
+sitemap.settings:
+  type: config_object
+  label: 'Sitemap settings'
+  mapping:
+    page_title:
+      type: label
+      label: 'Page title'
+    path:
+      type: path
+      label: 'Path'
+    message:
+      type: text_format
+      label: 'Message'
+    plugins:
+      type: sequence
+      label: 'Plugins'
+      nullable: true
+      sequence:
+        type: sitemap_plugin
+    include_css:
+      type: boolean
+      label: 'Include CSS file flag'
+
+# Schema for sitemap plugins.
+sitemap_plugin:
+  type: mapping
+  label: 'Plugin'
+  mapping:
+    base_plugin:
+      type: string
+      label: 'The base plugin ID'
+    enabled:
+      type: boolean
+      label: 'Enabled'
+    weight:
+      type: integer
+      label: 'Weight'
+    settings:
+      type: sitemap_plugin_settings.[%parent.base_plugin]
+      label: 'Settings'
+    id:
+      type: string
+      label: 'Plugin ID'
+    provider:
+      type: string
+      label: 'Provider name'
+
+# Base schema for sitemap plugin settings.
+sitemap_plugin_settings_base:
+  type: mapping
+  label: 'Plugin settings'
+  mapping:
+    title:
+      type: label
+      label: 'Title'
+
+# Schema for the front page plugin settings.
+sitemap_plugin_settings.frontpage:
+  type: sitemap_plugin_settings_base
+  mapping:
+    rss:
+      type: path
+      label: "RSS"
+      nullable: true
+
+# Schema for Menu plugin settings.
+sitemap_plugin_settings.menu:
+  type: sitemap_plugin_settings_base
+  mapping:
+    show_disabled:
+      type: boolean
+      label: 'Show disabled'
+      nullable: true
+
+# Schema for Vocabulary plugin settings.
+sitemap_plugin_settings.vocabulary:
+  type: sitemap_plugin_settings_base
+  mapping:
+    show_description:
+      type: boolean
+      label: "Show description"
+      nullable: true
+    show_count:
+      type: boolean
+      label: 'Show count'
+      nullable: true
+    display_unpublished:
+      type: boolean
+      label: 'Display unpublished'
+      nullable: true
+    term_depth:
+      type: integer
+      label: 'Term depth'
+      nullable: true
+    term_count_threshold:
+      type: integer
+      label: 'Term count threshold'
+      nullable: true
+    customize_link:
+      type: boolean
+      label: 'Customize link'
+      nullable: true
+    term_link:
+      type: string
+      label: 'Term link'
+      nullable: true
+    always_link:
+      type: boolean
+      label: 'Always link'
+      nullable: true
+    enable_rss:
+      type: boolean
+      label: 'Enable RSS'
+      nullable: true
+    rss_link:
+      type: string
+      label: 'RSS link'
+      nullable: true
+    rss_depth:
+      type: integer
+      label: 'RSS depth'
+      nullable: true

@@ -1,0 +1,61 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$_simple_sitemap_index_now\\.$#"
+			count: 1
+			path: modules/simple_sitemap_engines/src/Form/Handler/EntityFormHandler.php
+
+		-
+			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+			count: 1
+			path: src/Controller/SimpleSitemapController.php
+
+		-
+			message: "#^Method Drupal\\\\simple_sitemap\\\\Entity\\\\EntityHelper\\:\\:getSupportedEntityTypes\\(\\) should return array\\<Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface\\> but returns array\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\.$#"
+			count: 1
+			path: src/Entity/EntityHelper.php
+
+		-
+			message: "#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, array\\{'Drupal\\\\\\\\simple_sitemap\\\\\\\\Entity\\\\\\\\SimpleSitemap', 'sort'\\} given\\.$#"
+			count: 2
+			path: src/Entity/SimpleSitemapStorage.php
+
+		-
+			message: "#^Parameter \\#1 \\$priority of static method Drupal\\\\simple_sitemap\\\\Form\\\\FormHelper\\:\\:formatPriority\\(\\) expects string, \\(float\\|int\\) given\\.$#"
+			count: 1
+			path: src/Form/FormHelper.php
+
+		-
+			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+			count: 2
+			path: src/Manager/Generator.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\EntityReferenceItem\\<mixed\\>\\:\\:\\$alt\\.$#"
+			count: 1
+			path: src/Plugin/simple_sitemap/UrlGenerator/EntityUrlGeneratorBase.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\EntityReferenceItem\\<mixed\\>\\:\\:\\$title\\.$#"
+			count: 1
+			path: src/Plugin/simple_sitemap/UrlGenerator/EntityUrlGeneratorBase.php
+
+		-
+			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+			count: 1
+			path: src/Plugin/simple_sitemap/UrlGenerator/SitemapIndexUrlGenerator.php
+
+		-
+			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+			count: 2
+			path: src/SimpleSitemapListBuilder.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertEmpty\\(\\) with non\\-empty\\-array\\<Behat\\\\Mink\\\\Element\\\\NodeElement\\> will always evaluate to false\\.$#"
+			count: 1
+			path: tests/src/Functional/SimplesitemapTest.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Database\\\\Query\\\\ConditionInterface\\:\\:condition\\(\\) expects array\\|Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\|int\\|string\\|null, true given\\.$#"
+			count: 1
+			path: tests/src/Functional/SimplesitemapTest.php

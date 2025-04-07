@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * ECA Access module file.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\eca_access\HookHandler;
+
+/**
+ * Helper function to return the hook handler service.
+ *
+ * @return \Drupal\eca_access\HookHandler
+ *   The hook handler service.
+ */
+function _eca_access_hook_handler(): HookHandler {
+  return \Drupal::service('eca_access.hook_handler');
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function eca_access_entity_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+  $render_context = new RenderContext();
+
+  /** @var \Drupal\eca_access\Event\EntityAccess|null $event */
+  $event = $renderer->executeInRenderContext($render_context, static function () use ($entity, $operation, $account) {
+    // ECA may use parts of the rendering system to evaluate access, such as
+    // token replacement. Cacheability metadata coming from there need to be
+    // collected, by wrapping the event dispatching with a render context.
+    return _eca_access_hook_handler()->entityAccess($entity, $operation, $account);
+  });
+
+  if ($event && ($result = $event->getAccessResult())) {
+    if ($result instanceof RefinableCacheableDependencyInterface) {
+      // If available, add the cacheability metadata from the render context.
+      if (!$render_context->isEmpty()) {
+        $result->addCacheableDependency($render_context->pop());
+      }
+      // Disable caching on dynamically determined access.
+      $result->mergeCacheMaxAge(0);
+    }
+    return $result;
+  }
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function eca_access_entity_field_access(string $operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
+  // Need the field item list to retrieve the according entity.
+  if ($items) {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $render_context = new RenderContext();
+
+    /** @var \Drupal\eca_access\Event\EntityAccess|null $event */
+    $event = $renderer->executeInRenderContext($render_context, static function () use ($items, $operation, $account, $field_definition) {
+      // ECA may use parts of the rendering system to evaluate access, such as
+      // token replacement. Cacheability metadata coming from there need to be
+      // collected, by wrapping the event dispatching with a render context.
+      return _eca_access_hook_handler()->fieldAccess($items->getEntity(), $operation, $account, $field_definition->getName());
+    });
+    if ($event && ($result = $event->getAccessResult())) {
+      if ($result instanceof RefinableCacheableDependencyInterface) {
+        // If available, add the cacheability metadata from the render context.
+        if (!$render_context->isEmpty()) {
+          $result->addCacheableDependency($render_context->pop());
+        }
+        // Disable caching on dynamically determined access.
+        $result->mergeCacheMaxAge(0);
+      }
+      return $result;
+    }
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_entity_create_access().
+ */
+function eca_access_entity_create_access(AccountInterface $account, array $context, ?string $entity_bundle = NULL): AccessResultInterface {
+  if (!isset($entity_bundle)) {
+    // Entities without bundles usually use the entity type ID, e.g. users.
+    $entity_bundle = $context['entity_type_id'];
+  }
+
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+  $render_context = new RenderContext();
+
+  /** @var \Drupal\eca_access\Event\CreateAccess|null $event */
+  $event = $renderer->executeInRenderContext($render_context, static function () use ($context, $entity_bundle, $account) {
+    // ECA may use parts of the rendering system to evaluate access, such as
+    // token replacement. Cacheability metadata coming from there need to be
+    // collected, by wrapping the event dispatching with a render context.
+    return _eca_access_hook_handler()->createAccess($context, $entity_bundle, $account);
+  });
+  if ($event && ($result = $event->getAccessResult())) {
+    if ($result instanceof RefinableCacheableDependencyInterface) {
+      // If available, add the cacheability metadata from the render context.
+      if (!$render_context->isEmpty()) {
+        $result->addCacheableDependency($render_context->pop());
+      }
+      // Disable caching on dynamically determined access.
+      $result->mergeCacheMaxAge(0);
+    }
+    return $result;
+  }
+  return AccessResult::neutral();
+}

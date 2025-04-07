@@ -1,0 +1,6 @@
+services:
+  automatic_updates_test_status_checker.checker:
+    class: Drupal\automatic_updates_test_status_checker\EventSubscriber\TestSubscriber2
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@state']

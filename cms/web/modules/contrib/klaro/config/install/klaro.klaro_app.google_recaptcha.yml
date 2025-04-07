@@ -1,0 +1,24 @@
+langcode: en
+status: false
+dependencies: {  }
+id: google_recaptcha
+label: 'Google reCAPTCHA'
+description: 'reCAPTCHA is a CAPTCHA system owned by Google LLC.'
+default: false
+purposes:
+  - security
+cookies: {  }
+required: false
+opt_out: false
+only_once: false
+info_url: 'https://www.google.com/recaptcha/about/'
+privacy_policy_url: 'https://policies.google.com/privacy'
+javascripts:
+  - 'https://www.google.com/recaptcha/api.js'
+  - 'https://www.recaptcha.net/recaptcha/api.js'
+  - recaptcha.js
+callback_code: ''
+wrapper_identifier:
+  - .g-recaptcha
+attachments: {  }
+weight: 0

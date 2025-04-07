@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall hooks for the Scheduler API Test module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Although not strictly necessary for testing, it is good practice to tidy up
+ * module config and content on uninstalling. Plus, when developing this module
+ * and enabling it manually as a real module, this code is needed to clean up,
+ * otherwise a re-install fails.
+ *
+ * The entity types, custom fields and storage are deleted automatically by
+ * having 'enforced: module: - scheduler_api_test' in the config/install/*.yml
+ * files. However, we have to delete the actual entity content here.
+ */
+function scheduler_api_test_uninstall() {
+
+  // Delete all content for the custom api types.
+  $api_data = [
+    'node' => ['db_id' => 'nid', 'type' => 'scheduler_api_node_test', 'bundle_field' => 'type'],
+    'media' => ['db_id' => 'mid', 'type' => 'scheduler_api_media_test', 'bundle_field' => 'bundle'],
+    'commerce_product' => ['db_id' => 'product_id', 'type' => 'scheduler_api_product_test', 'bundle_field' => 'type'],
+  ];
+  // @todo Re-write this using proper entity queries not database select().
+  foreach ($api_data as $entityTypeId => $values) {
+    $ids_query = \Drupal::database()->select($entityTypeId, 'a')
+      ->fields('a', ["{$values['db_id']}"])
+      ->condition($values['bundle_field'], ["{$values['type']}"], 'IN')
+      ->execute();
+    if ($ids = $ids_query->fetchCol()) {
+      $storage = \Drupal::entityTypeManager()->getStorage($entityTypeId);
+      $entities = $storage->loadMultiple($ids);
+      $entity = reset($entities);
+      $storage->delete($entities);
+      \Drupal::messenger()->addMessage(\Drupal::translation()->formatPlural(count($ids), '1 %bundle has been deleted.', '@count %bundle have been deleted.', [
+        '%bundle' => $entity->{$values['bundle_field']}->entity->label(),
+      ]));
+    }
+  }
+}

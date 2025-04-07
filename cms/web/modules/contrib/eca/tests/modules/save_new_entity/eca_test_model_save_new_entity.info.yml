@@ -1,0 +1,19 @@
+name: 'ECA model test: Saving a new entity'
+type: module
+description: 'This module contains a model test for saving a new entity.'
+package: Testing
+dependencies:
+  - drupal:node
+  - drupal:taxonomy
+  - drupal:text
+  - eca:eca_base
+  - eca:eca_content
+
+config_devel:
+  - eca.eca.eca_test_0008
+  - eca.model.eca_test_0008
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

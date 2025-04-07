@@ -1,0 +1,40 @@
+klaro.admin:
+  title: 'Klaro!'
+  description: 'Configure the Klaro! consent manager.'
+  parent: system.admin_config_ui
+  route_name: klaro.admin
+
+klaro.admin.general:
+  title: 'Settings'
+  description: 'Configure the Klaro! consent manager.'
+  parent: klaro.admin
+  route_name: klaro.admin
+  weight: 0
+
+klaro.admin.manage:
+  title: 'Manage'
+  description: 'Manage Klaro! apps and purposes.'
+  parent: klaro.admin
+  route_name: entity.klaro_app.collection
+  weight: 1
+
+klaro.admin.manage.apps:
+  title: 'Services'
+  description: 'Manage Klaro! services.'
+  parent: klaro.admin.manage
+  route_name: entity.klaro_app.collection
+  weight: 0
+
+klaro.admin.manage.purposes:
+  title: 'Purposes'
+  description: 'Manage Klaro! purposes.'
+  parent: klaro.admin.manage
+  route_name: entity.klaro_purpose.collection
+  weight: 1
+
+klaro.admin.texts:
+  title: 'Texts'
+  description: 'Configure Klaro! texts.'
+  parent: klaro.admin
+  route_name: klaro.admin.texts
+  weight: 2

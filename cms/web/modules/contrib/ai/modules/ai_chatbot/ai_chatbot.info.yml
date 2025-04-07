@@ -1,0 +1,12 @@
+name: 'AI Chatbot'
+type: module
+description: 'Provides a chatbot frontend for the AI Assistant API.'
+package: AI Tools
+core_version_requirement: ^10.2 || ^11
+dependencies:
+  - ai_assistant_api
+
+# Information added by Drupal.org packaging script on 2025-03-05
+version: '1.0.5'
+project: 'ai'
+datestamp: 1741174945

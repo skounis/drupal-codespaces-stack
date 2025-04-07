@@ -1,0 +1,18 @@
+langcode: en
+id: cms
+label: 'Functional'
+status: true
+description: 'Store data (e.g. cookie for user session) in your browser (required to use this website).'
+default: true
+purposes:
+  - cms
+cookies:
+  - { regex: '^[SESS|SSESS]', path: '', domain: ''}
+required: true
+opt_out: false
+only_once: false
+weight: -1
+info_url: 'https://www.drupal.org'
+privacy_policy_url: ''
+javascripts: { }
+attachments: { }

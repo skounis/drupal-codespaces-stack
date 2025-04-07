@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for AI Content Suggestions module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ai_content_suggestions_form_node_form_alter(&$form, FormStateInterface $form_state): void {
+  ai_content_suggestions_alter_form($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ai_content_suggestions_form_taxonomy_term_tags_form_alter(&$form, FormStateInterface $form_state): void {
+  ai_content_suggestions_alter_form($form, $form_state);
+}
+
+/**
+ * Helper to add the content plugins to the edit form.
+ *
+ * @param array $form
+ *   The form being altered.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ */
+function ai_content_suggestions_alter_form(array &$form, FormStateInterface $form_state): void {
+  $user = \Drupal::currentUser();
+  $hasPermission = $user->hasPermission('access ai content suggestion tools');
+  if ($hasPermission) {
+    \Drupal::service('ai_content_suggestions.form_alter')->alter($form, $form_state);
+    $form['#cache']['contexts'][] = 'user.permissions';
+    $form['#cache']['contexts'][] = 'ai_content_suggestions_plugins';
+    $form['#cache']['contexts'][] = 'ai_providers';
+  }
+}

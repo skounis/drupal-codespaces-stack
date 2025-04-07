@@ -1,0 +1,48 @@
+{#
+/**
+ * @file
+ * Template for the order receipt.
+ *
+ * Available variables:
+ * - commerce_order: The order entity.
+ * - billing_information: The billing information.
+ * - shipping_information: The shipping information.
+ * - payment_method: The payment method.
+ * - totals: An array of order totals values with the following keys:
+ *   - subtotal: The order subtotal price.
+ *   - adjustments: An array of adjustment totals:
+ *     - type: The adjustment type.
+ *     - label: The adjustment label.
+ *     - total: The adjustment total price.
+ *     - weight: The adjustment weight, taken from the adjustment type.
+ *   - total: The order total price.
+ *
+ * @ingroup themeable
+ */
+#}
+<table cellpadding=0 cellspacing=0 style="padding-top: 15px; padding-bottom:15px; width: 100%;">
+  <tr>
+    <td>
+      <p style="margin-bottom: 0; text-align: right;">
+        {{ 'Subtotal: @subtotal'|t({'@subtotal': totals.subtotal|commerce_price_format}) }}
+      </p>
+    </td>
+  </tr>
+  {% for adjustment in totals.adjustments %}
+    <tr>
+      <td>
+        <p style="margin-bottom: 0; text-align: right;">
+          {{ adjustment.label }}: {{ adjustment.total|commerce_price_format }}
+        </p>
+      </td>
+    </tr>
+  {% endfor %}
+  <tr>
+    <td>
+      <p style="font-size: 130%; padding-top: 15px; padding-bottom: 5px; text-align: right;">
+        {{ 'Order Total: @total'|t({'@total': commerce_order.getTotalPrice|commerce_price_format}) }}
+      </p>
+    </td>
+  </tr>
+</table>
+

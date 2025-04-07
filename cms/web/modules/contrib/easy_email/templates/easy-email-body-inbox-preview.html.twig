@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * The default template file for the inbox preview HTML of an easy email.
+ *
+ * Available variables:
+ * - body: The content to be displayed in the inbox preview, as a render array
+ * - easy_email: The easy email entity
+ *
+ * This template may be overriden by easy email type, using one of the
+ * following template names:
+ * - easy-email-body-inbox-preview.html.twig: global, used by default.
+ * - easy-email-body-inbox-preview--my-easy-email-type.html.twig: only for emails using the "my_easy_email_type" template.
+ *
+ * @see template_preprocess()
+ * @see template_preprocess_easy_email_body_inbox_preview()
+ *
+ * @ingroup themeable
+ */
+#}
+<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  {{ body }}
+</div>
+<div style="display: none; max-height: 0px; overflow: hidden;">
+  &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+</div>

@@ -1,0 +1,23 @@
+trash.settings.form:
+  path: '/admin/config/content/trash'
+  defaults:
+    _form: '\Drupal\trash\Form\TrashSettingsForm'
+    _title: 'Trash Settings'
+  requirements:
+    _permission: 'administer trash'
+
+trash.admin_content_trash:
+  path: '/admin/content/trash'
+  defaults:
+    _controller: '\Drupal\trash\Controller\TrashController::listing'
+    _title: 'Trash'
+  requirements:
+    _permission: 'access trash+administer trash'
+
+trash.admin_content_trash_entity_type:
+  path: '/admin/content/trash/{entity_type_id}'
+  defaults:
+    _controller: '\Drupal\trash\Controller\TrashController::listing'
+    _title: 'Trash'
+  requirements:
+    _permission: 'access trash+administer trash'

@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Contains install implementations for AI Image Alt text.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_uninstall().
+ */
+function ai_image_alt_text_uninstall() {
+  // Remove the image style.
+  \Drupal::configFactory()->getEditable('image.style.ai_image_alt_text')->delete();
+}

@@ -1,0 +1,54 @@
+{
+	"country_code": "SV",
+	"subdivisions": {
+		"AH": {
+			"code": "Ahuachapan",
+			"name": "Ahuachapán"
+		},
+		"CA": {
+			"code": "Cabanas",
+			"name": "Cabañas"
+		},
+		"CH": {
+			"code": "Calatenango",
+			"name": "Chalatenango"
+		},
+		"CU": {
+			"code": "Cuscatlan",
+			"name": "Cuscatlán"
+		},
+		"LI": {
+			"name": "La Libertad"
+		},
+		"PA": {
+			"name": "La Paz"
+		},
+		"UN": {
+			"code": "La Union",
+			"name": "La Unión"
+		},
+		"MO": {
+			"code": "Morazan",
+			"name": "Morazán"
+		},
+		"SM": {
+			"name": "San Miguel"
+		},
+		"SS": {
+			"name": "San Salvador"
+		},
+		"SV": {
+			"name": "San Vicente"
+		},
+		"SA": {
+			"name": "Santa Ana"
+		},
+		"SO": {
+			"name": "Sonsonate"
+		},
+		"US": {
+			"code": "Usulutan",
+			"name": "Usulután"
+		}
+	}
+}

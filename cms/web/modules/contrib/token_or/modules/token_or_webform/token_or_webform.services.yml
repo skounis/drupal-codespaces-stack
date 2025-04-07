@@ -1,0 +1,7 @@
+services:
+  token_or_webform.token_manager:
+    class: Drupal\token_or_webform\TokenOrWebformTokenManager
+    decorates: webform.token_manager
+    decoration_priority: 50
+    public: false
+    arguments: ['@current_user', '@language_manager', '@config.factory', '@module_handler', '@token']

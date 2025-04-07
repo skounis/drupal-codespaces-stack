@@ -1,0 +1,780 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\Utility\Crypt;
+use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Access\AccessibleInterface;
+use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\Url;
+use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
+
+/**
+ * Returns whether this site supports the default user picture feature.
+ *
+ * This approach preserves compatibility with node/comment templates. Alternate
+ * user picture implementations (e.g., Gravatar) should provide their own
+ * add/edit/delete forms and populate the 'picture' variable during the
+ * preprocess stage.
+ */
+function user_picture_enabled() {
+  $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('user', 'user');
+  return isset($field_definitions['user_picture']);
+}
+
+/**
+ * Fetches a user object by email address.
+ *
+ * @param string $mail
+ *   String with the account's email address.
+ *
+ * @return \Drupal\user\UserInterface|false
+ *   A fully-loaded $user object upon successful user load or FALSE if user
+ *   cannot be loaded.
+ *
+ * @see \Drupal\user\Entity\User::loadMultiple()
+ */
+function user_load_by_mail($mail) {
+  $users = \Drupal::entityTypeManager()->getStorage('user')
+    ->loadByProperties(['mail' => $mail]);
+  return $users ? reset($users) : FALSE;
+}
+
+/**
+ * Fetches a user object by account name.
+ *
+ * @param string $name
+ *   String with the account's user name.
+ *
+ * @return \Drupal\user\UserInterface|false
+ *   A fully-loaded $user object upon successful user load or FALSE if user
+ *   cannot be loaded.
+ *
+ * @see \Drupal\user\Entity\User::loadMultiple()
+ */
+function user_load_by_name($name) {
+  $users = \Drupal::entityTypeManager()->getStorage('user')
+    ->loadByProperties(['name' => $name]);
+  return $users ? reset($users) : FALSE;
+}
+
+/**
+ * Verify the syntax of the given name.
+ *
+ * @param string $name
+ *   The user name to validate.
+ *
+ * @return string|null
+ *   A translated violation message if the name is invalid or NULL if the name
+ *   is valid.
+ *
+ * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\user\UserNameValidator::validateName() instead.
+ *
+ * @see https://www.drupal.org/node/3431205
+ */
+function user_validate_name($name) {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserNameValidator::validateName() instead. See https://www.drupal.org/node/3431205', E_USER_DEPRECATED);
+  $violations = \Drupal::service('user.name_validator')->validateName($name);
+  if (count($violations) > 0) {
+    return $violations[0]->getMessage();
+  }
+}
+
+/**
+ * Checks for usernames blocked by user administration.
+ *
+ * @param string $name
+ *   A string containing a name of the user.
+ *
+ * @return bool
+ *   TRUE if the user is blocked, FALSE otherwise.
+ *
+ * @deprecated in drupal:11.0.0 and is removed from drupal:12.0.0. Use
+ * Drupal\user\UserInterface::isBlocked() instead.
+ * @see https://www.drupal.org/node/3411040
+ */
+function user_is_blocked($name) {
+  @trigger_error('user_is_blocked() is deprecated in drupal:11.0.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserInterface::isBlocked() instead. See https://www.drupal.org/node/3411040', E_USER_DEPRECATED);
+  return (bool) \Drupal::entityQuery('user')
+    ->accessCheck(FALSE)
+    ->condition('name', $name)
+    ->condition('status', 0)
+    ->execute();
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for block templates.
+ */
+function user_preprocess_block(&$variables): void {
+  if ($variables['configuration']['provider'] == 'user') {
+    switch ($variables['elements']['#plugin_id']) {
+      case 'user_login_block':
+        $variables['attributes']['role'] = 'form';
+        break;
+    }
+  }
+}
+
+/**
+ * Prepares variables for username templates.
+ *
+ * Default template: username.html.twig.
+ *
+ * Modules that make any changes to variables like 'name' or 'extra' must ensure
+ * that the final string is safe.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - account: The user account (\Drupal\Core\Session\AccountInterface).
+ */
+function template_preprocess_username(&$variables): void {
+  $account = $variables['account'] ?: new AnonymousUserSession();
+
+  $variables['extra'] = '';
+  $variables['uid'] = $account->id();
+  if (empty($variables['uid'])) {
+    if (theme_get_setting('features.comment_user_verification')) {
+      $variables['extra'] = ' (' . t('not verified') . ')';
+    }
+  }
+
+  // Set the name to a formatted name that is safe for printing and
+  // that won't break tables by being too long. Keep an un-shortened,
+  // unsanitized version, in case other preprocess functions want to implement
+  // their own shortening logic or add markup. If they do so, they must ensure
+  // that $variables['name'] is safe for printing.
+  $name = $account->getDisplayName();
+  $variables['name_raw'] = $account->getAccountName();
+  if (mb_strlen($name) > 20) {
+    $name = Unicode::truncate($name, 15, FALSE, TRUE);
+    $variables['truncated'] = TRUE;
+  }
+  else {
+    $variables['truncated'] = FALSE;
+  }
+  $variables['name'] = $name;
+  if ($account instanceof AccessibleInterface) {
+    $variables['profile_access'] = $account->access('view');
+  }
+  else {
+    $variables['profile_access'] = \Drupal::currentUser()->hasPermission('access user profiles');
+  }
+
+  $external = FALSE;
+  // Populate link path and attributes if appropriate.
+  if ($variables['uid'] && $variables['profile_access']) {
+    // We are linking to a local user.
+    $variables['attributes']['title'] = t('View user profile.');
+    $variables['link_path'] = 'user/' . $variables['uid'];
+  }
+  elseif (!empty($account->homepage)) {
+    // Like the 'class' attribute, the 'rel' attribute can hold a
+    // space-separated set of values, so initialize it as an array to make it
+    // easier for other preprocess functions to append to it.
+    $variables['attributes']['rel'] = 'nofollow';
+    $variables['link_path'] = $account->homepage;
+    $variables['homepage'] = $account->homepage;
+    $external = TRUE;
+  }
+  // We have a link path, so we should generate a URL.
+  if (isset($variables['link_path'])) {
+    if ($external) {
+      $variables['attributes']['href'] = Url::fromUri($variables['link_path'], $variables['link_options'])
+        ->toString();
+    }
+    else {
+      $variables['attributes']['href'] = Url::fromRoute('entity.user.canonical', [
+        'user' => $variables['uid'],
+      ])->toString();
+    }
+  }
+}
+
+/**
+ * Finalizes the login process and logs in a user.
+ *
+ * The function logs in the user, records a watchdog message about the new
+ * session, saves the login timestamp, calls hook_user_login(), and generates a
+ * new session.
+ *
+ * The current user is replaced with the passed in account.
+ *
+ * @param \Drupal\user\UserInterface $account
+ *   The account to log in.
+ *
+ * @see hook_user_login()
+ * @see \Drupal\user\Authentication\Provider\Cookie
+ */
+function user_login_finalize(UserInterface $account) {
+  \Drupal::currentUser()->setAccount($account);
+  \Drupal::logger('user')->info('Session opened for %name.', ['%name' => $account->getAccountName()]);
+  // Update the user table timestamp noting user has logged in.
+  // This is also used to invalidate one-time login links.
+  $account->setLastLoginTime(\Drupal::time()->getRequestTime());
+  \Drupal::entityTypeManager()
+    ->getStorage('user')
+    ->updateLastLoginTimestamp($account);
+
+  // Regenerate the session ID to prevent against session fixation attacks.
+  // This is called before hook_user_login() in case one of those functions
+  // fails or incorrectly does a redirect which would leave the old session
+  // in place.
+  /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
+  $session = \Drupal::service('session');
+  $session->migrate();
+  $session->set('uid', $account->id());
+  $session->set('check_logged_in', TRUE);
+  \Drupal::moduleHandler()->invokeAll('user_login', [$account]);
+}
+
+/**
+ * Generates a unique URL for a user to log in and reset their password.
+ *
+ * @param \Drupal\user\UserInterface $account
+ *   An object containing the user account.
+ * @param array $options
+ *   (optional) A keyed array of settings. Supported options are:
+ *   - langcode: A language code to be used when generating locale-sensitive
+ *    URLs. If langcode is NULL the users preferred language is used.
+ *
+ * @return string
+ *   A unique URL that provides a one-time log in for the user, from which
+ *   they can change their password.
+ */
+function user_pass_reset_url($account, $options = []) {
+  $timestamp = \Drupal::time()->getCurrentTime();
+  $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
+  return Url::fromRoute('user.reset',
+    [
+      'uid' => $account->id(),
+      'timestamp' => $timestamp,
+      'hash' => user_pass_rehash($account, $timestamp),
+    ],
+    [
+      'absolute' => TRUE,
+      'language' => \Drupal::languageManager()->getLanguage($langcode),
+    ]
+  )->toString();
+}
+
+/**
+ * Generates a URL to confirm an account cancellation request.
+ *
+ * @param \Drupal\user\UserInterface $account
+ *   The user account object.
+ * @param array $options
+ *   (optional) A keyed array of settings. Supported options are:
+ *   - langcode: A language code to be used when generating locale-sensitive
+ *     URLs. If langcode is NULL the users preferred language is used.
+ *
+ * @return string
+ *   A unique URL that may be used to confirm the cancellation of the user
+ *   account.
+ *
+ * @see user_mail_tokens()
+ * @see \Drupal\user\Controller\UserController::confirmCancel()
+ */
+function user_cancel_url(UserInterface $account, $options = []) {
+  $timestamp = \Drupal::time()->getRequestTime();
+  $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
+  $url_options = ['absolute' => TRUE, 'language' => \Drupal::languageManager()->getLanguage($langcode)];
+  return Url::fromRoute('user.cancel_confirm', [
+    'user' => $account->id(),
+    'timestamp' => $timestamp,
+    'hashed_pass' => user_pass_rehash($account, $timestamp),
+  ], $url_options)->toString();
+}
+
+/**
+ * Creates a unique hash value for use in time-dependent per-user URLs.
+ *
+ * This hash is normally used to build a unique and secure URL that is sent to
+ * the user by email for purposes such as resetting the user's password. In
+ * order to validate the URL, the same hash can be generated again, from the
+ * same information, and compared to the hash value from the URL. The hash
+ * contains the time stamp, the user's last login time, the numeric user ID,
+ * and the user's email address.
+ * For a usage example, see user_cancel_url() and
+ * \Drupal\user\Controller\UserController::confirmCancel().
+ *
+ * @param \Drupal\user\UserInterface $account
+ *   An object containing the user account.
+ * @param int $timestamp
+ *   A UNIX timestamp, typically \Drupal::time()->getRequestTime().
+ *
+ * @return string
+ *   A string that is safe for use in URLs and SQL statements.
+ */
+function user_pass_rehash(UserInterface $account, $timestamp) {
+  $data = $timestamp;
+  $data .= ':' . $account->getLastLoginTime();
+  $data .= ':' . $account->id();
+  $data .= ':' . $account->getEmail();
+  return Crypt::hmacBase64($data, Settings::getHashSalt() . $account->getPassword());
+}
+
+/**
+ * Cancel a user account.
+ *
+ * Since the user cancellation process needs to be run in a batch, either
+ * Form API will invoke it, or batch_process() needs to be invoked after calling
+ * this function and should define the path to redirect to.
+ *
+ * @param array $edit
+ *   An array of submitted form values.
+ * @param int $uid
+ *   The user ID of the user account to cancel.
+ * @param string $method
+ *   The account cancellation method to use.
+ *
+ * @see _user_cancel()
+ */
+function user_cancel($edit, $uid, $method) {
+  $account = User::load($uid);
+
+  if (!$account) {
+    \Drupal::messenger()->addError(t('The user account %id does not exist.', ['%id' => $uid]));
+    \Drupal::logger('user')->error('Attempted to cancel non-existing user account: %id.', ['%id' => $uid]);
+    return;
+  }
+
+  // Initialize batch (to set title).
+  $batch_builder = (new BatchBuilder())
+    ->setTitle(t('Cancelling account'));
+  batch_set($batch_builder->toArray());
+
+  // When the 'user_cancel_delete' method is used, user_delete() is called,
+  // which invokes hook_ENTITY_TYPE_predelete() and hook_ENTITY_TYPE_delete()
+  // for the user entity. Modules should use those hooks to respond to the
+  // account deletion.
+  if ($method != 'user_cancel_delete') {
+    // Allow modules to add further sets to this batch.
+    \Drupal::moduleHandler()->invokeAll('user_cancel', [$edit, $account, $method]);
+  }
+
+  // Finish the batch and actually cancel the account.
+  $batch_builder = (new BatchBuilder())
+    ->setTitle(t('Cancelling user account'))
+    ->addOperation('_user_cancel', [$edit, $account, $method]);
+
+  // After cancelling account, ensure that user is logged out.
+  if ($account->id() == \Drupal::currentUser()->id()) {
+    // Batch API stores data in the session, so use the finished operation to
+    // manipulate the current user's session id.
+    $batch_builder->setFinishCallback('_user_cancel_session_regenerate');
+  }
+
+  batch_set($batch_builder->toArray());
+
+  // Batch processing is either handled via Form API or has to be invoked
+  // manually.
+}
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * Last step for cancelling a user account.
+ *
+ * Since batch and session API require a valid user account, the actual
+ * cancellation of a user account needs to happen last.
+ * @param array $edit
+ *   An array of submitted form values.
+ * @param \Drupal\user\UserInterface $account
+ *   The user ID of the user account to cancel.
+ * @param string $method
+ *   The account cancellation method to use.
+ *
+ * @see user_cancel()
+ */
+function _user_cancel($edit, $account, $method) {
+  $logger = \Drupal::logger('user');
+
+  switch ($method) {
+    case 'user_cancel_block':
+    case 'user_cancel_block_unpublish':
+    default:
+      // Send account blocked notification if option was checked.
+      if (!empty($edit['user_cancel_notify'])) {
+        _user_mail_notify('status_blocked', $account);
+      }
+      $account->block();
+      $account->save();
+      \Drupal::messenger()->addStatus(t('Account %name has been disabled.', ['%name' => $account->getDisplayName()]));
+      $logger->notice('Blocked user: %name %email.', ['%name' => $account->getAccountName(), '%email' => '<' . $account->getEmail() . '>']);
+      break;
+
+    case 'user_cancel_reassign':
+    case 'user_cancel_delete':
+      // Send account canceled notification if option was checked.
+      if (!empty($edit['user_cancel_notify'])) {
+        _user_mail_notify('status_canceled', $account);
+      }
+      $account->delete();
+      \Drupal::messenger()->addStatus(t('Account %name has been deleted.', ['%name' => $account->getDisplayName()]));
+      $logger->notice('Deleted user: %name %email.', ['%name' => $account->getAccountName(), '%email' => '<' . $account->getEmail() . '>']);
+      break;
+  }
+
+  // After cancelling account, ensure that user is logged out. We can't destroy
+  // their session though, as we might have information in it, and we can't
+  // regenerate it because batch API uses the session ID, we will regenerate it
+  // in _user_cancel_session_regenerate().
+  if ($account->id() == \Drupal::currentUser()->id()) {
+    \Drupal::currentUser()->setAccount(new AnonymousUserSession());
+  }
+}
+
+/**
+ * Implements callback_batch_finished().
+ *
+ * Finished batch processing callback for cancelling a user account.
+ *
+ * @see user_cancel()
+ */
+function _user_cancel_session_regenerate() {
+  // Regenerate the users session instead of calling session_destroy() as we
+  // want to preserve any messages that might have been set.
+  \Drupal::service('session')->migrate();
+}
+
+/**
+ * Helper function to return available account cancellation methods.
+ *
+ * See documentation of hook_user_cancel_methods_alter().
+ *
+ * @return array
+ *   An array containing all account cancellation methods as form elements.
+ *
+ * @see hook_user_cancel_methods_alter()
+ * @see user_admin_settings()
+ */
+function user_cancel_methods() {
+  $user_settings = \Drupal::config('user.settings');
+  $anonymous_name = $user_settings->get('anonymous');
+  $methods = [
+    'user_cancel_block' => [
+      'title' => t('Disable the account and keep its content.'),
+      'description' => t('Your account will be blocked and you will no longer be able to log in. All of your content will remain attributed to your username.'),
+    ],
+    'user_cancel_block_unpublish' => [
+      'title' => t('Disable the account and unpublish its content.'),
+      'description' => t('Your account will be blocked and you will no longer be able to log in. All of your content will be hidden from everyone but administrators.'),
+    ],
+    'user_cancel_reassign' => [
+      'title' => t('Delete the account and make its content belong to the %anonymous-name user. This action cannot be undone.', ['%anonymous-name' => $anonymous_name]),
+      'description' => t('Your account will be removed and all account information deleted. All of your content will be assigned to the %anonymous-name user.', ['%anonymous-name' => $anonymous_name]),
+    ],
+    'user_cancel_delete' => [
+      'title' => t('Delete the account and its content. This action cannot be undone.'),
+      'description' => t('Your account will be removed and all account information deleted. All of your content will also be deleted.'),
+      'access' => \Drupal::currentUser()->hasPermission('administer users'),
+    ],
+  ];
+  // Allow modules to customize account cancellation methods.
+  \Drupal::moduleHandler()->alter('user_cancel_methods', $methods);
+
+  // Turn all methods into real form elements.
+  $form = [
+    '#options' => [],
+    '#default_value' => $user_settings->get('cancel_method'),
+  ];
+  foreach ($methods as $name => $method) {
+    $form['#options'][$name] = $method['title'];
+    // Add the description for the confirmation form. This description is never
+    // shown for the cancel method option, only on the confirmation form.
+    // Therefore, we use a custom #confirm_description property.
+    if (isset($method['description'])) {
+      $form[$name]['#confirm_description'] = $method['description'];
+    }
+    if (isset($method['access'])) {
+      $form[$name]['#access'] = $method['access'];
+    }
+  }
+  return $form;
+}
+
+/**
+ * Token callback to add unsafe tokens for user mails.
+ *
+ * This function is used by \Drupal\Core\Utility\Token::replace() to set up
+ * some additional tokens that can be used in email messages generated by
+ * user_mail().
+ *
+ * @param array $replacements
+ *   An associative array variable containing mappings from token names to
+ *   values (for use with strtr()).
+ * @param array $data
+ *   An associative array of token replacement values. If the 'user' element
+ *   exists, it must contain a user account object with the following
+ *   properties:
+ *   - login: The UNIX timestamp of the user's last login.
+ *   - pass: The hashed account login password.
+ * @param array $options
+ *   A keyed array of settings and flags to control the token replacement
+ *   process. See \Drupal\Core\Utility\Token::replace().
+ */
+function user_mail_tokens(&$replacements, $data, $options) {
+  if (isset($data['user'])) {
+    $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options);
+    $replacements['[user:cancel-url]'] = user_cancel_url($data['user'], $options);
+  }
+}
+
+/**
+ * Change permissions for a user role.
+ *
+ * This function may be used to grant and revoke multiple permissions at once.
+ * For example, when a form exposes checkboxes to configure permissions for a
+ * role, the form submit handler may directly pass the submitted values for the
+ * checkboxes form element to this function.
+ *
+ * @param mixed $rid
+ *   The ID of a user role to alter.
+ * @param array $permissions
+ *   (optional) An associative array, where the key holds the permission name
+ *   and the value determines whether to grant or revoke that permission. Any
+ *   value that evaluates to TRUE will cause the permission to be granted.
+ *   Any value that evaluates to FALSE will cause the permission to be
+ *   revoked.
+ *   @code
+ *     [
+ *       'administer nodes' => 0,                // Revoke 'administer nodes'
+ *       'administer blocks' => FALSE,           // Revoke 'administer blocks'
+ *       'access user profiles' => 1,            // Grant 'access user profiles'
+ *       'access content' => TRUE,               // Grant 'access content'
+ *       'access comments' => 'access comments', // Grant 'access comments'
+ *     ]
+ *   @endcode
+ *   Existing permissions are not changed, unless specified in $permissions.
+ *
+ * @see user_role_grant_permissions()
+ * @see user_role_revoke_permissions()
+ */
+function user_role_change_permissions($rid, array $permissions = []) {
+  // Grant new permissions for the role.
+  $grant = array_filter($permissions);
+  if (!empty($grant)) {
+    user_role_grant_permissions($rid, array_keys($grant));
+  }
+  // Revoke permissions for the role.
+  $revoke = array_diff_assoc($permissions, $grant);
+  if (!empty($revoke)) {
+    user_role_revoke_permissions($rid, array_keys($revoke));
+  }
+}
+
+/**
+ * Grant permissions to a user role.
+ *
+ * @param mixed $rid
+ *   The ID of a user role to alter.
+ * @param array $permissions
+ *   (optional) A list of permission names to grant.
+ *
+ * @see user_role_change_permissions()
+ * @see user_role_revoke_permissions()
+ */
+function user_role_grant_permissions($rid, array $permissions = []) {
+  // Grant new permissions for the role.
+  if ($role = Role::load($rid)) {
+    foreach ($permissions as $permission) {
+      $role->grantPermission($permission);
+    }
+    $role->trustData()->save();
+  }
+}
+
+/**
+ * Revoke permissions from a user role.
+ *
+ * @param mixed $rid
+ *   The ID of a user role to alter.
+ * @param array $permissions
+ *   (optional) A list of permission names to revoke.
+ *
+ * @see user_role_change_permissions()
+ * @see user_role_grant_permissions()
+ */
+function user_role_revoke_permissions($rid, array $permissions = []) {
+  // Revoke permissions for the role.
+  $role = Role::load($rid);
+  foreach ($permissions as $permission) {
+    $role->revokePermission($permission);
+  }
+  $role->trustData()->save();
+}
+
+/**
+ * Creates and sends a notification email following a change to a user account.
+ *
+ * @param string $op
+ *   The operation being performed on the account. Possible values:
+ *   - 'register_admin_created': Welcome message for user created by the admin.
+ *   - 'register_no_approval_required': Welcome message when user
+ *     self-registers.
+ *   - 'register_pending_approval': Welcome message, user pending admin
+ *     approval.
+ *   - 'password_reset': Password recovery request.
+ *   - 'status_activated': Account activated.
+ *   - 'status_blocked': Account blocked.
+ *   - 'cancel_confirm': Account cancellation request.
+ *   - 'status_canceled': Account canceled.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The user object of the account being notified. Must contain at
+ *   least the fields 'uid', 'name', and 'mail'.
+ *
+ * @return array
+ *   An array containing various information about the message.
+ *   See \Drupal\Core\Mail\MailManagerInterface::mail() for details.
+ *
+ * @see user_mail_tokens()
+ */
+function _user_mail_notify($op, AccountInterface $account) {
+
+  if (\Drupal::config('user.settings')->get('notify.' . $op)) {
+    $params['account'] = $account;
+    // Get the custom site notification email to use as the from email address
+    // if it has been set.
+    $site_mail = \Drupal::config('system.site')->get('mail_notification');
+    // If the custom site notification email has not been set, we use the site
+    // default for this.
+    if (empty($site_mail)) {
+      $site_mail = \Drupal::config('system.site')->get('mail');
+    }
+    if (empty($site_mail)) {
+      $site_mail = ini_get('sendmail_from');
+    }
+    $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $account->getPreferredLangcode(), $params, $site_mail);
+    if ($op == 'register_pending_approval') {
+      // If a user registered requiring admin approval, notify the admin, too.
+      // We use the site default language for this.
+      \Drupal::service('plugin.manager.mail')->mail('user', 'register_pending_approval_admin', $site_mail, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+    }
+  }
+  return empty($mail) ? NULL : $mail['result'];
+}
+
+/**
+ * Form element process handler for client-side password validation.
+ *
+ * This #process handler is automatically invoked for 'password_confirm' form
+ * elements to add the JavaScript and string translations for dynamic password
+ * validation.
+ */
+function user_form_process_password_confirm($element) {
+  $password_settings = [
+    'confirmTitle' => t('Passwords match:'),
+    'confirmSuccess' => t('yes'),
+    'confirmFailure' => t('no'),
+    'showStrengthIndicator' => FALSE,
+  ];
+
+  if (\Drupal::config('user.settings')->get('password_strength')) {
+    $password_settings['showStrengthIndicator'] = TRUE;
+    $password_settings += [
+      'strengthTitle' => t('Password strength:'),
+      'hasWeaknesses' => t('Recommendations to make your password stronger:'),
+      'tooShort' => t('Make it at least 12 characters'),
+      'addLowerCase' => t('Add lowercase letters'),
+      'addUpperCase' => t('Add uppercase letters'),
+      'addNumbers' => t('Add numbers'),
+      'addPunctuation' => t('Add punctuation'),
+      'sameAsUsername' => t('Make it different from your username'),
+      'weak' => t('Weak'),
+      'fair' => t('Fair'),
+      'good' => t('Good'),
+      'strong' => t('Strong'),
+      'username' => \Drupal::currentUser()->getAccountName(),
+    ];
+  }
+
+  $element['#attached']['library'][] = 'user/drupal.user';
+  $element['#attached']['drupalSettings']['password'] = $password_settings;
+
+  return $element;
+}
+
+/**
+ * Saves visitor information as a cookie so it can be reused.
+ *
+ * @param array $values
+ *   An array of key/value pairs to be saved into a cookie.
+ */
+function user_cookie_save(array $values) {
+  $request_time = \Drupal::time()->getRequestTime();
+  foreach ($values as $field => $value) {
+    // Set cookie for 365 days.
+    setrawcookie('Drupal.visitor.' . $field, rawurlencode($value), $request_time + 31536000, '/');
+  }
+}
+
+/**
+ * Delete a visitor information cookie.
+ *
+ * @param string $cookie_name
+ *   A cookie name such as 'homepage'.
+ */
+function user_cookie_delete($cookie_name) {
+  setrawcookie('Drupal.visitor.' . $cookie_name, '', \Drupal::time()->getRequestTime() - 3600, '/');
+}
+
+/**
+ * Logs the current user out.
+ */
+function user_logout() {
+  $user = \Drupal::currentUser();
+
+  \Drupal::logger('user')->info('Session closed for %name.', ['%name' => $user->getAccountName()]);
+
+  \Drupal::moduleHandler()->invokeAll('user_logout', [$user]);
+
+  // Destroy the current session, and reset $user to the anonymous user.
+  // Note: In Symfony the session is intended to be destroyed with
+  // Session::invalidate(). Regrettably this method is currently broken and may
+  // lead to the creation of spurious session records in the database.
+  // @see https://github.com/symfony/symfony/issues/12375
+  \Drupal::service('session_manager')->destroy();
+  $user->setAccount(new AnonymousUserSession());
+}
+
+/**
+ * Prepares variables for user templates.
+ *
+ * Default template: user.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the user information and any
+ *     fields attached to the user. Properties used:
+ *     - #user: A \Drupal\user\Entity\User object. The user account of the
+ *       profile being viewed.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_user(&$variables): void {
+  $variables['user'] = $variables['elements']['#user'];
+  // Helpful $content variable for templates.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Additional submit handler for \Drupal\system\Form\RegionalForm.
+ */
+function user_form_system_regional_settings_submit($form, FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('system.date')
+    ->set('timezone.user.configurable', $form_state->getValue('configurable_timezones'))
+    ->set('timezone.user.warn', $form_state->getValue('empty_timezone_message'))
+    ->set('timezone.user.default', $form_state->getValue('user_default_timezone'))
+    ->save();
+}

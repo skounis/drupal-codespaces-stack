@@ -1,0 +1,7 @@
+/**
+ * @file
+ * Custom styling for search autocomplete dropdowns.
+*/
+.search-api-autocomplete-search {
+  z-index: 110; /* Appear above flyout menu. */
+}

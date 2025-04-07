@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Contains addtocal_augment.module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function addtocal_augment_theme($existing, $type, $theme, $path) {
+  return [
+    'addtocal_links' => [
+      'variables' => [
+        'label' => NULL,
+        'ical' => NULL,
+        'outlook' => NULL,
+        'google' => NULL,
+        'id' => NULL,
+        'icons' => NULL,
+      ],
+    ],
+    'addtocal_links__modal' => [
+      'variables' => [
+        'label' => NULL,
+        'ical' => NULL,
+        'outlook' => NULL,
+        'google' => NULL,
+        'id' => NULL,
+        'icons' => NULL,
+      ],
+    ],
+  ];
+}

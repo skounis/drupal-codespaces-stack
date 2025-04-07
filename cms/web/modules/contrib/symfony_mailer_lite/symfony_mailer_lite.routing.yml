@@ -1,0 +1,55 @@
+entity.symfony_mailer_lite_transport.collection:
+  path: '/admin/config/system/symfony-mailer-lite/transport'
+  defaults:
+    _entity_list: 'symfony_mailer_lite_transport'
+    _title: 'Email Transport'
+  requirements:
+    _permission: 'administer symfony_mailer_lite configuration'
+
+entity.symfony_mailer_lite_transport.add_form:
+  path: '/admin/config/system/symfony-mailer-lite/transport/add/{plugin_id}'
+  defaults:
+    _entity_form: 'symfony_mailer_lite_transport.add'
+    _title: 'Add transport'
+  requirements:
+    _permission: 'administer symfony_mailer_lite configuration'
+
+entity.symfony_mailer_lite_transport.edit_form:
+  path: '/admin/config/system/symfony-mailer-lite/transport/{symfony_mailer_lite_transport}'
+  defaults:
+    _entity_form: 'symfony_mailer_lite_transport.edit'
+    _title: 'Edit transport'
+  requirements:
+    _entity_access: 'symfony_mailer_lite_transport.update'
+
+entity.symfony_mailer_lite_transport.delete_form:
+  path: '/admin/config/system/symfony-mailer-lite/transport/{symfony_mailer_lite_transport}/delete'
+  defaults:
+    _entity_form: 'symfony_mailer_lite_transport.delete'
+    _title: 'Delete transport'
+  requirements:
+    _entity_access: 'symfony_mailer_lite_transport.delete'
+
+entity.symfony_mailer_lite_transport.set_default:
+  path: '/admin/config/system/symfony-mailer-lite/transport/{symfony_mailer_lite_transport}/set-default'
+  defaults:
+    _controller: '\Drupal\symfony_mailer_lite\Controller\TransportController::setAsDefault'
+  requirements:
+    _csrf_token: 'TRUE'
+    _permission: 'administer symfony_mailer_lite configuration'
+
+symfony_mailer_lite.message_settings:
+  path: '/admin/config/symfony-mailer-lite/message-settings'
+  defaults:
+    _form: '\Drupal\symfony_mailer_lite\Form\MessageSettingsForm'
+    _title: 'Message settings'
+  requirements:
+    _permission: 'administer symfony_mailer_lite configuration'
+
+symfony_mailer_lite.test:
+  path: '/admin/config/system/symfony-mailer-lite/test'
+  defaults:
+    _form: '\Drupal\symfony_mailer_lite\Form\TestEmailForm'
+    _title: 'Send Test Email'
+  requirements:
+    _permission: 'administer symfony_mailer_lite configuration'

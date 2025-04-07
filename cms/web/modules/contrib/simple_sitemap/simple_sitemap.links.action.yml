@@ -1,0 +1,11 @@
+simple_sitemap.sitemap.add:
+  route_name: simple_sitemap.add
+  title: 'Add sitemap'
+  appears_on:
+    - entity.simple_sitemap.collection
+
+simple_sitemap.type.add:
+  route_name: simple_sitemap_type.add
+  title: 'Add sitemap type'
+  appears_on:
+    - entity.simple_sitemap_type.collection

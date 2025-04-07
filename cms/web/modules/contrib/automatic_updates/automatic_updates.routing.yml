@@ -1,0 +1,29 @@
+automatic_updates.status_check:
+  path: '/admin/automatic_updates/status'
+  defaults:
+    _controller: '\Drupal\automatic_updates\Controller\StatusCheckController::run'
+    _title: 'Update readiness checking'
+  requirements:
+    _permission: 'administer software updates'
+  options:
+    _maintenance_access: TRUE
+    _automatic_updates_status_messages: skip
+automatic_updates.confirmation_page:
+  path: '/admin/automatic-update-ready/{stage_id}'
+  defaults:
+    _form: '\Drupal\automatic_updates\Form\UpdateReady'
+    _title: 'Ready to update'
+  requirements:
+    _permission: 'administer software updates'
+  options:
+    _maintenance_access: TRUE
+    _automatic_updates_status_messages: skip
+automatic_updates.finish:
+  path: '/automatic-update/finish'
+  defaults:
+    _controller: '\Drupal\automatic_updates\Controller\UpdateController::onFinish'
+  requirements:
+    _permission: 'administer software updates'
+  options:
+    _maintenance_access: TRUE
+    _automatic_updates_status_messages: skip

@@ -1,0 +1,57 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.scheduler_api_media_test.field_approved_publishing
+    - field.field.media.scheduler_api_media_test.field_approved_unpublishing
+    - field.field.media.scheduler_api_media_test.field_media_image_api
+    - image.style.large
+    - media.type.scheduler_api_media_test
+  module:
+    - image
+id: media.scheduler_api_media_test.default
+targetEntityType: media
+bundle: scheduler_api_media_test
+mode: default
+content:
+  field_approved_publishing:
+    weight: 2
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+    region: content
+  field_approved_unpublishing:
+    weight: 3
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+    region: content
+  field_media_image_api:
+    label: visually_hidden
+    weight: 1
+    settings:
+      image_style: large
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
+  name:
+    type: string
+    weight: 0
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  created: true
+  thumbnail: true
+  uid: true

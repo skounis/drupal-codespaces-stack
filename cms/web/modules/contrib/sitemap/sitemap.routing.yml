@@ -1,0 +1,7 @@
+sitemap.settings:
+  path: '/admin/config/search/sitemap'
+  defaults:
+    _form: '\Drupal\sitemap\Form\SitemapSettingsForm'
+    _title: 'Sitemap'
+  requirements:
+    _permission: 'administer sitemap'

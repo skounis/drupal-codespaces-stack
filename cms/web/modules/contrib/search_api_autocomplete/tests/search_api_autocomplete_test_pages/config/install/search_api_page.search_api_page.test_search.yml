@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.autocomplete_search_index
+id: test_search
+label: Test search page
+path: test-search
+clean_url: true
+show_all_when_no_keys: false
+index: autocomplete_search_index
+limit: 10
+searched_fields:
+  name: name
+style: search_results
+view_mode_configuration: {  }
+show_search_form: true

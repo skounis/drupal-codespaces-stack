@@ -1,0 +1,385 @@
+<?php
+
+/**
+ * @file
+ * ECA Render module file.
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\ContentEntityFormInterface;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
+use Drupal\eca\Event\RenderEventInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function eca_render_theme(): array {
+  return [
+    'eca_serialized' => [
+      'variables' => [
+        'serialized' => '',
+        'method' => '',
+        'format' => '',
+        'data' => NULL,
+        'wrap' => TRUE,
+      ],
+    ],
+    'eca_lazy' => [
+      'variables' => [
+        'name' => '',
+        'argument' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Preprocesses for eca-serialized.html.twig.
+ *
+ * @param array &$variables
+ *   The variables consisting of following keys:
+ *   - data: The not-serialized data.
+ *   - format: The used serialization format (e.g. "json").
+ *   - method: The performed method, either "serialize" or "unserialize".
+ *   - serialized: The already serialized data as string. When not given,
+ *     the theme function will take care of serializing the given data.
+ *   - wrap: Boolean indicating whether the serialized string should be wrapped
+ *     by an HTML script tag.
+ */
+function template_preprocess_eca_serialized(array &$variables = []): void {
+  if (!isset($variables['wrap'])) {
+    $variables['wrap'] = TRUE;
+  }
+  if (!isset($variables['method'])) {
+    $variables['method'] = 'serialize';
+  }
+  if (isset($variables['data'], $variables['format']) && !isset($variables['serialized'])) {
+    $variables['serialized'] = \Drupal::service('serializer')->serialize($variables['data'], $variables['format']);
+  }
+  if (!empty($variables['wrap'])) {
+    if (!isset($variables['attributes'])) {
+      $variables['attributes'] = new Attribute();
+    }
+    elseif (!($variables['attributes'] instanceof Attribute)) {
+      $variables['attributes'] = new Attribute($variables['attributes']);
+    }
+    $attributes = $variables['attributes'];
+    if (!isset($attributes['id'])) {
+      $attributes['id'] = Html::getUniqueId('eca-serialized');
+      if ($attributes instanceof Attribute) {
+        $attributes->addClass('eca-serialized');
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function eca_render_entity_operation(EntityInterface $entity): array {
+  $build = [];
+  $event = _eca_trigger_event()->dispatchFromPlugin('eca_render:entity_operations', $entity, $build);
+  if ($event instanceof RenderEventInterface) {
+    $build = &$event->getRenderArray();
+  }
+
+  $operations = [];
+
+  // Convert link element builds into operation link arrays.
+  $k = 0;
+  foreach ($build as $i => $link) {
+    if ($link instanceof EntityInterface) {
+      if (!($link->hasLinkTemplate('canonical'))) {
+        unset($build[$i]);
+        continue;
+      }
+      $link = [
+        'title' => $link->label(),
+        'url' => $link->toUrl('canonical'),
+        'weight' => (++$k * 10),
+      ];
+    }
+    $weight = $link['weight'] ?? ($link['#weight'] ?? (++$k * 10));
+    if (isset($link['#title'], $link['#url'])) {
+      $link = [
+        'title' => $link['#title'],
+        'url' => $link['#url'],
+      ];
+    }
+    if (isset($link['url']) && is_string($link['url'])) {
+      try {
+        $link['url'] = Url::fromUserInput($link['url']);
+      }
+      catch (\Exception $e1) {
+        try {
+          $link['url'] = Url::fromUri($link['url']);
+        }
+        catch (\Exception $e2) {
+          \Drupal::logger('eca')->error("Failed to convert to URL when building up entity operation links.");
+          continue;
+        }
+      }
+    }
+    $link['weight'] = $weight;
+
+    if (isset($link['url']) && ($link['url'] instanceof Url)) {
+      $operations[$i] = $link;
+    }
+  }
+
+  return $operations;
+}
+
+/**
+ * Implements hook_contextual_links_alter().
+ */
+function eca_render_contextual_links_alter(array &$links, string $group, array $route_parameters): void {
+  $build = [];
+  $etm = \Drupal::entityTypeManager();
+  $event = _eca_trigger_event()->dispatchFromPlugin('eca_render:contextual_links', $links, $group, $route_parameters, $build, $etm);
+  if ($event instanceof RenderEventInterface) {
+    $build = &$event->getRenderArray();
+  }
+
+  // Convert link element builds into contextual link arrays.
+  $k = 0;
+  foreach ($build as $i => $link) {
+    if ($link instanceof EntityInterface) {
+      if (!($link->hasLinkTemplate('canonical'))) {
+        unset($build[$i]);
+        continue;
+      }
+      $url = $link->toUrl('canonical');
+      $link = [
+        'title' => $link->label(),
+        'route_name' => $url->getRouteName(),
+        'route_parameters' => $url->getRouteParameters(),
+        'localized_options' => $url->getOptions(),
+        'weight' => (++$k * 10),
+      ];
+    }
+    $weight = $link['weight'] ?? ($link['#weight'] ?? (++$k * 10));
+    if (isset($link['#title'], $link['#url'])) {
+      $link = [
+        'title' => $link['#title'],
+        'url' => $link['#url'],
+      ];
+    }
+    if (isset($link['url']) && is_string($link['url'])) {
+      try {
+        $link['url'] = Url::fromUserInput($link['url']);
+      }
+      catch (\Exception $e1) {
+        try {
+          $link['url'] = Url::fromUri($link['url']);
+        }
+        catch (\Exception $e2) {
+          \Drupal::logger('eca')->error("Failed to convert to URL when building up contextual links.");
+          continue;
+        }
+      }
+    }
+
+    if (isset($link['url'], $link['title']) && ($link['url'] instanceof Url)) {
+      /**
+       * @var \Drupal\Core\Url $url
+       */
+      $url = $link['url'];
+      $link = [
+        'title' => $link['title'],
+        'route_name' => $url->getRouteName(),
+        'route_parameters' => $url->getRouteParameters(),
+        'localized_options' => $url->getOptions(),
+        'weight' => $weight,
+      ];
+      $links[$i] = $link;
+    }
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function eca_render_menu_local_tasks_alter(array &$data, string $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  $build = [];
+  $event = _eca_trigger_event()->dispatchFromPlugin('eca_render:local_tasks', $route_name, $data, $build);
+  if ($event instanceof RenderEventInterface) {
+    $build = &$event->getRenderArray();
+  }
+  // Convert link element builds into contextual link arrays.
+  $k = 0;
+  foreach ($build as $i => $link) {
+    if ($link instanceof EntityInterface) {
+      if (!($link->hasLinkTemplate('canonical'))) {
+        unset($build[$i]);
+        continue;
+      }
+      $url = $link->toUrl('canonical');
+      $link = [
+        '#title' => $link->label(),
+        '#url' => $url,
+        'weight' => (++$k * 10),
+      ];
+    }
+    if (isset($link['#title'], $link['#url'])) {
+      $weight = $link['weight'] ?? ($link['#weight'] ?? (++$k * 10));
+      $data['tabs'][0]['eca.local_task.' . $i] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => $link['#title'],
+          'url' => is_string($link['#url']) ? Url::fromUserInput($link['#url']) : $link['#url'],
+          'localized_options' => [],
+        ],
+        '#access' => TRUE,
+        '#weight' => $weight,
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function eca_render_views_data_alter(array &$data): void {
+  $data['views']['eca_render'] = [
+    'title' => t('ECA Views field'),
+    'help' => t("Custom render output, build up via ECA."),
+    'field' => [
+      'id' => 'eca_render',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function eca_render_entity_extra_field_info(): array {
+  $etm = \Drupal::entityTypeManager();
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   */
+  $bundle_info = \Drupal::service('entity_type.bundle.info');
+
+  $extra = [];
+  /**
+   * @var \Drupal\eca\Entity\Eca $eca
+   */
+  foreach ($etm->getStorage('eca')->loadMultiple() as $eca) {
+    foreach ($eca->get('events') ?? [] as $event) {
+      if (($event['plugin'] ?? NULL) !== 'eca_render:extra_field') {
+        continue;
+      }
+      $config = $event['configuration'] ?? [];
+
+      $entity_type_ids = $config['entity_type_id'] === '' ?
+        array_keys($etm->getDefinitions()) :
+        explode(',', $config['entity_type_id']);
+      foreach ($entity_type_ids as $entity_type_id) {
+        $name = trim((string) ($config['extra_field_name'] ?? ''));
+        $label = trim((string) ($config['extra_field_label'] ?? $name));
+        $description = trim((string) ($config['extra_field_description'] ?? ''));
+        $display_type = $config['display_type'] ?? 'display';
+        $weight = (int) ($config['weight'] ?? 0);
+        $visible = (bool) ($config['visible'] ?? FALSE);
+
+        if ($name === '') {
+          continue;
+        }
+        $entity_type_id = trim($entity_type_id);
+        if (($entity_type_id === '') || !$etm->hasDefinition($entity_type_id)) {
+          continue;
+        }
+        $bundle = trim($config['bundle'] ?? '');
+        $bundles_available = array_keys($bundle_info->getBundleInfo($entity_type_id));
+        if ($bundle === '' || $bundle === '*') {
+          $bundles = $bundles_available;
+        }
+        else {
+          $bundles = explode(',', $bundle);
+          $bundles = array_intersect($bundles, $bundles_available);
+        }
+        foreach ($bundles as $bundle) {
+          $extra[$entity_type_id][$bundle][$display_type]['eca_render__' . $name] = [
+            'label' => $label,
+            'description' => $description,
+            'weight' => $weight,
+            'visible' => $visible,
+          ];
+        }
+      }
+    }
+  }
+
+  return $extra;
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function eca_render_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, string $view_mode): void {
+  $event = _eca_trigger_event()->dispatchFromPlugin('eca_render:entity', $entity, $build, $display, $view_mode);
+  if ($event instanceof RenderEventInterface) {
+    $build = &$event->getRenderArray();
+  }
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+  _eca_render_trigger_extra_field($build, $entity, $display, $view_mode, 'display');
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function eca_render_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form_object = $form_state->getFormObject();
+  if ($form_object instanceof ContentEntityFormInterface) {
+    $entity = $form_object->getEntity();
+    if (!($entity instanceof FieldableEntityInterface)) {
+      return;
+    }
+    $display = $form_object->getFormDisplay($form_state);
+    if ($display instanceof EntityFormDisplayInterface) {
+      _eca_render_trigger_extra_field($form, $entity, $display, $display->getMode(), 'form');
+    }
+  }
+}
+
+/**
+ * Triggers the rendering of extra fields via ECA.
+ *
+ * @param array &$build
+ *   The render array.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity.
+ * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $display
+ *   The entity display.
+ * @param string $view_mode
+ *   The view mode.
+ * @param string $display_type
+ *   The display type.
+ */
+function _eca_render_trigger_extra_field(array &$build, EntityInterface $entity, EntityDisplayInterface $display, string $view_mode, string $display_type): void {
+  foreach ($display->getComponents() as $name => $options) {
+    if (strpos($name, 'eca_render__') !== 0) {
+      continue;
+    }
+    $extra_field_name = substr($name, 12);
+    $render_build = [];
+    $event = _eca_trigger_event()->dispatchFromPlugin('eca_render:extra_field', $entity, $extra_field_name, $options, $render_build, $display, $view_mode, $display_type);
+    if ($event instanceof RenderEventInterface) {
+      $render_build = &$event->getRenderArray();
+    }
+    $build[$name] = $render_build;
+    if (!isset($build['#weight']) && isset($options['weight'])) {
+      $build['#weight'] = $options['weight'];
+    }
+  }
+}

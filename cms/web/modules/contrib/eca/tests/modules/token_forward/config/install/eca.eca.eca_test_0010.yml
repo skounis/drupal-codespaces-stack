@@ -1,0 +1,83 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_base
+    - eca_content
+    - eca_user
+id: eca_test_0010
+modeller: bpmn_io
+label: 'Forward tokens to custom event'
+version: v1
+weight: null
+events:
+  Event_06wii13:
+    plugin: 'content_entity:presave'
+    label: 'Pre-save node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_0fivpxs
+        condition: ''
+  Event_1mgm70j:
+    plugin: 'eca_base:eca_custom'
+    label: CE1
+    configuration:
+      event_id: CE1
+    successors:
+      -
+        id: Activity_08pl6mg
+        condition: ''
+  Event_1of088f:
+    plugin: 'eca_base:eca_custom'
+    label: CE2
+    configuration:
+      event_id: CE2
+    successors:
+      -
+        id: Activity_0gs2ia6
+        condition: ''
+conditions: {  }
+gateways: {  }
+actions:
+  Activity_0fivpxs:
+    plugin: eca_token_load_user_current
+    label: 'Add current user to token'
+    configuration:
+      token_name: some_user
+    successors:
+      -
+        id: Activity_1bq8y0a
+        condition: ''
+      -
+        id: Activity_1v0ofdt
+        condition: ''
+  Activity_1bq8y0a:
+    plugin: eca_trigger_custom_event
+    label: 'Trigger custom event without tokens'
+    configuration:
+      event_id: CE1
+      tokens: ''
+    successors: {  }
+  Activity_1v0ofdt:
+    plugin: eca_trigger_custom_event
+    label: 'Trigger custom event with tokens'
+    configuration:
+      event_id: CE2
+      tokens: 'entity,some_user'
+    successors: {  }
+  Activity_08pl6mg:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: "From CE1: we received user '[some_user:account-name]' and node '[entity:title]'"
+    successors: {  }
+  Activity_0gs2ia6:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: "From CE2: we received user '[some_user:account-name]' and node '[entity:title]'"
+    successors: {  }

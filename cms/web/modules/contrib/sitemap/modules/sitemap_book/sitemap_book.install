@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall hooks for the sitemap_book module.
+ */
+
+/**
+ * Store a schema version in the database.
+ */
+function sitemap_book_update_8200(&$sandbox) {
+  // No-op to ensure there is a schema version in the database.
+}

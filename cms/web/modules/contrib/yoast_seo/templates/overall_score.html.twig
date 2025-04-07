@@ -1,0 +1,5 @@
+<div {% if overall_score_target_id %}id="{{ overall_score_target_id }}"{% endif %}
+     class="overallScore {{ overall_score|clean_class }}">
+    <span class="score_circle"></span>
+    <span class="score_value">{{ overall_score }}</span>
+</div>

@@ -1,0 +1,15 @@
+entity.eca.collection:
+  title: 'ECA'
+  parent: system.admin_config_workflow
+  description: 'Create, edit and manage ECA models.'
+  route_name: entity.eca.collection
+eca.import:
+  title: 'Import'
+  parent: entity.eca.collection
+  description: 'Import an ECA model.'
+  route_name: eca.import
+eca.settings:
+  title: 'Settings'
+  parent: entity.eca.collection
+  description: 'Configure ECA settings.'
+  route_name: eca.settings

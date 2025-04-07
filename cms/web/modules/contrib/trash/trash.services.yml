@@ -1,0 +1,58 @@
+services:
+  trash.manager:
+    class: Drupal\trash\TrashManager
+    autowire: true
+  Drupal\trash\TrashManagerInterface: '@trash.manager'
+
+  trash.entity_purger:
+    class: Drupal\trash\TrashEntityPurger
+    arguments: ['@entity_type.manager', '@trash.manager', '@config.factory', '@datetime.time', '@queue', '@settings']
+
+  trash.config_subscriber:
+    class: Drupal\trash\EventSubscriber\TrashConfigSubscriber
+    arguments: ['@entity_type.manager', '@trash.manager', '@entity.last_installed_schema.repository', '@router.builder', '@kernel']
+    tags:
+      - { name: event_subscriber }
+
+  trash.entity_schema_subscriber:
+    class: Drupal\trash\EventSubscriber\TrashEntitySchemaSubscriber
+    arguments: ['@trash.manager', '@config.factory']
+    tags:
+      - { name: event_subscriber }
+
+  trash.ignore_subscriber:
+    class: Drupal\trash\EventSubscriber\TrashIgnoreSubscriber
+    arguments: ['@trash.manager', '@current_route_match']
+    tags:
+      - { name: event_subscriber }
+
+  trash.route_subscriber:
+    class: Drupal\trash\Routing\RouteSubscriber
+    arguments: ['@entity_type.manager', '@trash.manager']
+    tags:
+      - { name: event_subscriber }
+
+  trash.route_processor:
+    class: Drupal\trash\RouteProcessor\TrashRouteProcessor
+    arguments: ['@request_stack', '@current_route_match']
+    tags:
+      - { name: route_processor_outbound }
+
+  trash.uninstall_validator:
+    class: Drupal\trash\TrashUninstallValidator
+    arguments: ['@entity_type.manager', '@trash.manager']
+
+  # Trash handlers.
+  trash.handler_configurator:
+    class: Drupal\trash\Handler\TrashHandlerConfigurator
+    public: false
+    autowire: true
+
+  Drupal\trash\Hook\TrashHandler\NodeTrashHandler:
+    tags:
+      - { name: trash_handler, entity_type_id: node }
+  Drupal\trash\Hook\TrashHandler\MenuLinkContentTrashHandler:
+    autowire: true
+    tags:
+      - { name: trash_handler, entity_type_id: menu_link_content }
+      - { name: event_subscriber }

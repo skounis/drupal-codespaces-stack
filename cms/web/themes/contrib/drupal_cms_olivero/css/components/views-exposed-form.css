@@ -1,0 +1,53 @@
+.views-exposed-form .fieldset--group .fieldset__legend--visible {
+  background-color: transparent;
+  text-transform: uppercase;
+  font-size: var(--font-size-s);
+  font-weight: 600;
+  letter-spacing: 4px;
+  float: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--color--gray-60);
+}
+
+.views-exposed-form .fieldset--group .fieldset__legend--visible .fieldset__label {
+  color: inherit;
+  padding-inline: 0;
+}
+
+.views-exposed-form .fieldset--group .fieldset__legend--visible ~ .fieldset__wrapper {
+  border: 0;
+  border-radius: 0;
+  padding-inline: 0;
+}
+
+.views-exposed-form .fieldset--group:is(:first-of-type, :last-of-type) .fieldset__legend--visible .fieldset__label {
+  display: flex;
+  gap: var(--sp0-5);
+
+  &::before {
+    display: inline-block;
+    aspect-ratio: 1;
+    content: "";
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-image: url('../../images/filter.svg');
+    mask-image: url('../../images/filter.svg');
+    inline-size: 14px;
+  }
+}
+
+.bef-exposed-form.form--inline .bef-checkboxes {
+  display: flex;
+  gap: var(--sp2);
+
+  & > * {
+    margin: 0;
+  }
+}

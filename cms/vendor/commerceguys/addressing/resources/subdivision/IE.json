@@ -1,0 +1,83 @@
+{
+	"country_code": "IE",
+	"subdivisions": {
+		"CW": {
+			"name": "Co. Carlow"
+		},
+		"CN": {
+			"name": "Co. Cavan"
+		},
+		"CE": {
+			"name": "Co. Clare"
+		},
+		"CO": {
+			"name": "Co. Cork"
+		},
+		"DL": {
+			"name": "Co. Donegal"
+		},
+		"D": {
+			"name": "Co. Dublin"
+		},
+		"G": {
+			"name": "Co. Galway"
+		},
+		"KY": {
+			"name": "Co. Kerry"
+		},
+		"KE": {
+			"name": "Co. Kildare"
+		},
+		"KK": {
+			"name": "Co. Kilkenny"
+		},
+		"LS": {
+			"name": "Co. Laois"
+		},
+		"LM": {
+			"name": "Co. Leitrim"
+		},
+		"LK": {
+			"name": "Co. Limerick"
+		},
+		"LD": {
+			"name": "Co. Longford"
+		},
+		"LH": {
+			"name": "Co. Louth"
+		},
+		"MO": {
+			"name": "Co. Mayo"
+		},
+		"MH": {
+			"name": "Co. Meath"
+		},
+		"MN": {
+			"name": "Co. Monaghan"
+		},
+		"OY": {
+			"name": "Co. Offaly"
+		},
+		"RN": {
+			"name": "Co. Roscommon"
+		},
+		"SO": {
+			"name": "Co. Sligo"
+		},
+		"TA": {
+			"name": "Co. Tipperary"
+		},
+		"WD": {
+			"name": "Co. Waterford"
+		},
+		"WH": {
+			"name": "Co. Westmeath"
+		},
+		"WX": {
+			"name": "Co. Wexford"
+		},
+		"WW": {
+			"name": "Co. Wicklow"
+		}
+	}
+}

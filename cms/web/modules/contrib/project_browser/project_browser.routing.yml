@@ -1,0 +1,60 @@
+project_browser.api_project_get_all:
+  path: '/project-browser/data/project'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\project_browser\Controller\ProjectBrowserEndpointController::getAllProjects'
+    _title: 'Get all projects'
+  requirements:
+    _permission: 'administer modules'
+  #options:
+  #  no_cache: 'TRUE'
+project_browser.browse:
+  path: '/admin/modules/browse/{source}'
+  defaults:
+    _controller: '\Drupal\project_browser\Controller\BrowserController::browse'
+    _title: 'Browse projects'
+  requirements:
+    _permission: 'administer modules'
+  options:
+    parameters:
+      source:
+        project_browser.source: TRUE
+project_browser.settings:
+  path: '/admin/config/development/project_browser'
+  defaults:
+    _form: '\Drupal\project_browser\Form\SettingsForm'
+    _title: 'Project Browser'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _menu_item: 'tab_parent' # Define as the primary tab.
+
+project_browser.actions_form:
+  path: '/admin/config/development/project_browser/actions'
+  defaults:
+    _form: '\Drupal\project_browser\Form\ActionsForm'
+    _title: 'Actions'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _menu_item: 'tab_child' # Define as a child tab.
+
+project_browser.activate:
+  path: '/admin/modules/project_browser/activate'
+  defaults:
+    _controller: '\Drupal\project_browser\Controller\ProjectBrowserEndpointController::activate'
+  requirements:
+    _permission: 'administer modules'
+  options:
+    requirements:
+      _format: json
+
+project_browser.uninstall:
+  path: '/project-browser/uninstall/{name}'
+  defaults:
+    _controller: '\Drupal\project_browser\Controller\ProjectBrowserEndpointController::uninstall'
+  requirements:
+    _permission: 'administer modules'
+
+route_callbacks:
+  - '\Drupal\project_browser\Routing\ProjectBrowserRoutes::routes'

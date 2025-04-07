@@ -1,0 +1,15 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following Prompt, what are the emails the person wants to send to? A comma separated list. If they want to remove, just answer none.
+  formats:
+    - emails: a comma separated list of emails. If the respondents is there, just name them [mail]. If no emails should be send write none.
+      action: the action to take - add or remove
+  one_shot_learning_examples:
+    - emails: "m.m@m.com"
+      action: remove
+    - emails: "[mail], marcus@marcusbox.com"
+      action: add
+    - emails: "none"
+      action: remove

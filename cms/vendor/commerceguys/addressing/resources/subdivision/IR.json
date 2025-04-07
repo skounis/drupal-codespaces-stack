@@ -1,0 +1,130 @@
+{
+	"country_code": "IR",
+	"locale": "fa",
+	"subdivisions": {
+		"03": {
+			"name": "East Azerbaijan Province",
+			"local_name": "استان آذربایجان شرقی"
+		},
+		"04": {
+			"name": "West Azerbaijan Province",
+			"local_name": "استان آذربایجان غربی"
+		},
+		"24": {
+			"name": "Ardabil Province",
+			"local_name": "استان اردبیل"
+		},
+		"10": {
+			"name": "Isfahan Province",
+			"local_name": "استان اصفهان"
+		},
+		"30": {
+			"name": "Alborz Province",
+			"local_name": "استان البرز"
+		},
+		"16": {
+			"name": "Ilam Province",
+			"local_name": "استان ایلام"
+		},
+		"18": {
+			"name": "Bushehr Province",
+			"local_name": "استان بوشهر"
+		},
+		"23": {
+			"name": "Tehran Province",
+			"local_name": "استان تهران"
+		},
+		"14": {
+			"name": "Chaharmahal and Bakhtiari Province",
+			"local_name": "استان چهارمحال و بختیاری"
+		},
+		"29": {
+			"name": "South Khorasan Province",
+			"local_name": "استان خراسان جنوبی"
+		},
+		"09": {
+			"name": "Razavi Khorasan Province",
+			"local_name": "استان خراسان رضوی"
+		},
+		"28": {
+			"name": "North Khorasan Province",
+			"local_name": "استان خراسان شمالی"
+		},
+		"06": {
+			"name": "Khuzestan Province",
+			"local_name": "استان خوزستان"
+		},
+		"19": {
+			"name": "Zanjan Province",
+			"local_name": "استان زنجان"
+		},
+		"20": {
+			"name": "Semnan Province",
+			"local_name": "استان سمنان"
+		},
+		"11": {
+			"name": "Sistan and Baluchestan Province",
+			"local_name": "استان سیستان و بلوچستان"
+		},
+		"07": {
+			"name": "Fars Province",
+			"local_name": "استان فارس"
+		},
+		"26": {
+			"name": "Qazvin Province",
+			"local_name": "استان قزوین"
+		},
+		"25": {
+			"name": "Qom Province",
+			"local_name": "استان قم"
+		},
+		"12": {
+			"name": "Kurdistan Province",
+			"local_name": "استان کردستان"
+		},
+		"08": {
+			"name": "Kerman Province",
+			"local_name": "استان کرمان"
+		},
+		"05": {
+			"name": "Kermanshah Province",
+			"local_name": "استان کرمانشاه"
+		},
+		"17": {
+			"name": "Kohgiluyeh and Boyer-Ahmad Province",
+			"local_name": "استان کهگیلویه و بویراحمد"
+		},
+		"27": {
+			"name": "Golestan Province",
+			"local_name": "استان گلستان"
+		},
+		"01": {
+			"name": "Gilan Province",
+			"local_name": "استان گیلان"
+		},
+		"15": {
+			"name": "Lorestan Province",
+			"local_name": "استان لرستان"
+		},
+		"02": {
+			"name": "Mazandaran Province",
+			"local_name": "استان مازندران"
+		},
+		"00": {
+			"name": "Markazi Province",
+			"local_name": "استان مرکزی"
+		},
+		"22": {
+			"name": "Hormozgan Province",
+			"local_name": "استان هرمزگان"
+		},
+		"13": {
+			"name": "Hamadan Province",
+			"local_name": "استان همدان"
+		},
+		"21": {
+			"name": "Yazd Province",
+			"local_name": "استان یزد"
+		}
+	}
+}

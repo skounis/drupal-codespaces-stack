@@ -1,0 +1,5 @@
+entity.automator_chain_type.collection:
+  title: 'Automator Chain Settings'
+  description: 'Manage and CRUD actions on Automator Chain type.'
+  parent: ai.admin_settings
+  route_name: entity.automator_chain_type.collection

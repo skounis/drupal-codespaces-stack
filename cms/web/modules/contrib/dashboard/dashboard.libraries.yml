@@ -1,0 +1,18 @@
+toolbar:
+  version: VERSION
+  css:
+    theme:
+      css/dashboard.icons.css: {}
+
+dashboard:
+  version: VERSION
+  css:
+    theme:
+      css/dashboard.css: {}
+
+
+dashboard.navigation:
+  version: VERSION
+  css:
+    theme:
+      css/dashboard.navigation.css: { }

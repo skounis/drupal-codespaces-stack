@@ -1,0 +1,49 @@
+langcode: en
+status: true
+dependencies: {  }
+id: seo_checklist
+label: 'SEO Checklist'
+routes:
+  -
+    route_name: checklistapi.checklists.seo_checklist
+tips:
+  welcome:
+    id: welcome
+    plugin: text
+    label: 'Welcome to the SEO Checklist'
+    weight: -10
+    position: 'auto'
+    selector: null
+    body: '<p>The SEO checklist guides you through the process of basic search engine optimization for your Drupal site.</p>'
+  progress:
+    id: progress
+    plugin: text
+    label: 'Progress bar'
+    weight: -9
+    position: 'auto'
+    selector: '.progress'
+    body: '<p>This bar at the top displays your overall progress.</p>'
+  sections:
+    id: sections
+    plugin: text
+    label: 'Sections'
+    weight: -8
+    position: 'auto'
+    selector: '.vertical-tabs__menu-link'
+    body: '<p>The checklist is broken into sections to help you stay organized.</p>'
+  checklist_item:
+    id: checklist_item
+    plugin: text
+    label: 'Checklist items'
+    weight: -7
+    position: 'auto'
+    selector: '#edit-checklistapi-search-engines-install-and-enable-robotstxt-module'
+    body: '<p>Check items off as you complete them. The checklist will save the date and time and associate your username with their completion.</p>'
+  save:
+    id: save
+    plugin: text
+    label: 'Don''t forget to save!'
+    weight: -6
+    position: 'auto'
+    selector: '#edit-save'
+    body: '<p>Your progress will not be recorded until you click "Save".</p>'

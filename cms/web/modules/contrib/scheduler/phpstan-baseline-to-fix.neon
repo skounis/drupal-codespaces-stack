@@ -1,0 +1,66 @@
+# ------------------------------------------------------------------------------
+# This phpstan-baseline-fix.neon file contains the messages for code which should
+# be worked on, and ultimately removed from here when the source is corrected.
+# ------------------------------------------------------------------------------
+parameters:
+  ignoreErrors:
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: scheduler_rules_integration/src/Plugin/Condition/PublishingIsEnabled.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: scheduler_rules_integration/src/Plugin/Condition/UnpublishingIsEnabled.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: scheduler_rules_integration/src/Plugin/RulesAction/RemovePublishingDate.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: scheduler_rules_integration/src/Plugin/RulesAction/RemoveUnpublishingDate.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 2
+      path: scheduler_rules_integration/src/Plugin/RulesAction/SchedulerRulesActionBase.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: scheduler_rules_integration/src/Plugin/RulesAction/SetPublishingDate.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: scheduler_rules_integration/src/Plugin/RulesAction/SetUnpublishingDate.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 3
+      path: src/Plugin/Validation/Constraint/SchedulerPublishOnConstraintValidator.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 4
+      path: src/Plugin/Validation/Constraint/SchedulerUnpublishOnConstraintValidator.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 1
+      path: src/Routing/SchedulerRouteSubscriber.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 17
+      path: src/SchedulerManager.php
+
+    -
+      message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+      count: 3
+      path: src/Theme/SchedulerThemeNegotiator.php

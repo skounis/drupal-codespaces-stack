@@ -1,0 +1,4 @@
+administer sam: 
+  title: 'Administer Simple Add More'
+  description: 'Users with this permission will be able to administer the Simple Add More module settings.'
+  restrict access: true

@@ -1,0 +1,5 @@
+simple_sitemap.views:
+  route_name: simple_sitemap.views
+  title: 'Views'
+  parent_id: simple_sitemap.inclusion
+  weight: 1

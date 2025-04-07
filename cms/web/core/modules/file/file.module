@@ -1,0 +1,766 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldFilteredMarkup;
+use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\Exception\FileExistsException;
+use Drupal\Core\File\Exception\FileWriteException;
+use Drupal\Core\File\Exception\InvalidStreamWrapperException;
+use Drupal\Core\File\FileExists;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Lock\LockAcquiringException;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
+use Drupal\Core\Template\Attribute;
+use Drupal\file\FileInterface;
+use Drupal\file\IconMimeTypes;
+use Drupal\file\Upload\FormUploadedFile;
+
+/**
+ * Examines a file entity and returns appropriate content headers for download.
+ *
+ * @param \Drupal\file\FileInterface $file
+ *   A file entity.
+ *
+ * @return array
+ *   An associative array of headers, as expected by
+ *   \Symfony\Component\HttpFoundation\StreamedResponse.
+ */
+function file_get_content_headers(FileInterface $file) {
+  return [
+    'Content-Type' => $file->getMimeType(),
+    'Content-Length' => $file->getSize(),
+    'Cache-Control' => 'private',
+  ];
+}
+
+/**
+ * Saves form file uploads.
+ *
+ * The files will be added to the {file_managed} table as temporary files.
+ * Temporary files are periodically cleaned. Use the 'file.usage' service to
+ * register the usage of the file which will automatically mark it as permanent.
+ *
+ * @param array $element
+ *   The FAPI element whose values are being saved.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ * @param null|int $delta
+ *   (optional) The delta of the file to return the file entity.
+ *   Defaults to NULL.
+ * @param \Drupal\Core\File\FileExists|int $fileExists
+ *   (optional) The replace behavior when the destination file already exists.
+ *
+ * @return array|\Drupal\file\FileInterface|null|false
+ *   An array of file entities or a single file entity if $delta != NULL. Each
+ *   array element contains the file entity if the upload succeeded or FALSE if
+ *   there was an error. Function returns NULL if no file was uploaded.
+ *
+ * @throws \ValueError
+ *    Thrown if $fileExists is a legacy int and not a valid value.
+ *
+ * @internal
+ *   This function is internal, and may be removed in a minor version release.
+ *   It wraps file_save_upload() to allow correct error handling in forms.
+ *   Contrib and custom code should not call this function, they should use the
+ *   managed file upload widgets in core.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3069020
+ * @see https://www.drupal.org/project/drupal/issues/2482783
+ */
+function _file_save_upload_from_form(array $element, FormStateInterface $form_state, $delta = NULL, FileExists|int $fileExists = FileExists::Rename) {
+  if (!$fileExists instanceof FileExists) {
+    // @phpstan-ignore staticMethod.deprecated
+    $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+  }
+  // Get all errors set before calling this method. This will also clear them
+  // from the messenger service.
+  $errors_before = \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_ERROR);
+
+  $upload_location = $element['#upload_location'] ?? FALSE;
+  $upload_name = implode('_', $element['#parents']);
+  $upload_validators = $element['#upload_validators'] ?? [];
+
+  $result = file_save_upload($upload_name, $upload_validators, $upload_location, $delta, $fileExists);
+
+  // Get new errors that are generated while trying to save the upload. This
+  // will also clear them from the messenger service.
+  $errors_new = \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_ERROR);
+  if (!empty($errors_new)) {
+
+    if (count($errors_new) > 1) {
+      // Render multiple errors into a single message.
+      // This is needed because only one error per element is supported.
+      $render_array = [
+        'error' => [
+          '#markup' => t('One or more files could not be uploaded.'),
+        ],
+        'item_list' => [
+          '#theme' => 'item_list',
+          '#items' => $errors_new,
+        ],
+      ];
+      $error_message = \Drupal::service('renderer')->renderInIsolation($render_array);
+    }
+    else {
+      $error_message = reset($errors_new);
+    }
+
+    $form_state->setError($element, $error_message);
+  }
+
+  // Ensure that errors set prior to calling this method are still shown to the
+  // user.
+  if (!empty($errors_before)) {
+    foreach ($errors_before as $error) {
+      \Drupal::messenger()->addError($error);
+    }
+  }
+
+  return $result;
+}
+
+/**
+ * Saves file uploads to a new location.
+ *
+ * The files will be added to the {file_managed} table as temporary files.
+ * Temporary files are periodically cleaned. Use the 'file.usage' service to
+ * register the usage of the file which will automatically mark it as permanent.
+ *
+ * Note that this function does not support correct form error handling. The
+ * file upload widgets in core do support this. It is advised to use these in
+ * any custom form, instead of calling this function.
+ *
+ * @param string $form_field_name
+ *   A string that is the associative array key of the upload form element in
+ *   the form array.
+ * @param array $validators
+ *   (optional) An associative array of Validation Constraint plugins used to
+ *   validate the file.
+ *   If the array is empty, 'FileExtension' will be used by default with a safe
+ *   list of extensions, as follows: "jpg jpeg gif png txt doc xls pdf ppt pps
+ *   odt ods odp". To allow all extensions, you must explicitly set this array
+ *   to ['FileExtension' => []]. (Beware: this is not safe and should only be
+ *   allowed for trusted users, if at all.)
+ * @param string|false $destination
+ *   (optional) A string containing the URI that the file should be copied to.
+ *   This must be a stream wrapper URI. If this value is omitted or set to
+ *   FALSE, Drupal's temporary files scheme will be used ("temporary://").
+ * @param null|int $delta
+ *   (optional) The delta of the file to return the file entity.
+ *   Defaults to NULL.
+ * @param \Drupal\Core\File\FileExists|int $fileExists
+ *   (optional) The replace behavior when the destination file already exists.
+ *
+ * @return array|\Drupal\file\FileInterface|null|false
+ *   An array of file entities or a single file entity if $delta != NULL. Each
+ *   array element contains the file entity if the upload succeeded or FALSE if
+ *   there was an error. Function returns NULL if no file was uploaded.
+ *
+ * @throws \ValueError
+ *   Thrown if $fileExists is a legacy int and not a valid value.
+ *
+ * @see _file_save_upload_from_form()
+ */
+function file_save_upload($form_field_name, $validators = [], $destination = FALSE, $delta = NULL, FileExists|int $fileExists = FileExists::Rename) {
+  if (!$fileExists instanceof FileExists) {
+    // @phpstan-ignore staticMethod.deprecated
+    $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+  }
+  static $upload_cache;
+
+  $all_files = \Drupal::request()->files->get('files', []);
+  // Make sure there's an upload to process.
+  if (empty($all_files[$form_field_name])) {
+    return NULL;
+  }
+  $file_upload = $all_files[$form_field_name];
+
+  // Return cached objects without processing since the file will have
+  // already been processed and the paths in $_FILES will be invalid.
+  if (isset($upload_cache[$form_field_name])) {
+    if (isset($delta)) {
+      return $upload_cache[$form_field_name][$delta];
+    }
+    return $upload_cache[$form_field_name];
+  }
+
+  // Prepare uploaded files info. Representation is slightly different
+  // for multiple uploads and we fix that here.
+  $uploaded_files = $file_upload;
+  if (!is_array($file_upload)) {
+    $uploaded_files = [$file_upload];
+  }
+
+  if ($destination === FALSE || $destination === NULL) {
+    $destination = 'temporary://';
+  }
+
+  /** @var \Drupal\file\Upload\FileUploadHandler $file_upload_handler */
+  $file_upload_handler = \Drupal::service('file.upload_handler');
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+  $files = [];
+  /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $uploaded_file */
+  foreach ($uploaded_files as $i => $uploaded_file) {
+    try {
+      $form_uploaded_file = new FormUploadedFile($uploaded_file);
+      $result = $file_upload_handler->handleFileUpload($form_uploaded_file, $validators, $destination, $fileExists);
+      if ($result->hasViolations()) {
+        $errors = [];
+        foreach ($result->getViolations() as $violation) {
+          $errors[] = $violation->getMessage();
+        }
+        $message = [
+          'error' => [
+            '#markup' => t('The specified file %name could not be uploaded.', ['%name' => $uploaded_file->getClientOriginalName()]),
+          ],
+          'item_list' => [
+            '#theme' => 'item_list',
+            '#items' => $errors,
+          ],
+        ];
+        // @todo Add support for render arrays in
+        // \Drupal\Core\Messenger\MessengerInterface::addMessage()?
+        // @see https://www.drupal.org/node/2505497.
+        \Drupal::messenger()->addError($renderer->renderInIsolation($message));
+        $files[$i] = FALSE;
+        continue;
+      }
+      $file = $result->getFile();
+      // If the filename has been modified, let the user know.
+      if ($result->isRenamed()) {
+        if ($result->isSecurityRename()) {
+          $message = t('For security reasons, your upload has been renamed to %filename.', ['%filename' => $file->getFilename()]);
+        }
+        else {
+          $message = t('Your upload has been renamed to %filename.', ['%filename' => $file->getFilename()]);
+        }
+        \Drupal::messenger()->addStatus($message);
+      }
+      $files[$i] = $file;
+    }
+    catch (FileExistsException) {
+      \Drupal::messenger()->addError(t('Destination file "%file" exists', ['%file' => $destination . $uploaded_file->getFilename()]));
+      $files[$i] = FALSE;
+    }
+    catch (InvalidStreamWrapperException) {
+      \Drupal::messenger()->addError(t('The file could not be uploaded because the destination "%destination" is invalid.', ['%destination' => $destination]));
+      $files[$i] = FALSE;
+    }
+    catch (FileWriteException) {
+      \Drupal::messenger()->addError(t('File upload error. Could not move uploaded file.'));
+      \Drupal::logger('file')->notice('Upload error. Could not move uploaded file %file to destination %destination.', ['%file' => $uploaded_file->getClientOriginalName(), '%destination' => $destination . '/' . $uploaded_file->getClientOriginalName()]);
+      $files[$i] = FALSE;
+    }
+    catch (FileException) {
+      \Drupal::messenger()->addError(t('The file %filename could not be uploaded because the name is invalid.', ['%filename' => $uploaded_file->getClientOriginalName()]));
+      $files[$i] = FALSE;
+    }
+    catch (LockAcquiringException) {
+      \Drupal::messenger()->addError(t('File already locked for writing.'));
+      $files[$i] = FALSE;
+    }
+  }
+
+  // Add files to the cache.
+  $upload_cache[$form_field_name] = $files;
+
+  return isset($delta) ? $files[$delta] : $files;
+}
+
+/**
+ * Form submission handler for upload / remove buttons of managed_file elements.
+ *
+ * @see \Drupal\file\Element\ManagedFile::processManagedFile()
+ */
+function file_managed_file_submit($form, FormStateInterface $form_state) {
+  // Determine whether it was the upload or the remove button that was clicked,
+  // and set $element to the managed_file element that contains that button.
+  $parents = $form_state->getTriggeringElement()['#array_parents'];
+  $button_key = array_pop($parents);
+  $element = NestedArray::getValue($form, $parents);
+
+  // No action is needed here for the upload button, because all file uploads on
+  // the form are processed by \Drupal\file\Element\ManagedFile::valueCallback()
+  // regardless of which button was clicked. Action is needed here for the
+  // remove button, because we only remove a file in response to its remove
+  // button being clicked.
+  if ($button_key == 'remove_button') {
+    $fids = array_keys($element['#files']);
+    // Get files that will be removed.
+    if ($element['#multiple']) {
+      $remove_fids = [];
+      foreach (Element::children($element) as $name) {
+        if (str_starts_with($name, 'file_') && $element[$name]['selected']['#value']) {
+          $remove_fids[] = (int) substr($name, 5);
+        }
+      }
+      $fids = array_diff($fids, $remove_fids);
+    }
+    else {
+      // If we deal with single upload element remove the file and set
+      // element's value to empty array (file could not be removed from
+      // element if we don't do that).
+      $remove_fids = $fids;
+      $fids = [];
+    }
+
+    foreach ($remove_fids as $fid) {
+      // If it's a temporary file we can safely remove it immediately, otherwise
+      // it's up to the implementing module to remove usages of files to have them
+      // removed.
+      if ($element['#files'][$fid] && $element['#files'][$fid]->isTemporary()) {
+        $element['#files'][$fid]->delete();
+      }
+    }
+    // Update both $form_state->getValues() and FormState::$input to reflect
+    // that the file has been removed, so that the form is rebuilt correctly.
+    // $form_state->getValues() must be updated in case additional submit
+    // handlers run, and for form building functions that run during the
+    // rebuild, such as when the managed_file element is part of a field widget.
+    // FormState::$input must be updated so that
+    // \Drupal\file\Element\ManagedFile::valueCallback() has correct information
+    // during the rebuild.
+    $form_state->setValueForElement($element['fids'], implode(' ', $fids));
+    NestedArray::setValue($form_state->getUserInput(), $element['fids']['#parents'], implode(' ', $fids));
+  }
+
+  // Set the form to rebuild so that $form is correctly updated in response to
+  // processing the file removal. Since this function did not change $form_state
+  // if the upload button was clicked, a rebuild isn't necessary in that
+  // situation and calling $form_state->disableRedirect() would suffice.
+  // However, we choose to always rebuild, to keep the form processing workflow
+  // consistent between the two buttons.
+  $form_state->setRebuild();
+}
+
+/**
+ * Saves any files that have been uploaded into a managed_file element.
+ *
+ * @param array $element
+ *   The FAPI element whose values are being saved.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ *
+ * @return array|false
+ *   An array of file entities for each file that was saved, keyed by its file
+ *   ID. Each array element contains a file entity. Function returns FALSE if
+ *   upload directory could not be created or no files were uploaded.
+ */
+function file_managed_file_save_upload($element, FormStateInterface $form_state) {
+  $upload_name = implode('_', $element['#parents']);
+  $all_files = \Drupal::request()->files->get('files', []);
+  if (empty($all_files[$upload_name])) {
+    return FALSE;
+  }
+  $file_upload = $all_files[$upload_name];
+
+  $destination = $element['#upload_location'] ?? NULL;
+  if (isset($destination) && !\Drupal::service('file_system')->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
+    \Drupal::logger('file')->notice('The upload directory %directory for the file field %name could not be created or is not accessible. A newly uploaded file could not be saved in this directory as a consequence, and the upload was canceled.', ['%directory' => $destination, '%name' => $element['#field_name']]);
+    $form_state->setError($element, t('The file could not be uploaded.'));
+    return FALSE;
+  }
+
+  // Save attached files to the database.
+  $files_uploaded = $element['#multiple'] && count(array_filter($file_upload)) > 0;
+  $files_uploaded |= !$element['#multiple'] && !empty($file_upload);
+  if ($files_uploaded) {
+    if (!$files = _file_save_upload_from_form($element, $form_state)) {
+      \Drupal::logger('file')->notice('The file upload failed. %upload', ['%upload' => $upload_name]);
+      return [];
+    }
+
+    // Value callback expects FIDs to be keys.
+    $files = array_filter($files);
+    $fids = array_map(function ($file) {
+      return $file->id();
+    }, $files);
+
+    return empty($files) ? [] : array_combine($fids, $files);
+  }
+
+  return [];
+}
+
+/**
+ * Prepares variables for file form widget templates.
+ *
+ * Default template: file-managed-file.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element representing the file.
+ */
+function template_preprocess_file_managed_file(&$variables): void {
+  $element = $variables['element'];
+
+  $variables['attributes'] = [];
+  if (isset($element['#id'])) {
+    $variables['attributes']['id'] = $element['#id'];
+  }
+  if (!empty($element['#attributes']['class'])) {
+    $variables['attributes']['class'] = (array) $element['#attributes']['class'];
+  }
+}
+
+/**
+ * Prepares variables for file link templates.
+ *
+ * Default template: file-link.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - file: A File entity to which the link will be created.
+ *   - icon_directory: (optional) A path to a directory of icons to be used for
+ *     files. Defaults to the value of the "icon.directory" variable.
+ *   - description: A description to be displayed instead of the filename.
+ *   - attributes: An associative array of attributes to be placed in the a tag.
+ */
+function template_preprocess_file_link(&$variables): void {
+  $file = $variables['file'];
+  $options = [];
+
+  /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
+  $file_url_generator = \Drupal::service('file_url_generator');
+  $url = $file_url_generator->generate($file->getFileUri());
+
+  $mime_type = $file->getMimeType();
+  $options['attributes']['type'] = $mime_type;
+
+  // Use the description as the link text if available.
+  if (empty($variables['description'])) {
+    $link_text = $file->getFilename();
+  }
+  else {
+    $link_text = $variables['description'];
+    $options['attributes']['title'] = $file->getFilename();
+  }
+
+  // Classes to add to the file field for icons.
+  $classes = [
+    'file',
+    // Add a specific class for each and every mime type.
+    'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']),
+    // Add a more general class for groups of well known MIME types.
+    'file--' . IconMimeTypes::getIconClass($mime_type),
+  ];
+
+  // Set file classes to the options array.
+  $variables['attributes'] = new Attribute($variables['attributes']);
+  $variables['attributes']->addClass($classes);
+  $variables['file_size'] = $file->getSize() !== NULL ? ByteSizeMarkup::create($file->getSize()) : '';
+
+  $variables['link'] = Link::fromTextAndUrl($link_text, $url->mergeOptions($options))->toRenderable();
+}
+
+/**
+ * Prepares variables for multi file form widget templates.
+ *
+ * Default template: file-widget-multiple.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element representing the widgets.
+ */
+function template_preprocess_file_widget_multiple(&$variables): void {
+  $element = $variables['element'];
+  // Special ID and classes for draggable tables.
+  $weight_class = $element['#id'] . '-weight';
+  $table_id = $element['#id'] . '-table';
+
+  // Build up a table of applicable fields.
+  $headers = [];
+  $headers[] = t('File information');
+  if ($element['#display_field']) {
+    $headers[] = [
+      'data' => t('Display'),
+      'class' => ['checkbox'],
+    ];
+  }
+  $headers[] = t('Weight');
+  $headers[] = t('Operations');
+
+  // Get our list of widgets in order (needed when the form comes back after
+  // preview or failed validation).
+  $widgets = [];
+  foreach (Element::children($element) as $key) {
+    $widgets[] = &$element[$key];
+  }
+  usort($widgets, '_field_multiple_value_form_sort_helper');
+
+  $rows = [];
+  foreach ($widgets as &$widget) {
+    // Save the uploading row for last.
+    if (empty($widget['#files'])) {
+      $widget['#title'] = $element['#file_upload_title'];
+      $widget['#description'] = \Drupal::service('renderer')->renderInIsolation($element['#file_upload_description']);
+      continue;
+    }
+
+    // Delay rendering of the buttons, so that they can be rendered later in the
+    // "operations" column.
+    $operations_elements = [];
+    foreach (Element::children($widget) as $key) {
+      if (isset($widget[$key]['#type']) && $widget[$key]['#type'] == 'submit') {
+        hide($widget[$key]);
+        $operations_elements[] = &$widget[$key];
+      }
+    }
+
+    // Delay rendering of the "Display" option and the weight selector, so that
+    // each can be rendered later in its own column.
+    if ($element['#display_field']) {
+      hide($widget['display']);
+    }
+    hide($widget['_weight']);
+    $widget['_weight']['#attributes']['class'] = [$weight_class];
+
+    // Render everything else together in a column, without the normal wrappers.
+    $row = [];
+    $widget['#theme_wrappers'] = [];
+    $row[] = \Drupal::service('renderer')->render($widget);
+
+    // Arrange the row with the rest of the rendered columns.
+    if ($element['#display_field']) {
+      unset($widget['display']['#title']);
+      $row[] = [
+        'data' => $widget['display'],
+        'class' => ['checkbox'],
+      ];
+    }
+    $row[] = [
+      'data' => $widget['_weight'],
+    ];
+
+    // Show the buttons that had previously been marked as hidden in this
+    // preprocess function. We use show() to undo the earlier hide().
+    foreach (Element::children($operations_elements) as $key) {
+      show($operations_elements[$key]);
+    }
+    $row[] = [
+      'data' => $operations_elements,
+    ];
+    $rows[] = [
+      'data' => $row,
+      'class' => isset($widget['#attributes']['class']) ? array_merge($widget['#attributes']['class'], ['draggable']) : ['draggable'],
+    ];
+  }
+
+  $variables['table'] = [
+    '#type' => 'table',
+    '#header' => $headers,
+    '#rows' => $rows,
+    '#attributes' => [
+      'id' => $table_id,
+    ],
+    '#tabledrag' => [
+      [
+        'action' => 'order',
+        'relationship' => 'sibling',
+        'group' => $weight_class,
+      ],
+    ],
+    '#access' => !empty($rows),
+  ];
+
+  $variables['element'] = $element;
+}
+
+/**
+ * Prepares variables for file upload help text templates.
+ *
+ * Default template: file-upload-help.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - description: The normal description for this field, specified by the
+ *     user.
+ *   - upload_validators: An array of upload validators as used in
+ *     $element['#upload_validators'].
+ */
+function template_preprocess_file_upload_help(&$variables): void {
+  $description = $variables['description'];
+  $upload_validators = $variables['upload_validators'];
+  $cardinality = $variables['cardinality'];
+
+  $descriptions = [];
+
+  if (!empty($description)) {
+    $descriptions[] = FieldFilteredMarkup::create($description);
+  }
+  if (isset($cardinality)) {
+    if ($cardinality == -1) {
+      $descriptions[] = t('Unlimited number of files can be uploaded to this field.');
+    }
+    else {
+      $descriptions[] = \Drupal::translation()->formatPlural($cardinality, 'One file only.', 'Maximum @count files.');
+    }
+  }
+
+  if (isset($upload_validators['FileSizeLimit'])) {
+    $descriptions[] = t('@size limit.', ['@size' => ByteSizeMarkup::create($upload_validators['FileSizeLimit']['fileLimit'])]);
+  }
+
+  if (isset($upload_validators['FileExtension'])) {
+    $descriptions[] = t('Allowed types: @extensions.', ['@extensions' => $upload_validators['FileExtension']['extensions']]);
+  }
+
+  if (isset($upload_validators['FileImageDimensions'])) {
+    $max = $upload_validators['FileImageDimensions']['maxDimensions'];
+    $min = $upload_validators['FileImageDimensions']['minDimensions'];
+    if ($min && $max && $min == $max) {
+      $descriptions[] = t('Images must be exactly <strong>@size</strong> pixels.', ['@size' => $max]);
+    }
+    elseif ($min && $max) {
+      $descriptions[] = t('Images must be larger than <strong>@min</strong> pixels. Images larger than <strong>@max</strong> pixels will be resized.', [
+        '@min' => $min,
+        '@max' => $max,
+      ]);
+    }
+    elseif ($min) {
+      $descriptions[] = t('Images must be larger than <strong>@min</strong> pixels.', ['@min' => $min]);
+    }
+    elseif ($max) {
+      $descriptions[] = t('Images larger than <strong>@max</strong> pixels will be resized.', ['@max' => $max]);
+    }
+  }
+
+  $variables['descriptions'] = $descriptions;
+}
+
+/**
+ * Retrieves a list of references to a file.
+ *
+ * @param \Drupal\file\FileInterface $file
+ *   A file entity.
+ * @param \Drupal\Core\Field\FieldDefinitionInterface|null $field
+ *   (optional) A field definition to be used for this check. If given,
+ *   limits the reference check to the given field. Defaults to NULL.
+ * @param int $age
+ *   (optional) A constant that specifies which references to count. Use
+ *   EntityStorageInterface::FIELD_LOAD_REVISION (the default) to retrieve all
+ *   references within all revisions or
+ *   EntityStorageInterface::FIELD_LOAD_CURRENT to retrieve references only in
+ *   the current revisions of all entities that have references to this file.
+ * @param string $field_type
+ *   (optional) The name of a field type. If given, limits the reference check
+ *   to fields of the given type. If both $field and $field_type are given but
+ *   $field is not the same type as $field_type, an empty array will be
+ *   returned. Defaults to 'file'.
+ *
+ * @return array
+ *   A multidimensional array. The keys are field_name, entity_type,
+ *   entity_id and the value is an entity referencing this file.
+ *
+ * @ingroup file
+ */
+function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface $field = NULL, $age = EntityStorageInterface::FIELD_LOAD_REVISION, $field_type = 'file') {
+  $references = &drupal_static(__FUNCTION__, []);
+  $field_columns = &drupal_static(__FUNCTION__ . ':field_columns', []);
+
+  // Fill the static cache, disregard $field and $field_type for now.
+  if (!isset($references[$file->id()][$age])) {
+    $references[$file->id()][$age] = [];
+    $usage_list = \Drupal::service('file.usage')->listUsage($file);
+    $file_usage_list = $usage_list['file'] ?? [];
+    foreach ($file_usage_list as $entity_type_id => $entity_ids) {
+      $entities = \Drupal::entityTypeManager()
+        ->getStorage($entity_type_id)->loadMultiple(array_keys($entity_ids));
+      foreach ($entities as $entity) {
+        $bundle = $entity->bundle();
+        // We need to find file fields for this entity type and bundle.
+        if (!isset($file_fields[$entity_type_id][$bundle])) {
+          $file_fields[$entity_type_id][$bundle] = [];
+          // This contains the possible field names.
+          foreach ($entity->getFieldDefinitions() as $field_name => $field_definition) {
+            // If this is the first time this field type is seen, check
+            // whether it references files.
+            if (!isset($field_columns[$field_definition->getType()])) {
+              $field_columns[$field_definition->getType()] = file_field_find_file_reference_column($field_definition);
+            }
+            // If the field type does reference files then record it.
+            if ($field_columns[$field_definition->getType()]) {
+              $file_fields[$entity_type_id][$bundle][$field_name] = $field_columns[$field_definition->getType()];
+            }
+          }
+        }
+        foreach ($file_fields[$entity_type_id][$bundle] as $field_name => $field_column) {
+          // Iterate over the field items to find the referenced file and field
+          // name. This will fail if the usage checked is in a non-current
+          // revision because field items are from the current
+          // revision.
+          // We also iterate over all translations because a file can be linked
+          // to a language other than the default.
+          foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+            foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
+              if ($file->id() == $item->{$field_column}) {
+                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  $return = $references[$file->id()][$age];
+  // Filter the static cache down to the requested entries. The usual static
+  // cache is very small so this will be very fast.
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  if ($field || $field_type) {
+    foreach ($return as $field_name => $data) {
+      foreach (array_keys($data) as $entity_type_id) {
+        $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions($entity_type_id);
+        $current_field = $field_storage_definitions[$field_name];
+        if (($field_type && $current_field->getType() != $field_type) || ($field && $field->uuid() != $current_field->uuid())) {
+          unset($return[$field_name][$entity_type_id]);
+        }
+      }
+    }
+  }
+  return $return;
+}
+
+/**
+ * Determine whether a field references files stored in {file_managed}.
+ *
+ * @param \Drupal\Core\Field\FieldDefinitionInterface $field
+ *   A field definition.
+ *
+ * @return bool
+ *   The field column if the field references {file_managed}.fid, typically
+ *   fid, FALSE if it does not.
+ */
+function file_field_find_file_reference_column(FieldDefinitionInterface $field) {
+  $schema = $field->getFieldStorageDefinition()->getSchema();
+  foreach ($schema['foreign keys'] as $data) {
+    if ($data['table'] == 'file_managed') {
+      foreach ($data['columns'] as $field_column => $column) {
+        if ($column == 'fid') {
+          return $field_column;
+        }
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Form submission handler for file system settings form.
+ */
+function file_system_settings_submit(array &$form, FormStateInterface $form_state) {
+  $config = \Drupal::configFactory()->getEditable('file.settings')
+    ->set('filename_sanitization', $form_state->getValue('filename_sanitization'));
+  $config->save();
+}

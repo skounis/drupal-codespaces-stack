@@ -1,0 +1,22 @@
+field.widget.third_party.sam:
+  type: mapping
+  label: Simple Add More
+  mapping:
+    skip_simplification:
+      type: boolean
+      label: 'Skip SAM Simplification'
+sam.settings:
+  type: config_object
+  mapping:
+    add_more_label:
+      type: string
+      label: 'Default text for the button'
+    remove_label:
+      type: string
+      label: 'Default text for the Remove button'
+    help_text_singular:
+      type: string
+      label: 'Default text for the help text in singular form'
+    help_text_plural:
+      type: string
+      label: 'Default text for the help text in plural form'

@@ -1,0 +1,12 @@
+name: 'Captcha Test'
+type: module
+description: 'Provides captcha types for tests.'
+package: Testing
+hidden: true
+dependencies:
+  - captcha:captcha
+
+# Information added by Drupal.org packaging script on 2024-11-22
+version: '2.0.7'
+project: 'captcha'
+datestamp: 1732250193

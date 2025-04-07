@@ -1,0 +1,12 @@
+name: AI Image Bulk Alt Text
+type: module
+description: Adds the possibility to bulk change the alt text.
+package: AI Tools
+core_version_requirement: ^10.2 || ^11
+dependencies:
+  - ai_image_alt_text:ai_image_alt_text
+
+# Information added by Drupal.org packaging script on 2025-02-05
+version: '1.0.1'
+project: 'ai_image_alt_text'
+datestamp: 1738761809

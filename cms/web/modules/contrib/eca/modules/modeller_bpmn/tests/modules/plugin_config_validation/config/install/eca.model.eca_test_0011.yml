@@ -1,0 +1,58 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - eca.eca.eca_test_0011
+id: eca_test_0011
+label: 'Validate plugin configuration'
+tags:
+  - untagged
+documentation: ''
+filename: ''
+modeldata: |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="eca_test_0011" name="Validate plugin configuration" isExecutable="true" camunda:versionTag="1.0.0">
+      <bpmn2:startEvent id="custom" name="Custom event" camunda:modelerTemplate="org.drupal.event.eca_base:eca_custom">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_base:eca_custom"/>
+          </camunda:properties>
+          <camunda:field name="event_id">
+            <camunda:string/>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:outgoing>Flow_1opgjzh</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:task id="Dummy" name="Dummy" camunda:modelerTemplate="org.drupal.action.eca_test_model_plugin_config_validation">
+        <bpmn2:extensionElements>
+          <camunda:properties>
+            <camunda:property name="pluginid" value="eca_test_model_plugin_config_validation"/>
+          </camunda:properties>
+          <camunda:field name="dummy">
+            <camunda:string>correct</camunda:string>
+          </camunda:field>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_1opgjzh</bpmn2:incoming>
+      </bpmn2:task>
+      <bpmn2:sequenceFlow id="Flow_1opgjzh" sourceRef="custom" targetRef="Dummy"/>
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="sid-0a76329c-a777-4f6b-8942-89034a8dddd8">
+      <bpmndi:BPMNPlane id="sid-95105220-93cf-4cbf-ad85-491d56ec5629" bpmnElement="eca_test_0011">
+        <bpmndi:BPMNEdge id="Flow_1opgjzh_di" bpmnElement="Flow_1opgjzh">
+          <di:waypoint x="228" y="190"/>
+          <di:waypoint x="290" y="190"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNShape id="Event_0zvt8vz_di" bpmnElement="custom">
+          <dc:Bounds x="192" y="172" width="36" height="36"/>
+          <bpmndi:BPMNLabel>
+            <dc:Bounds x="177" y="215" width="68" height="14"/>
+          </bpmndi:BPMNLabel>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape id="Activity_0rt55gb_di" bpmnElement="Dummy">
+          <dc:Bounds x="290" y="150" width="100" height="80"/>
+          <bpmndi:BPMNLabel/>
+        </bpmndi:BPMNShape>
+      </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+  </bpmn2:definitions>

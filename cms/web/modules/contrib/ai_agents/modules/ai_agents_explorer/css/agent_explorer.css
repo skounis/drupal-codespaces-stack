@@ -1,0 +1,13 @@
+.ai-agents-explorer-form {
+  float: left;
+  width: 48%;
+}
+
+.ai-agents-explorer-progress {
+  float: left;
+  width: 48%;
+  min-height: 300px;
+  margin-left: 2%;
+  padding: 1%;
+  background: #f0f0f0;
+}

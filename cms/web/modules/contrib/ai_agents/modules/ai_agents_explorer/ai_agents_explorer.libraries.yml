@@ -1,0 +1,9 @@
+explore:
+  css:
+    theme:
+      css/agent_explorer.css: {}
+  js:
+    js/agent_explorer.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal

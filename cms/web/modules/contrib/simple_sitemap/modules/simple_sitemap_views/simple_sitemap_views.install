@@ -1,0 +1,130 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall hooks for the simple_sitemap_views module.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_modules_installed().
+ *
+ * Using hook_modules_installed instead of hook_install, as this module's routes do not seem to be available yet.
+ */
+function simple_sitemap_views_modules_installed($modules) {
+  if (in_array('simple_sitemap_views', $modules, TRUE)) {
+    // Enable views display extender plugin.
+    /** @var \Drupal\simple_sitemap_views\SimpleSitemapViews $simple_sitemap_views */
+    $simple_sitemap_views = \Drupal::service('simple_sitemap.views');
+    $simple_sitemap_views->enable();
+    \Drupal::messenger()->addWarning(t('In order to use the Simple XML Sitemap Views module, the Views URL generator must be <a href="@url">added</a> to a sitemap type.',
+        ['@url' => Url::fromRoute('entity.simple_sitemap_type.collection')->toString()])
+    );
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simple_sitemap_views_uninstall() {
+  // Disable views display extender plugin.
+  /** @var \Drupal\simple_sitemap_views\SimpleSitemapViews $simple_sitemap_views */
+  $simple_sitemap_views = \Drupal::service('simple_sitemap.views');
+  $simple_sitemap_views->disable();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function simple_sitemap_views_schema() {
+  $schema['simple_sitemap_views'] = [
+    'description' => 'Index of argument values for view pages.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique ID for argument values.',
+      ],
+      'view_id' => [
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => 128,
+        'description' => 'The ID of the view.',
+      ],
+      'display_id' => [
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => 128,
+        'description' => 'The ID of the view display.',
+      ],
+      'arguments_ids' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => 1024,
+        'description' => 'A string representation of the set of argument identifiers.',
+      ],
+      'arguments_values' => [
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => 1024,
+        'description' => 'A string representation of the set of argument values.',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'arguments_ids' => ['view_id', 'display_id', 'arguments_ids'],
+    ],
+  ];
+  return $schema;
+}
+
+/**
+ * Update views display extender config.
+ */
+function simple_sitemap_views_update_8301() {
+  $config_factory = \Drupal::configFactory();
+  $display_extender_name = 'simple_sitemap_display_extender';
+
+  // Find all views configs.
+  foreach ($config_factory->listAll('views.view.') as $view_config_name) {
+    $view = $config_factory->getEditable($view_config_name);
+    $changed = FALSE;
+
+    // Go through each display on each view.
+    $displays = $view->get('display');
+    foreach ($displays as $display_name => $display) {
+      if (isset($display['display_options']['display_extenders'][$display_extender_name])) {
+        $options = $display['display_options']['display_extenders'][$display_extender_name];
+
+        if (!isset($options['variants']) && isset($options['variant'])) {
+          $variant = $options['variant'];
+          unset($options['variant']);
+
+          // Update display extender config.
+          $key = "display.$display_name.display_options.display_extenders.$display_extender_name";
+          $options = ['variants' => [$variant => $options]];
+          $view->set($key, $options);
+          $changed = TRUE;
+        }
+      }
+    }
+
+    if ($changed) {
+      $view->save(TRUE);
+    }
+  }
+}
+
+/**
+ * Remove unnecessary indexes.
+ */
+function simple_sitemap_views_update_8302() {
+  $schema = \Drupal::database()->schema();
+  $schema->dropIndex('simple_sitemap_views', 'view');
+  $schema->dropIndex('simple_sitemap_views', 'display');
+}

@@ -1,0 +1,12 @@
+{
+    "name": "drupal/symfony_mailer_lite",
+    "description": "Drupal Symfony Mailer Lite",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/mailsystem": "^4.4",
+        "html2text/html2text": "^4.0.1",
+        "symfony/mailer": "^6.4 || ^7.1",
+        "tijsverkoyen/css-to-inline-styles": "^2.2"
+    }
+}

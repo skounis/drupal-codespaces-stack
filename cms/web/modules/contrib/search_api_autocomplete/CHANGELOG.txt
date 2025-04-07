@@ -1,0 +1,179 @@
+Search API Autocomplete 1.10 (2025-01-15):
+------------------------------------------
+- #3487349 by recrit, drunken monkey: Fixed AutocompleteHelper::alterElement()
+  to not add duplicate process callbacks.
+- #3495585 by drunken monkey: Added warning messages when suggesters are invalid.
+- #3496037 by drunken monkey: Fixed implicitly nullable parameter type hints.
+- #3484623 by drunken monkey: Added note about JSON responses not containing
+  valid HTML to README.md.
+- #3458912 by sourojeetpaul, drunken monkey, kristen pol: Added a logo.
+- #3457996 by drunken monkey: Increased Drupal core version requirement to 10.2.
+- #3455534 by infojunkie, sarwan_verma, drunken monkey: Fixed unchecked use of
+  DeprecationHelper class.
+- #3455000 by codebymikey, drunken monkey: Fixed inconsistent sorting of
+  dependencies in config exports.
+
+Search API Autocomplete 1.9 (2024-06-16):
+-----------------------------------------
+- #3442321 by drunken monkey: Fixed call to deprecated method renderPlain().
+- #3442323 by drunken monkey: Fixed CSS code style issues reported by CSpell.
+- #3442315 by drunken monkey: Fixed test failures against Drupal 10.3.
+- #3427555 by drunken monkey: Fixed GitLab CI pipelines (phpstan and cspell).
+- #3425236 by drunken monkey, samit.310@gmail.com: Fixed incompatibility with
+  Drupal 11.
+- #3408112 by drunken monkey, Prashant.c, thakurnishant_06: Added GitLab CI
+  configuration.
+- #3416842 by benjifisher, drunken monkey: Added proper dependency metadata to
+  this module's dynamic permissions.
+- #3408112 by Prashant.c, thakurnishant_06, drunken monkey: Added GitLab CI
+  configuration.
+- #3373000 by drunken monkey: Fixed error in autocomplete endpoint when "q"
+  parameter is missing.
+
+Search API Autocomplete 1.8 (2023-10-15):
+-----------------------------------------
+- #3382226 by bvoynick, drunken monkey, keshavv, claudiu.cristea: Fixed errors
+  with newer Solr module versions.
+- #3385144 by codebymikey, drunken monkey: Fixed unnecessary tabIndex of
+  suggestions list.
+- #3273631 by drunken monkey: Fixed autocomplete on field-specific filters.
+- #3328528 by mvogel, drunken monkey: Fixed dangling permissions after deleting
+  an autocomplete search.
+- #3342798 by kjl16, drunken monkey: Fixed URL suggestions redirecting when
+  pressing the Tab key.
+- #3263882 by DieterHolvoet, drunken monkey: Fixed wrong render() call in
+  AutocompleteController.
+- #3339352 by drunken monkey: Fixed Javascript code style.
+- #3320634 by drunken monkey, _pratik_, darvanen: Replaced README.txt with
+  README.md.
+
+Search API Autocomplete 1.7 (2022-10-05):
+-----------------------------------------
+- #3262214 by Lal_, japerry, balintpekker, drunken monkey, Berdir: Fixed
+  several problems with Drupal 10 compatibility.
+- #2948566 by stephenrodrigo@yahoo.com, drunken monkey, tvhung: Added an option
+  for Live Results to suggest result labels as keys.
+- #3248581 by drunken monkey: Fixed parse mode used for Search API Pages
+  autocomplete.
+- #3251257 by paulocs, drunken monkey: Fixed search_api requirement in
+  composer.json.
+- #3268954 by drunken monkey, kimberlly_amaral: Changed indents in
+  composer.json to 4 spaces.
+- #3257941 by drunken monkey, mkalkbrenner: Added notes about the Search API
+  Solr Autocomplete module.
+
+Search API Autocomplete 1.6 (2022-01-12):
+-----------------------------------------
+- #3238635 by drunken monkey, mkalkbrenner: Deprecated
+  AutocompleteBackendInterface in favor of the one in Search API.
+- #3224354 by drunken monkey: Fixed service container error after module
+  upgrade.
+- #3228452 by drunken monkey: Fixed test failures against Drupal 9.3.x.
+- #3226934 by drunken monkey: Fixed some exception handling problems.
+- #3226653 by drunken monkey: Added "lifecycle" key to .info.yml file.
+
+Search API Autocomplete 1.5 (2021-07-19):
+-----------------------------------------
+- #3060211 by FeyP, drunken monkey: Added optional highlighting for the "Live
+  Results" suggester.
+- #3184593 by becassin, drunken monkey: Added search input ID to the
+  suggestions list HTML.
+- #3173401 by drunken monkey: Removed drupalPostForm() calls from functional
+  tests.
+- #3171527 by drunken monkey: Fixed service definitions by removing the leading
+  slash.
+- #3159000 by thomas.hery, drunken monkey: Fixed compatibility with Better
+  Exposed Filters.
+- #3171305 by drunken monkey: Fixed tests on Drupal Core versions before 9.1.
+
+Search API Autocomplete 1.4 (2020-09-07):
+-----------------------------------------
+- #3169391 by drunken monkey: Fixed tests on Drupal 9.
+- #3132027 by drunken monkey, borisson_: Fixed excerpt field not displayed in
+  autocomplete.
+- #3131385 by lolandese, drunken monkey: Fixed Composer "license" key.
+- #3126618 by drunken monkey: Fix coding standards.
+- #3123377 by Berdir, drunken monkey, mo_farhaz: Made module compatible with
+  Drupal 9.
+
+Search API Autocomplete 1.3 (2020-04-10):
+-----------------------------------------
+- #3117639 by mo_farhaz, drunken monkey: Fixed call to deprecated method
+  Item::checkAccess().
+- #2986223 by drunken monkey, idebr: Switched JS tests to WebDriverTestBase.
+- #3045398 by drunken monkey: Adapted to PHPCS changes in Core.
+- #3042748 by marcoweijenborg, drunken monkey: Removed usage of deprecated code
+  and added an explicit dependency for Drupal 8.5.
+- #2947273 by drunken monkey: Fixed keywords preprocessing for “Live
+  results” suggester.
+
+Search API Autocomplete 1.2 (2019-03-11):
+-----------------------------------------
+- #3039180 by drunken monkey: Fixed failing tests.
+- #2902281 by drunken monkey, mpp, borisson_: Fixed problems with derivative
+  cache.
+- #3034802 by MiroslavBanov, drunken monkey, LaravZ: Fixed use of the reserved
+  #prefix key in our template.
+- #3037290 by drunken monkey, LaravZ: Replaced drupal_get_path() call in tests.
+- #3035017 by Satyanarayan Reddy, drunken monkey: Changed calls to deprecated
+  Unicode::* methods.
+- #3032183 by hugronaphor, drunken monkey: Fixed message string in
+  watchdog_exception() calls.
+- #3005650 by idebr, drunken monkey: Fixed UI inconsistencies on the index
+  overview form.
+- #2999477 by chintan.vyas, mikemadison, drunken monkey: Improved accessibility
+  of search results.
+
+Search API Autocomplete 1.1 (2018-09-17):
+-----------------------------------------
+- #2981783 by drunken monkey: Improved theme/template documentation.
+- #2989973 by drunken monkey: Fixed the current test fails.
+- #2985727 by drunken monkey: Added a tag to the search query.
+- #2971710 by perryjanssen, drunken monkey: Fixed an "undefined index" bug.
+
+Search API Autocomplete 1.0 (2018-03-18):
+-----------------------------------------
+- #2953269 by drunken monkey: Fixed the "enabled for Views display" check.
+- #2953545 by anavarre, drunken monkey: Added a hint to create a search view
+  when no searches are available.
+
+Search API Autocomplete 1.0, RC 2 (2018-02-28):
+-----------------------------------------------
+- #2912246 by drunken monkey, kekkis: Fixed validation problems for Views with
+  required fulltext filter.
+- #2919102 by drunken monkey, sagesolutions, ressa: Fixed highlighting of
+  options when selected with arrow keys.
+- #2941485 by seanB, drunken monkey: Fixed highlighting of suggestions being
+  case-sensitive.
+
+Search API Autocomplete 1.0, RC 1 (2018-01-28):
+-----------------------------------------------
+- #2924778 by drunken monkey: Fixed two small coding mistakes.
+- #2938374 by drunken monkey: Improved the module's coding standards compliance.
+- #2431111 by nabiyllin, drunken monkey: Added support for transliteration.
+- #1567234 by dobe, edurenye, drunken monkey, heshanlk, dermario: Added a "Live
+  results" suggester.
+- #2933802 by drunken monkey: Improved error handling in the autocomplete
+  controller.
+- #2903889 by drunken monkey: Fixed handling of removed dependencies.
+- #2924122 by drunken monkey: Fixed the Javascript check for whether there is a
+  "delay" setting.
+- #2904510 by drunken monkey: Fixed caching of render element.
+- #2904510 by drunken monkey: Caching of render element doesn't seem to work
+  correctly
+
+Search API Autocomplete 1.0, Beta 2 (2017-11-05):
+-------------------------------------------------
+- #2912596 by ceaucari, drunken monkey: Fixed notice in form alter hook.
+- #2915671 by drunken monkey, Johnny vd Laar: Fixed NULL return value of
+  getAutocompleteSuggestions().
+- #2906450 by ressa, sagesolutions, drunken monkey: Fixed CSS for autocomplete
+  suggestions.
+- #2901869 by drunken monkey: Added a test for the Pages integration.
+- #2907925 by drunken monkey: Fixed tests on PostgreSQL.
+
+Search API Autocomplete 1.0, Beta 1 (2017-09-12):
+-------------------------------------------------
+First Beta release of the project's Drupal 8 version. The API can be considered
+mostly stable and an upgrade path will be provided for all data structure
+changes from this point forward. No known major bugs.

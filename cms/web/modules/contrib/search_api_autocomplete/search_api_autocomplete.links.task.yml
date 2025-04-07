@@ -1,0 +1,5 @@
+search_api_autocomplete.admin_overview:
+  route_name: search_api_autocomplete.admin_overview
+  base_route: entity.search_api_index.canonical
+  title: 'Autocomplete'
+  weight: 20

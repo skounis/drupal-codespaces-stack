@@ -1,0 +1,201 @@
+<?php
+
+/**
+ * @file
+ * Module install and update procedures.
+ */
+
+use Drupal\Core\Url;
+use Drupal\simple_sitemap_engines\Entity\SimpleSitemapEngine;
+use Drupal\simple_sitemap_engines\Form\SimplesitemapEnginesForm;
+
+/**
+ * Implements hook_requirements().
+ */
+function simple_sitemap_engines_requirements(string $phase): array {
+  $requirements = [];
+
+  if ($phase === 'runtime'
+    && \Drupal::config('simple_sitemap_engines.settings')->get('index_now_enabled')) {
+    switch (SimplesitemapEnginesForm::getKeyLocation()) {
+      case 'state':
+        $requirements['simple_sitemap_engines_index_now'] = [
+          'title' => t('Simple XML Sitemap IndexNow'),
+          'value' => t('Verification key in Drupal State'),
+          'description' => SimplesitemapEnginesForm::getKeyStatusMessage('state_warning'),
+          'severity' => REQUIREMENT_WARNING,
+        ];
+        break;
+
+      case NULL:
+        $requirements['simple_sitemap_engines_index_now'] = [
+          'title' => t('Simple XML Sitemap IndexNow'),
+          'value' => t('Verification key not available'),
+          'description' => SimplesitemapEnginesForm::getKeyStatusMessage('missing_warning'),
+          'severity' => REQUIREMENT_WARNING,
+        ];
+        break;
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_modules_installed().
+ *
+ * Using hook_modules_installed instead of hook_install, as this module's routes do not seem to be available yet.
+ */
+function simple_sitemap_engines_modules_installed($modules) {
+  if (in_array('simple_sitemap_engines', $modules, TRUE)) {
+    \Drupal::messenger()->addWarning(t('In order to generate a verification key for the IndexNow service and choose which sitemaps are to be submitted to search engines, visit <a href="@url">this</a> configuration page.',
+      ['@url' => Url::fromRoute('simple_sitemap.engines.settings')->toString()]));
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simple_sitemap_engines_uninstall() {
+  $state = \Drupal::service('state');
+  foreach (SimpleSitemapEngine::loadMultiple() as $engine_id => $engine) {
+    $state->delete("simple_sitemap_engines.simple_sitemap_engine.{$engine_id}.last_submitted");
+  }
+  $state->delete('simple_sitemap_engines.index_now.last');
+  $state->delete('simple_sitemap_engines.index_now.key');
+}
+
+/**
+ * Moving last_submitted data from configuration to state.
+ */
+function simple_sitemap_engines_update_8301() {
+  foreach (SimpleSitemapEngine::loadSitemapSubmissionEngines() as $engine_id => $engine) {
+    $config = \Drupal::configFactory()
+      ->getEditable("simple_sitemap_engines.simple_sitemap_engine.$engine_id");
+    $last_submitted = $config->get('last_submitted');
+    $config->clear('last_submitted')->save();
+    if ($last_submitted !== NULL) {
+      \Drupal::state()->set("simple_sitemap_engines.simple_sitemap_engine.{$engine_id}.last_submitted",
+        $last_submitted);
+    }
+  }
+}
+
+/**
+ * Fixing erroneous default submission interval if not yet overwritten.
+ */
+function simple_sitemap_engines_update_8302() {
+  $config = \Drupal::configFactory()->getEditable('simple_sitemap_engines.settings');
+  if ($config->get('submission_interval') === 86400) {
+    $config->set('submission_interval', 24)->save();
+  }
+}
+
+/**
+ * Enabling IndexNow functionality and adding index_now_url property to simple_sitemap_engine entities.
+ */
+function simple_sitemap_engines_update_8401() {
+  \Drupal::configFactory()->getEditable('simple_sitemap_engines.settings')->set('index_now_enabled', TRUE)->save();
+
+  foreach (SimpleSitemapEngine::loadMultiple() as $engine) {
+    $engine->save();
+  }
+
+  return 'For the IndexNow service to be used, a key needs to be generated. Visit admin/config/search/simplesitemap/engines/settings for more info.';
+}
+
+/**
+ * Updating the simple_sitemap_engine Bing entity to use the IndexNow service instead of the sitemap ping service.
+ */
+function simple_sitemap_engines_update_8402() {
+  if ($bing = SimpleSitemapEngine::load('bing')) {
+    $bing->index_now_url = 'https://bing.com/indexnow?url=[url]&key=[key]';
+    $bing->url = NULL;
+    $bing->save();
+
+    /** @var \Drupal\simple_sitemap\Settings $settings */
+    $settings = \Drupal::service('simple_sitemap.settings');
+
+    if (!empty($default_variant = $settings->get('default_variant'))) {
+      $config_factory = \Drupal::configFactory();
+
+      /** @var \Drupal\simple_sitemap\Manager\EntityManager $entity_manager */
+      $entity_manager = \Drupal::service('simple_sitemap.entity_manager');
+
+      $all_bundle_settings = $entity_manager
+        ->setSitemaps($default_variant)
+        ->getAllBundleSettings();
+      if (!empty($all_bundle_settings[$default_variant])) {
+        foreach ($all_bundle_settings[$default_variant] as $entity_type_name => $bundle_settings) {
+          foreach ($bundle_settings as $bundle_name => $settings) {
+            if (!empty($settings['index'])) {
+              $bundle_settings = $config_factory->getEditable("simple_sitemap_engines.bundle_settings.$entity_type_name.$bundle_name");
+              $bundle_settings->set('index_now', TRUE)->save();
+            }
+          }
+        }
+      }
+    }
+
+    return 'Bing has switched from using the sitemap ping service to using the IndexNow service. If bing was previously set to receive sitemap pings, it will now receive IndexNow notifications directly on entity form submission of indexed entities. Entity inclusion settings can be adjusted on the page admin/config/search/simplesitemap/entities.';
+  }
+}
+
+/**
+ * Adding 'IndexNow' and 'Yandex' search engine entities.
+ */
+function simple_sitemap_engines_update_8403() {
+  if (NULL === SimpleSitemapEngine::load('yandex')) {
+    SimpleSitemapEngine::create([
+      'id' => 'yandex',
+      'label' => 'Yandex',
+      'index_now_url' => "https://yandex.com/indexnow?url=[url]&key=[key]",
+    ])->save();
+  }
+
+  if (NULL === SimpleSitemapEngine::load('index_now')) {
+    SimpleSitemapEngine::create([
+      'id' => 'index_now',
+      'label' => 'IndexNow',
+      'index_now_url' => "https://api.indexnow.org/indexnow?url=[url]&key=[key]",
+    ])->save();
+  }
+}
+
+/**
+ * Adding 'Seznam', 'Naver' and 'Yep' search engine entities.
+ */
+function simple_sitemap_engines_update_8404() {
+  if (NULL === SimpleSitemapEngine::load('naver')) {
+    SimpleSitemapEngine::create([
+      'id' => 'naver',
+      'label' => 'Naver',
+      'index_now_url' => "https://searchadvisor.naver.com/indexnow?url=[url]&key=[key]",
+    ])->save();
+  }
+
+  if (NULL === SimpleSitemapEngine::load('seznam')) {
+    SimpleSitemapEngine::create([
+      'id' => 'seznam',
+      'label' => 'Seznam',
+      'index_now_url' => "https://search.seznam.cz/indexnow?url=[url]&key=[key]",
+    ])->save();
+  }
+
+  if (NULL === SimpleSitemapEngine::load('yep')) {
+    SimpleSitemapEngine::create([
+      'id' => 'yep',
+      'label' => 'Yep',
+      'index_now_url' => "https://indexnow.yep.com/indexnow?url=[url]&key=[key]",
+    ])->save();
+  }
+}
+
+/**
+ * Removing the Google engine, as it supports neither sitemap pinging nor IndexNow.
+ */
+function simple_sitemap_engines_update_8405() {
+  if ($engine = SimpleSitemapEngine::load('google')) {
+    $engine->delete();
+  }
+}

@@ -1,0 +1,283 @@
+################
+# DrupalCI GitLabCI template
+#
+# Gitlab-ci.yml to replicate DrupalCI testing for Contrib
+#
+# With thanks to:
+#   * The GitLab Acceleration Initiative participants
+#   * DrupalSpoons
+################
+
+################
+# Guidelines
+#
+# This template is designed to give any Contrib maintainer everything they need to test, without requiring modification. It is also designed to keep up to date with Core Development automatically through the use of include files that can be centrally maintained.
+#
+# However, you can modify this template if you have additional needs for your project.
+################
+
+################
+# Includes
+#
+# Additional configuration can be provided through includes.
+# One advantage of include files is that if they are updated upstream, the changes affect all pipelines using that include.
+#
+# Includes can be overridden by re-declaring anything provided in an include, here in gitlab-ci.yml
+# https://docs.gitlab.com/ee/ci/yaml/includes.html#override-included-configuration-values
+################
+
+include:
+  ################
+  # DrupalCI includes:
+  # As long as you include this, any future includes added by the Drupal Association will be accessible to your pipelines automatically.
+  # View these include files at https://git.drupalcode.org/project/gitlab_templates/
+  ################
+  - project: $_GITLAB_TEMPLATES_REPO
+    ref: $_GITLAB_TEMPLATES_REF
+    file:
+      - '/includes/include.drupalci.main.yml'
+      - '/includes/include.drupalci.variables.yml'
+      - '/includes/include.drupalci.workflows.yml'
+
+stages:
+  - development
+  - build
+  - validate
+  - test
+  - publish
+
+################
+# Pipeline configuration variables
+#
+# These are the variables provided to the Run Pipeline form that a user may want to override.
+#
+# Docs at https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.variables.yml
+################
+variables:
+  # For parallel running, needs more CPU resources.
+  KUBERNETES_CPU_REQUEST: 16
+  OPT_IN_TEST_PREVIOUS_MAJOR: '1'
+  OPT_IN_TEST_NEXT_MAJOR: '1'
+  # These two variables allow PHPUnit to run in a parallel job matrix.
+  _PHPUNIT_CONCURRENT: '1'
+  _PHPUNIT_TESTGROUPS: ''
+
+  # Broaden test coverage.
+  OPT_IN_TEST_PREVIOUS_MINOR: 1
+  OPT_IN_TEST_NEXT_MINOR: 1
+  OPT_IN_TEST_MAX_PHP: 1
+
+# @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+.is-push-rule: &is-push-rule
+  if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+
+.manual-rule: &manual-rule
+  - when: manual
+    allow_failure: true
+
+# @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+.php-files-change-rule: &php-files-change-rule
+  - changes:
+      - "**/*.{php,module,inc,install,theme,profile}"
+    when: on_success
+
+# @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+.css-files-change-rule: &css-files-change-rule
+  - changes:
+      - "**/*.css"
+    when: on_success
+
+# @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+.module-metadata-files-change-rule: &module-metadata-files-change-rule
+  - changes:
+      - "**/*.yml"
+    when: on_success
+
+# @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+.module-config-files-change-rule: &module-config-files-change-rule
+  - changes:
+      # config schema and/or default config
+      - config
+    when: on_success
+
+# @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+composer-lint:
+  rules:
+    - *is-push-rule
+    - *php-files-change-rule
+    - changes:
+        - composer.json
+      when: on_success
+    - *manual-rule
+
+################
+# Require composer checks to pass.
+################
+composer-lint:
+  allow_failure: false
+
+################
+# Require cspell to pass.
+################
+cspell:
+  allow_failure: false
+  variables:
+    _CSPELL_IGNORE_PATHS: 'README.md,contributor.md,sveltejs/public/build,sveltejs/node_modules,tests/fixtures,fixtures'
+
+################
+# Require stylelint checks to pass.
+################
+stylelint:
+  allow_failure: false
+
+################
+# Require phpcs checks to pass.
+################
+phpcs:
+  allow_failure: false
+  # @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+  rules:
+    - *is-push-rule
+    - *php-files-change-rule
+    # Also run whenever we catch up to the upstream PHPCS rules.
+    - changes:
+        - core.phpcs.xml.dist
+      when: on_success
+    - *manual-rule
+
+phpcs-rules-match-drupal-11:
+  stage: development
+  script:
+    - |
+      # Download the file from the Drupal repository
+      curl -o drupal_core_phpcs.xml.dist https://git.drupalcode.org/project/drupal/-/raw/11.x/core/phpcs.xml.dist?ref_type=heads
+
+      # Check if the download was successful
+      if [ $? -ne 0 ]; then
+        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+        echo "Error: Failed to download $DRUPAL_URL"
+        exit 1
+      fi
+
+      # Compare the downloaded file with the local file using a subshell to prevent premature exit
+      echo "Comparing downloaded file with local file..."
+      # With uses the braces the job just ends here for some reason.
+       {
+        diff drupal_core_phpcs.xml.dist core.phpcs.xml.dist
+        DIFF_EXIT_CODE=$?
+      } || true
+
+      if [ $DIFF_EXIT_CODE -ne 0 ]; then
+        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+        echo "Error: core.phpcs.xml.dist not up to date with Drupal 11.x core/phpcs.xml.dist. Please create an issue to update this file."
+      else
+        echo "👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍"
+        echo "core.phpcs.xml.dist is up to date with Drupal 11.x core/phpcs.xml.dist"
+      fi
+
+      # Exit with the exit code of the diff command
+      exit $DIFF_EXIT_CODE
+  # Allow this to fail, to avoid disrupting XB's CI when upstream changes.
+  allow_failure: true
+
+################
+# Require phpstan checks to pass.
+################
+phpstan:
+  allow_failure: false
+
+################
+# We want to run standard eslint for /js directory, but not /sveltejs directory.
+# .eslintignore patterns do not work due to ESLint scanning for .eslintrc.js
+################
+eslint:
+  allow_failure: false
+  before_script:
+    - rm -fr sveltejs
+    - rm -fr recipes
+
+################
+# Add a new section for validation of Svelte JS.
+################
+eslint-sveltejs:
+  stage: validate
+  allow_failure: false
+  needs:
+    - composer
+  script:
+    - cd sveltejs
+    - yarn install
+    - yarn lint:svelte
+
+################
+# Split tests by test type for parallel running.
+################
+phpunit:
+  parallel:
+    matrix:
+      - TEST_TYPE:
+          - Unit
+          - Kernel
+          - Functional
+          - FunctionalJavascript
+  variables:
+    _PHPUNIT_EXTRA: '--types PHPUnit-$TEST_TYPE --module project_browser'
+
+###################################################################################
+#
+#                                        *
+#                                       /(
+#                                      ((((,
+#                                    /(((((((
+#                                   ((((((((((*
+#                                ,(((((((((((((((
+#                              ,(((((((((((((((((((
+#                            ((((((((((((((((((((((((*
+#                         *(((((((((((((((((((((((((((((
+#                       ((((((((((((((((((((((((((((((((((*
+#                    *((((((((((((((((((  .((((((((((((((((((
+#                  ((((((((((((((((((.       /(((((((((((((((((*
+#                /(((((((((((((((((            .(((((((((((((((((,
+#             ,((((((((((((((((((                 ((((((((((((((((((
+#           .((((((((((((((((((((                   .(((((((((((((((((
+#          (((((((((((((((((((((((                     ((((((((((((((((/
+#        (((((((((((((((((((((((((((/                    ,(((((((((((((((*
+#      .((((((((((((((/  /(((((((((((((.                   ,(((((((((((((((
+#     *((((((((((((((      ,(((((((((((((/                   *((((((((((((((.
+#    ((((((((((((((,          /(((((((((((((.                  ((((((((((((((,
+#   (((((((((((((/              ,(((((((((((((*                 ,(((((((((((((,
+#  *(((((((((((((                .(((((((((((((((                ,(((((((((((((
+#  ((((((((((((/                /((((((((((((((((((.              ,((((((((((((/
+# (((((((((((((              *(((((((((((((((((((((((*             *((((((((((((
+# (((((((((((((            ,(((((((((((((..(((((((((((((           *((((((((((((
+# ((((((((((((,          /((((((((((((*      /((((((((((((/         ((((((((((((
+# (((((((((((((        /((((((((((((/          (((((((((((((*       ((((((((((((
+# (((((((((((((/     /((((((((((((               ,((((((((((((,    *((((((((((((
+#  ((((((((((((((  *(((((((((((/                   *((((((((((((.  ((((((((((((/
+#  *((((((((((((((((((((((((((,                      /(((((((((((((((((((((((((
+#   (((((((((((((((((((((((((                         ((((((((((((((((((((((((,
+#   .(((((((((((((((((((((((/                         ,(((((((((((((((((((((((
+#     ((((((((((((((((((((((/                         ,(((((((((((((((((((((/
+#      *(((((((((((((((((((((                         (((((((((((((((((((((,
+#       ,(((((((((((((((((((((,                      ((((((((((((((((((((/
+#         ,(((((((((((((((((((((*                  /((((((((((((((((((((
+#            ((((((((((((((((((((((,           ,/((((((((((((((((((((,
+#              ,(((((((((((((((((((((((((((((((((((((((((((((((((((
+#                 .(((((((((((((((((((((((((((((((((((((((((((((
+#                     .((((((((((((((((((((((((((((((((((((,.
+#                          .,(((((((((((((((((((((((((.
+#
+###################################################################################
+
+phpunit (next major):
+  # Require us to be compatible with the next major version of core.
+  allow_failure: false
+
+phpstan (previous major):
+  extends: phpstan
+  rules:
+    - !reference [ .opt-in-previous-major-rule ]
+    - !reference [ .skip-phpstan-rule ]
+    - !reference [ .phpstan-allow-failure-rule ]
+  needs:
+    - 'composer (previous major)'

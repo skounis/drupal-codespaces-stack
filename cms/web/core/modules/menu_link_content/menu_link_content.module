@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Helper function to update plugin definition using internal scheme.
+ *
+ * @param string $path
+ *   The path alias.
+ */
+function _menu_link_content_update_path_alias($path) {
+  /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
+  $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
+  /** @var \Drupal\menu_link_content\MenuLinkContentInterface[] $entities */
+  $entities = \Drupal::entityTypeManager()
+    ->getStorage('menu_link_content')
+    ->loadByProperties(['link.uri' => 'internal:' . $path]);
+  foreach ($entities as $menu_link) {
+    $menu_link_manager->updateDefinition($menu_link->getPluginId(), $menu_link->getPluginDefinition(), FALSE);
+  }
+}

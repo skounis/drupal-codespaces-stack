@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * Theme implementation to display a taxonomy term in the sitemap.
+ *
+ * Available variables:
+ * - name: The name of the taxonomy term.
+ * - show_link: Whether or not to display the link for the term.
+ * - url: The URL for the taxonomy term.
+ * - show_count: Whether or not to display the number of nodes using the term.
+ * - count: The number of nodes using this taxonomy term.
+ * - show_feed: Whether or not to display the RSS feed link for this term.
+ * - feed: The URL for the taxonomy term's feed, or FALSE if the option to
+ *     display the feed link is disabled.
+ * - feed_icon: The icon to display for the RSS feed's link.
+ *
+ * @see template_preprocess_sitemap_taxonomy_term()
+ */
+#}
+{% if url and show_link %}<a href="{{ url }}">{% endif %}{{ name }}{% if url and show_link %}</a>{% endif %} {% if show_count %}<span class="count">({{ count }})</span>{% endif %} {% if show_feed and feed and feed_icon %}<a href="{{ feed }}">{{ feed_icon }}</a>{% endif %}

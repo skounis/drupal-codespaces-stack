@@ -1,0 +1,11 @@
+system.dashboard:
+  title: 'Dashboard'
+  route_name: 'dashboard'
+  parent: 'system.admin'
+  description: 'User dashboard.'
+  weight: -20
+entity.dashboard.overview:
+  title: Dashboard
+  parent: system.admin_structure
+  description: 'Manage and customize dashboard displays.'
+  route_name: entity.dashboard.collection

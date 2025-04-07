@@ -1,0 +1,6 @@
+friendlycaptcha.admin_settings_form:
+  title: 'Friendly Captcha'
+  parent: captcha.settings
+  description: 'Administer the Friendly Captcha integration.'
+  route_name: friendlycaptcha.admin_settings_form
+  weight: 1

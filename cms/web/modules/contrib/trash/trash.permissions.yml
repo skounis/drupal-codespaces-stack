@@ -1,0 +1,11 @@
+administer trash:
+  title: 'Administer trash'
+  description: 'Allows a user to configure which entity types can use the trash bin.'
+access trash:
+  title: 'View trash bin'
+  description: 'Allows a user to see the contents of the trash bin.'
+view deleted entities:
+  title: 'View deleted entities'
+  description: 'Allows a user to view deleted entities.'
+permission_callbacks:
+  - \Drupal\trash\TrashPermissions::entityTypePermissions

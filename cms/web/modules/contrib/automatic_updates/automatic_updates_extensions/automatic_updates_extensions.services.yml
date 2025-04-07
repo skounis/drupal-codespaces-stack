@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true
+
+  Drupal\automatic_updates_extensions\ExtensionUpdateStage: ~
+  Drupal\automatic_updates_extensions\Validator\UpdateReleaseValidator:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates_extensions\Validator\ForbidCoreChangesValidator:
+    tags:
+      - { name: event_subscriber }
+  Drupal\automatic_updates_extensions\Validator\RequestedUpdateValidator:
+    tags:
+      - { name: event_subscriber }

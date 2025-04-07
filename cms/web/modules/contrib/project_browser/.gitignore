@@ -1,0 +1,7 @@
+.idea
+vendor
+composer.lock
+.DS_Store
+node_modules
+sveltejs/report*
+sveltejs/.yarn/install-state.gz

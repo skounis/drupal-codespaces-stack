@@ -1,0 +1,9 @@
+suggest:
+  css:
+    theme:
+      css/loader.css: {}
+  js:
+    js/suggest.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal

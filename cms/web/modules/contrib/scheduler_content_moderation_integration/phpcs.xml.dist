@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="scheduler_content_moderation_integration">
+  <description>Default PHP CodeSniffer configuration for Scheduler Content Moderation Integration</description>
+  <file>.</file>
+
+  <!-- Initially include all Drupal and DrupalPractice sniffs. -->
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+
+  <!-- Check these file extensions -->
+  <arg name="extensions" value="php,module,inc,install,css,md,yml"/>
+
+  <!-- Use 's' to print the full sniff name in the report. -->
+  <arg value="s"/>
+  <arg value="-colors"/>
+  <arg name="report-width" value="130"/>
+
+  <!-- Increase the allowed line length for inline array declarations. -->
+  <rule ref="Drupal.Arrays.Array">
+    <properties>
+      <property name="lineLimit" value="110"/>
+    </properties>
+  </rule>
+
+</ruleset>

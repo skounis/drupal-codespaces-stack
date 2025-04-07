@@ -1,0 +1,12 @@
+name: 'Sitemap custom plugin test'
+type: module
+description: 'Testing module to verify other modules can provide custom plugins'
+core_version_requirement: ^9.1 || ^10
+package: Testing
+dependencies:
+  - sitemap:sitemap
+
+# Information added by Drupal.org packaging script on 2024-08-28
+version: '8.x-2.0'
+project: 'sitemap'
+datestamp: 1724850104

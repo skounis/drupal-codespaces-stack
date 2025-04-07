@@ -1,0 +1,220 @@
+<?php
+
+/**
+ * @file
+ * ECA install file.
+ */
+
+use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\eca\Plugin\ECA\Condition\ConditionInterface;
+
+/**
+ * Update existing schema of eca config entities.
+ */
+function eca_update_8001(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /** @var \Drupal\eca\Entity\Eca $eca */
+  foreach ($storage->loadMultiple() as $eca) {
+    foreach (['events', 'conditions', 'actions', 'gateways'] as $type) {
+      $items = $eca->get($type) ?? [];
+      foreach ($items as &$item) {
+        if (isset($item['fields'])) {
+          $fields = [];
+          foreach ($item['fields'] as $field) {
+            if (!isset($field['key'])) {
+              // Model already of new structure.
+              break 3;
+            }
+            $fields[$field['key']] = $field['value'];
+          }
+          $item['configuration'] = $fields;
+          unset($item['fields']);
+        }
+      }
+      $eca->set($type, $items);
+    }
+    $eca->save();
+  }
+}
+
+/**
+ * Enable eca_ui sub-module which has been moved to its own sub-module.
+ */
+function eca_update_8002(): void {
+  \Drupal::service('module_installer')->install(['eca_ui']);
+}
+
+/**
+ * Adds the new documentation domain setting with a default value.
+ *
+ * Export your configuration after this update.
+ */
+function eca_update_8003(): void {
+  $config = \Drupal::configFactory()->getEditable('eca.settings');
+  $config->set('documentation_domain', "https://ecaguide.org");
+  $config->save(TRUE);
+}
+
+/**
+ * Replace core save actions by one generic save action.
+ *
+ * Export your configuration after this update.
+ */
+function eca_update_8004(): void {
+  /** @var \Drupal\eca\Entity\Eca $eca */
+  foreach (\Drupal::entityTypeManager()->getStorage('eca')->loadMultiple() as $eca) {
+    $items = $eca->get('actions') ?? [];
+    $needs_save = FALSE;
+    foreach ($items as &$item) {
+      $plugin_id = $item['plugin'] ?? '';
+      if (strpos($plugin_id, 'entity:save_action') === 0) {
+        $item['plugin'] = 'eca_save_entity';
+        $needs_save = TRUE;
+      }
+    }
+    if ($needs_save) {
+      $eca->set('actions', $items);
+      $eca->save();
+    }
+  }
+
+  /** @var \Drupal\eca\Entity\Model $eca_model */
+  foreach (\Drupal::entityTypeManager()->getStorage('eca_model')->loadMultiple() as $eca_model) {
+    $model_data = $eca_model->get('modeldata') ?? '';
+    if ($model_data) {
+      $needs_save = FALSE;
+      foreach (array_keys(\Drupal::entityTypeManager()->getDefinitions()) as $entity_type_id) {
+        $core_action = 'entity:save_action:' . $entity_type_id;
+        if (strpos($model_data, $core_action) !== FALSE) {
+          $model_data = str_replace($core_action, 'eca_save_entity', $model_data);
+          $needs_save = TRUE;
+        }
+      }
+      if ($needs_save) {
+        $eca_model->set('modeldata', $model_data);
+        $eca_model->save();
+      }
+    }
+  }
+}
+
+/**
+ * Update existing eca config entities to use boolean value for checkboxes.
+ */
+function eca_update_8005(): void {
+  $actionPluginManager = \Drupal::service('plugin.manager.action');
+  $conditionPluginManager = \Drupal::service('plugin.manager.eca.condition');
+
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /** @var \Drupal\eca\Entity\Eca $eca */
+  foreach ($storage->loadMultiple() as $eca) {
+    $changed = FALSE;
+    foreach (['conditions', 'actions'] as $type) {
+      $items = $eca->get($type) ?? [];
+      foreach ($items as &$item) {
+        if (!empty($item['configuration'])) {
+          $defaultConfig = [];
+          if ($type === 'actions') {
+            $plugin = $actionPluginManager()->createInstance($item['plugin'], []);
+            if ($plugin instanceof ConfigurableInterface) {
+              $defaultConfig = $plugin->defaultConfiguration();
+            }
+          }
+          elseif ($type === 'conditions') {
+            $plugin = $conditionPluginManager()->createInstance($item['plugin'], []);
+            if ($plugin instanceof ConditionInterface) {
+              $defaultConfig = $plugin->defaultConfiguration();
+            }
+          }
+          // Convert potential strings from pseudo-checkboxes back to boolean.
+          foreach ($defaultConfig as $key => $value) {
+            if (is_bool($value) && isset($item['configuration'][$key]) && !is_bool($item['configuration'][$key])) {
+              $item['configuration'][$key] = mb_strtolower($item['configuration'][$key]) === 'yes';
+              $changed = TRUE;
+            }
+          }
+        }
+      }
+      $eca->set($type, $items);
+    }
+    if ($changed) {
+      $eca->save();
+    }
+  }
+}
+
+/**
+ * Update bpmn ids.
+ */
+function eca_update_8006(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /** @var \Drupal\eca\Entity\Eca $eca */
+  foreach ($storage->loadMultiple() as $eca) {
+    $model = $eca->getModel();
+    $xml = $model->getModeldata();
+    foreach (['event', 'condition', 'action'] as $type) {
+      $items = $eca->get($type . 's') ?? [];
+      foreach ($items as $item) {
+        $search = 'org.drupal.' . $item['plugin'];
+        $replace = 'org.drupal.' . $type . '.' . $item['plugin'];
+        $xml = str_replace($search, $replace, $xml);
+      }
+    }
+    $model
+      ->setModeldata($xml)
+      ->save();
+  }
+}
+
+/**
+ * Update global configuration with new user setting.
+ */
+function eca_update_8007(): void {
+  \Drupal::configFactory()
+    ->getEditable('eca.settings')
+    ->set('user', '')
+    ->save();
+}
+
+/**
+ * Update global configuration with new dependency calculation settings.
+ */
+function eca_update_8008(): void {
+  \Drupal::configFactory()
+    ->getEditable('eca.settings')
+    ->set('dependency_calculation', [
+      'bundle',
+      'field_storage',
+      'field_config',
+      'new_field_config',
+    ])
+    ->save();
+}
+
+/**
+ * Writes subscribed ECA events into Drupal state for the new subscriber logic.
+ */
+function eca_update_8009(): void {
+  /**
+   * @var \Drupal\eca\Entity\EcaStorage $storage
+   */
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  $storage->rebuildSubscribedEvents();
+}
+
+/**
+ * Update global configuration with new service user setting.
+ */
+function eca_update_8010(): void {
+  \Drupal::configFactory()
+    ->getEditable('eca.settings')
+    ->set('service_user', '')
+    ->save();
+}
+
+/**
+ * Update existing models.
+ */
+function eca_update_8011(): void {
+  \Drupal::service('eca.update')->updateAllModels();
+}

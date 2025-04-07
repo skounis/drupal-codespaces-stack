@@ -1,0 +1,16 @@
+name: Simple Add More
+type: module
+description: Improves limited-cardinality widgets by displaying only one empty element at a time.
+core_version_requirement: ^9.2 || ^10 || ^11
+package: Fields
+
+test_dependencies:
+  - entity_reference_revisions:entity_reference_revisions
+  - paragraphs:paragraphs
+
+configure: sam.admin_settings
+
+# Information added by Drupal.org packaging script on 2024-12-04
+version: '1.3.2'
+project: 'sam'
+datestamp: 1733343164

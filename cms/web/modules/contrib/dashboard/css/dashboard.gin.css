@@ -1,0 +1,105 @@
+/*
+* General blocks theming
+*/
+
+.dashboard {
+  & .layout {
+    & .block {
+      box-sizing: border-box;
+      border: 1px solid var(--gin-border-color-layer);
+      border-radius: var(--gin-border-l);
+      background: var(--gin-bg-layer);
+      box-shadow: var(--gin-shadow-l1);
+
+      a {
+        text-decoration: none;
+        color: var(--gin-color-primary-active);
+
+        &:hover {
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+      }
+
+      & h2 {
+        color: var(--gin-color-primary-active);
+        border-radius: var(--gin-border-m);
+        background: var(--gin-bg-header);
+        font-size: var(--gin-font-size-l);
+        font-weight: var(--gin-font-weight-bold);
+      }
+
+      & .announcements {
+        padding-inline: var(--space-m);
+
+        & .announcement__date,
+        & a {
+          color: var(--gin-color-text);
+        }
+
+        & a:hover {
+          color: var(--gin-color-primary-active);
+        }
+      }
+
+      & .announcements--view-all {
+        padding-inline: var(--space-m);
+      }
+
+      /*
+      * Recent Content
+      */
+      &.block-views-blockrecent-content-block-recent-content {
+        & a {
+          color: var(--gin-color-primary);
+        }
+
+        & a:hover {
+          color: var(--gin-color-primary-active);
+        }
+
+        time {
+          color: var(--gin-color-text);
+        }
+        .views-empty a {
+          color: var(--gin-color-button-text);
+          border: 2px solid var(--gin-color-primary) !important;
+          border-radius: var(--gin-border-m);
+          background-color: var(--gin-color-primary);
+          font-size: var(--gin-font-size-s);
+          line-height: 1rem;
+          padding-block: calc(var(--gin-spacing-s) - 2px);
+          padding-inline: var(--gin-spacing-m);
+
+          &:hover {
+            background-color: var(--gin-color-primary-active);
+          }
+        }
+      }
+
+      &.block-menu {
+        ul.menu {
+          li.menu-item {
+            & a {
+              color: var(--gin-color-text);
+
+              &:hover {
+                color: var(--gin-color-primary-active);
+              }
+
+              &::after {
+                background-color: var(--gin-color-primary-active);
+              }
+            }
+          }
+        }
+      }
+
+      .gin-layer-wrapper {
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  }
+}

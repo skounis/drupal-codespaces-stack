@@ -1,0 +1,180 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the ai module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function ai_requirements($phase) {
+  $requirements = [];
+
+  // Check that providers are installed and usable.
+  if ($phase == 'runtime') {
+    $ai_provider = \Drupal::service('ai.provider');
+    $warn = TRUE;
+    foreach ($ai_provider->getDefinitions() as $provider_id => $provider) {
+      if ($ai_provider->createInstance($provider_id)->isUsable()) {
+        $warn = FALSE;
+        break;
+      }
+    }
+    if ($warn) {
+      $requirements['ai_module'] = [
+        'title' => t('AI'),
+        'value' => t('You need to install and setup one AI Provider before you can use the AI module.'),
+        'severity' => REQUIREMENT_WARNING,
+      ];
+    }
+    else {
+      $requirements['ai_module'] = [
+        'title' => t('AI'),
+        'value' => t('Providers installed'),
+        'severity' => REQUIREMENT_OK,
+      ];
+    }
+  }
+  elseif ($phase === 'update') {
+    /** @var \Drupal\Core\Extension\ModuleExtensionList $list */
+    $list = \Drupal::service('extension.list.module');
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $handler */
+    $handler = \Drupal::service('module_handler');
+
+    // Find any installed providers that do not yet have their corresponding new
+    // module composer required.
+    foreach (_ai_providers_mapping() as $submodule => $external_module) {
+      if ($handler->moduleExists($submodule)) {
+        $requirements['ai_requirement_' . $submodule] = [
+          'title' => t('External module "@external_module" should exist and be ready to replace the currently installed "@submodule".', [
+            '@external_module' => $external_module,
+            '@submodule' => $submodule,
+          ]),
+          'value' => $list->exists($external_module) ? t('Yes') : t('Please run "composer require drupal/@external_module"', [
+            '@external_module' => $external_module,
+          ]),
+          'severity' => $list->exists($external_module) ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+        ];
+      }
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Update hook to update the custom models.
+ */
+function ai_update_10300() {
+  $old_config = \Drupal::configFactory()->get('ai_models.settings');
+  if ($old_config->get('models')) {
+    $models = $old_config->get('models');
+    $config = \Drupal::configFactory()->getEditable('ai.settings');
+    $config->set('models', $models)->save();
+    // Remove the old config.
+    \Drupal::configFactory()->getEditable('ai_models.settings')->delete();
+  }
+}
+
+/**
+ * Checks to ensure a smooth migration from AI submodules to external modules.
+ */
+function ai_update_10301() {
+  /** @var \Drupal\Core\Extension\ModuleExtensionList $list */
+  $list = \Drupal::service('extension.list.module');
+  /** @var \Drupal\Core\Extension\ModuleInstallerInterface $installer */
+  $installer = \Drupal::service('module_installer');
+  /** @var \Drupal\Core\Extension\ModuleHandlerInterface $handler */
+  $handler = \Drupal::service('module_handler');
+
+  // Find any providers that do not yet have their corresponding new module
+  // composer required.
+  $missing = [];
+  foreach (_ai_providers_mapping() as $submodule => $external_module) {
+    // phpcs:disable
+    // Scenarios are:
+    // 1. Old submodule is not enabled -> we have nothing to do.
+    // 2. Old submodule is enabled:
+    //    1. New module exists but is not yet installed -> Install it.
+    //    2. New module does not exist and is therefore not installed -> Tell
+    //       the user to composer require it and retry the update hook.
+    //    3. New module exists and is installed (yet the old is still enabled,
+    //       see (1) -> Since the new module should uninstall the old, this
+    //       should never happen. Throw an error.
+    // phpcs:enable
+
+    // If the new module is already enabled, it should have uninstalled the
+    // old module. 'Module Exists' method checks if the module is actually
+    // enabled too.
+    if (!$handler->moduleExists($submodule)) {
+      continue;
+    }
+
+    // If the new module exists but is not yet installed, enable it. The 'list'
+    // service exists method only checks that the module is in the file system,
+    // but does not care if its enabled or not.
+    if ($list->exists($external_module) && !$handler->moduleExists($external_module)) {
+
+      // No try-catch, we want a failure to throw an error.
+      $installer->install([$external_module]);
+      continue;
+    }
+
+    // If the new module does not exist but the old submodule is enabled,
+    // we need to tell the user to composer require it. We will then fail this
+    // update hook so that we can try it again later after they have carried out
+    // the composer install.
+    if (!$list->exists($external_module)) {
+      $missing[$submodule] = 'drupal/' . $external_module;
+      continue;
+    }
+
+    // New module is installed but so does is the old submodule (since we
+    // already checked that above), but as noted.
+    if ($handler->moduleExists($external_module)) {
+      $message = t("Only '@external_module' should be installed, not '@submodule'.", [
+        '@external_module' => $external_module,
+        '@submodule' => $submodule,
+      ]);
+      die((string) $message);
+    }
+  }
+  if ($missing) {
+    $message = t('A number of modules you have installed have been moved from the AI Core to a separate modules. Please run `composer require @missing` then run this update hook again.', [
+      '@missing' => implode(' ', $missing),
+    ]);
+    die((string) $message);
+  }
+  return t('AI module moving to contributed modules has been completed.');
+}
+
+/**
+ * Disable deprecated sub modules.
+ */
+function ai_update_10302() {
+  /** @var \Drupal\Core\Extension\ModuleHandlerInterface $handler */
+  $handler = \Drupal::service('module_handler');
+  /** @var \Drupal\Core\Extension\ModuleInstallerInterface $installer */
+  $installer = \Drupal::service('module_installer');
+
+  $messages = [];
+
+  // Disable old sub modules if they exist.
+  foreach (array_keys(_ai_providers_mapping()) as $submodule) {
+    if ($handler->moduleExists($submodule)) {
+      try {
+        $installer->uninstall([$submodule]);
+        $messages[] = t('Successfully disabled @module', ['@module' => $submodule]);
+      }
+      catch (\Exception $e) {
+        $messages[] = t('Failed to disable @module: @error', [
+          '@module' => $submodule,
+          '@error' => $e->getMessage(),
+        ]);
+      }
+    }
+  }
+
+  return empty($messages) ? t('No deprecated modules needed to be disabled.') : implode(' ', $messages);
+}

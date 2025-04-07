@@ -1,0 +1,18 @@
+drupal.autosave_form:
+  css:
+    theme:
+      css/autosave_form.css: {}
+  js:
+    js/autosave_form.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.dialog
+    - core/drupal.dialog.ajax
+    - core/drupal.ajax
+    - core/once
+    # A workaround for use cases where the ajax submit is triggered before the
+    # jquery ajaxSubmit function is initialized. The workaround can be removed
+    #  when a solution for https://dgo.to/2755791 is accepted.
+    - core/internal.jquery.form

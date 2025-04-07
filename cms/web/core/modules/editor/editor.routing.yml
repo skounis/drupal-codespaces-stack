@@ -1,0 +1,6 @@
+editor.filter_xss:
+  path: '/editor/filter_xss/{filter_format}'
+  defaults:
+    _controller: '\Drupal\editor\EditorController::filterXss'
+  requirements:
+    _entity_access: 'filter_format.use'

@@ -1,0 +1,344 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for Sitemap module.
+ */
+
+use Drupal\sitemap\Plugin\Sitemap\Vocabulary;
+
+/**
+ * Change sitemap configuration page permission to administer sitemap.
+ */
+function sitemap_update_8101() {
+  $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple('administer site configuration');
+  if (!empty($roles)) {
+    foreach ($roles as $rid => $role) {
+      user_role_grant_permissions($rid, ['administer sitemap']);
+    }
+  }
+}
+
+/**
+ * Update the CSS configuration setting to reflect the change in option wording.
+ */
+function sitemap_update_8102(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('sitemap.settings');
+  if ($config->get('css')) {
+    $css = ($config->get('css') == TRUE) ? FALSE : TRUE;
+    $config->set('css', $css);
+  }
+  $config->save();
+}
+
+/**
+ * Update configuration for 2.x.
+ */
+function sitemap_update_8200(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('sitemap.settings');
+
+  // Update the config key for the CSS option.
+  $config->set('include_css', $config->get('css'));
+  $config->clear('css');
+
+  // Remove the config for the RSS position option.
+  $show_rss = (boolean) $config->get('show_rss_links');
+  $config->clear('show_rss_links');
+
+  $plugins = [];
+  $show_titles = $config->get('show_titles');
+  $order = $config->get('order');
+  $config->clear('show_titles');
+  $config->clear('order');
+
+  // Update to the front page plugin.
+  $plugins['frontpage'] = [
+    'enabled' => (bool) $config->get('show_front'),
+    'weight' => $order['front'] ?? 0,
+    'settings' => [
+      'title' => $show_titles ? 'Front page' : '',
+      'rss' => $config->get('rss_front') && $show_rss ? '/' . $config->get('rss_front') : '',
+    ],
+  ];
+  $config->clear('show_front');
+  $config->clear('rss_front');
+
+  // Update to the book plugin.
+  if (\Drupal::moduleHandler()->moduleExists('book')
+    && $books = $config->get('show_books')
+  ) {
+    // Install the sitemap_book submodule.
+    \Drupal::moduleHandler()->install(['sitemap_book']);
+
+    foreach ($books as $bid => $enabled) {
+      $plugins['book:' . $bid] = [
+        'enabled' => (bool) $enabled,
+        'weight' => $order['books_' . $bid] ?? 0,
+        'settings' => [
+          'title' => sitemap_book_title_update($bid, $show_titles),
+          'show_expanded' => $config->get('books_expanded'),
+        ],
+      ];
+    }
+  }
+  $config->clear('show_books');
+  $config->clear('books_expanded');
+
+  // Update to the menu plugin.
+  if ($menus = $config->get('show_menus')) {
+    foreach ($menus as $menu_id => $enabled) {
+      $plugins['menu:' . $menu_id] = [
+        'enabled' => (bool) $enabled,
+        'weight' => $order['menus_' . $menu_id] ?? 0,
+        'settings' => [
+          'title' => sitemap_menu_title_update($menu_id, $show_titles),
+          'show_disabled' => $config->get('show_menus_hidden'),
+        ],
+      ];
+    }
+  }
+  $config->clear('show_menus');
+  $config->clear('show_menus_hidden');
+
+  // Update to the vocabulary plugin.
+  if ($vocabs = $config->get('show_vocabularies')) {
+    if (\Drupal::service('module_handler')->moduleExists('forum')) {
+      $forumVid = \Drupal::config('forum.settings')->get('vocabulary');
+    }
+    foreach ($vocabs as $vid => $enabled) {
+      $plugins['vocabulary:' . $vid] = [
+        'enabled' => (bool) $enabled,
+        'weight' => $order['vocabularies_' . $vid] ?? 0,
+        'settings' => [
+          'title' => $show_titles ? sitemap_vocab_title_update($vid) : '',
+          'show_description' => $config->get('show_description'),
+          'show_count' => $config->get('show_count'),
+          'term_depth' => sitemap_vocab_depth_update($config->get('vocabulary_depth')),
+          'term_count_threshold' => isset($formVid) && $forumVid == $vid ? sitemap_vocab_threshold_update($config->get('forum_threshold')) : sitemap_vocab_threshold_update($config->get('term_threshold')),
+          'customize_link' => $config->get('vocabulary_show_links'),
+          'term_link' => Vocabulary::DEFAULT_TERM_LINK,
+          'always_link' => $config->get('vocabulary_show_links'),
+          'enable_rss' => (bool) sitemap_vocab_depth_update($config->get('rss_taxonomy')),
+          'rss_link' => Vocabulary::DEFAULT_TERM_RSS_LINK,
+          'rss_depth' => sitemap_vocab_depth_update($config->get('rss_taxonomy')),
+        ],
+      ];
+    }
+  }
+  $config->clear('show_vocabularies');
+  $config->clear('show_description');
+  $config->clear('show_count');
+  $config->clear('vocabulary_depth');
+  $config->clear('vocabulary_show_links');
+  $config->clear('term_threshold');
+  $config->clear('forum_threshold');
+  $config->clear('rss_taxonomy');
+
+  $config->set('plugins', $plugins);
+
+  $config->save(TRUE);
+}
+
+/**
+ * The sitemap path is now configurable; set it to its former, hardcoded value.
+ */
+function sitemap_update_8201(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('sitemap.settings');
+  $config->set('path', 'sitemap');
+  $config->save(TRUE);
+}
+
+/**
+ * Install sitemap_book submodule if the book module is installed.
+ */
+function sitemap_update_8202(&$sandbox) {
+  if (\Drupal::moduleHandler()->moduleExists('book')) {
+    \Drupal::service('module_installer')->install(['sitemap_book']);
+  }
+}
+
+/**
+ * Adds the base_plugin key to plugin configuration.
+ */
+function sitemap_update_8203(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $settings = $config_factory->getEditable('sitemap.settings');
+  $manager = \Drupal::service('plugin.manager.sitemap');
+
+  foreach ($settings->get('plugins') as $id => $config) {
+    if (!$manager->hasDefinition($id)) {
+      continue;
+    }
+
+    $instance = $manager->createInstance($id, $config);
+    $base_plugin = $instance->getBaseId();
+    $settings->set("plugins.$id.base_plugin", $base_plugin);
+  }
+  $settings->save();
+}
+
+/**
+ * Re-run 8201, 8202, in case config was not exported after beta7 db update.
+ */
+function sitemap_update_8204(&$sandbox) {
+  // Shortly after sitemap-8.x-2.0-beta7 was released (which contained 8201 and
+  // 8202), we discovered in [#3466939] that some administrators had run
+  // database updates (i.e.: which created essential config); and then
+  // immediately re-imported the old config, as part of their deployment process
+  // (i.e.: undoing the database update and deleting the essential config). This
+  // put the sitemap module into a broken state, where configuration that was
+  // supposed to exist did not, and the admin had no way to re-save correct
+  // configuration.
+  //
+  // The sitemap maintainers forgot to include instructions in the beta7 and
+  // beta8 release notes (i.e.: to warn admins to run database updates, then
+  // export config). So, to accommodate sites that did break, this update hook
+  // safely re-runs 8201 and 8202. However, please note that it isn't feasible
+  // for us to accommodate for overwritten configuration every time that we make
+  // a database update.
+  //
+  // We need editable config for both 8201 and 8202.
+  $settings = \Drupal::configFactory()->getEditable('sitemap.settings');
+
+  // Safely re-run 8201: the sitemap.path config should not be null if 8201 had
+  // been captured properly; so if it is null now, then we know that we have to
+  // re-set it. Afterwards, flush cache configuration (so route rebuilding
+  // works), then rebuild routes (so the sitemap.page route is re-created).
+  if (\is_null($settings->get('path'))) {
+    $settings->set('path', 'sitemap');
+    $settings->save(TRUE);
+  }
+  \Drupal::service('cache.config')->invalidateAll();
+  \Drupal::service('router.builder')->rebuild();
+
+  // Safely re-run 8202: if the book module is installed, but sitemap_book is
+  // not, then loop through all the sitemap plugins. If we find a plugin for a
+  // book, then enable sitemap_book so that plugin does not break.
+  if (\Drupal::moduleHandler()->moduleExists('book')
+    && !\Drupal::moduleHandler()->moduleExists('sitemap_book')
+  ) {
+    $pluginManager = \Drupal::service('plugin.manager.sitemap');
+    foreach ($settings->get('plugins') as $pluginId => $pluginConfig) {
+      if (!$pluginManager->hasDefinition($pluginId)) {
+        continue;
+      }
+
+      $pluginInstance = $pluginManager->createInstance($pluginId, $pluginConfig);
+      $basePlugin = $pluginInstance->getBaseId();
+      if ($basePlugin === 'book') {
+        \Drupal::service('module_installer')->install(['sitemap_book']);
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to get a book title for the 2.x settings update.
+ *
+ * @param int $bid
+ *   The book id.
+ * @param bool $show_title
+ *   Determines if the title is shown.
+ *
+ * @return string
+ *   Returns the book label.
+ */
+function sitemap_book_title_update($bid, $show_title) {
+  if ($show_title) {
+    $book = \Drupal::service('entity_type.manager')
+      ->getStorage('node')
+      ->load($bid);
+    if ($book) {
+      return $book->label();
+    }
+  }
+  // If we get here, then we weren't supposed to show the title, or the book
+  // couldn't be loaded: either way, return an empty string.
+  return '';
+}
+
+/**
+ * Helper function to get a menu title from 1.x menu settings.
+ *
+ * @param string $menu_id
+ *   The menu's id.
+ * @param bool $show_title
+ *   Determines if the title is shown.
+ *
+ * @return string
+ *   Returns the title.
+ */
+function sitemap_menu_title_update($menu_id, $show_title) {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('system.menu.' . $menu_id);
+
+  $title = '';
+  if ($show_title) {
+    if ($thirdParty = $config->get('third_party_settings')) {
+      if (isset($thirdParty['sitemap']) && $setting = $thirdParty['sitemap']) {
+        if (isset($setting['sitemap_display_name'])) {
+          $title = $setting['sitemap_display_name'];
+        }
+      }
+    }
+    if (empty($title)) {
+      $title = $config->get('label');
+    }
+  }
+
+  $config->clear('third_party_settings.sitemap');
+  $config->save();
+  return $title;
+}
+
+/**
+ * Helper function to get a vocabulary title for the 2.x settings update.
+ *
+ * @param string $vid
+ *   The vocabulary id.
+ *
+ * @return string
+ *   Returns the vocabulary name.
+ */
+function sitemap_vocab_title_update($vid) {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('taxonomy.vocabulary.' . $vid);
+
+  return $config->get('name');
+}
+
+/**
+ * Helper function to update the term_depth setting.
+ *
+ * @param int $value
+ *   The new Depth vocabulary value.
+ *
+ * @return int
+ *   Returns the value.
+ */
+function sitemap_vocab_depth_update($value) {
+  if ($value == -1 || $value > Vocabulary::DEPTH_MAX) {
+    return Vocabulary::DEPTH_MAX;
+  }
+  return $value;
+}
+
+/**
+ * Helper function to update the term_threshold and forum_threshold settings.
+ *
+ * @param int $value
+ *   The value to update the term_threshold and forum_threshold settings.
+ *
+ * @return int
+ *   Returns the value.
+ */
+function sitemap_vocab_threshold_update($value) {
+  if ($value == -1) {
+    return Vocabulary::THRESHOLD_DISABLED;
+  }
+  return $value;
+}

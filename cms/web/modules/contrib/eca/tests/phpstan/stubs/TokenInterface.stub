@@ -1,0 +1,22 @@
+<?php
+
+namespace Drupal\token;
+
+interface TokenInterface {
+
+  /**
+   * @param string $token_type
+
+   * @return string[][]
+   */
+  public function getTypeInfo(string $token_type): array;
+
+  /**
+   * @param string $token_type
+   * @param string $token
+   *
+   * @return string[][]
+   */
+  public function getTokenInfo(string $token_type, string $token): array;
+
+}

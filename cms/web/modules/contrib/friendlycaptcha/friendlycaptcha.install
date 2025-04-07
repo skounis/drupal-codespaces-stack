@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the friendlycaptcha module.
+ */
+
+/**
+ * Add api_endpoint to config.
+ */
+function friendlycaptcha_update_8101(&$sandbox) {
+  \Drupal::configFactory()
+    ->getEditable('friendlycaptcha.settings')
+    ->set('api_endpoint', 'global')
+    ->save();
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function friendlycaptcha_requirements($phase) {
+  $requirements = [];
+  // If we are not in runtime phase, there is nothing to do. So bail out early.
+  if ($phase !== 'runtime') {
+    return [];
+  }
+
+  /** @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder $library_file_finder */
+  $library_file_finder = \Drupal::service('library.libraries_directory_file_finder');
+
+  // Library not found, show a warning:
+  if (!$library_file_finder->find('friendly-challenge')) {
+    $requirements['friendlycaptcha_plugin'] = [
+      'title' => t('Friendly Captcha plugin'),
+      'severity' => REQUIREMENT_WARNING,
+      'value' => t('Missing local library'),
+      'description' => _friendlycaptcha_get_library_missing_message(),
+    ];
+  }
+  return $requirements;
+}
+
+/**
+ * The "administer friendlycaptcha" permission got removed.
+ *
+ * Make sure that roles who were allowed to access the friendly captcha settings
+ * page before, now have the "administer CAPTCHA settings" permission set.
+ */
+function friendlycaptcha_update_8102() {
+  $user_roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple();
+  foreach ($user_roles as $user_role) {
+    if ($user_role->hasPermission('administer friendlycaptcha')) {
+      // Revoke the old friendly captcha permission:
+      user_role_revoke_permissions($user_role->id(), ['administer friendlycaptcha']);
+    }
+  }
+}
+
+/**
+ * Adds the new "enable_validation_logging" configuration option.
+ */
+function friendlycaptcha_update_8103() {
+  \Drupal::configFactory()
+    ->getEditable('friendlycaptcha.settings')
+    // Enable it, so it is on par with how it worked before:
+    ->set('enable_validation_logging', TRUE)
+    ->save();
+}
+
+/**
+ * Refresh the kernel container to clear old dependency injections.
+ */
+function friendlycaptcha_update_8104() {
+  \Drupal::service('kernel')->rebuildContainer();
+}

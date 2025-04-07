@@ -1,0 +1,133 @@
+{
+	"country_code": "MX",
+	"subdivisions": {
+		"AGU": {
+			"code": "Ags.",
+			"name": "Aguascalientes"
+		},
+		"BCN": {
+			"code": "B.C.",
+			"name": "Baja California"
+		},
+		"BCS": {
+			"code": "B.C.S.",
+			"name": "Baja California Sur"
+		},
+		"CAM": {
+			"code": "Camp.",
+			"name": "Campeche"
+		},
+		"CHP": {
+			"code": "Chis.",
+			"name": "Chiapas"
+		},
+		"CHH": {
+			"code": "Chih.",
+			"name": "Chihuahua"
+		},
+		"CMX": {
+			"code": "CDMX",
+			"name": "Ciudad de México"
+		},
+		"COA": {
+			"code": "Coah.",
+			"name": "Coahuila de Zaragoza"
+		},
+		"COL": {
+			"code": "Col.",
+			"name": "Colima"
+		},
+		"DUR": {
+			"code": "Dgo.",
+			"name": "Durango"
+		},
+		"MEX": {
+			"code": "Méx.",
+			"name": "Estado de México"
+		},
+		"GUA": {
+			"code": "Gto.",
+			"name": "Guanajuato"
+		},
+		"GRO": {
+			"code": "Gro.",
+			"name": "Guerrero"
+		},
+		"HID": {
+			"code": "Hgo.",
+			"name": "Hidalgo"
+		},
+		"JAL": {
+			"code": "Jal.",
+			"name": "Jalisco"
+		},
+		"MIC": {
+			"code": "Mich.",
+			"name": "Michoacán"
+		},
+		"MOR": {
+			"code": "Mor.",
+			"name": "Morelos"
+		},
+		"NAY": {
+			"code": "Nay.",
+			"name": "Nayarit"
+		},
+		"NLE": {
+			"code": "N.L.",
+			"name": "Nuevo León"
+		},
+		"OAX": {
+			"code": "Oax.",
+			"name": "Oaxaca"
+		},
+		"PUE": {
+			"code": "Pue.",
+			"name": "Puebla"
+		},
+		"QUE": {
+			"code": "Qro.",
+			"name": "Querétaro"
+		},
+		"ROO": {
+			"code": "Q.R.",
+			"name": "Quintana Roo"
+		},
+		"SLP": {
+			"code": "S.L.P.",
+			"name": "San Luis Potosí"
+		},
+		"SIN": {
+			"code": "Sin.",
+			"name": "Sinaloa"
+		},
+		"SON": {
+			"code": "Son.",
+			"name": "Sonora"
+		},
+		"TAB": {
+			"code": "Tab.",
+			"name": "Tabasco"
+		},
+		"TAM": {
+			"code": "Tamps.",
+			"name": "Tamaulipas"
+		},
+		"TLA": {
+			"code": "Tlax.",
+			"name": "Tlaxcala"
+		},
+		"VER": {
+			"code": "Ver.",
+			"name": "Veracruz"
+		},
+		"YUC": {
+			"code": "Yuc.",
+			"name": "Yucatán"
+		},
+		"ZAC": {
+			"code": "Zac.",
+			"name": "Zacatecas"
+		}
+	}
+}

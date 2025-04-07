@@ -1,0 +1,4 @@
+services:
+  eca_project_browser.hook_handler:
+    class: Drupal\eca_project_browser\HookHandler
+    arguments: ['@eca.trigger_event']

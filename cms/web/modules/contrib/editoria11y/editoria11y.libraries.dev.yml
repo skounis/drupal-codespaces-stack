@@ -1,0 +1,74 @@
+editoria11y:
+  js:
+    library/js/ed11y-element-alt.js: {preprocess: false}
+    library/js/ed11y-element-panel.js: {preprocess: false}
+    library/js/ed11y-element-result.js: {preprocess: false}
+    library/js/ed11y-element-tip.js: {preprocess: false}
+    library/js/ed11y-localization.js: { preprocess: false }
+    library/js/ed11y-test-embeds.js: { preprocess: false }
+    library/js/ed11y-test-headings.js: {preprocess: false}
+    library/js/ed11y-test-images.js: {preprocess: false}
+    library/js/ed11y-test-links.js: {preprocess: false}
+    library/js/ed11y-test-text.js: {preprocess: false}
+    library/js/ed11y.js: {preprocess: false}
+    js/editoria11y-drupal.js: {preprocess: false}
+  css:
+    theme:
+      library/css/editoria11y.css: { preprocess: false }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+
+editoria11y-localized:
+  js:
+    library/js/ed11y-element-alt.js: {preprocess: false}
+    library/js/ed11y-element-panel.js: {preprocess: false}
+    library/js/ed11y-element-result.js: {preprocess: false}
+    library/js/ed11y-element-tip.js: {preprocess: false}
+    library/js/ed11y-localization.js: { preprocess: false }
+    library/js/ed11y-test-embeds.js: { preprocess: false }
+    library/js/ed11y-test-headings.js: {preprocess: false}
+    library/js/ed11y-test-images.js: {preprocess: false}
+    library/js/ed11y-test-links.js: {preprocess: false}
+    library/js/ed11y-test-text.js: {preprocess: false}
+    library/js/ed11y.js: {preprocess: false}
+    js/editoria11y-localization.js: {}
+    js/editoria11y-drupal.js: {preprocess: false}
+  css:
+    theme:
+      library/css/editoria11y.css: {preprocess: false}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+
+editoria11y-admin:
+  js:
+    js/editoria11y-admin.js: {}
+  css:
+    layout:
+      css/editoria11y-admin.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.message
+
+editoria11y-nocache:
+  js:
+    library/js/ed11y-element-alt.js: {preprocess: false}
+    library/js/ed11y-element-panel.js: {preprocess: false}
+    library/js/ed11y-element-result.js: {preprocess: false}
+    library/js/ed11y-element-tip.js: {preprocess: false}
+    library/js/ed11y-localization.js: { preprocess: false }
+    library/js/ed11y-test-embeds.js: { preprocess: false }
+    library/js/ed11y-test-headings.js: {preprocess: false}
+    library/js/ed11y-test-images.js: {preprocess: false}
+    library/js/ed11y-test-links.js: {preprocess: false}
+    library/js/ed11y-test-text.js: {preprocess: false}
+    library/js/ed11y.js: {preprocess: false}
+    js/editoria11y-drupal.js: {preprocess: false}
+  css:
+    theme:
+      library/css/editoria11y.css: { preprocess: false }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings

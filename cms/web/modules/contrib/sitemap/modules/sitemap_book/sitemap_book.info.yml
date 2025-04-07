@@ -1,0 +1,12 @@
+name: 'Sitemap book'
+type: module
+description: 'Display books on the sitemap.'
+core_version_requirement: ^10.2 || ^11
+dependencies:
+  - book:book
+  - sitemap:sitemap
+
+# Information added by Drupal.org packaging script on 2024-08-28
+version: '8.x-2.0'
+project: 'sitemap'
+datestamp: 1724850104

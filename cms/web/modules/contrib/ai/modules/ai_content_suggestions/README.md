@@ -1,0 +1,1 @@
+# AI Content Suggestions&#10## What is the AI Content Suggestions module?&#10This module assistants content editors obtain feedback from a configured LLM&#10about the node they are editing.&#10&#10## Using the module&#10Check the [AI Content Suggestions module guide](https://project.pages.drupalcode.org/ai/modules/ai_content_suggestions/) for&#10information on using the module.

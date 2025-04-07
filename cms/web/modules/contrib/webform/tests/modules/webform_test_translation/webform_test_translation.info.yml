@@ -1,0 +1,15 @@
+name: 'Webform Translation test'
+type: module
+description: 'Support module for webform translation testing.'
+package: Testing
+dependencies:
+  - 'drupal:config_translation'
+  - 'drupal:language'
+  - 'drupal:locale'
+  - 'webform:webform'
+  - 'webform:webform_image_select'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

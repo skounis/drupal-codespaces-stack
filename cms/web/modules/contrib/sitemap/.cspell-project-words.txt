@@ -1,0 +1,16 @@
+# Maintainer names.
+Alexandrov
+Kalata
+
+# Other module names.
+taxonews
+Entityreference
+
+# Example words in tests.
+amet
+adipiscing
+~bizz
+pametis
+
+# Technical terms.
+mlid

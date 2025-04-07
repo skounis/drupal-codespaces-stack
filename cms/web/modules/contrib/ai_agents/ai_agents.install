@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Update functions for the ai module.
+ */
+
+/**
+ * Update hook to install the extra module.
+ */
+function ai_agents_update_10300() {
+  // If its an old environment, we install the extra module.
+  if (!\Drupal::moduleHandler()->moduleExists('ai_agents_extra')) {
+    \Drupal::service('module_installer')->install(['ai_agents_extra']);
+  }
+}

@@ -1,0 +1,11 @@
+name: Easy Email Theme
+type: theme
+description: 'A theme for sending HTML emails'
+package: Mail
+base theme: false
+core_version_requirement: ^10.2 || ^11
+
+# Information added by Drupal.org packaging script on 2024-10-16
+version: '1.0.0'
+project: 'easy_email_theme'
+datestamp: 1729101399

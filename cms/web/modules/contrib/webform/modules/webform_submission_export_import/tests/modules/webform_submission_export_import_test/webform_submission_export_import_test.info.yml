@@ -1,0 +1,12 @@
+name: 'Webform Submission Export/Import test'
+type: module
+description: 'Support module for webform submission export/import testing.'
+package: Testing
+dependencies:
+  - 'webform:webform_submission_export_import'
+  - 'webform:webform_image_select'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

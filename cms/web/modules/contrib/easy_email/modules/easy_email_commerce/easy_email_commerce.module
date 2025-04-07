@@ -1,0 +1,161 @@
+<?php
+
+use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RenderContext;
+
+function easy_email_commerce_template_by_token() {
+  return [
+    'commerce_order' => [
+      'easy_email_html' => [
+        'template' => 'easy_email_commerce_order_html',
+        'name' => t('Rendered as HTML'),
+        'description' => t('HTML for order that is suitable for emails'),
+      ],
+      'easy_email_plain' => [
+        'template' => 'easy_email_commerce_order_plain',
+        'name' => t('Rendered as plain text'),
+        'description' => t('Plain text for order that is suitable for emails'),
+      ],
+      'easy_email_order_items_html' => [
+        'template' => 'easy_email_commerce_order_order_items_html',
+        'name' => t('Order items rendered as HTML'),
+        'description' => t('The order items for the order rendered as HTML that is suitable for emails'),
+      ],
+      'easy_email_order_items_plain' => [
+        'template' => 'easy_email_commerce_order_order_items_plain',
+        'name' => t('Order items rendered as plain text'),
+        'description' => t('The order items for the order rendered as plain text that is suitable for emails'),
+      ],
+      'easy_email_billing_profile_html' => [
+        'template' => 'easy_email_commerce_order_billing_profile_html',
+        'name' => t('Billing information rendered as HTML'),
+        'description' => t('The billing information for the order rendered as HTML that is suitable for emails'),
+      ],
+      'easy_email_billing_profile_plain' => [
+        'template' => 'easy_email_commerce_order_billing_profile_plain',
+        'name' => t('Billing information rendered as plain text'),
+        'description' => t('The billing information for the order rendered as plain text that is suitable for emails'),
+      ],
+      'easy_email_shipping_profile_html' => [
+        'template' => 'easy_email_commerce_order_shipping_profile_html',
+        'name' => t('Shipping information rendered as HTML'),
+        'description' => t('The shipping information for the order rendered as HTML that is suitable for emails'),
+      ],
+      'easy_email_shipping_profile_plain' => [
+        'template' => 'easy_email_commerce_order_shipping_profile_plain',
+        'name' => t('Payment method rendered as HTML'),
+        'description' => t('The payment method for the order rendered as HTML that is suitable for emails'),
+      ],
+      'easy_email_payment_method_html' => [
+        'template' => 'easy_email_commerce_order_payment_method_html',
+        'name' => t('Payment method rendered as HTML'),
+        'description' => t('The payment method for the order rendered as HTML that is suitable for emails'),
+      ],
+      'easy_email_payment_method_plain' => [
+        'template' => 'easy_email_commerce_order_payment_method_plain',
+        'name' => t('Payment method rendered as plain text'),
+        'description' => t('The payment method for the order rendered as plain text that is suitable for emails'),
+      ],
+      'easy_email_totals_html' => [
+        'template' => 'easy_email_commerce_order_totals_html',
+        'name' => t('Total rendered as HTML'),
+        'description' => t('The total for the order rendered as HTML that is suitable for emails'),
+      ],
+      'easy_email_totals_plain' => [
+        'template' => 'easy_email_commerce_order_totals_plain',
+        'name' => t('Total rendered as plain text'),
+        'description' => t('The total for the order rendered as plain text that is suitable for emails'),
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme().
+ */
+function easy_email_commerce_theme($existing, $type, $theme, $path) {
+  $templates = [];
+  foreach (easy_email_commerce_template_by_token() as $entity_type => $tokens) {
+    foreach ($tokens as $token => $info) {
+      $templates[$info['template']] = [
+        'variables' => [$entity_type => NULL],
+      ];
+      if ($entity_type === 'commerce_order') {
+        $templates[$info['template']]['variables']['totals'] = NULL;
+        $templates[$info['template']]['variables']['billing_information'] = NULL;
+        $templates[$info['template']]['variables']['shipping_information'] = NULL;
+        $templates[$info['template']]['variables']['payment_method'] = NULL;
+      }
+    }
+  }
+  return $templates;
+}
+
+/**
+ * Implements hook_token_info_alter().
+ */
+function easy_email_commerce_token_info_alter(&$data) {
+  foreach (easy_email_commerce_template_by_token() as $entity_type => $tokens) {
+    if (isset($data['tokens'][$entity_type])) {
+      foreach ($tokens as $token => $info) {
+        $data['tokens'][$entity_type][$token] = [
+          'name' => $info['name'],
+          'description' => $info['description'],
+          'module' => 'easy_email_commerce',
+          'type' => $entity_type,
+        ];
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function easy_email_commerce_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+  /** @var \Drupal\commerce_order\OrderTotalSummaryInterface $order_total_summary */
+  $order_total_summary = \Drupal::service('commerce_order.order_total_summary');
+  $has_profile = \Drupal::moduleHandler()->moduleExists('profile');
+  if ($has_profile) {
+    $profile_view_builder = \Drupal::entityTypeManager()->getViewBuilder('profile');
+  }
+  $has_payment = \Drupal::moduleHandler()->moduleExists('commerce_payment');
+  $has_shipping = \Drupal::moduleHandler()->moduleExists('commerce_shipping');
+  if ($has_shipping) {
+    $order_shipment_summary = \Drupal::service('commerce_shipping.order_shipment_summary');
+  }
+  $token_template_by_entity_type = easy_email_commerce_template_by_token();
+  $replacements = [];
+  foreach ($token_template_by_entity_type as $entity_type => $token_templates) {
+    if ($type === $entity_type && !empty($data[$entity_type])) {
+      foreach ($tokens as $name => $original) {
+        if (isset($token_templates[$name])) {
+          $build = [
+            '#theme' => $token_templates[$name]['template'],
+            '#' . $entity_type => $data[$entity_type],
+          ];
+          if ($entity_type === 'commerce_order') {
+            $build['#totals'] = $order_total_summary->buildTotals($data[$entity_type]);
+          }
+          if ($has_profile && $billing_profile = $data[$entity_type]->getBillingProfile()) {
+            $build['#billing_information'] = $profile_view_builder->view($billing_profile);
+          }
+          if ($has_shipping) {
+            $build['#shipping_information'] = $order_shipment_summary->build($data[$entity_type]);
+          }
+          if ($has_payment) {
+            $vars = ['order_entity' => $data[$entity_type]];
+            commerce_payment_preprocess_commerce_order($vars);
+            $build['#payment_method'] = $vars['payment_method'];
+          }
+          $replacements[$original] = $renderer->renderRoot($build);
+        }
+      }
+    }
+  }
+  return $replacements;
+}
+

@@ -1,0 +1,73 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    Based on the context of the Prompt, create form elements that makes sense.
+
+    If you can't create a form from this because its lacking information, just
+    answer with the no_information action.
+
+    If asked for an address, just write one row with address.
+    If parts of the command refers to a global structure event of the whole form
+    rather then each element, write this in the type format.
+  possible_actions:
+    set_title: Sets the whole forms title
+    set_url: Sets the forms url
+    set_languages: Comma separated list of languages
+    set_description: Sets the forms description, make up a one sentence max 150 characters if not available.
+    roles: access where values is 'anonymous' for non-logged users and 'authenticated' for logged in
+    no_information: If there isn't enough information to create the form, just answer with this action
+  formats:
+    - id: unique id of element
+      title: human readable title
+      description: short description of the element
+      required: boolean if its required field
+      options: semi-colon separated list of options, if needed
+      prompt: the prompt to generate the field
+      response: one sentence human readable response on action taken
+      markup: if its a markup based field, the markup with allowed strong, header, em, p HTML tags
+    - type: type of action
+      value: the value of the action
+  one_shot_learning_examples:
+    - id: last_name
+      title: Last Name
+      description: The last name of the person responding
+      required: true
+      options:
+      prompt: Generate a Last Name field
+      response: We added the Last Name after the first name
+      markup:
+    - id: gender
+      title: Gender
+      description: The gender of the persons responding
+      required: true
+      options: Male;Female;Non-Binary
+      prompt: Generate checkboxes with Gender options
+      response: We added the Gender.
+      markup:
+    - id: terms_and_conditions
+      title: Terms & Conditions
+      description: Read our <a href="http://localhost/toc">Terms & Conditions</a>
+      required: true
+      options:
+      prompt: Generate a checkbox with terms and conditions
+      response: We added the Terms and conditions.
+      markup:
+    - id: introduction
+      title: Introduction of the Form
+      description:
+      required:
+      options:
+      follows:
+      prompt: Generate a markup field
+      response: We added the Introduction field with some text
+      markup: <p>The reason we want you to fill out this field is because it's <strong>important</strong> for us to get feedback.</p>
+    - type: set_title
+      value: User Registration
+    - type: set_url
+      value: /user/register
+    - type: set_description
+      value: Register as a new user
+    - type: no_information
+      value: Not enough information to create the form

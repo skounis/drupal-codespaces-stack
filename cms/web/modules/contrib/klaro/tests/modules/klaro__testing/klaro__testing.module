@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Hooks related to klaro__testing.
+ */
+
+/**
+ * Load all stages into available render elements.
+ */
+function klaro__testing_theme($existing, $type, $theme, $path) {
+  $items = [];
+  $stages = scandir($path . '/templates');
+  foreach ($stages as $stage) {
+    $stage_name = basename($stage, '.html.twig');
+    if (empty($stage_name) || $stage_name == "." || $stage_name == "..") {
+      continue;
+    }
+    // POC this should be replaceable with theme suggestions.
+    $items['STAGE__' . $stage_name] = [
+      'render element' => 'children',
+      'template' => $stage_name,
+      'path' => $path . '/templates',
+    ];
+  }
+  return $items;
+}

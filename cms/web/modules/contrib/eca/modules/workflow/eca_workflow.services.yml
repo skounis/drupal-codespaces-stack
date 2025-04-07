@@ -1,0 +1,7 @@
+services:
+  eca_workflow.hook_handler:
+    class: Drupal\eca_workflow\HookHandler
+    arguments: ['@eca.trigger_event']
+    calls:
+      - [setContentEntityTypes, ['@eca.service.content_entity_types']]
+      - [setModerationInformation, ['@content_moderation.moderation_information']]

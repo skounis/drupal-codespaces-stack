@@ -1,0 +1,30 @@
+{
+	"country_code": "TV",
+	"subdivisions": {
+		"FUN": {
+			"name": "Funafuti"
+		},
+		"NMG": {
+			"name": "Nanumanga"
+		},
+		"NMA": {
+			"name": "Nanumea"
+		},
+		"Niulakita": [],
+		"NIT": {
+			"name": "Niutao"
+		},
+		"NUI": {
+			"name": "Nui"
+		},
+		"NKF": {
+			"name": "Nukufetau"
+		},
+		"NKL": {
+			"name": "Nukulaelae"
+		},
+		"VAI": {
+			"name": "Vaitupu"
+		}
+	}
+}

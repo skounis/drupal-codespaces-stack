@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains simple_search_form module hooks.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function simple_search_form_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the simple_search_form module.
+    case 'help.page.simple_search_form':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Module implements simple search form with input and submit button. It allows redirect user to a page with a GET parameter. Like: @example', ['@example' => '/some-site-page?myparam=sometext']);
+      $output .= '<br>' . t('Use case: The parameter matches search API fulltext search or view exposed search filter.') . '</p>';
+      return $output;
+
+    default:
+  }
+}

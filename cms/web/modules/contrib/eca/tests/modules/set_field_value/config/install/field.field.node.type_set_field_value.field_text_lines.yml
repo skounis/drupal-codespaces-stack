@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_text_lines
+    - node.type.type_set_field_value
+id: node.type_set_field_value.field_text_lines
+field_name: field_text_lines
+entity_type: node
+bundle: type_set_field_value
+label: 'Text Lines'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

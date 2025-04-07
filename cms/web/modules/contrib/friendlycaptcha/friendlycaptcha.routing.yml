@@ -1,0 +1,15 @@
+friendlycaptcha.admin_settings_form:
+  path: '/admin/config/people/captcha/friendlycaptcha'
+  defaults:
+    _form: '\Drupal\friendlycaptcha\Form\FriendlyCaptchaAdminSettingsForm'
+    _title: 'Friendly Captcha'
+  requirements:
+    _permission: 'administer CAPTCHA settings'
+
+friendlycaptcha.api_puzzle:
+  path: '/api/v1/puzzle'
+  defaults:
+    _controller: '\Drupal\friendlycaptcha\Controller\PuzzleController::execute'
+  # @todo Implement access control according to Polite::cors()
+  requirements:
+    _permission: 'access content'

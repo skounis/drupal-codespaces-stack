@@ -1,0 +1,3 @@
+administer eca:
+  title: 'Administer ECA configuration'
+  restrict access: true

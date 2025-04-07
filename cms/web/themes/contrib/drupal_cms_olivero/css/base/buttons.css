@@ -1,0 +1,38 @@
+/**
+ * @file
+ * Extra button styles.
+ */
+
+.button--external {
+  gap: 8px;
+
+  /* Only show external icon if href starts with "http" */
+  &:where([href^="http" i]):after {
+    content: "";
+    width: 15px;
+    height: 15px;
+    margin-top: -0.2lh;
+    -webkit-mask-image: url('../../images/external.svg');
+    mask-image: url('../../images/external.svg');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    background: currentColor;
+
+    @media (forced-colors: active) {
+      background: buttonText;
+    }
+  }
+}
+
+.button--link[class] {
+  border: 0;
+  padding: 0;
+
+  &:hover {
+    border: 0;
+  }
+}

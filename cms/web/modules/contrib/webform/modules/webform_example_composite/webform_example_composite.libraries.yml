@@ -1,0 +1,6 @@
+webform_example_composite:
+  css:
+    theme:
+      css/webform_example_composite.css: {}
+  dependencies:
+    - webform/webform.composite

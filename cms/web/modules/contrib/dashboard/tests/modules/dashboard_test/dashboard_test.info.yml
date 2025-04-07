@@ -1,0 +1,11 @@
+name: 'Dashboard test'
+type: module
+description: 'Provides test configuration for dashboard.'
+package: Testing
+dependencies:
+  - drupal:dashboard
+
+# Information added by Drupal.org packaging script on 2025-01-10
+version: '2.0.0'
+project: 'dashboard'
+datestamp: 1736528737

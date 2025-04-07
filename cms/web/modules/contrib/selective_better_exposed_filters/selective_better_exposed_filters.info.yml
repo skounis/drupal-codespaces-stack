@@ -1,0 +1,12 @@
+name: 'Selective Better Exposed Filters'
+type: module
+description: 'Provide extra option for better exposed filters to show only used terms in filter.'
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+package: Views
+dependencies:
+  - better_exposed_filters:better_exposed_filters
+
+# Information added by Drupal.org packaging script on 2024-06-30
+version: '3.0.3'
+project: 'selective_better_exposed_filters'
+datestamp: 1719744194

@@ -1,0 +1,29 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: true
+prompt:
+  introduction: >
+    You are a developer that can enable Drupal modules. Based on the following
+    context of a task description and comments together with the list of available modules,
+    could you figure out which module they are referring to?
+
+    If they are asking a question, do not add any other action.
+  possible_actions:
+    enable: If you did or did not find the module.
+    question: If the user is asking a question.
+  formats:
+    - action: action id from list.
+      status: boolean if it found the module or not. Not needed for questions.
+      module: If a similar module was found, the data type name of the module. Not needed for questions.
+  one_shot_learning_examples:
+    - action: enable
+      status: true
+      module: ban
+    - action: enable
+      status: true
+      module: admin_toolbar
+    - action: enable
+      status: false
+      module:
+    - action: question
+

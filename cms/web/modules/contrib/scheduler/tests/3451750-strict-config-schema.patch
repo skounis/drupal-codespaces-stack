@@ -1,0 +1,76 @@
+diff --git a/tests/src/Functional/SchedulerBrowserTestBase.php b/tests/src/Functional/SchedulerBrowserTestBase.php
+index c4c3ed1..8b1fb84 100644
+--- a/tests/src/Functional/SchedulerBrowserTestBase.php
++++ b/tests/src/Functional/SchedulerBrowserTestBase.php
+@@ -45,6 +45,21 @@ abstract class SchedulerBrowserTestBase extends BrowserTestBase {
+    */
+   protected $defaultTheme = 'stark';
+
++  /**
++   * Strict schema checking.
++   *
++   * The EntityReferenceArgument `entity_target_id` views argument plugin was
++   * introduced in Drupal 10.3 but not back-ported. This throws a schema error
++   * in earlier versions during tests (but not in actual live sites) so we need
++   * to remove the schema validation for versions earlier than 10.3.
++   *
++   * @var bool
++   *
++   * @see https://www.drupal.org/project/drupal/issues/2640994
++   * @see https://www.drupal.org/project/scheduler/issues/3451750
++   */
++  protected $strictConfigSchema = FALSE;
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php b/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php
+index f4f86b2..d1662a8 100644
+--- a/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php
++++ b/tests/src/FunctionalJavascript/SchedulerJavascriptTestBase.php
+@@ -49,6 +49,21 @@ abstract class SchedulerJavascriptTestBase extends WebDriverTestBase {
+    */
+   protected $defaultTheme = 'claro';
+
++  /**
++   * Strict schema checking.
++   *
++   * The EntityReferenceArgument `entity_target_id` views argument plugin was
++   * introduced in Drupal 10.3 but not back-ported. This throws a schema error
++   * in earlier versions during tests (but not in actual live sites) so we need
++   * to remove the schema validation for versions earlier than 10.3.
++   *
++   * @var bool
++   *
++   * @see https://www.drupal.org/project/drupal/issues/2640994
++   * @see https://www.drupal.org/project/scheduler/issues/3451750
++   */
++  protected $strictConfigSchema = FALSE;
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/tests/src/Kernel/MigrateSchedulerTestBase.php b/tests/src/Kernel/MigrateSchedulerTestBase.php
+index 419b508..45da703 100644
+--- a/tests/src/Kernel/MigrateSchedulerTestBase.php
++++ b/tests/src/Kernel/MigrateSchedulerTestBase.php
+@@ -19,4 +19,19 @@ abstract class MigrateSchedulerTestBase extends MigrateDrupal7TestBase {
+     'views',
+   ];
+
++  /**
++   * Strict schema checking.
++   *
++   * The EntityReferenceArgument `entity_target_id` views argument plugin was
++   * introduced in Drupal 10.3 but not back-ported. This throws a schema error
++   * in earlier versions during tests (but not in actual live sites) so we need
++   * to remove the schema validation for versions earlier than 10.3.
++   *
++   * @var bool
++   *
++   * @see https://www.drupal.org/project/drupal/issues/2640994
++   * @see https://www.drupal.org/project/scheduler/issues/3451750
++   */
++  protected $strictConfigSchema = FALSE;
++
+ }

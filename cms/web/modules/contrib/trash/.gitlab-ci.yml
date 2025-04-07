@@ -1,0 +1,50 @@
+include:
+  - project: $_GITLAB_TEMPLATES_REPO
+    ref: $_GITLAB_TEMPLATES_REF
+    file:
+      - '/includes/include.drupalci.main.yml'
+      - '/includes/include.drupalci.variables.yml'
+      - '/includes/include.drupalci.workflows.yml'
+
+variables:
+  OPT_IN_TEST_NEXT_MINOR: 1
+  OPT_IN_TEST_NEXT_MAJOR: 1
+  _CSPELL_WORDS: 'Csvg, Cpath'
+
+composer-lint:
+  allow_failure: false
+
+eslint:
+  allow_failure: false
+
+cspell:
+  allow_failure: false
+
+phpcs:
+  allow_failure: false
+
+phpstan:
+  allow_failure: false
+
+phpstan (next minor):
+  allow_failure: false
+
+phpstan (next major):
+  allow_failure: false
+
+phpunit (next minor):
+  allow_failure: false
+
+phpunit (next major):
+  allow_failure: false
+
+phpunit:
+  allow_failure: false
+  parallel:
+    matrix:
+      - _TARGET_DB_TYPE: 'mysql'
+        _TARGET_DB_VERSION: '8'
+      - _TARGET_DB_TYPE: 'pgsql'
+        _TARGET_DB_VERSION: '16'
+      - _TARGET_DB_TYPE: 'sqlite'
+        _TARGET_DB_VERSION: '3'

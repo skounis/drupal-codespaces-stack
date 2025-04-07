@@ -1,0 +1,154 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Url;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_preprocess_HOOK() for views templates.
+ */
+function views_ui_preprocess_views_view(&$variables): void {
+  $view = $variables['view'];
+
+  // Render title for the admin preview.
+  if (!empty($view->live_preview)) {
+    $variables['title'] = [
+      '#markup' => $view->getTitle(),
+      '#allowed_tags' => Xss::getHtmlTagList(),
+    ];
+  }
+
+  if (!empty($view->live_preview) && \Drupal::moduleHandler()->moduleExists('contextual')) {
+    $view->setShowAdminLinks(FALSE);
+    foreach (['title', 'header', 'exposed', 'rows', 'pager', 'more', 'footer', 'empty', 'attachment_after', 'attachment_before'] as $section) {
+      if (!empty($variables[$section])) {
+        $variables[$section] = [
+          '#theme' => 'views_ui_view_preview_section',
+          '#view' => $view,
+          '#section' => $section,
+          '#content' => $variables[$section],
+          '#theme_wrappers' => ['views_ui_container'],
+          '#attributes' => ['class' => ['contextual-region']],
+        ];
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function views_ui_theme_suggestions_views_ui_view_preview_section(array $variables) {
+  return ['views_ui_view_preview_section__' . $variables['section']];
+}
+
+/**
+ * Returns contextual links for each handler of a certain section.
+ *
+ * @todo Bring in relationships.
+ * @todo Refactor this function to use much stuff of
+ *    views_ui_edit_form_get_bucket.
+ *
+ * @param $title
+ *   Add a bolded title of this section.
+ */
+function views_ui_view_preview_section_handler_links(ViewExecutable $view, $type, $title = FALSE) {
+  $display = $view->display_handler->display;
+  $handlers = $view->display_handler->getHandlers($type);
+  $links = [];
+
+  $types = ViewExecutable::getHandlerTypes();
+  if ($title) {
+    $links[$type . '-title'] = [
+      'title' => $types[$type]['title'],
+    ];
+  }
+
+  foreach ($handlers as $id => $handler) {
+    $field_name = $handler->adminLabel(TRUE);
+    $links[$type . '-edit-' . $id] = [
+      'title' => t('Edit @section', ['@section' => $field_name]),
+      'url' => Url::fromRoute('views_ui.form_handler', ['js' => 'nojs', 'view' => $view->storage->id(), 'display_id' => $display['id'], 'type' => $type, 'id' => $id]),
+      'attributes' => ['class' => ['views-ajax-link']],
+    ];
+  }
+  $links[$type . '-add'] = [
+    'title' => t('Add new'),
+    'url' => Url::fromRoute('views_ui.form_add_handler', ['js' => 'nojs', 'view' => $view->storage->id(), 'display_id' => $display['id'], 'type' => $type]),
+    'attributes' => ['class' => ['views-ajax-link']],
+  ];
+
+  return $links;
+}
+
+/**
+ * Returns a link to editing a certain display setting.
+ */
+function views_ui_view_preview_section_display_category_links(ViewExecutable $view, $type, $title) {
+  $display = $view->display_handler->display;
+  $links = [
+    $type . '-edit' => [
+      'title' => t('Edit @section', ['@section' => $title]),
+      'url' => Url::fromRoute('views_ui.form_display', ['js' => 'nojs', 'view' => $view->storage->id(), 'display_id' => $display['id'], 'type' => $type]),
+      'attributes' => ['class' => ['views-ajax-link']],
+    ],
+  ];
+
+  return $links;
+}
+
+/**
+ * Returns all contextual links for the main content part of the view.
+ */
+function views_ui_view_preview_section_rows_links(ViewExecutable $view) {
+  $links = [];
+  $links = array_merge($links, views_ui_view_preview_section_handler_links($view, 'filter', TRUE));
+  $links = array_merge($links, views_ui_view_preview_section_handler_links($view, 'field', TRUE));
+  $links = array_merge($links, views_ui_view_preview_section_handler_links($view, 'sort', TRUE));
+  $links = array_merge($links, views_ui_view_preview_section_handler_links($view, 'argument', TRUE));
+  $links = array_merge($links, views_ui_view_preview_section_handler_links($view, 'relationship', TRUE));
+
+  return $links;
+}
+
+/**
+ * Sets a static variable for controlling whether contextual links are rendered.
+ *
+ * @see views_ui_contextual_links_view_alter()
+ */
+function views_ui_contextual_links_suppress($set = NULL) {
+  $suppress = &drupal_static(__FUNCTION__);
+  if (isset($set)) {
+    $suppress = $set;
+  }
+  return $suppress;
+}
+
+/**
+ * Increments the views_ui_contextual_links_suppress() static variable.
+ *
+ * When this function is added to the #pre_render of an element, and
+ * 'views_ui_contextual_links_suppress_pop' is added to the #post_render of the
+ * same element, then all contextual links within the element and its
+ * descendants are suppressed from being rendered. This is used, for example,
+ * during a View preview, when it is not desired for nodes in the Views result
+ * to have contextual links.
+ *
+ * @see views_ui_contextual_links_suppress_pop()
+ */
+function views_ui_contextual_links_suppress_push() {
+  views_ui_contextual_links_suppress(((int) views_ui_contextual_links_suppress()) + 1);
+}
+
+/**
+ * Decrements the views_ui_contextual_links_suppress() static variable.
+ *
+ * @see views_ui_contextual_links_suppress_push()
+ */
+function views_ui_contextual_links_suppress_pop() {
+  views_ui_contextual_links_suppress(((int) views_ui_contextual_links_suppress()) - 1);
+}

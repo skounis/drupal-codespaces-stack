@@ -1,0 +1,22 @@
+fieldsetSummaries:
+  version: VERSION
+  js:
+    js/simple_sitemap.fieldsetSummaries.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+
+sitemapEntities:
+  version: VERSION
+  js:
+    js/simple_sitemap.sitemapEntities.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupal.message
+
+sitemaps:
+  version: VERSION
+  css:
+    theme:
+      css/simple_sitemap.sitemaps.css: {}

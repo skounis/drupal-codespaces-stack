@@ -1,0 +1,4 @@
+webform_schema:
+  css:
+    theme:
+      css/webform_schema.module.css: {}

@@ -1,0 +1,50 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Card
+status: experimental
+props:
+  type: object
+  required:
+    - title
+  properties:
+    image:
+      $ref: json-schema-definitions://experience_builder.module/image
+      type: object
+      title: Image
+      description: The background image
+      examples:
+        - src: images/example-image.jpg
+          alt: 'Dexter the dog laying on a hammock and smiling'
+          width: 800
+          height: 600
+    pretitle:
+      type: string
+      title: Pretitle
+      description: The text above the title
+      examples:
+        - Pretitle text
+    title:
+      type: string
+      title: Title
+      description: The title text
+      examples:
+        - Title text
+    subtitle:
+      type: string
+      title: Subtitle
+      description: The text below the title
+      examples:
+        - Subtitle text
+    summary:
+      $ref: json-schema-definitions://experience_builder.module/textarea
+      type: string
+      title: Summary
+      description: The summary text
+      examples:
+        - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sodales maximus augue at tincidunt. Duis in dui maximus libero aliquet scelerisque eu id mi."
+    link_url:
+      type: string
+      format: uri-reference
+      title: URL
+      description: The entire card will be clickable if populated
+      examples:
+        - https://example.com

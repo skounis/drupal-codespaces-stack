@@ -1,0 +1,5 @@
+entity.ai_agent_decision.collection:
+  title: 'Agent Decisions'
+  description: 'List of agent decisions.'
+  route_name: entity.ai_agent_decision.collection
+  parent: system.admin_content

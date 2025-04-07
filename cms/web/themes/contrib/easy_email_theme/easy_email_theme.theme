@@ -1,0 +1,48 @@
+<?php
+
+use Drupal\Core\Asset\AttachedAssets;
+
+/**
+ * Implements hook_preprocess_easy_email_body_html().
+ */
+function easy_email_theme_preprocess_easy_email_body_html(&$variables) {
+  $site_logo = theme_get_setting('logo.url');
+  if (!empty($site_logo)) {
+    $variables['site_logo'] = \Drupal::service('file_url_generator')->generateAbsoluteString($site_logo);
+  }
+  $variables['site_name'] = \Drupal::config('system.site')->get('name');
+  $variables['site_url'] = \Drupal\Core\Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString();
+
+  // Get the CSS files from the easy_email_theme/style-tag-styles library
+  $css_render = [
+    '#attached' => [
+      'library' => [
+        'easy_email_theme/style-tag-styles',
+      ],
+    ],
+  ];
+  $asset_resolver = \Drupal::service('asset.resolver');
+  $css_optimizer = \Drupal::service('asset.css.optimizer');
+  $css = '';
+  foreach ($asset_resolver->getCssAssets(AttachedAssets::createFromRenderArray($css_render), FALSE) as $asset) {
+    if (($asset['type'] === 'file') && $asset['preprocess']) {
+      $css .= $css_optimizer->optimize($asset);
+    } else {
+      $css .= file_get_contents($asset['data']);
+    }
+  }
+  if (!empty($css)) {
+    $variables['style_tag_styles'] = $css;
+  }
+
+}
+
+if (\Drupal::moduleHandler()->moduleExists('symfony_mailer')) {
+  /**
+   * Implements hook_preprocess_email() for Symfony Mailer.
+   */
+  function easy_email_theme_preprocess_email(&$variables) {
+    easy_email_theme_preprocess_easy_email_body_html($variables);
+  }
+}
+

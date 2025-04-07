@@ -1,0 +1,13 @@
+name: 'ECA Project Browser'
+type: module
+description: 'Events and actions for the Project Browser.'
+core_version_requirement: ^10.4 || ^11
+package: ECA
+dependencies:
+  - eca:eca
+  - project_browser:project_browser(^2)
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

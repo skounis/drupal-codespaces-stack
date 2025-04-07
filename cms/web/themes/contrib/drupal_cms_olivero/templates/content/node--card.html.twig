@@ -1,0 +1,56 @@
+{#
+/**
+ * @file
+ * Implementation to display a node card.
+ *
+ * @todo This markup is largely duplicated from the card component. Once we can
+ * either get the src and alt from the image to pass to the component, or
+ * populate a slot with an image in XB, we can consolidate.
+ */
+#}
+
+{{ attach_library('core/components.drupal_cms_olivero--card')}}
+
+{%
+  set classes = [
+  'node',
+  'node--type-' ~ node.bundle|clean_class,
+  node.isPromoted() ? 'node--promoted',
+  node.isSticky() ? 'node--sticky',
+  not node.isPublished() ? 'node--unpublished',
+  view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
+]
+%}
+
+{% set has_image = content.field_featured_image|render|striptags('img')|trim %}
+<article{{ attributes.addClass(classes, 'card', not has_image ? 'card--no-image') }}>
+  <div class="card__inner">
+    {{ title_suffix }}
+    {% if has_image %}
+      <div class="card__image">
+        {{ content.field_featured_image }}
+      </div>
+    {% endif %}
+    <div class="card__content">
+      <header class="card__header">
+        <h3 class="card__title">
+          <a href="{{ url }}">{{ label }}</a>
+        </h3>
+        {% if display_submitted %}
+          <div class="card__subtitle">
+            <span{{ author_attributes }}>
+              {{ date }}
+            </span>
+            {{ metadata }}
+          </div>
+        {% endif %}
+      </header>
+      <div class="card__lower">
+        <div class="card__description">
+          {{ content|without('field_featured_image', 'links') }}
+        </div>
+      </div>
+    </div>
+    <div class="card__cta-icon button button--primary"></div>
+  </div>
+</article>

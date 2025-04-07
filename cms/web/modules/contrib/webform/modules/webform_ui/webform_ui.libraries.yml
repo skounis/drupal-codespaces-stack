@@ -1,0 +1,6 @@
+webform_ui:
+  css:
+    theme:
+      css/webform_ui.module.css: {}
+  js:
+    js/webform_ui.js: {}

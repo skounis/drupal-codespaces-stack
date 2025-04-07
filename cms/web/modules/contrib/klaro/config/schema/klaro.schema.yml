@@ -1,0 +1,332 @@
+# Schema for the configuration files of the Klaro! module.
+klaro.klaro_app.*:
+  type: config_entity
+  label: 'Klaro! Service'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    description:
+      type: text
+      label: 'Description'
+    default:
+      type: boolean
+      label: 'Toggled by default'
+    purposes:
+      type: sequence
+      label: 'Purposes'
+      sequence:
+        type: string
+    cookies:
+      type: sequence
+      sequence:
+        type: mapping
+        label: 'Cookie'
+        mapping:
+          regex:
+            type: string
+            label: 'Regular expression'
+          path:
+            type: string
+            label: 'Path'
+          domain:
+            type: string
+            label: 'Domain'
+    required:
+      type: boolean
+      label: 'Required'
+    opt_out:
+      type: boolean
+      label: 'Opt out'
+    only_once:
+      type: boolean
+      label: 'Only once'
+    contextual_consent_only:
+      type: boolean
+      label: 'Contextual Consent Only'
+    contextual_consent_text:
+      type: string
+      label: 'Contextual Consent Text'
+    info_url:
+      type: uri
+      label: 'Info url'
+      nullable: true
+    privacy_policy_url:
+      type: uri
+      label: 'Privacy policy url'
+      nullable: true
+    javascripts:
+      type: sequence
+      label: 'Src attribute paths'
+      sequence:
+        type: string
+    callback_code:
+      type: string
+      label: 'Callback (inline Javascript)'
+    wrapper_identifier:
+      type: sequence
+      label: 'Embed wrap classes'
+      sequence:
+        type: string
+    attachments:
+      type: sequence
+      label: 'Page Attachment identifiers'
+      sequence:
+        type: string
+    weight:
+      type: integer
+      label: 'weight'
+
+klaro.klaro_purpose.*:
+  type: config_entity
+  label: 'Klaro! purpose'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    description:
+      type: text
+      label: 'Description'
+    weight:
+      type: integer
+      label: 'weight'
+
+klaro.settings:
+  type: config_object
+  label: 'Klaro! settings'
+  mapping:
+    dialog_mode:
+      type: string
+      label: 'Dialog mode'
+    auto_decorate_final_html:
+      type: boolean
+      label: 'Process final HTML'
+    auto_decorate_js_alter:
+      type: boolean
+      label: 'Process js_alter'
+    auto_decorate_page_attachments:
+      type: boolean
+      label: 'Process page_attachments'
+    auto_decorate_preprocess_field:
+      type: boolean
+      label: 'Process preprocess_field'
+    get_entity_thumbnail:
+      type: boolean
+      label: 'Determine thumbnail for preview'
+    block_unknown:
+      type: boolean
+      label: 'Block unknown external resources'
+    log_unknown_resources:
+      type: boolean
+      label: 'Log unknown resources'
+    block_unknown_label:
+      type: label
+      label: 'Label for the unknown app.'
+    block_unknown_description:
+      type: label
+      label: 'Description text for the unknown app.'
+    show_toggle_button:
+      type: boolean
+      label: 'Show klaro notice toggle button'
+    toggle_button_icon:
+      type: string
+      label: 'Toggle button icon'
+    show_close_button:
+      type: boolean
+      label: 'Show closing button X to notice dialog'
+    deletable_cookie_domains:
+      type: sequence
+      label: 'Deletable cookie domains'
+      sequence:
+        type: string
+    exclude_urls:
+      type: sequence
+      label: 'Dont show Klaro element and block all groups on following urls'
+      sequence:
+        type: string
+    disable_urls:
+      type: sequence
+      label: 'Dont show Klaro element and show all groups on following urls'
+      sequence:
+        type: string
+    styles:
+      type: sequence
+      label: 'Override Klaro css variables'
+      sequence:
+        type: string
+    process_descriptions:
+      type: boolean
+      label: 'Process descriptions'
+    override_css:
+      type: boolean
+      label: 'Override Klaro CSS'
+    show_notice_title:
+      type: boolean
+      label: 'Show title of notice dialog'
+    library:
+      type: mapping
+      label: 'Library settings'
+      mapping:
+        element_id:
+          type: string
+          label: 'Element ID'
+        storage_method:
+          type: string
+          label: 'Storage method'
+        cookie_name:
+          type: string
+          label: 'Cookie name'
+        cookie_expires_after_days:
+          type: integer
+          label: 'Cookie expires after'
+        cookie_domain:
+          type: string
+          label: 'Cookie domain'
+        group_by_purpose:
+          type: boolean
+          label: 'Group apps by purpose'
+        accept_all:
+          type: boolean
+          label: 'Accept all'
+        hide_decline_all:
+          type: boolean
+          label: 'Hide decline all'
+        hide_learn_more:
+          type: boolean
+          label: 'Hide learn more'
+        learn_more_as_button:
+          type: boolean
+          label: 'Display Learn more as a button'
+        additional_class:
+          type: string
+          label: 'Additional css classes'
+        html_texts:
+          type: boolean
+          label: 'Allow HTML in texts. (Does not work for button texts)'
+        auto_focus:
+          type: boolean
+          label: 'Enable autofocus for Klaro element'
+
+klaro.texts:
+  type: config_object
+  label: 'Klaro! texts'
+  mapping:
+    consentModal:
+      type: mapping
+      mapping:
+        title:
+          type: label
+          label: 'Title'
+        description:
+          type: text
+          label: 'Description'
+        privacyPolicy:
+          type: mapping
+          label: 'Privacy Policy'
+          mapping:
+            name:
+              type: label
+              label: 'Name'
+            text:
+              type: text
+              label: 'Text'
+            url:
+              # @todo Change to uri once #2866303 is fixed.
+              type: label
+              label: 'URL'
+    consentNotice:
+      type: mapping
+      label: 'Consent notice'
+      mapping:
+        title:
+          type: label
+          label: 'Title'
+        changeDescription:
+          type: label
+          label: 'Change description'
+        description:
+          type: text
+          label: 'Description'
+        learnMore:
+          type: label
+          label: 'Learn more link text'
+    ok:
+      type: label
+      label: 'Ok button text'
+    save:
+      type: label
+      label: 'Save button text'
+    decline:
+      type: label
+      label: 'Decline button text'
+    close:
+      type: label
+      label: 'Close button hover text'
+    acceptAll:
+      type: label
+      label: 'Accept all button text'
+    acceptSelected:
+      type: label
+      label: 'Accept selected button text'
+    service:
+      type: mapping
+      label: 'Service'
+      mapping:
+        disableAll:
+          type: mapping
+          label: 'Disable all'
+          mapping:
+            title:
+              type: label
+              label: 'Title'
+            description:
+              type: text
+              label: 'Description'
+        optOut:
+          type: mapping
+          label: 'Opt out'
+          mapping:
+            title:
+              type: label
+              label: 'Title'
+            description:
+              type: text
+              label: 'Description'
+        required:
+          type: mapping
+          label: 'Required'
+          mapping:
+            title:
+              type: label
+              label: 'Title'
+            description:
+              type: text
+              label: 'Description'
+        purposes:
+          type: label
+          label: 'Purposes'
+        purpose:
+          type: label
+          label: 'Purpose'
+    contextualConsent:
+      type: mapping
+      label: 'Contextual Blocking'
+      mapping:
+        acceptAlways:
+          type: label
+          label: 'Accept always'
+        acceptOnce:
+          type: label
+          label: 'Accept once'
+        description:
+          type: text
+          label: 'Description'
+    poweredBy:
+      type: label
+      label: 'Powered by'

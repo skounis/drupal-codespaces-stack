@@ -1,0 +1,183 @@
+services:
+  php:
+    # We can build at D9 or D10. This is determined by the image statement below
+    # not the core version of the drupalci test that triggered the build.
+    # image: q0rban/tugboat-drupal:9.5
+    image: q0rban/tugboat-drupal:10.0
+    default: true
+    http: false
+    depends: mysql
+    commands:
+      init: |
+        # Install the bcmath extension, required for commerce_product
+        docker-php-ext-install bcmath
+        # JPEG support is not included by default, but it is needed when generating content.
+        docker-php-ext-configure gd --enable-gd --with-jpeg
+        docker-php-ext-install gd
+
+      update: |
+        set -eux
+
+        # Check out a branch using the unique Tugboat ID for this repository, to
+        # ensure we don't clobber an existing branch.
+        git checkout -b $TUGBOAT_REPO_ID
+
+        # Composer is hungry. You need a Tugboat project with a pretty sizeable
+        # chunk of memory.
+        export COMPOSER_MEMORY_LIMIT=-1
+
+        # This is an environment variable we added in the Dockerfile that
+        # provides the path to Drupal composer root (not the web root).
+        cd $DRUPAL_COMPOSER_ROOT
+
+        # We configure the Drupal project to use the checkout of the module as a
+        # Composer package repository.
+        composer config repositories.tugboat vcs $TUGBOAT_ROOT
+
+        # Scheduler does not yet have a full 2.0 release so fails the default
+        # minimum stability if it is loaded via SCMI composer.json. We can get
+        # it here specifically, to avoid this problem.
+        composer require drupal/scheduler ^2.0@RC
+
+        # Now we can require this module, specifing the branch name we created
+        # above that uses the $TUGBOAT_REPO_ID environment variable.
+        composer require drupal/scheduler_content_moderation_integration:dev-$TUGBOAT_REPO_ID
+
+        # Install Drupal on the site.
+        vendor/bin/drush \
+          --yes \
+          --db-url=mysql://tugboat:tugboat@mysql:3306/tugboat \
+          --site-name="${TUGBOAT_PREVIEW_NAME}" \
+          --account-pass=admin \
+          site:install standard
+
+        # Show site status and GD image support status.
+        vendor/bin/drush status-report
+        vendor/bin/drush php:eval 'phpinfo()' | grep GD
+        vendor/bin/drush php:eval 'print "imagepng() " . (function_exists("imagepng") ? "--yes\n" : "--no\n"); '
+        vendor/bin/drush php:eval 'print "imagejpeg() " . (function_exists("imagejpeg") ? "--yes\n" : "--no\n"); '
+        vendor/bin/drush php:eval 'print_r(gd_info());'
+
+        # Get other useful modules to assist testing.
+        composer require drupal/devel_generate
+        composer require drupal/config_inspector
+
+        # These modules are not compatible with Drupal 10 (yet) so only get them
+        # when running Drupal 9.
+        vendor/bin/drush core:status | awk "NR==1{print \$2\$3\$4}"
+        vendor/bin/drush core:status | awk "NR==1{print \$2\$3\$4}" | \
+          grep version:9 && composer require drupal/module_filter drupal/admin_toolbar drupal/config_update
+
+        # Set up the files directory permissions.
+        mkdir -p $DRUPAL_DOCROOT/sites/default/files
+        chgrp -R www-data $DRUPAL_DOCROOT/sites/default/files
+        chmod 2775 $DRUPAL_DOCROOT/sites/default/files
+        chmod -R g+w $DRUPAL_DOCROOT/sites/default/files
+
+        # Enable modules.
+        vendor/bin/drush --yes pm:enable scheduler devel devel_generate \
+          scheduler_content_moderation_integration media
+
+        # Enable modules that are only available at Drupal 9.
+        vendor/bin/drush core:status | awk "NR==1{print \$2\$3\$4}" | \
+          grep version:9 && vendor/bin/drush --yes pm:enable module_filter admin_toolbar config_update
+
+        # Show versions.
+        composer show drupal/scheduler | egrep 'name |vers'
+        composer show drupal/scheduler_content_moderation_integration | egrep 'name |vers'
+        vendor/bin/drush pml | grep scheduler
+        composer show drupal/devel | egrep 'name |vers'
+        vendor/bin/drush pml | grep devel
+
+        # Scheduler general settings.
+        vendor/bin/drush -y config-set scheduler.settings allow_date_only 1
+        vendor/bin/drush -y config-set scheduler.settings default_time '04:06:00'
+        vendor/bin/drush config-get scheduler.settings
+
+        # Scheduler content settings.
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.unpublish_enable 1
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.expand_fieldset 'always'
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.fields_display_mode 'fieldset'
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.publish_past_date 'schedule'
+        vendor/bin/drush config-get node.type.article third_party_settings
+
+        # Scheduler media settings.
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.unpublish_enable 1
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.expand_fieldset 'when_required'
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.fields_display_mode 'vertical_tab'
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.publish_past_date 'schedule'
+        vendor/bin/drush config-get media.type.image third_party_settings
+
+        vendor/bin/drush -y config-set media.type.document third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush config-get media.type.document third_party_settings
+
+        # Media settings.
+        vendor/bin/drush -y config-set media.settings standalone_url 1
+        vendor/bin/drush config-get media.settings
+        vendor/bin/drush -y config-set field.field.media.image.field_media_image required 0
+        vendor/bin/drush config-get field.field.media.image.field_media_image
+
+        # Turn on moderation for article, image and document, using default editorial workflow
+        vendor/bin/drush -y config-set workflows.workflow.editorial type_settings.entity_types.node.0 article
+        vendor/bin/drush -y config-set workflows.workflow.editorial type_settings.entity_types.media.0 image
+        vendor/bin/drush -y config-set workflows.workflow.editorial type_settings.entity_types.media.1 document
+        vendor/bin/drush config-get workflows.workflow.editorial type_settings.entity_types
+
+        # Create a role which has all of the scheduler permissions.
+        vendor/bin/drush role-create 'scheduler_editor' 'Scheduler Editor'
+        vendor/bin/drush role-add-perm 'scheduler_editor' "schedule publishing of nodes, view scheduled content, \
+          schedule publishing of media, view scheduled media"
+
+        # Create a role which has all permissions for the default editorial workflow.
+        vendor/bin/drush role-create 'moderator' 'Moderator'
+        vendor/bin/drush role-add-perm 'moderator' \
+          "use editorial transition create_new_draft, use editorial transition publish,\
+          use editorial transition archive, use editorial transition archived_published,\
+          use editorial transition archived_draft, view latest version, view any unpublished content"
+
+        # Add some permissions for all authenticated users.
+        vendor/bin/drush role-add-perm 'authenticated' "create article content, edit any article content, \
+          delete any article content, access content overview, view own unpublished content, switch users, \
+          create media, update any media, delete any media, access media overview, view own unpublished media"
+
+        # Create users and give them roles.
+        vendor/bin/drush user-create 'Eddie editor'
+        vendor/bin/drush user-add-role 'scheduler_editor' 'Eddie editor'
+        vendor/bin/drush user-create 'Moby moderator'
+        vendor/bin/drush user-add-role 'moderator' 'Moby moderator'
+        vendor/bin/drush user-create 'Paisley publisher'
+        vendor/bin/drush user-add-role 'scheduler_editor' 'Paisley publisher'
+        vendor/bin/drush user-add-role 'moderator' 'Paisley publisher'
+
+        # Generate content.
+        vendor/bin/drush devel-generate-content 3 --bundles=article --authors=1,2,3,4 --verbose
+        vendor/bin/drush devel-generate-content 3 --bundles=page --authors=1,2,3,4 --verbose
+        # devel-generate-media does not have a --authors option.
+        vendor/bin/drush devel-generate-media 3 --media-types=image --verbose
+        vendor/bin/drush devel-generate-media 3 --media-types=document --verbose
+
+        # Update form displays to match the entity type settings.
+        vendor/bin/drush ev "\Drupal::service('scheduler.manager')->resetFormDisplayFields()"
+        vendor/bin/drush ev "_scheduler_content_moderation_integration_reset_form_display()"
+
+        # @todo Place the 'Switch users' block in first sidebar.
+        # @todo Add 'content overview' to tools menu.
+
+      build: |
+        set -eux
+
+        # Delete and re-check out this branch in case this is built from a Base Preview.
+        git branch -D $TUGBOAT_REPO_ID && git checkout -b $TUGBOAT_REPO_ID || true
+        export COMPOSER_MEMORY_LIMIT=-1
+        cd $DRUPAL_COMPOSER_ROOT
+        composer install --optimize-autoloader
+
+        # Update this module, including all dependencies.
+        composer update drupal/scheduler --with-all-dependencies
+        vendor/bin/drush --yes updb
+        vendor/bin/drush cache:rebuild
+
+  mysql:
+    image: tugboatqa/mariadb

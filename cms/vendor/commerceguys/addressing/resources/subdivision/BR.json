@@ -1,0 +1,140 @@
+{
+	"country_code": "BR",
+	"subdivisions": {
+		"AC": {
+			"code": "AC",
+			"name": "Acre",
+			"has_children": true
+		},
+		"AL": {
+			"code": "AL",
+			"name": "Alagoas",
+			"has_children": true
+		},
+		"AP": {
+			"code": "AP",
+			"name": "Amapá",
+			"has_children": true
+		},
+		"AM": {
+			"code": "AM",
+			"name": "Amazonas",
+			"has_children": true
+		},
+		"BA": {
+			"code": "BA",
+			"name": "Bahia",
+			"has_children": true
+		},
+		"CE": {
+			"code": "CE",
+			"name": "Ceará",
+			"has_children": true
+		},
+		"DF": {
+			"code": "DF",
+			"name": "Distrito Federal",
+			"has_children": true
+		},
+		"ES": {
+			"code": "ES",
+			"name": "Espírito Santo",
+			"has_children": true
+		},
+		"GO": {
+			"code": "GO",
+			"name": "Goiás",
+			"has_children": true
+		},
+		"MA": {
+			"code": "MA",
+			"name": "Maranhão",
+			"has_children": true
+		},
+		"MT": {
+			"code": "MT",
+			"name": "Mato Grosso",
+			"has_children": true
+		},
+		"MS": {
+			"code": "MS",
+			"name": "Mato Grosso do Sul",
+			"has_children": true
+		},
+		"MG": {
+			"code": "MG",
+			"name": "Minas Gerais",
+			"has_children": true
+		},
+		"PA": {
+			"code": "PA",
+			"name": "Pará",
+			"has_children": true
+		},
+		"PB": {
+			"code": "PB",
+			"name": "Paraíba",
+			"has_children": true
+		},
+		"PR": {
+			"code": "PR",
+			"name": "Paraná",
+			"has_children": true
+		},
+		"PE": {
+			"code": "PE",
+			"name": "Pernambuco",
+			"has_children": true
+		},
+		"PI": {
+			"code": "PI",
+			"name": "Piauí",
+			"has_children": true
+		},
+		"RJ": {
+			"code": "RJ",
+			"name": "Rio de Janeiro",
+			"has_children": true
+		},
+		"RN": {
+			"code": "RN",
+			"name": "Rio Grande do Norte",
+			"has_children": true
+		},
+		"RS": {
+			"code": "RS",
+			"name": "Rio Grande do Sul",
+			"has_children": true
+		},
+		"RO": {
+			"code": "RO",
+			"name": "Rondônia",
+			"has_children": true
+		},
+		"RR": {
+			"code": "RR",
+			"name": "Roraima",
+			"has_children": true
+		},
+		"SC": {
+			"code": "SC",
+			"name": "Santa Catarina",
+			"has_children": true
+		},
+		"SP": {
+			"code": "SP",
+			"name": "São Paulo",
+			"has_children": true
+		},
+		"SE": {
+			"code": "SE",
+			"name": "Sergipe",
+			"has_children": true
+		},
+		"TO": {
+			"code": "TO",
+			"name": "Tocantins",
+			"has_children": true
+		}
+	}
+}

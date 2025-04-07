@@ -1,0 +1,5 @@
+symfony_mailer_lite.symfony_mailer_lite_transport.collection:
+  title: 'Drupal Symfony Mailer Lite'
+  parent: system.admin_config_system
+  description: 'Configure Drupal Symfony Mailer Lite'
+  route_name: entity.symfony_mailer_lite_transport.collection

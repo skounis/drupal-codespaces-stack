@@ -1,0 +1,12 @@
+name: 'ECA BPMN'
+type: module
+description: 'Common functionality for all BPMN based modeller implementations.'
+core_version_requirement: ^10.3 || ^11
+package: ECA
+dependencies:
+  - eca:eca_ui
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

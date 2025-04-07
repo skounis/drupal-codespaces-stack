@@ -1,0 +1,46 @@
+yoast_seo_base_style:
+  version: 1.x
+  css:
+    theme:
+      css/yoast_seo.css: {}
+      css/yoast_seo_score.css: {}
+
+yoast_seo_core:
+  version: 1.x
+  js:
+    js/yoast_seo.js: {}
+  dependencies:
+      - core/jquery
+      - core/once
+      - core/drupal
+      - core/drupalSettings
+      - yoast_seo/analytics_core
+  css:
+    theme:
+      css/yoast_seo.css: {}
+
+yoast_seo_admin:
+  version: 1.x
+  css:
+    theme:
+      css/yoast_seo.config.css: {}
+      css/yoast_seo.message.css: {}
+
+yoast_seo_view:
+  version: 1.x
+  css:
+    theme:
+      css/yoast_seo.css: {}
+
+analytics_core:
+  remote: https://github.com/goalgorilla/RTSEO.js
+  version: 2.0.0
+  license:
+    name: GPL-3.0
+    url: https://github.com/goalgorilla/RTSEO.js/blob/master/LICENSE
+    gpl-compatible: true
+  js:
+    /libraries/rtseo.js/dist/rtseo.js: { preprocess: false }
+  css:
+    theme:
+      /libraries/rtseo.js/dist/rtseo.min.css: {}

@@ -1,0 +1,170 @@
+{
+	"country_code": "CO",
+	"subdivisions": {
+		"DC": {
+			"code": "DC",
+			"name": "Distrito Capital de Bogotá",
+			"postal_code_pattern": "11\\d{4}"
+		},
+		"AMA": {
+			"code": "AMA",
+			"name": "Amazonas",
+			"postal_code_pattern": "91\\d{4}"
+		},
+		"ANT": {
+			"code": "ANT",
+			"name": "Antioquia",
+			"postal_code_pattern": "05\\d{4}"
+		},
+		"ARA": {
+			"code": "ARA",
+			"name": "Arauca",
+			"postal_code_pattern": "81\\d{4}"
+		},
+		"ATL": {
+			"code": "ATL",
+			"name": "Atlántico",
+			"postal_code_pattern": "08\\d{4}"
+		},
+		"BOL": {
+			"code": "BOL",
+			"name": "Bolívar",
+			"postal_code_pattern": "13\\d{4}"
+		},
+		"BOY": {
+			"code": "BOY",
+			"name": "Boyacá",
+			"postal_code_pattern": "15\\d{4}"
+		},
+		"CAL": {
+			"code": "CAL",
+			"name": "Caldas",
+			"postal_code_pattern": "17\\d{4}"
+		},
+		"CAQ": {
+			"code": "CAQ",
+			"name": "Caquetá",
+			"postal_code_pattern": "18\\d{4}"
+		},
+		"CAS": {
+			"code": "CAS",
+			"name": "Casanare",
+			"postal_code_pattern": "85\\d{4}"
+		},
+		"CAU": {
+			"code": "CAU",
+			"name": "Cauca",
+			"postal_code_pattern": "19\\d{4}"
+		},
+		"CES": {
+			"code": "CES",
+			"name": "Cesar",
+			"postal_code_pattern": "20\\d{4}"
+		},
+		"COR": {
+			"code": "COR",
+			"name": "Córdoba",
+			"postal_code_pattern": "23\\d{4}"
+		},
+		"CUN": {
+			"code": "CUN",
+			"name": "Cundinamarca",
+			"postal_code_pattern": "25\\d{4}"
+		},
+		"CHO": {
+			"code": "CHO",
+			"name": "Chocó",
+			"postal_code_pattern": "27\\d{4}"
+		},
+		"GUA": {
+			"code": "GUA",
+			"name": "Guanía",
+			"postal_code_pattern": "94\\d{4}"
+		},
+		"GUV": {
+			"code": "GUV",
+			"name": "Guaviare",
+			"postal_code_pattern": "95\\d{4}"
+		},
+		"HUI": {
+			"code": "HUI",
+			"name": "Huila",
+			"postal_code_pattern": "41\\d{4}"
+		},
+		"LAG": {
+			"code": "LAG",
+			"name": "La Guajira",
+			"postal_code_pattern": "44\\d{4}"
+		},
+		"MAG": {
+			"code": "MAG",
+			"name": "Magdalena",
+			"postal_code_pattern": "47\\d{4}"
+		},
+		"MET": {
+			"code": "MET",
+			"name": "Meta",
+			"postal_code_pattern": "50\\d{4}"
+		},
+		"NAR": {
+			"code": "NAR",
+			"name": "Nariño",
+			"postal_code_pattern": "52\\d{4}"
+		},
+		"NSA": {
+			"code": "NSA",
+			"name": "Norte de Santander",
+			"postal_code_pattern": "54\\d{4}"
+		},
+		"PUT": {
+			"code": "PUT",
+			"name": "Putumayo",
+			"postal_code_pattern": "86\\d{4}"
+		},
+		"QUI": {
+			"code": "QUI",
+			"name": "Quindío",
+			"postal_code_pattern": "63\\d{4}"
+		},
+		"RIS": {
+			"code": "RIS",
+			"name": "Risaralda",
+			"postal_code_pattern": "66\\d{4}"
+		},
+		"SAP": {
+			"code": "SAP",
+			"name": "San Andrés, Providencia y Santa Catalina",
+			"postal_code_pattern": "88\\d{4}"
+		},
+		"SAN": {
+			"code": "SAN",
+			"name": "Santander",
+			"postal_code_pattern": "68\\d{4}"
+		},
+		"SUC": {
+			"code": "SUC",
+			"name": "Sucre",
+			"postal_code_pattern": "70\\d{4}"
+		},
+		"TOL": {
+			"code": "TOL",
+			"name": "Tolima",
+			"postal_code_pattern": "73\\d{4}"
+		},
+		"VAC": {
+			"code": "VAC",
+			"name": "Valle del Cauca",
+			"postal_code_pattern": "76\\d{4}"
+		},
+		"VAU": {
+			"code": "VAU",
+			"name": "Vaupés",
+			"postal_code_pattern": "97\\d{4}"
+		},
+		"VID": {
+			"code": "VID",
+			"name": "Vichada",
+			"postal_code_pattern": "99\\d{4}"
+		}
+	}
+}

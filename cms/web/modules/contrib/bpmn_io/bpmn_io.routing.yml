@@ -1,0 +1,19 @@
+bpmn_io.add:
+  path: '/admin/config/workflow/eca/add/bpmn-io'
+  defaults:
+    _controller: '\Drupal\bpmn_io\Controller\BpmnIo::add'
+    _title: Create new ECA model with BPMN.io
+  requirements:
+    _permission: 'edit bpmn io diagram'
+
+bpmn_io.convert:
+  path: '/admin/config/workflow/eca/{eca}/convert/bpmn-io'
+  defaults:
+    _controller: '\Drupal\bpmn_io\Controller\BpmnIo::convert'
+    _title: Edit with BPMN.io
+  options:
+    parameters:
+      eca:
+        type: 'entity:eca'
+  requirements:
+    _custom_access: 'bpmn_io.services.converter::access'

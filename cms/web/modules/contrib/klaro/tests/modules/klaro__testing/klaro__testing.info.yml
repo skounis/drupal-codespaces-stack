@@ -1,0 +1,10 @@
+name: Klaro Consent Manager Testing
+description: Allows for testing of klaro
+
+type: module
+core_version_requirement: ^10.1 || ^11
+
+# Information added by Drupal.org packaging script on 2025-04-06
+version: '3.0.4'
+project: 'klaro'
+datestamp: 1743966333

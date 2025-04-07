@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Real-Time SEO module.
+ */
+
+use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\views\Views;
+
+/**
+ * Remove the SEO status from the content overview.
+ */
+function yoast_seo_update_8201() {
+  $content_view = Views::getView('content');
+
+  if ($content_view) {
+    $display_id = 'page_1';
+
+    $handlers = $content_view->getHandlers('field', $display_id);
+    if (isset($handlers['field_yoast_seo'])) {
+      $content_view->removeHandler($display_id, 'field', 'field_yoast_seo');
+      $content_view->save();
+    }
+  }
+}
+
+/**
+ * Add a title and description property to the yoast_seo field.
+ */
+function yoast_seo_update_8202() {
+  $field_type = 'yoast_seo';
+  $add_properties = [
+    'title',
+    'description',
+  ];
+
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  $field_map = \Drupal::service('entity_field.manager')->getFieldMapByFieldType($field_type);
+
+  foreach ($field_map as $entity_type_id => $fields) {
+    foreach (array_keys($fields) as $field_name) {
+      $field_storage_definition = $manager->getFieldStorageDefinition($field_name, $entity_type_id);
+      $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
+
+      if ($storage instanceof SqlContentEntityStorage) {
+        $table_mapping = $storage->getTableMapping([
+          $field_name => $field_storage_definition,
+        ]);
+        $table_names = $table_mapping->getDedicatedTableNames();
+        $columns = $table_mapping->getColumnNames($field_name);
+
+        foreach ($table_names as $table_name) {
+          $field_schema = $field_storage_definition->getSchema();
+          $schema = \Drupal::database()->schema();
+
+          foreach ($add_properties as $new_property) {
+            $field_exists = $schema->fieldExists($table_name, $columns[$new_property]);
+            $table_exists = $schema->tableExists($table_name);
+
+            if (!$field_exists && $table_exists) {
+              $schema->addField($table_name, $columns[$new_property], $field_schema['columns'][$new_property]);
+            }
+          }
+        }
+      }
+      $manager->updateFieldStorageDefinition($field_storage_definition);
+    }
+  }
+
+}
+
+/**
+ * Move score label configuration into module settings.
+ */
+function yoast_seo_update_8203() {
+  \Drupal::configFactory()
+    ->getEditable('yoast_seo.settings')
+    ->set('score_rules', [
+      0 => 'Not available',
+      8 => 'Good',
+      1 => 'Bad',
+      5 => 'Okay',
+    ])
+    ->save();
+}
+
+/**
+ * Added an option to disable auto-refresh of the SEO results.
+ *
+ * In case you have complex pages that are being analysed and the form freezes
+ * during analysis, or you experience delays when editing,, consider disabling
+ * the feature in the module settings.
+ *
+ * Auto refresh remains enabled for existing installations.
+ */
+function yoast_seo_update_8204() : void {
+  // Keep enabled for BC on existing installations:
+  \Drupal::configFactory()->getEditable('yoast_seo.settings')
+    ->set('auto_refresh_seo_result', TRUE)
+    ->save();
+  $kernel = \Drupal::service('kernel');
+  assert($kernel instanceof DrupalKernelInterface);
+  $kernel->rebuildContainer();
+}

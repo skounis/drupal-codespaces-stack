@@ -1,0 +1,18 @@
+name: Pinecone Serverless VDB Provider
+description: This enables the use of Pinecone Serverless VDB in the AI module.
+package: AI Vector Database Providers (Experimental)
+type: module
+core_version_requirement: ^10.2 || ^11
+lifecycle: deprecated
+lifecycle_link: "https://www.drupal.org/project/ai/issues/3483356"
+hidden: true
+
+dependencies:
+  - ai:ai
+  - ai_search:ai_search
+  - key:key
+
+# Information added by Drupal.org packaging script on 2025-03-05
+version: '1.0.5'
+project: 'ai'
+datestamp: 1741174945

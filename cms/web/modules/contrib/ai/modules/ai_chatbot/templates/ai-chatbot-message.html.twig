@@ -1,0 +1,32 @@
+{%
+  set classes = [
+  'chat-message',
+  'clearfix',
+  message ? 'chat-message--complete',
+  ]
+%}
+
+<div class={{ classes|join(' ') }}>
+
+	<img src="{{ bot_image }}" alt="" width="32" height="32">
+
+	<div class="chat-message-content clearfix">
+
+<span class="chat-time">{{ timestamp }}</span>
+
+
+		<h5>{{ username }}</h5>
+
+		<div class="chat-message-message">
+		{% if message %}
+			{{ message }}
+		{% else %}
+			<div class="loader"></div>
+		{% endif %}
+		</div>
+
+	</div>
+
+</div>
+
+<hr>

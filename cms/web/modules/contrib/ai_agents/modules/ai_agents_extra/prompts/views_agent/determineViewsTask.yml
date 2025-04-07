@@ -1,0 +1,126 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: true
+prompt:
+  introduction: >
+    You are a developer that can generate Drupal Views. Based on the following
+    context of a task description and comments could you figure out if they are trying
+    to create a new view, edit an existing view, delete the
+    view or if they are just trying to get information that requires no
+    action. Any modification to an existing views will be marked as an edit.
+    The user might have provided some information about the view in the comments,
+    based on questions asked. Please review that.
+
+    Please be creative, since you will later be given information about the fields
+    available to create the view, its filters and sorting. Just make sure in this
+    prompt that you do understand which entity type and bundle the view is about.
+    You will be given a list of all entity types and bundles to make that easier.
+
+    You will also be given a list of the view styles available in Drupal. If the
+    user did not specify a view styles, assume that the view should be a default.
+
+    If the user asks for administration views or a table, you can assume that the
+    view should be using the admin theme and if they did not specify a path, it
+    should start with /admin.
+
+    If its an admin theme or if requested, set the show mode to fields, otherwise
+    set it to content.
+
+    If the user did not specify a path, be creative and come up with a path that
+    makes sense for the view.
+
+    If the user did not specify a title, be creative and come up with a title that
+    makes sense for the view.
+
+    If the actions create, edit or delete is dependent on some information about
+    the view, please verify that first.
+
+    When editing or deleting a view, the information title, path or the data_name
+    is required information - otherwise ask for information.
+
+    You can answer with multiple objects if needed.
+  possible_actions:
+    create: They are trying to create a view.
+    edit: They want to edit a view.
+    delete: They want to delete a view.
+    information: They want information about a view.
+    fail: The information was not enough.
+  formats:
+    - action: action id from list
+      title: The title of the view.
+      data_name: The machine name of the view. Make up one if creating.
+      path: The path of the view. Make up on if creating and not specified.
+      description: The description of the view.
+      view_type: The type of view to create from the list. Assume page if no info is given.
+      view_style: The style of the view. Assume default if no info is given.
+      show_mode: Fields or Content. Only required on create. Should be Content if not specified and not admin view.
+      content_mode: If Content mode is selected this the view mode for the entity to show. Default to teaser.
+      entity_type: The entity type of the view. Only required on create.
+      bundle: The bundle of the view. Can be all if not specified. Only required on create.
+      administration_theme: true or false, if the view should use the admin theme.
+      pager: Can be full, mini or none. Only required on create.
+      amount_per_page: The amount of items per page. Set 10 if not specified or 50 if administrative view with tables. 0 means all.
+      permission: The permission to access the view. Only set if asked for or set to administer content types if its an admin view.
+      role: The role to access the view. Only set if asked for and permission is not set.
+  one_shot_learning_examples:
+    - action: create
+      title: Articles
+      data_name: articles
+      path: /admin/article-view
+      description: An admin view of all articles.
+      view_type: page
+      view_style: table
+      show_mode: fields
+      entity_type: node
+      bundle: article
+      administration_theme: true
+      pager: full
+      amount_per_page: 10
+      permission: edit articles
+      role: null
+    - action: create
+      title: Articles (Public)
+      data_name: articles_public
+      path: /articles
+      description: A public view of all articles.
+      view_type: page
+      view_style: default
+      show_mode: content
+      content_mode: teaser
+      entity_type: node
+      bundle: article
+      administration_theme: false
+      pager: full
+      amount_per_page: 10
+      permission: view all articles
+      role: null
+    - action: create
+      title: Hotels on Map
+      data_name: hotels_on_map
+      path: /maps/hotel-view
+      description: A view of all hotels on a map.
+      view_type: geolocation_layer
+      view_style: maps_common
+      show_mode: fields
+      entity_type: hotel
+      bundle: all
+      administration_theme: false
+      pager: full
+      amount_per_page: 0
+      permission: view all hotels
+      role: null
+    - action: delete
+      data_name: articles
+    - action: delete
+      title: Hotels on Map
+    - action: delete
+      path: /maps/hotel-view
+    - action: edit
+      path: /admin/article-view
+    - action: edit
+      title: Articles
+    - action: information
+    - action: fail
+      extra_info: I can't extract enough information to determine the action.
+    - action: fail
+      extra_info: You are trying to generate a view of a non-existing entity type.

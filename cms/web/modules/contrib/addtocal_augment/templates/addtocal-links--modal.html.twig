@@ -1,0 +1,18 @@
+{%
+set classes = [
+  'add-to-calendar',
+  'modal'
+]
+%}
+{% if icons %}{% set classes = classes|merge(['icons']) %}{% endif %}
+<dialog{{attributes.addClass(classes)}} data-type="add_to_cal_modal">
+  <button autofocus class="close" aria-label="Close">X</button>
+	<a href="{{ google }}" target="_blank" class="addtocal__link addtocal__google">Google</a>
+	<a href="{{ outlook }}" download="event.ics" class="addtocal__link addtocal__outlook">Outlook</a>
+	<a href="{{ ical }}" download="event.ics" class="addtocal__link addtocal__ical">iCal</a>
+</dialog>
+{% if icons %}{{ attach_library('addtocal_augment/icons') }}
+<button type="button" class="addtocal__label" aria-label="{{ label }}"></button>
+{% else %}
+<button type="button" class="button">{{ label }}</button>
+{% endif %}

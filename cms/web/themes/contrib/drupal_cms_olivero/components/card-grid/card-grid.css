@@ -1,0 +1,29 @@
+:is(.card-grid, .card-grid[data-xb-slot-id]) {
+
+  @media(min-width: 600px) {
+    --column-count: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
+    gap: var(--sp2);
+
+    &:has(> :nth-child(2n)),
+    &:has(> .xb--sortable-list > :nth-child(2n)),
+    &:has(> :nth-child(5):last-child),
+    &:has(> .xb--sortable-list > :nth-child(5):last-child) {
+      --column-count: 2;
+    }
+
+    &:has(> :nth-child(3n):last-child),
+    &:has(> .xb--sortable-list > :nth-child(3n):last-child) {
+      --column-count: 3;
+    }
+
+    > .xb--sortable-list {
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-column: 1 / -1;
+      gap: var(--sp2);
+    }
+  }
+
+}

@@ -1,0 +1,8 @@
+services:
+  focal_point.manager:
+    class: Drupal\focal_point\FocalPointManager
+    arguments: ['@entity_type.manager']
+  focal_point.migrate_subscriber:
+    class: Drupal\focal_point\EventSubscriber\MigrationSubscriber
+    tags:
+      - { name: event_subscriber }

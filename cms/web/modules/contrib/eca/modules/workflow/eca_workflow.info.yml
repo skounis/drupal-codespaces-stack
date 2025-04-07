@@ -1,0 +1,13 @@
+name: 'ECA Workflow'
+type: module
+description: 'Events, conditions and actions for content moderation workflow.'
+core_version_requirement: ^10.3 || ^11
+package: ECA
+dependencies:
+  - drupal:content_moderation
+  - eca:eca
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

@@ -1,0 +1,12 @@
+name: 'Webform Options Limit'
+type: module
+description: 'Allows elements with options (i.e. select, checkboxes, and radios) to have option specific submission limits.'
+package: 'Webform'
+core_version_requirement: ^10.3 || ^11.0
+dependencies:
+  - 'webform:webform'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

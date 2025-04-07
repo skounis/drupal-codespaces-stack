@@ -1,0 +1,19 @@
+<div{{ attributes.addClass('hero') }}>
+  <img class="hero__image" src="{{ image.src }}" alt="{{ image.alt }}" width="{{ image.width }}" height="{{ image.height }}">
+  <div class="hero__container container grid-full">
+    <div class="hero__data">
+      <div class="hero__data-inner">
+        <h2 class="hero__title">{{ title }}</h2>
+        {% if summary %}
+          <p class="hero__summary">{{ summary }}</p>
+        {% endif %}
+        <div class="hero__buttons">
+          <a class="button button--primary" href="{{ link_url_1 }}">{{ link_text_1|default('Learn more'|t) }}</a>
+          {%- if link_text_2 and link_url_2 -%}
+            <a class="button button--secondary" href="{{ link_url_2 }}">{{ link_text_2 }}</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

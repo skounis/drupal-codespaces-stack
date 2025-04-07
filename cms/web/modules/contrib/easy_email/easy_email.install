@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function easy_email_requirements($phase) {
+  $requirements = [];
+  if ($phase === 'install' || $phase === 'runtime') {
+    $mailers = [
+      'symfony_mailer' => [
+        'label' => t('Drupal Symfony Mailer'),
+        'url' => 'https://www.drupal.org/project/symfony_mailer',
+        'test_class' => 'Drupal\symfony_mailer\Mailer',
+      ],
+      'symfony_mailer_lite' => [
+        'label' => t('Drupal Symfony Mailer Lite'),
+        'url' => 'https://www.drupal.org/project/symfony_mailer_lite',
+        'test_class' => 'Drupal\symfony_mailer_lite\Plugin\Mail\SymfonyMailer',
+      ],
+    ];
+    $has_acceptable_mailer = FALSE;
+    foreach ($mailers as $mailer) {
+      if (class_exists($mailer['test_class'])) {
+        $has_acceptable_mailer = TRUE;
+        break;
+      }
+    }
+    if (!$has_acceptable_mailer) {
+      $replacements = [];
+      $mailer_descriptions = [];
+      foreach ($mailers as $key => $mailer) {
+        $mailer_descriptions[] = '<a target="_blank" href=":' . $key . '">@' . $key . '_label</a>';
+        $replacements[':' . $key] = $mailer['url'];
+        $replacements['@' . $key . '_label'] = $mailer['label'];
+      }
+      $requirements['easy_email_mailer'] = [
+        'title' => t('Easy Email mailer module'),
+        'description' => t('Easy Email requires one of the following modules to be installed: '
+          . implode(', ', $mailer_descriptions), $replacements),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+  return $requirements;
+}
+
+
+function easy_email_install($is_syncing) {
+  if (!$is_syncing) {
+    if (\Drupal::moduleHandler()->moduleExists('mailsystem')) {
+      if (\Drupal::moduleHandler()->moduleExists('symfony_mailer_lite')) {
+        $settings = Drupal::configFactory()->getEditable('mailsystem.settings');
+        $settings->set('modules.easy_email.none', [
+          'formatter' => 'symfony_mailer_lite',
+          'sender' => 'symfony_mailer_lite',
+        ])->save();
+      }
+    }
+  }
+}
+
+/**
+ * Set the default value for accessing the email log report.
+ */
+function easy_email_update_10001(&$sandbox) {
+  $config = \Drupal::configFactory()->getEditable('easy_email.settings');
+  $config->set('email_collection_access', TRUE);
+  $config->save();
+}

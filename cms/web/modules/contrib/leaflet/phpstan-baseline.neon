@@ -1,0 +1,266 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to an undefined property \\:\\:\\$leafletService\\.$#"
+			count: 3
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property \\:\\:\\$rendered_fields\\.$#"
+			count: 3
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\leaflet_views\\\\Plugin\\\\views\\\\style\\\\LeafletMap\\:\\:\\$fieldDefinition\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(field\\)\\:\\:\\$display_handler\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(field\\)\\:\\:\\$rowPlugin\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(view\\)\\:\\:\\$entityManager\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(view\\)\\:\\:\\$leafletService\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(view\\)\\:\\:\\$moduleHandler\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(view\\)\\:\\:\\$options\\.$#"
+			count: 10
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(view\\)\\:\\:\\$rendered_fields\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to an undefined property hasProperty\\(view\\)\\:\\:\\$renderer\\.$#"
+			count: 3
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Access to property \\$_item on an unknown class Drupal\\\\search_api\\\\Plugin\\\\views\\\\ResultRow\\.$#"
+			count: 3
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to an undefined method \\:\\:viewsTokenReplace\\(\\)\\.$#"
+			count: 15
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to an undefined method hasProperty\\(view\\)\\:\\:getFieldValue\\(\\)\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to an undefined method hasProperty\\(view\\)\\:\\:viewsTokenReplace\\(\\)\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to method getEntityTypeId\\(\\) on an unknown class Drupal\\\\search_api\\\\Datasource\\\\DatasourceInterface\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to method getText\\(\\) on an unknown class Drupal\\\\search_api\\\\Plugin\\\\search_api\\\\data_type\\\\value\\\\TextValue\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to method providersPluginsTableList\\(\\) on an unknown class Drupal\\\\geocoder\\\\ProviderPluginManager\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to static method load\\(\\) on an unknown class Drupal\\\\search_api\\\\Entity\\\\Index\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Class Drupal\\\\leaflet\\\\LeafletService referenced with incorrect case\\: Drupal\\\\Leaflet\\\\LeafletService\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Class Drupal\\\\search_api\\\\Datasource\\\\DatasourceInterface not found\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Class Drupal\\\\search_api\\\\Plugin\\\\search_api\\\\data_type\\\\value\\\\TextValue not found\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Class Drupal\\\\search_api\\\\Plugin\\\\views\\\\ResultRow not found\\.$#"
+			count: 2
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$geocoder_provider contains unknown class Drupal\\\\geocoder\\\\ProviderPluginManager\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Variable \\$entity might not be defined\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Variable \\$features_groups in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Variable \\$force_checkbox_selector might not be defined\\.$#"
+			count: 4
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Variable \\$weight on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: modules/leaflet_views/src/Plugin/views/style/LeafletMap.php
+
+		-
+			message: "#^Call to method geometryType\\(\\) on an unknown class Geometry\\.$#"
+			count: 1
+			path: src/LeafletService.php
+
+		-
+			message: "#^Call to method getComponents\\(\\) on an unknown class GeometryCollection\\.$#"
+			count: 8
+			path: src/LeafletService.php
+
+		-
+			message: "#^Call to method getX\\(\\) on an unknown class Geometry\\.$#"
+			count: 5
+			path: src/LeafletService.php
+
+		-
+			message: "#^Call to method getY\\(\\) on an unknown class Geometry\\.$#"
+			count: 5
+			path: src/LeafletService.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$component contains unknown class Geometry\\.$#"
+			count: 2
+			path: src/LeafletService.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$component contains unknown class GeometryCollection\\.$#"
+			count: 1
+			path: src/LeafletService.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$geom contains unknown class GeometryCollection\\.$#"
+			count: 7
+			path: src/LeafletService.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$polygon contains unknown class GeometryCollection\\.$#"
+			count: 1
+			path: src/LeafletService.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$subcomponent contains unknown class Geometry\\.$#"
+			count: 2
+			path: src/LeafletService.php
+
+		-
+			message: "#^PHPDoc tag @var with type GeometryCollection is not subtype of native type Geometry\\.$#"
+			count: 5
+			path: src/LeafletService.php
+
+		-
+			message: "#^Parameter \\$geom of method Drupal\\\\leaflet\\\\LeafletService\\:\\:leafletProcessGeometry\\(\\) has invalid type Geometry\\.$#"
+			count: 2
+			path: src/LeafletService.php
+
+		-
+			message: "#^Variable \\$file_headers in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: src/LeafletService.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\leaflet\\\\Plugin\\\\Field\\\\FieldFormatter\\\\LeafletDefaultFormatter\\:\\:\\$entityType\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TranslatableInterface\\:\\:bundle\\(\\)\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TranslatableInterface\\:\\:getEntityTypeId\\(\\)\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TranslatableInterface\\:\\:id\\(\\)\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Call to method providersPluginsTableList\\(\\) on an unknown class Drupal\\\\geocoder\\\\ProviderPluginManager\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$geocoder_provider contains unknown class Drupal\\\\geocoder\\\\ProviderPluginManager\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Variable \\$force_checkbox_selector_widget in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 2
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Variable \\$weight on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/LeafletDefaultFormatter.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\leaflet\\\\Plugin\\\\Field\\\\FieldWidget\\\\LeafletDefaultWidget\\:\\:\\$entityType\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/LeafletDefaultWidget.php
+
+		-
+			message: "#^Call to method providersPluginsTableList\\(\\) on an unknown class Drupal\\\\geocoder\\\\ProviderPluginManager\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/LeafletDefaultWidget.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$geocoder_provider contains unknown class Drupal\\\\geocoder\\\\ProviderPluginManager\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/LeafletDefaultWidget.php
+
+		-
+			message: "#^Variable \\$force_checkbox_selector_widget in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 2
+			path: src/Plugin/Field/FieldWidget/LeafletDefaultWidget.php
+
+		-
+			message: "#^Variable \\$weight on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/LeafletDefaultWidget.php

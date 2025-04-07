@@ -1,0 +1,6 @@
+ai_content_suggestions.settings:
+  title: AI Content Suggestions settings
+  description: Enable and Disable plugins for the AI Content Suggestions module
+  parent: ai.admin_settings
+  route_name: ai_content_suggestions.settings
+  weight: 10

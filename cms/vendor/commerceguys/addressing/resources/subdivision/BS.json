@@ -1,0 +1,101 @@
+{
+	"country_code": "BS",
+	"subdivisions": {
+		"AK": {
+			"name": "Acklins"
+		},
+		"BY": {
+			"name": "Berry Islands"
+		},
+		"BI": {
+			"name": "Bimini"
+		},
+		"BP": {
+			"name": "Black Point"
+		},
+		"CI": {
+			"name": "Cat Island"
+		},
+		"CO": {
+			"name": "Central Abaco"
+		},
+		"CS": {
+			"name": "Central Andros"
+		},
+		"CE": {
+			"name": "Central Eleuthera"
+		},
+		"FP": {
+			"name": "City of Freeport"
+		},
+		"CK": {
+			"name": "Crooked Island and Long Cay"
+		},
+		"EG": {
+			"name": "East Grand Bahama"
+		},
+		"EX": {
+			"name": "Exuma"
+		},
+		"GC": {
+			"name": "Grand Cay"
+		},
+		"HI": {
+			"name": "Harbour Island"
+		},
+		"HT": {
+			"name": "Hope Town"
+		},
+		"IN": {
+			"name": "Inagua"
+		},
+		"LI": {
+			"name": "Long Island"
+		},
+		"MC": {
+			"name": "Mangrove Cay"
+		},
+		"MG": {
+			"name": "Mayaguana"
+		},
+		"MI": {
+			"name": "Moore's Island"
+		},
+		"NP": {
+			"name": "New Providence"
+		},
+		"NO": {
+			"name": "North Abaco"
+		},
+		"NS": {
+			"name": "North Andros"
+		},
+		"NE": {
+			"name": "North Eleuthera"
+		},
+		"RI": {
+			"name": "Ragged Island"
+		},
+		"RC": {
+			"name": "Rum Cay"
+		},
+		"SS": {
+			"name": "San Salvador"
+		},
+		"SO": {
+			"name": "South Abaco"
+		},
+		"SA": {
+			"name": "South Andros"
+		},
+		"SE": {
+			"name": "South Eleuthera"
+		},
+		"SW": {
+			"name": "Spanish Wells"
+		},
+		"WG": {
+			"name": "West Grand Bahama"
+		}
+	}
+}

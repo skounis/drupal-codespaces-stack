@@ -1,0 +1,17 @@
+'view editoria11y checker':
+  title: 'View Editoria11y checker'
+  description: 'Assign to all content editors.'
+'administer editoria11y checker':
+  title: 'Administer Editoria11y checker'
+  description: 'Allows user to purge results and change configuration.'
+  restrict access: true
+'mark as hidden in editoria11y':
+  title: 'Mark as hidden in Editoria11y'
+  description: 'Adds button to suppress a manual check for the current user.'
+'mark as ok in editoria11y':
+  title: 'Mark as OK in Editoria11y'
+  description: 'Adds button to suppress a manual check for all users, if sync is enabled.'
+'manage editoria11y results':
+  title: 'Manage Editoria11y results'
+  description: 'View the site-wide dashboard and reset dismissals.'
+  restrict access: true

@@ -1,0 +1,94 @@
+user.register_admin_created:
+  id: 'user.register_admin_created'
+  label: 'User: Welcome (new user created by administrator)'
+  module: 'user'
+  key: 'register_admin_created'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.register_pending_approval:
+  id: 'user.register_pending_approval'
+  label: 'User: Welcome (awaiting approval)'
+  module: 'user'
+  key: 'register_pending_approval'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.register_pending_approval_admin:
+  id: 'user.register_pending_approval_admin'
+  label: 'User: Admin (user awaiting approval)'
+  module: 'user'
+  key: 'register_pending_approval_admin'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.register_no_approval_required:
+  id: 'user.register_no_approval_required'
+  label: 'User: Welcome (no approval required)'
+  module: 'user'
+  key: 'register_no_approval_required'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.status_activated:
+  id: 'user.status_activated'
+  label: 'User: Account activation'
+  module: 'user'
+  key: 'status_activated'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.status_blocked:
+  id: 'user.status_blocked'
+  label: 'User: Account blocked'
+  module: 'user'
+  key: 'status_blocked'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.cancel_confirm:
+  id: 'user.status_blocked'
+  label: 'User: Account cancellation confirmation'
+  module: 'user'
+  key: 'cancel_confirm'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.status_canceled:
+  id: 'user.status_blocked'
+  label: 'User: Account canceled'
+  module: 'user'
+  key: 'status_canceled'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+user.password_reset:
+  id: 'user.password_reset'
+  label: 'User: Password recovery'
+  module: 'user'
+  key: 'password_reset'
+  params:
+    account:
+      type: 'entity:user'
+      label: 'Account'
+
+easy_email_override.deriver:
+  id: 'easy_email_override.deriver'
+  label: 'Easy Email Override'
+  deriver: 'Drupal\easy_email_override\Plugin\Derivative\DeclaredEmailDeriver'

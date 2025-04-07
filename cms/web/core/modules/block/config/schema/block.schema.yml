@@ -1,0 +1,58 @@
+# Schema for the configuration files of the Block module.
+
+block.block.*:
+  type: config_entity
+  label: 'Block'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    id:
+      type: machine_name
+      label: 'ID'
+      # Blocks have atypical machine names: they allow periods for historical reasons.
+      # @see https://www.drupal.org/project/drupal/issues/2685917
+      # @see https://www.drupal.org/project/drupal/issues/2043527
+      constraints:
+        Regex:
+          pattern: '/^[a-z0-9_.]+$/'
+          message: "The %value machine name is not valid."
+    theme:
+      type: string
+      label: 'Theme'
+      constraints:
+        NotBlank: []
+        ExtensionName: []
+        ExtensionExists: theme
+    region:
+      type: string
+      label: 'Region'
+      constraints:
+        NotBlank: []
+        Callback: ['\Drupal\block\Entity\Block', validateRegion]
+    weight:
+      type: weight
+      label: 'Weight'
+    provider:
+      # @todo Deprecate this from config schema and remove it from the `config_export` definition in https://www.drupal.org/project/drupal/issues/3426278
+      nullable: true
+      type: string
+      label: 'Provider'
+    plugin:
+      type: string
+      label: 'Plugin'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.block
+          interface: Drupal\Core\Block\BlockPluginInterface
+          # Block plugin IDs may not be valid in blocks that are backed by
+          # block_content entities that don't exist yet. Therefore, it's okay
+          # to consider the fallback plugin ID as valid.
+          allowFallback: true
+    settings:
+      type: block.settings.[%parent.plugin]
+    visibility:
+      type: sequence
+      label: 'Visibility Conditions'
+      sequence:
+        type: condition.plugin.[id]
+        label: 'Visibility Condition'

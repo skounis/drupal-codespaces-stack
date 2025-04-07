@@ -1,0 +1,9 @@
+search_api_autocomplete_suggester:
+  label: Search API Autocomplete suggester
+  plugin_manager_service_id: plugin.manager.search_api_autocomplete.suggester
+  plugin_definition_decorator_class: \Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator
+
+search_api_autocomplete_search:
+  label: Search API Autocomplete search plugin
+  plugin_manager_service_id: plugin.manager.search_api_autocomplete.search
+  plugin_definition_decorator_class: \Drupal\plugin\PluginDefinition\ArrayPluginDefinitionDecorator

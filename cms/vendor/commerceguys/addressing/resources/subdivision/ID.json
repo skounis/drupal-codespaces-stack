@@ -1,0 +1,158 @@
+{
+	"country_code": "ID",
+	"locale": "id",
+	"subdivisions": {
+		"AC": {
+			"name": "Aceh",
+			"local_name": "Aceh"
+		},
+		"BA": {
+			"name": "Bali",
+			"local_name": "Bali"
+		},
+		"BT": {
+			"name": "Banten",
+			"local_name": "Banten"
+		},
+		"BE": {
+			"name": "Bengkulu",
+			"local_name": "Bengkulu"
+		},
+		"YO": {
+			"name": "Special Region of Yogyakarta",
+			"local_name": "Daerah Istimewa Yogyakarta"
+		},
+		"JK": {
+			"name": "Jakarta",
+			"local_name": "DKI Jakarta"
+		},
+		"GO": {
+			"name": "Gorontalo",
+			"local_name": "Gorontalo"
+		},
+		"JA": {
+			"name": "Jambi",
+			"local_name": "Jambi"
+		},
+		"JB": {
+			"name": "West Java",
+			"local_name": "Jawa Barat"
+		},
+		"JT": {
+			"name": "Central Java",
+			"local_name": "Jawa Tengah"
+		},
+		"JI": {
+			"name": "East Java",
+			"local_name": "Jawa Timur"
+		},
+		"KB": {
+			"name": "West Kalimantan",
+			"local_name": "Kalimantan Barat"
+		},
+		"KS": {
+			"name": "South Kalimantan",
+			"local_name": "Kalimantan Selatan"
+		},
+		"KT": {
+			"name": "Central Kalimantan",
+			"local_name": "Kalimantan Tengah"
+		},
+		"KI": {
+			"name": "East Kalimantan",
+			"local_name": "Kalimantan Timur"
+		},
+		"KU": {
+			"name": "North Kalimantan",
+			"local_name": "Kalimantan Utara"
+		},
+		"BB": {
+			"name": "Bangka Belitung Islands",
+			"local_name": "Kepulauan Bangka Belitung"
+		},
+		"KR": {
+			"name": "Riau Islands",
+			"local_name": "Kepulauan Riau"
+		},
+		"LA": {
+			"name": "Lampung",
+			"local_name": "Lampung"
+		},
+		"MA": {
+			"name": "Maluku",
+			"local_name": "Maluku"
+		},
+		"MU": {
+			"name": "North Maluku",
+			"local_name": "Maluku Utara"
+		},
+		"NB": {
+			"name": "West Nusa Tenggara",
+			"local_name": "Nusa Tenggara Barat"
+		},
+		"NT": {
+			"name": "East Nusa Tenggara",
+			"local_name": "Nusa Tenggara Timur"
+		},
+		"PA": {
+			"name": "Papua",
+			"local_name": "Papua"
+		},
+		"PB": {
+			"name": "West Papua",
+			"local_name": "Papua Barat"
+		},
+		"PD": {
+			"name": "Southwest Papua",
+			"local_name": "Papua Barat Daya"
+		},
+		"PE": {
+			"name": "Highland Papua",
+			"local_name": "Papua Pengunungan"
+		},
+		"PS": {
+			"name": "South Papua",
+			"local_name": "Papua Selatan"
+		},
+		"PT": {
+			"name": "Central Papua",
+			"local_name": "Papua Tengah"
+		},
+		"RI": {
+			"name": "Riau",
+			"local_name": "Riau"
+		},
+		"SR": {
+			"name": "West Sulawesi",
+			"local_name": "Sulawesi Barat"
+		},
+		"SN": {
+			"name": "South Sulawesi",
+			"local_name": "Sulawesi Selatan"
+		},
+		"ST": {
+			"name": "Central Sulawesi",
+			"local_name": "Sulawesi Tengah"
+		},
+		"SG": {
+			"name": "South East Sulawesi",
+			"local_name": "Sulawesi Tenggara"
+		},
+		"SA": {
+			"name": "North Sulawesi",
+			"local_name": "Sulawesi Utara"
+		},
+		"SB": {
+			"name": "West Sumatra",
+			"local_name": "Sumatera Barat"
+		},
+		"SS": {
+			"name": "South Sumatra",
+			"local_name": "Sumatera Selatan"
+		},
+		"SU": {
+			"name": "North Sumatra",
+			"local_name": "Sumatera Utara"
+		}
+	}
+}

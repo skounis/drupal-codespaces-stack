@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Installation file for SCMI module.
+ */
+
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * Implements hook_install().
+ */
+function scheduler_content_moderation_integration_install(): void {
+  // When this module is installed the publish and unpublish state fields are
+  // hidden by default. If Scheduler has already been in use before SCMI is
+  // installed then some entity types may be enabled for Scheduling. Those
+  // fields need to be displayed in the form.
+  _scheduler_content_moderation_integration_reset_form_display();
+}
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function scheduler_content_moderation_integration_update_last_removed(): int {
+  return 9003;
+}
+
+/**
+ * Add publish state and unpublish state fields to newly supported entity types.
+ */
+function scheduler_content_moderation_integration_update_10301(): string|TranslatableMarkup {
+  $output = _scheduler_content_moderation_integration_add_fields();
+  return $output ? implode('</li><li>', $output) : t('No update required.');
+}

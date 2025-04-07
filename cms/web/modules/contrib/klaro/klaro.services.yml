@@ -1,0 +1,9 @@
+services:
+  klaro.helper:
+    class: Drupal\klaro\Utility\KlaroHelper
+    arguments: ['@config.factory', '@language_manager', '@current_user', '@entity_type.manager', '@request_stack', '@renderer', '@logger.factory', '@library.libraries_directory_file_finder', '@file_url_generator', '@theme.manager']
+  klaro.response_subscriber:
+    class: Drupal\klaro\EventSubscriber\ResponseSubscriber
+    arguments: ['@klaro.helper']
+    tags:
+      - { name: event_subscriber }

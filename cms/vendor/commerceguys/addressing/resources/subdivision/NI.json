@@ -1,0 +1,56 @@
+{
+	"country_code": "NI",
+	"subdivisions": {
+		"BO": {
+			"name": "Boaco"
+		},
+		"CA": {
+			"name": "Carazo"
+		},
+		"CI": {
+			"name": "Chinandega"
+		},
+		"CO": {
+			"name": "Chontales"
+		},
+		"ES": {
+			"name": "Estelí"
+		},
+		"GR": {
+			"name": "Granada"
+		},
+		"JI": {
+			"name": "Jinotega"
+		},
+		"LE": {
+			"name": "León"
+		},
+		"MD": {
+			"name": "Madriz"
+		},
+		"MN": {
+			"name": "Managua"
+		},
+		"MS": {
+			"name": "Masaya"
+		},
+		"MT": {
+			"name": "Matagalpa"
+		},
+		"NS": {
+			"name": "Nueva Segovia"
+		},
+		"AN": {
+			"name": "Región Autónoma de la Costa Caribe Norte"
+		},
+		"AS": {
+			"name": "Región Autónoma de la Costa Caribe Sur"
+		},
+		"SJ": {
+			"name": "Río San Juan"
+		},
+		"RI": {
+			"name": "Rivas"
+		}
+	}
+}

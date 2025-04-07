@@ -1,0 +1,28 @@
+{
+    "name": "drupal/search_api_autocomplete",
+    "description": "Adds autocomplete functionality to searches.",
+    "type": "drupal-module",
+    "homepage": "https://www.drupal.org/project/search_api_autocomplete",
+    "authors": [
+        {
+            "name": "Thomas Seidl",
+            "homepage": "https://www.drupal.org/u/drunken-monkey"
+        },
+        {
+            "name": "See other contributors",
+            "homepage": "https://www.drupal.org/node/1142202/committers"
+        }
+    ],
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/search_api_autocomplete",
+        "irc": "irc://irc.freenode.org/drupal-search-api",
+        "source": "http://git.drupal.org/project/search_api_autocomplete.git"
+    },
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/search_api": "^1.0"
+    },
+    "require-dev": {
+        "drupal/search_api_page": "1.x-dev"
+    }
+}

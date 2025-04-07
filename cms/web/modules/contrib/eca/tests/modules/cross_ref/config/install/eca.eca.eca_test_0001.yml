@@ -1,0 +1,215 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.type_1.field_other_node
+    - field.field.node.type_2.field_other_node
+    - field.storage.node.field_other_node
+  module:
+    - eca_base
+    - eca_content
+id: eca_test_0001
+modeller: bpmn_io
+label: 'Cross references'
+version: v1
+weight: null
+events:
+  Event_011cx7s:
+    plugin: 'content_entity:insert'
+    label: 'Insert node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_1rlgsjy
+        condition: ''
+  Event_1cfd8ek:
+    plugin: 'content_entity:update'
+    label: 'Update node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_1rlgsjy
+        condition: ''
+      -
+        id: Activity_1cxcwjm
+        condition: ''
+conditions:
+  Flow_0iztkfs:
+    plugin: eca_entity_type_bundle
+    configuration:
+      negate: false
+      type: 'node type_1'
+      entity: ''
+  Flow_1jqykgu:
+    plugin: eca_entity_type_bundle
+    configuration:
+      negate: false
+      type: 'node type_2'
+      entity: ''
+  Flow_0i81v8o:
+    plugin: eca_entity_field_value
+    configuration:
+      case: false
+      expected_value: '[entity:nid]'
+      field_name: field_other_node
+      operator: equal
+      type: value
+      negate: true
+      entity: refentity
+  Flow_1tgic5x:
+    plugin: eca_entity_field_value_empty
+    configuration:
+      field_name: field_other_node
+      negate: true
+      entity: ''
+  Flow_0rgzuve:
+    plugin: eca_entity_field_value_empty
+    configuration:
+      negate: false
+      field_name: field_other_node
+      entity: ''
+  Flow_0c3s897:
+    plugin: eca_entity_field_value_empty
+    configuration:
+      field_name: field_other_node
+      negate: true
+      entity: originalentity
+gateways:
+  Gateway_1xl2rvc:
+    type: 0
+    successors:
+      -
+        id: Activity_0k6im8f
+        condition: ''
+      -
+        id: Activity_1oj601y
+        condition: ''
+actions:
+  Activity_1rlgsjy:
+    plugin: eca_token_load_entity
+    label: 'Load original entity'
+    configuration:
+      token_name: originalentity
+      from: current
+      entity_type: _none
+      entity_id: ''
+      revision_id: ''
+      properties: ''
+      langcode: _interface
+      latest_revision: false
+      unchanged: true
+      object: ''
+    successors:
+      -
+        id: Activity_0r1gs9s
+        condition: Flow_0iztkfs
+      -
+        id: Activity_0r1gs9s
+        condition: Flow_1jqykgu
+  Activity_0h8b7vh:
+    plugin: eca_token_load_entity_ref
+    label: 'Load referenced node'
+    configuration:
+      field_name_entity_ref: field_other_node
+      token_name: refentity
+      from: current
+      entity_type: _none
+      entity_id: ''
+      revision_id: ''
+      properties: ''
+      langcode: _interface
+      latest_revision: false
+      unchanged: false
+      object: ''
+    successors:
+      -
+        id: Gateway_1xl2rvc
+        condition: Flow_0i81v8o
+  Activity_0k6im8f:
+    plugin: eca_set_field_value
+    label: 'Set Cross Ref'
+    configuration:
+      field_name: field_other_node
+      field_value: '[entity:nid]'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: true
+      object: refentity
+    successors: {  }
+  Activity_0r1gs9s:
+    plugin: eca_void_and_condition
+    label: void
+    configuration: {  }
+    successors:
+      -
+        id: Activity_0h8b7vh
+        condition: Flow_1tgic5x
+      -
+        id: Activity_1ch3wrr
+        condition: Flow_0rgzuve
+  Activity_1oj601y:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      message: 'Node [entity:title] references [refentity:title]'
+      replace_tokens: true
+    successors: {  }
+  Activity_1cxcwjm:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      message: 'Node [entity:title] got updated'
+      replace_tokens: true
+    successors: {  }
+  Activity_1w7m4sk:
+    plugin: eca_token_load_entity_ref
+    label: 'Load referenced node'
+    configuration:
+      field_name_entity_ref: field_other_node
+      token_name: originalentityref
+      from: current
+      entity_type: _none
+      entity_id: ''
+      revision_id: ''
+      properties: ''
+      langcode: _interface
+      latest_revision: false
+      unchanged: false
+      object: originalentity
+    successors:
+      -
+        id: Activity_1bfoheo
+        condition: ''
+      -
+        id: Activity_077d2t8
+        condition: ''
+  Activity_1ch3wrr:
+    plugin: eca_void_and_condition
+    label: void
+    configuration: {  }
+    successors:
+      -
+        id: Activity_1w7m4sk
+        condition: Flow_0c3s897
+  Activity_1bfoheo:
+    plugin: eca_set_field_value
+    label: 'Empty Cross Ref'
+    configuration:
+      field_name: field_other_node
+      field_value: ''
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: true
+      object: originalentityref
+    successors: {  }
+  Activity_077d2t8:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      message: 'The title of the referenced node is [originalentity:field_other_node:entity:title].'
+      replace_tokens: true
+    successors: {  }

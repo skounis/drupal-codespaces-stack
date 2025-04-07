@@ -1,0 +1,50 @@
+.heading {
+  margin-block-end: var(--sp2-5);
+
+  /* Default to H2 */
+  letter-spacing: -0.02em;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: var(--sp3);
+
+  &.heading--h1 {
+    letter-spacing: -0.02em;
+    font-size: 3.75rem;
+    font-weight: 800;
+    line-height: var(--sp4);
+  }
+
+  &.heading--h3 {
+    letter-spacing: -0.01em;
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: var(--line-height-base);
+  }
+
+  &.heading--h4 {
+    letter-spacing: 0.09em;
+    font-size: 1.3125rem;
+    font-weight: 700;
+    line-height: var(--line-height-base);
+  }
+
+  &.heading--h5 {
+    letter-spacing: 0.12em;
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    line-height: var(--line-height-base);
+    text-transform: uppercase;
+  }
+
+  &.heading--h6 {
+    letter-spacing: 0.2em;
+    font-size: var(--font-size-s);
+    font-weight: 600;
+    line-height: var(--line-height-s);
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 43.75rem) {
+    /* @todo grid-column: 3 / 10; */
+  }
+}

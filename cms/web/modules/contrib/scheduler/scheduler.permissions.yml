@@ -1,0 +1,7 @@
+'administer scheduler':
+  title: 'Administer scheduler'
+  description: 'Configure scheduler - set default times, lightweight cron.'
+# All other permissions are dynamically created for each supported entity type.
+# See src/SchedulerPermissions.php
+permission_callbacks:
+  - Drupal\scheduler\SchedulerPermissions::permissions

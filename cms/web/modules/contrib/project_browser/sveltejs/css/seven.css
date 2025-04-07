@@ -1,0 +1,139 @@
+#block-seven-content h3 a {
+  font-size: 17px;
+}
+
+#block-seven-content .body {
+  font-size: 15px;
+}
+
+#block-seven-content .download-icon {
+  top: 0.55em;
+  left: 15px;
+  height: 45%;
+}
+
+#block-seven-content .categories {
+  font-size: 1em;
+}
+
+#block-seven-content .button--primary {
+  height: 2.5em;
+}
+
+/**
+ *  CSS for initial loader.
+ *  Copied from themes/claro/css/components/ajax-progress.module.css
+ *  @see https://git.drupalcode.org/project/project_browser/-/merge_requests/155#note_99327
+ */
+.ajax-progress {
+  display: inline-block;
+}
+
+.ajax-progress__throbber {
+  box-sizing: border-box;
+  width: 1.125rem;
+  height: 1.125rem;
+  animation: claro-throbber 0.75s linear infinite;
+  border: 2px solid #003cc5;
+  border-right: 2px dotted transparent;
+  border-radius: 50%;
+}
+
+.ajax-progress--fullscreen {
+  position: fixed;
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  width: 3.5rem; /* 56px */
+  height: 3.5rem;
+  margin: -1.75rem;
+  border: 1px solid rgba(216, 217, 224, 0.8);
+  border-radius: 3.5rem;
+  background: #fff;
+  box-shadow: 0 0.25rem 0.625rem rgba(34, 35, 48, 0.1);
+}
+
+.ajax-progress__throbber--fullscreen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.75rem; /* 28px */
+  height: 1.75rem; /* 28px */
+  margin: -0.875rem;
+  content: "";
+  border: 3px solid #003cc5;
+  border-right: 3px dotted transparent;
+}
+#block-seven-content fieldset:not(.fieldgroup) > legend {
+  top: 0;
+  margin: -1rem 0 0 0;
+  font-size: 1.602rem;
+}
+
+@media screen and (-ms-high-contrast: active) {
+  /**
+   * Throbber animation is shaky on Edge RTL on high contrast for border width
+   * less than 4px.
+   */
+  @supports (-ms-ime-align: auto) {
+    [dir="rtl"] .ajax-progress__throbber {
+      border-width: 4px;
+    }
+  }
+}
+
+@keyframes claro-throbber {
+  0% {
+    transform: rotateZ(0);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+.project-browser-popup input {
+  width: 90%;
+  color: #fff;
+  border: none;
+  background-color: #292b32;
+}
+.project-browser-popup .command-box img {
+  display: block;
+  width: 1.25em;
+  background: transparent;
+}
+.project-browser-popup .command-box button {
+  margin-inline-start: auto;
+  border: none;
+  background: transparent;
+}
+.project-browser-popup button:hover {
+  cursor: pointer;
+}
+.project-browser-popup #download-cmd,
+#install-cmd {
+  position: relative;
+  display: flex;
+  margin: 0.85rem 0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 6px;
+  background-color: #282c34;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  padding-inline: 1rem 0.25rem;
+}
+.project-browser-popup .copied-download,
+.copied-install {
+  position: absolute;
+  z-index: 1;
+  right: -18px;
+  width: fit-content;
+  margin-top: 30px;
+  padding: 0 4px 0;
+  opacity: 0;
+  border: 0.5px solid black;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+}

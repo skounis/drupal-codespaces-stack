@@ -1,0 +1,346 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for Automatic Updates.
+ */
+
+declare(strict_types=1);
+
+use Drupal\automatic_updates\BatchProcessor;
+use Drupal\automatic_updates\CronUpdateRunner;
+use Drupal\automatic_updates\ReleaseChooser;
+use Drupal\automatic_updates\UpdateStage;
+use Drupal\automatic_updates\Validation\StatusChecker;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\automatic_updates\Validation\AdminStatusCheckMessages;
+use Drupal\Core\Url;
+use Drupal\package_manager\ComposerInspector;
+use Drupal\Core\Utility\Error;
+use Drupal\system\Controller\DbUpdateController;
+use Drupal\update\Hook\UpdateHooks;
+
+/**
+ * Implements hook_help().
+ */
+function automatic_updates_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.automatic_updates':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Automatic Updates lets you update Drupal core.') . '</p>';
+      $output .= '<p>';
+      $output .= t('Automatic Updates will keep Drupal secure and up-to-date by automatically installing new patch-level updates, if available, when cron runs. It also provides a user interface to check if any updates are available and install them. You can <a href=":configure-form">configure Automatic Updates</a> to install all patch-level updates, only security updates, or no updates at all, during cron. By default, only security updates are installed during cron; this requires that you <a href=":update-form">install non-security updates through the user interface</a>.', [
+        ':configure-form' => Url::fromRoute('update.settings')->toString(),
+        ':update-form' => Url::fromRoute('update.report_update')->toString(),
+      ]);
+      $output .= '</p>';
+      $output .= '<p>' . t('Additionally, Automatic Updates periodically runs checks to ensure that updates can be installed, and will warn site administrators if problems are detected.') . '</p>';
+      $output .= '<h3>' . t('Requirements') . '</h3>';
+      $output .= '<p>' . t('Automatic Updates requires a Composer executable whose version satisfies <code>@version</code>, and PHP must have permission to run it. The path to the executable may be set in the <code>package_manager.settings:executables.composer</code> config setting, or it will be automatically detected.', ['@version' => ComposerInspector::SUPPORTED_VERSION]) . '</p>';
+      $output .= '<p>' . t('For more information, see the <a href=":automatic-updates-documentation">online documentation for the Automatic Updates module</a>.', [':automatic-updates-documentation' => 'https://www.drupal.org/docs/8/update/automatic-updates']) . '</p>';
+      $output .= '<h3 id="minor-update">' . t('Updating to another minor version of Drupal') . '</h3>';
+      $output .= '<p>';
+      $output .= t('Automatic Updates supports updating from one minor version of Drupal core to another; for example, from Drupal 9.4.8 to Drupal 9.5.0. This is only allowed when updating via <a href=":url">the user interface</a>. Unattended background updates can only update <em>within</em> the currently installed minor version (for example, Drupal 9.4.6 to 9.4.8).', [
+        ':url' => Url::fromRoute('update.report_update')->toString(),
+      ]);
+      $output .= '</p>';
+      $output .= '<p>' . t('This is because updating from one minor version of Drupal to another is riskier than staying within the current minor version. New minor versions of Drupal introduce changes that can, in some situations, be incompatible with installed modules and themes.') . '</p>';
+      $output .= '<p>' . t('Therefore, if you want to use Automatic Updates to update to another minor version of Drupal, it is strongly recommended to do a test update first, ideally on an isolated development copy of your site, before updating your production site.') . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function automatic_updates_mail(string $key, array &$message, array $params): void {
+  // Explicitly pass the language code to all translated strings.
+  $options = [
+    'langcode' => $message['langcode'],
+  ];
+  if ($key === 'cron_successful') {
+    $message['subject'] = t("Drupal core was successfully updated", [], $options);
+    $message['body'][] = t('Congratulations!', [], $options);
+    $message['body'][] = t('Drupal core was automatically updated from @previous_version to @updated_version.', [
+      '@previous_version' => $params['previous_version'],
+      '@updated_version' => $params['updated_version'],
+    ], $options);
+  }
+  elseif (str_starts_with($key, 'cron_failed')) {
+    $message['subject'] = t("Drupal core update failed", [], $options);
+
+    // If this is considered urgent, prefix the subject line with a call to
+    // action.
+    if ($params['urgent']) {
+      $message['subject'] = t('URGENT: @subject', [
+        '@subject' => $message['subject'],
+      ], $options);
+    }
+
+    $message['body'][] = t('Drupal core failed to update automatically from @previous_version to @target_version. The following error was logged:', [
+      '@previous_version' => $params['previous_version'],
+      '@target_version' => $params['target_version'],
+    ], $options);
+    $message['body'][] = $params['error_message'];
+
+    // If the problem was not due to a failed apply, provide a link for the site
+    // owner to do the update.
+    if ($key !== 'cron_failed_apply') {
+      $url = Url::fromRoute('update.report_update')
+        ->setAbsolute()
+        ->toString();
+
+      if ($key === 'cron_failed_insecure') {
+        $message['body'][] = t('Your site is running an insecure version of Drupal and should be updated as soon as possible. Visit @url to perform the update.', ['@url' => $url], $options);
+      }
+      else {
+        $message['body'][] = t('No immediate action is needed, but it is recommended that you visit @url to perform the update, or at least check that everything still looks good.', ['@url' => $url], $options);
+      }
+    }
+  }
+  elseif ($key === 'status_check_failed') {
+    $message['subject'] = t('Automatic updates readiness checks failed', [], $options);
+
+    $url = Url::fromRoute('system.status')
+      ->setAbsolute()
+      ->toString();
+    $message['body'][] = t('Your site has failed some readiness checks for automatic updates and may not be able to receive automatic updates until further action is taken. Visit @url for more information.', [
+      '@url' => $url,
+    ], $options);
+  }
+
+  // If this email was related to an unattended update, explicitly state that
+  // this isn't supported yet.
+  if (str_starts_with($key, 'cron_')) {
+    $message['body'][] = t('This email was sent by the Automatic Updates module. Unattended updates are not yet fully supported.', [], $options);
+    $message['body'][] = t('If you are using this feature in production, it is strongly recommended for you to visit your site and ensure that everything still looks good.', [], $options);
+  }
+}
+
+/**
+ * Implements hook_page_top().
+ */
+function automatic_updates_page_top(array &$page_top) {
+  // Ensure error messages will be displayed on the batch page.
+  // @todo Remove this work around when https://drupal.org/i/3406612 is fixed.
+  if (\Drupal::routeMatch()->getRouteName() === 'system.batch_page.html') {
+    // Directly render a status message placeholder without any messages.
+    // Messages are not intended to be show on the batch page, but in the event
+    // an error in a AJAX callback the messages will be displayed.
+    $page_top['messages'] = [
+      '#theme' => 'status_messages',
+      '#message_list' => [],
+      '#status_headings' => [
+        'status' => t('Status message'),
+        'error' => t('Error message'),
+        'warning' => t('Warning message'),
+      ],
+    ];
+  }
+  /** @var \Drupal\automatic_updates\Validation\AdminStatusCheckMessages $status_check_messages */
+  $status_check_messages = \Drupal::classResolver(AdminStatusCheckMessages::class);
+  $status_check_messages->displayAdminPageMessages();
+
+  // @todo Rely on the route option after https://www.drupal.org/i/3236497 is
+  //   committed.
+  $skip_routes = [
+    'automatic_updates.confirmation_page',
+    'automatic_updates.report_update',
+    'automatic_updates.module_update',
+  ];
+  // @see auto_updates_module_implements_alter()
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if (!in_array($route_name, $skip_routes, TRUE)) {
+    // The UpdateHooks service was added in Drupal 11.1 and contains OO
+    // implementations of Update's hooks.
+    if (\Drupal::hasService(UpdateHooks::class)) {
+      \Drupal::service(UpdateHooks::class)->pageTop();
+    }
+    elseif (function_exists('update_page_top')) {
+      update_page_top();
+    }
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * @todo Remove after https://www.drupal.org/i/3236497 is committed.
+ */
+function automatic_updates_module_implements_alter(&$implementations, $hook) {
+  if ($hook === 'page_top') {
+    // Remove hook_page_top() implementation from the Update module. This '
+    // implementation displays error messages about security releases. We call
+    // this implementation in our own automatic_updates_page_top() except on our
+    // own routes to avoid these messages while an update is in progress.
+    unset($implementations['update']);
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function automatic_updates_modules_installed(array $modules, bool $is_syncing): void {
+  // Invalidate stored status check results, in case the new modules provide
+  // status checkers.
+  /** @var \Drupal\automatic_updates\Validation\StatusChecker $status_checker */
+  $status_checker = \Drupal::service(StatusChecker::class);
+  $status_checker->clearStoredResults();
+  // If we're not in the middle of installing Drupal, or syncing config, go
+  // ahead and run the status checks.
+  if (!InstallerKernel::installationAttempted() && !$is_syncing) {
+    $status_checker->run();
+  }
+  /** @var \Drupal\automatic_updates\CronUpdateRunner $runner */
+  $runner = \Drupal::service(CronUpdateRunner::class);
+  // If cron updates are disabled status check messages will not be displayed on
+  // admin pages. Therefore, after installing the module the user will not be
+  // alerted to any problems until they access the status report page.
+  if ($runner->getMode() === CronUpdateRunner::DISABLED) {
+    /** @var \Drupal\automatic_updates\Validation\AdminStatusCheckMessages $status_check_messages */
+    $status_check_messages = \Drupal::classResolver(AdminStatusCheckMessages::class);
+    $status_check_messages->displayResultSummary();
+  }
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ */
+function automatic_updates_modules_uninstalled() {
+  // Run the status checkers if needed when any modules are uninstalled in
+  // case they provided status checkers.
+  /** @var \Drupal\automatic_updates\Validation\StatusChecker $status_checker */
+  $status_checker = \Drupal::service(StatusChecker::class);
+  $status_checker->run();
+}
+
+/**
+ * Implements hook_batch_alter().
+ *
+ * @todo Remove this in https://www.drupal.org/i/3267817.
+ */
+function automatic_updates_batch_alter(array &$batch): void {
+  foreach ($batch['sets'] as &$batch_set) {
+    if (!empty($batch_set['finished']) && $batch_set['finished'] === [DbUpdateController::class, 'batchFinished']) {
+      $batch_set['finished'] = [BatchProcessor::class, 'dbUpdateBatchFinished'];
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for update_settings.
+ */
+function automatic_updates_form_update_settings_alter(array &$form): void {
+  $config = \Drupal::config('automatic_updates.settings');
+
+  $form['unattended_level'] = [
+    '#type' => 'radios',
+    '#title' => t('Unattended background updates'),
+    '#options' => [
+      CronUpdateRunner::DISABLED => t('Disabled'),
+      CronUpdateRunner::SECURITY => t('Security updates only'),
+      CronUpdateRunner::ALL => t('All patch releases'),
+    ],
+    '#default_value' => $config->get('unattended.level'),
+    '#description' => t('When background updates are applied, your site will be briefly put into maintenance mode.'),
+  ];
+  $form['unattended_method'] = [
+    '#type' => 'radios',
+    '#title' => t('How unattended updates should be run'),
+    '#options' => [
+      'web' => t('By using the Automated Cron module or a request to /system/cron'),
+      'console' => t('By the <code>auto-update</code> command-line utility'),
+    ],
+    '#default_value' => $config->get('unattended.method'),
+    '#states' => [
+      'invisible' => [
+        'input[name="unattended_level"]' => [
+          'value' => CronUpdateRunner::DISABLED,
+        ],
+      ],
+    ],
+    '#description' => t('To use the <code>/system/cron</code> method <a href="http://drupal.org/docs/user_guide/en/security-cron.html">ensure cron is set up correctly</a>.'),
+  ];
+  $form['#submit'][] = '_automatic_updates_submit_update_settings';
+}
+
+/**
+ * Saves settings for unattended updates.
+ *
+ * @param array $form
+ *   The complete form structure.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ */
+function _automatic_updates_submit_update_settings(array &$form, FormStateInterface $form_state): void {
+  \Drupal::configFactory()
+    ->getEditable('automatic_updates.settings')
+    ->set('unattended', [
+      'method' => $form_state->getValue('unattended_method'),
+      'level' => $form_state->getValue('unattended_level'),
+    ])
+    ->save();
+}
+
+/**
+ * Implements hook_preprocess_update_project_status().
+ */
+function automatic_updates_preprocess_update_project_status(array &$variables) {
+  $project = &$variables['project'];
+  if ($project['name'] !== 'drupal') {
+    return;
+  }
+  $stage = \Drupal::service(UpdateStage::class);
+  $supported_target_versions = [];
+  /** @var \Drupal\automatic_updates\ReleaseChooser $recommender */
+  $recommender = \Drupal::service(ReleaseChooser::class);
+  try {
+    if ($installed_minor_release = $recommender->getLatestInInstalledMinor($stage)) {
+      $supported_target_versions[] = $installed_minor_release->getVersion();
+    }
+    if ($next_minor_release = $recommender->getLatestInNextMinor($stage)) {
+      $supported_target_versions[] = $next_minor_release->getVersion();
+    }
+  }
+  catch (RuntimeException $exception) {
+    // If for some reason we are not able to get the update recommendations
+    // do not alter the report.
+    Error::logException(\Drupal::logger('automatic_updates'), $exception);
+    return;
+  }
+  $variables['#attached']['library'][] = 'automatic_updates/update_status';
+
+  $status = &$variables['status'];
+  if ($supported_target_versions && $status['label']) {
+    $status['label'] = [
+      '#markup' => t(
+        '@label <a href=":update-form">Update now</a>', [
+          '@label' => $status['label'],
+          ':update-form' => Url::fromRoute('update.report_update')->toString(),
+        ]),
+    ];
+  }
+  // BEGIN: DELETE FROM CORE MERGE REQUEST
+  if (empty($variables['versions'])) {
+    return;
+  }
+  foreach ($variables['versions'] as &$themed_version) {
+    $version_info = &$themed_version['#version'];
+    if ($supported_target_versions && in_array($version_info['version'], $supported_target_versions, TRUE)) {
+      $version_info['download_link'] = Url::fromRoute('update.report_update')->setAbsolute()->toString();
+    }
+    else {
+      // If this version will not be displayed as an option on this module's
+      // update form replace the link to download the archive file with the
+      // release notes link. The release notes page will provide Composer
+      // instructions. While this isn't a perfect solution the Update module twig
+      // templates do not check if 'download_link' is set, so we cannot unset it
+      // here.
+      $themed_version['#attributes']['class'][] = 'automatic-updates-unsupported-version';
+      $version_info['download_link'] = $version_info['release_link'];
+    }
+  }
+  // END: DELETE FROM CORE MERGE REQUEST
+}

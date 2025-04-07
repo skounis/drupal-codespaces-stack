@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Enables this plugin source on install.
+ *
+ * If you do not want this behavior, you can remove this entire .install file.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function project_browser_source_example_install(): void {
+  $configFactory = \Drupal::configFactory();
+  $current_source_plugin = $configFactory->getEditable('project_browser.admin_settings')
+    ->get('enabled_sources');
+  $current_source_plugin[] = 'project_browser_source_example';
+  $configFactory->getEditable('project_browser.admin_settings')
+    ->set('enabled_sources', $current_source_plugin)
+    ->save(TRUE);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function project_browser_source_example_uninstall(): void {
+  $admin_settings = \Drupal::configFactory()->getEditable('project_browser.admin_settings');
+  $enabled_sources = $admin_settings->get('enabled_sources');
+  if (($key = array_search('project_browser_source_example', $enabled_sources)) !== FALSE) {
+    unset($enabled_sources[$key]);
+    $admin_settings
+      ->set('enabled_sources', array_values($enabled_sources) ?: ['drupalorg_jsonapi'])
+      ->save(TRUE);
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "name": "drupal/klaro",
+    "type": "drupal-module",
+    "description": "Implements the Klaro! consent manager utility into Drupal.",
+    "keywords": [
+        "Drupal"
+    ],
+    "homepage": "https://www.drupal.org/project/klaro",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/klaro",
+        "source": "https://git.drupalcode.org/project/klaro"
+    },
+    "require": {
+        "drupal/core": "^10.2 || ^11",
+        "drupal/klaro_js": "~3.0.0"
+    }
+}

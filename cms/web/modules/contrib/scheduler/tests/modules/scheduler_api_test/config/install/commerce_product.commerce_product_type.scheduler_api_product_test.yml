@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - scheduler
+  enforced:
+    module:
+      - scheduler_api_test
+third_party_settings:
+  scheduler:
+    expand_fieldset: always
+    fields_display_mode: fieldset
+    publish_enable: true
+    publish_past_date: schedule
+    publish_past_date_created: false
+    publish_required: false
+    publish_revision: false
+    publish_touch: false
+    show_message_after_update: true
+    unpublish_enable: true
+    unpublish_required: false
+    unpublish_revision: false
+id: scheduler_api_product_test
+label: 'Scheduler API Product Test'
+description: 'Commerce Product type used in Scheduler API testing'
+variationType: default
+multipleVariations: true
+injectVariationFields: true
+traits: {  }
+locked: false

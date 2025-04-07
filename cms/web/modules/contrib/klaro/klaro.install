@@ -1,0 +1,263 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for klaro.
+ */
+
+/**
+ * Update settings and permissions.
+ */
+function klaro_update_8201() {
+  $config_factory = \Drupal::configFactory();
+
+  $config_settings = $config_factory->getEditable('klaro.settings');
+  $config_texts = $config_factory->getEditable('klaro.texts');
+
+  // Update settings.
+  $config_texts->set('consentModal.privacyPolicy.url', $config_settings->get('library.privacy_policy'));
+  $config_settings->clear('library.privacy_policy');
+  $config_settings->set('auto_show', $config_settings->get('enabled'));
+  $config_settings->clear('enabled');
+  // @todo Write update notice for users wanting "no-css" feature.
+  $config_settings->clear('klaro_library');
+
+  $config_settings->save(TRUE);
+  $config_texts->save(TRUE);
+
+  // Update permissions.
+  $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple();
+  foreach ($roles as $role) {
+    if ($role->hasPermission('bypass klaro')) {
+      $role->revokePermission('bypass klaro');
+    }
+    else {
+      $role->grantPermission('use klaro');
+    }
+    $role->save();
+  }
+}
+
+/**
+ * Update to 3.0.0.
+ */
+function klaro_update_10001(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+  $config_texts = $config_factory->getEditable('klaro.texts');
+
+  // Set new config settings.
+  $config_settings->set('block_unknown', TRUE);
+  $config_settings->set('auto_decorate_js_alter', TRUE);
+  $config_settings->set('auto_decorate_page_attachments', TRUE);
+  $config_settings->set('auto_decorate_final_html', TRUE);
+  $config_settings->set('show_toggle_button', TRUE);
+  $config_settings->set('block_unknown_label', 'Unknown app');
+  $config_settings->set('block_unknown_description', 'Unknown description');
+
+  // Remove old config settings.
+  $config_settings->clear('auto_show');
+
+  $config_settings->save(TRUE);
+
+  // Add new texts.
+  $config_texts->set('contextualConsent.acceptAlways', 'Always');
+  $config_texts->set('contextualConsent.acceptOnce', 'Yes');
+  $config_texts->set('contextualConsent.description', 'Do you want to load external content supplied by {title}?');
+
+  $config_texts->save();
+
+}
+
+/**
+ * Remove obsolete auto_show setting.
+ */
+function klaro_update_10002() {
+  $config = \Drupal::configFactory()->getEditable('klaro.settings');
+  $config->clear('auto_show')->save(TRUE);
+}
+
+/**
+ * Issue #3483378: Add option for preprocess_field.
+ */
+function klaro_update_10005(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  // Set new config setting.
+  $config_settings->set('auto_decorate_preprocess_field', TRUE);
+
+  $config_settings->save(TRUE);
+
+}
+
+/**
+ * Issue #3476193: Rename log unknown services.
+ */
+function klaro_update_10006(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  $data = $config_settings->get('block_unknown_logger');
+  // Set new config setting.
+  $config_settings->set('log_unknown_resources', $data);
+  $config_settings->save(TRUE);
+  $config_settings->clear('block_unknown_logger')->save(TRUE);
+}
+
+/**
+ * Issue #3486631: Read thumbnail and title for contextual consent.
+ */
+function klaro_update_10007(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  // Set new config setting.
+  $config_settings->set('get_entity_thumbnail', TRUE);
+
+  $config_settings->save(TRUE);
+
+}
+
+/**
+ * Issue #3485880: Add close button X to notice dialog.
+ */
+function klaro_update_10008(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  // Set new config setting.
+  $config_settings->set('show_close_button', FALSE);
+
+  $config_settings->save(TRUE);
+
+}
+
+/**
+ * Issue #3484938: Add support for a less intrusive user experience mode.
+ */
+function klaro_update_10009(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  if ($config_settings->get('library.must_consent')) {
+    $dialog_mode = 'manager';
+  }
+  elseif ($config_settings->get('library.notice_as_modal')) {
+    $dialog_mode = 'notice_modal';
+  }
+  else {
+    $dialog_mode = 'notice';
+  }
+  // Set new config setting.
+  $config_settings->set('dialog_mode', $dialog_mode);
+  $config_settings->save(TRUE);
+  $config_settings->clear('library.must_consent')->save(TRUE);
+  $config_settings->clear('library.notice_as_modal')->save(TRUE);
+
+}
+
+/**
+ * Rename app to service in klaro.texts.
+ */
+function klaro_update_10010() {
+  $original_config = \Drupal::configFactory()->getEditable('klaro.texts');
+  $original_langcode = $original_config->get('langcode');
+
+  $language_manager = \Drupal::languageManager();
+  $languages = $language_manager->getLanguages();
+  foreach ($languages as $langcode => $language) {
+    if ($langcode === $original_langcode) {
+      continue;
+    }
+    if ($language->isLocked()) {
+      // Only real languages (English, French, but not "Not specified").
+      continue;
+    }
+    /** @var \Drupal\language\ConfigurableLanguageManager $language_manager **/
+    $config = $language_manager->getLanguageConfigOverride($langcode, 'klaro.texts');
+    _klaro_update__app_to_service($config);
+  }
+
+  // Do the original last since otherwise it could wipe all translations.
+  _klaro_update__app_to_service($original_config);
+}
+
+/**
+ * Helper for update hook 10010 that performs the move/rename of the config key.
+ */
+function _klaro_update__app_to_service($config) : void {
+  if ($data = $config->get('app')) {
+    $config
+      ->set('service', $data)
+      ->save();
+    // Needs to be done in two steps since otherwise deletes everything.
+    // (might have been only when the original config is first).
+    $config
+      ->clear('app')
+      ->save();
+  }
+}
+
+/**
+ * Change classname to querySelector.
+ */
+function klaro_update_10011() {
+  $storage = \Drupal::entityTypeManager()->getStorage('klaro_app');
+  $query = $storage->getQuery();
+  $result = $storage->loadMultiple($query->accessCheck(FALSE)->execute());
+  foreach ($result as $app) {
+    $wrapperIdentifier = $app->wrapperIdentifier();
+    if (count($wrapperIdentifier) > 0) {
+      foreach ($wrapperIdentifier as $k => $v) {
+        $wrapperIdentifier[$k] = '.' . $v;
+      }
+      $app->setWrapperIdentifier($wrapperIdentifier);
+      $app->save();
+    }
+  }
+}
+
+/**
+ * Issue #3493235: Make autofocus customable.
+ */
+function klaro_update_10012(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  // Set new config setting.
+  $config_settings->set('library.auto_focus', TRUE);
+
+  $config_settings->save(TRUE);
+
+}
+
+/**
+ * Issue #3495342: Add override CSS.
+ */
+function klaro_update_10013(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+
+  // Set new config setting.
+  $config_settings->set('override_css', FALSE);
+
+  $config_settings->save(TRUE);
+
+}
+
+/**
+ * Issue #3484844: Show title on notice dialog optional.
+ */
+function klaro_update_10014(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config_settings = $config_factory->getEditable('klaro.settings');
+  // Set new config setting.
+  $config_settings->set('show_notice_title', FALSE);
+  $config_settings->save(TRUE);
+
+  $config_texts = $config_factory->getEditable('klaro.texts');
+  $config_texts->set('consentNotice.title', 'Use of personal data and cookies');
+  $config_texts->save();
+
+}

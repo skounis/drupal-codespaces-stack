@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Theme implementation to display a single Sitemap plugin item.
+ *
+ * Available variables:
+ * - title: The title of the sitemap item if configured.
+ * - content: A renderable array of sitemap item content.
+ * - sitemap: The full sitemap plugin instance.
+ * - attributes: Attributes for the sitemap item container.
+ * - plugin_type: The plugin definition ID.
+ * - plugin_id: The specific plugin ID.
+ **/
+ #}
+{%
+  set classes = [
+    'sitemap-item',
+    plugin_type ? 'sitemap-plugin--' ~ plugin_type|clean_class,
+    plugin_id ? 'sitemap-item--' ~ plugin_id|clean_class,
+  ]
+ %}
+{% if content %}
+<div{{ attributes.addClass(classes) }}>
+  {% if title %}
+    <h2>{{ title }}</h2>
+  {% endif %}
+  <div>
+    {{ content }}
+  </div>
+</div>
+{% endif %}

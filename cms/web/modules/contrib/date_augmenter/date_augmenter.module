@@ -1,0 +1,164 @@
+<?php
+
+/**
+ * @file
+ * Implement hooks to inject relevant form fields and related messaging.
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Plugin\PluginFormInterface;
+
+/**
+ * Implements hook_field_formatter_third_party_settings_form().
+ *
+ * Adds extra configuration fields to compatible date fields.
+ */
+function date_augmenter_field_formatter_third_party_settings_form($plugin, $field_definition, $form_mode, $form, $form_state) {
+  // Check if the formatter has explicitly delcared support.
+  if (!method_exists($plugin, 'supportsDateAugmenter') || !$sets = $plugin->supportsDateAugmenter()) {
+    return;
+  }
+
+  // Make sure the service is available.
+  $dateAugmenterManager = \Drupal::service('plugin.manager.dateaugmenter');
+  if (!$dateAugmenterManager) {
+    // @todo throw an error here?
+    return;
+  }
+  $augmenters = $dateAugmenterManager->getDefinitions();
+
+  // Retrieve configuration.
+  if ($field_definition instanceof BaseFieldDefinition) {
+    // @todo populaate $config for custom entities.
+    $config = $field_definition->getSetting('augmenters');
+  }
+  else {
+    $config = $plugin->getThirdPartySettings('date_augmenter');
+  }
+  // Convert the options returned into an array the form can use.
+  $augmenter_options = [];
+  foreach ($augmenters as $augmenter) {
+    $augmenter_options[$augmenter['id']] = $augmenter['label'];
+  }
+
+  if (is_array($sets) && $sets) {
+    $element = [];
+    foreach ($sets as $set_id => $set_label) {
+      // Set up set-specific config variables, with fallbacks.
+      $set_config = $config[$set_id] ?? $config;
+      $element[$set_id] = date_augmenter_make_config_fields($set_config, $augmenters, $dateAugmenterManager, $field_definition);
+      $element[$set_id] += [
+        '#type' => 'fieldset',
+        '#title' => $set_label,
+      ];
+
+    }
+  }
+  else {
+    $element = date_augmenter_make_config_fields($config, $augmenters, $dateAugmenterManager, $field_definition);
+  }
+  $element['#attached']['library'][] = 'date_augmenter/augmenters';
+  return $element;
+}
+
+/**
+ * Adds status weights augmenter_settings configuration fields.
+ */
+function date_augmenter_make_config_fields($config, $augmenters, $dateAugmenterManager, $field_definition) {
+  $active_augmenters = $config['status'] ?? [];
+
+  // Add the list of augmenters with checkboxes to enable/disable them.
+  $element['status'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Enabled Date Augmenters'),
+    '#attributes' => [
+      'class' => [
+        'date-augmenter-status-wrapper',
+      ],
+    ],
+  ];
+  foreach ($augmenters as $augmenter_id => $augmenter) {
+    $clean_css_id = Html::cleanCssIdentifier($augmenter_id);
+    $is_enabled = !empty($active_augmenters[$augmenter_id]);
+    $element['status'][$augmenter_id] = [
+      '#type' => 'checkbox',
+      '#title' => $augmenter['label'],
+      '#default_value' => $is_enabled,
+      '#description' => $augmenter['description'],
+      '#attributes' => [
+        'class' => [
+          'date-augmenter-status-' . $clean_css_id,
+        ],
+        'data-id' => $clean_css_id,
+      ],
+    ];
+  }
+
+  $element['weights'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Augmenting order'),
+  ];
+  $element['weights']['order'] = [
+    '#type' => 'table',
+  ];
+  $element['weights']['order']['#tabledrag'][] = [
+    'action' => 'order',
+    'relationship' => 'sibling',
+    'group' => 'date-augmenter-weight',
+  ];
+  $augmenter_weights = [];
+  foreach ($augmenters as $augmenter_id => $augmenter) {
+    $augmenter_weights[$augmenter_id] = $config['weights']['order'][$augmenter_id]['weight'] ?? 0;
+  }
+  asort($augmenter_weights);
+
+  foreach ($augmenter_weights as $augmenter_id => $weight) {
+    $augmenter = $augmenters[$augmenter_id];
+    $element['weights']['order'][$augmenter_id]['#attributes']['class'][] = 'draggable';
+    $element['weights']['order'][$augmenter_id]['#attributes']['class'][] = 'date-augmenter-weight--' . Html::cleanCssIdentifier($augmenter_id);
+    $element['weights']['order'][$augmenter_id]['#weight'] = $weight;
+    $element['weights']['order'][$augmenter_id]['label']['#plain_text'] = $augmenter['label'];
+    $element['weights']['order'][$augmenter_id]['weight'] = [
+      '#type' => 'weight',
+      '#title' => t('Weight for augmenter %title', ['%title' => $augmenter['label']]),
+      '#title_display' => 'invisible',
+      '#delta' => 50,
+      '#default_value' => $weight,
+      '#attributes' => [
+        'class' => [
+          'date-augmenter-weight',
+        ],
+      ],
+    ];
+  }
+
+  // Add vertical tabs containing the settings for the augmenters. Tabs for
+  // disabled augmenters are hidden with JS magic, but need to be included in
+  // case the augmenter is enabled.
+  $element['augmenter_settings'] = [
+    '#title' => t('Augmenter settings'),
+    '#type' => 'vertical_tabs',
+  ];
+
+  foreach ($augmenters as $augmenter_id => $augmenter) {
+    $aug_plugin = $dateAugmenterManager->createInstance($augmenter_id);
+    if ($aug_plugin instanceof PluginFormInterface) {
+      $element['settings'][$augmenter_id] = [
+        '#type' => 'details',
+        '#title' => $augmenter['label'],
+        '#group' => 'augmenter_settings',
+        '#attributes' => [
+          'class' => [
+            'date-augmenter-settings-' . Html::cleanCssIdentifier($augmenter_id),
+          ],
+        ],
+      ];
+      $settings = $config['settings'][$augmenter_id] ?? [];
+      $element['settings'][$augmenter_id] += $aug_plugin->configurationFields($element['settings'][$augmenter_id], $settings, $field_definition);
+    }
+    else {
+      unset($element['settings'][$augmenter_id]);
+    }
+  }
+  return $element;
+}

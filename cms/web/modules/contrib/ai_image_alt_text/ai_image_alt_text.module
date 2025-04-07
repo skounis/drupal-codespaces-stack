@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for AI Image Alt text.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Link;
+use Drupal\image\Plugin\Field\FieldWidget\ImageWidget;
+
+/**
+ * Implements hook_field_widget_single_element_form_alter().
+ *
+ * Modify the form for image widgets.
+ */
+function ai_image_alt_text_field_widget_single_element_form_alter(&$element, &$form_state, $context) {
+  // Only image based field widgets are supported.
+  if ($context['widget'] instanceof ImageWidget) {
+    // Only run if alt text field is enabled.
+    if (empty($element['#alt_field'])) {
+      return;
+    }
+
+    // Only show if the user has permission to generate alt text.
+    if (!\Drupal::currentUser()->hasPermission('generate ai alt tags')) {
+      return;
+    }
+
+    // Only show if a default provider exists and is working.
+    if (!\Drupal::service('ai_image_alt_text.provider')->getSetProvider()) {
+      // Set a warning message if the user has the right to setup the provider.
+      if (\Drupal::currentUser()->hasPermission('administer ai settings')) {
+        \Drupal::messenger()->addWarning(t('No AI provider is set for the AI Image Alt Text. Please configure one in the %ai_image_alt_text_settings_link or setup a default Chat with Image Vision in the %ai_settings_link.', [
+          '%ai_image_alt_text_settings_link' => Link::createFromRoute(t('AI Image Alt Text settings'), 'ai_image_alt_text.settings_form')->toString(),
+          '%ai_settings_link' => Link::createFromRoute(t('AI settings'), 'ai.settings_form')->toString(),
+        ]));
+      }
+      return;
+    }
+
+    // Attach JS.
+    $element['#attached']['library'][] = 'ai_image_alt_text/alt_text';
+    // Get the entities language or the sites default language.
+    $form_object = $form_state->getFormObject();
+    $config = \Drupal::config('ai_image_alt_text.settings');
+    $lang = method_exists($form_object, 'getEntity') ? $form_object->getEntity()->language()->getId() : \Drupal::languageManager()->getDefaultLanguage()->getId();
+    $element['#attached']['drupalSettings']['ai_image_alt_text']['lang'] = $lang;
+    $element['#attached']['drupalSettings']['ai_image_alt_text']['autogenerate'] = $config->get('autogenerate');
+    $element['#attached']['drupalSettings']['ai_image_alt_text']['hide_button'] = $config->get('hide_button');
+
+    // Only show button if an image is uploaded.
+    if (!empty($element['#default_value']['fids'])) {
+      $element['ai_alt_text_generation'][$context['delta']] = [
+        '#type' => 'button',
+        '#value' => 'Generate with AI',
+        '#prefix' => '<div class="ai-alt-text-generation-wrapper">',
+        '#suffix' => '</div>',
+        '#attributes' => [
+          'class' => ['ai-alt-text-generation', 'button--primary'],
+          'data-file-id' => $element['#default_value']['fids'][0] ?? 0,
+        ],
+      ];
+      if ($config->get('hide_button')) {
+        $element['ai_alt_text_generation'][$context['delta']]['#attributes']['style'] = 'display: none;';
+      }
+    }
+  }
+}

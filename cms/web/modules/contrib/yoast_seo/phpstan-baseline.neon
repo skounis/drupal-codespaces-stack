@@ -1,0 +1,346 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\EntityAnalyser\\:\\:createEntityPreview\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/EntityAnalyser.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\EntityAnalyser\\:\\:getFieldMappings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/EntityAnalyser.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\EntityAnalyser\\:\\:replaceContextAwareTokens\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/EntityAnalyser.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\EntityAnalyser\\:\\:replaceContextAwareTokens\\(\\) has parameter \\$metatags with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/EntityAnalyser.php
+
+		-
+			message: "#^Property Drupal\\\\yoast_seo\\\\EntityAnalyser\\:\\:\\$defaultTheme \\(string\\) does not accept mixed\\.$#"
+			count: 1
+			path: src/EntityAnalyser.php
+
+		-
+			message: "#^Cannot access property \\$in_preview on mixed\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Form\\\\AnalysisFormHandler\\:\\:addAnalysisSubmit\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Form\\\\AnalysisFormHandler\\:\\:addAnalysisSubmit\\(\\) has parameter \\$element with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Form\\\\AnalysisFormHandler\\:\\:analysisSubmitAjax\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Form\\\\AnalysisFormHandler\\:\\:cacheProcessedEntityForPreview\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Form\\\\AnalysisFormHandler\\:\\:cacheProcessedEntityForPreview\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Drupal\\\\yoast_seo\\\\EntityAnalyser\\:\\:createEntityPreview\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, mixed given\\.$#"
+			count: 1
+			path: src/Form/AnalysisFormHandler.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldFormatter\\\\YoastSeoEmptyFormatter\\:\\:viewElements\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/YoastSeoEmptyFormatter.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\:\\:\\$status\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/YoastSeoFormatter.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldFormatter\\\\YoastSeoFormatter\\:\\:viewElements\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldFormatter/YoastSeoFormatter.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldType\\\\YoastSeoItem\\:\\:schema\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldType/YoastSeoItem.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$info\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Cannot access property \\$description on mixed\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Cannot access property \\$focus_keyword on mixed\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Cannot access property \\$status on mixed\\.$#"
+			count: 2
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Cannot access property \\$title on mixed\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:__construct\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:__construct\\(\\) has parameter \\$third_party_settings with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:create\\(\\) has parameter \\$configuration with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:defaultSettings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:formElement\\(\\) has parameter \\$element with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:formElement\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:formElement\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:getJavaScriptConfiguration\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:massageFormValues\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:massageFormValues\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:massageFormValues\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:settingsForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:settingsForm\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:settingsSummary\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Parameter \\#1 \\$theme of method Drupal\\\\Core\\\\Extension\\\\ThemeHandlerInterface\\:\\:getName\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Property Drupal\\\\yoast_seo\\\\Plugin\\\\Field\\\\FieldWidget\\\\YoastSeoWidget\\:\\:\\$jsTargets type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/YoastSeoWidget.php
+
+		-
+			message: "#^Method Drupal\\\\yoast_seo\\\\SeoManager\\:\\:getEnabledBundles\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/SeoManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function array_reverse expects array, mixed given\\.$#"
+			count: 1
+			path: src/SeoManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function ksort expects array, mixed given\\.$#"
+			count: 1
+			path: src/SeoManager.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$message\\.$#"
+			count: 1
+			path: tests/src/Context/Log.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$severity\\.$#"
+			count: 4
+			path: tests/src/Context/Log.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$type\\.$#"
+			count: 4
+			path: tests/src/Context/Log.php
+
+		-
+			message: "#^Cannot call method invalidateContainer\\(\\) on mixed\\.$#"
+			count: 2
+			path: tests/src/Context/Setup.php
+
+		-
+			message: "#^Cannot call method rebuildContainer\\(\\) on mixed\\.$#"
+			count: 2
+			path: tests/src/Context/Setup.php
+
+		-
+			message: "#^Method Drupal\\\\Tests\\\\yoast_seo\\\\Context\\\\Setup\\:\\:updateSetting\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/src/Context/Setup.php
+
+		-
+			message: "#^Method Drupal\\\\Tests\\\\yoast_seo\\\\Functional\\\\ConfigurationPageTest\\:\\:testAdministerPermissionRequirement\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/src/Functional/ConfigurationPageTest.php
+
+		-
+			message: "#^Method Drupal\\\\Tests\\\\yoast_seo\\\\Kernel\\\\EntityAnalyserTest\\:\\:createYoastSeoField\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/src/Kernel/EntityAnalyserTest.php
+
+		-
+			message: "#^Method Drupal\\\\Tests\\\\yoast_seo\\\\Kernel\\\\EntityAnalyserTest\\:\\:testEntityPreviewWithSavedNode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/src/Kernel/EntityAnalyserTest.php
+
+		-
+			message: "#^Method Drupal\\\\Tests\\\\yoast_seo\\\\Kernel\\\\EntityAnalyserTest\\:\\:testEntityPreviewWithUnsavedNode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/src/Kernel/EntityAnalyserTest.php
+
+		-
+			message: "#^Property Drupal\\\\Tests\\\\yoast_seo\\\\Kernel\\\\EntityAnalyserTest\\:\\:\\$modules type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/src/Kernel/EntityAnalyserTest.php
+
+		-
+			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\:\\:getDedicatedTableNames\\(\\)\\.$#"
+			count: 1
+			path: yoast_seo.install
+
+		-
+			message: "#^Function yoast_seo_update_8201\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.install
+
+		-
+			message: "#^Function yoast_seo_update_8202\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.install
+
+		-
+			message: "#^Function yoast_seo_update_8203\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.install
+
+		-
+			message: "#^Parameter \\#1 \\$field_name of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\:\\:getColumnNames\\(\\) expects string, int\\|string given\\.$#"
+			count: 1
+			path: yoast_seo.install
+
+		-
+			message: "#^Parameter \\#1 \\$name of method Drupal\\\\Core\\\\Entity\\\\EntityDefinitionUpdateManagerInterface\\:\\:getFieldStorageDefinition\\(\\) expects string, int\\|string given\\.$#"
+			count: 1
+			path: yoast_seo.install
+
+		-
+			message: "#^Cannot access offset 'description' on mixed\\.$#"
+			count: 2
+			path: yoast_seo.module
+
+		-
+			message: "#^Cannot access offset 'title' on mixed\\.$#"
+			count: 2
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_entity_field_access\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_entity_field_access\\(\\) has parameter \\$operation with no type specified\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_entity_type_build\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_entity_type_build\\(\\) has parameter \\$entity_types with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_form_field_storage_config_edit_form_alter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_form_field_storage_config_edit_form_alter\\(\\) has parameter \\$form with no type specified\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_metatags_alter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_metatags_alter\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_metatags_alter\\(\\) has parameter \\$metatags with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: yoast_seo.module
+
+		-
+			message: "#^Function yoast_seo_theme\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: yoast_seo.module

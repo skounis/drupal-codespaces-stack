@@ -1,0 +1,12 @@
+trash.admin_content_trash:
+  title: 'Trash'
+  route_name: trash.admin_content_trash
+  base_route: system.admin_content
+  weight: 50
+  cache_tags:
+    - config:trash.settings
+trash.admin_content_trash_entity_type:
+  title: 'Trash'
+  route_name: trash.admin_content_trash_entity_type
+  parent_id: trash.admin_content_trash
+  deriver: \Drupal\trash\Plugin\Derivative\TrashLocalTasks

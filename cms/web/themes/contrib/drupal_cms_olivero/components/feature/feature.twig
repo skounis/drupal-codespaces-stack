@@ -1,0 +1,32 @@
+{%
+  set classes = [
+    'feature',
+    not image ? 'feature--has-no-image',
+    image and image_position and image_position == 'right' ? 'feature--flipped',
+  ]
+%}
+
+<article{{ attributes.addClass(classes) }}>
+  <div class="feature__inner">
+    {% if image %}
+      <div class="feature__image-wrapper">
+        <img src="{{ image.src }}" alt="{{ image.alt }}">
+      </div>
+    {% endif %}
+    <div class="feature__content-wrapper">
+      <div class="feature__text-wrapper">
+        <h3 class="feature__title">
+          {{ title }}
+        </h3>
+        <div class="feature__summary">
+          {{ summary }}
+        </div>
+      </div>
+      {% if link_url %}
+        <div class="feature__link-wrapper">
+          <a class="button--primary" href="{{ link_url }}">{{ link_text|default('Learn more'|t) }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</article>

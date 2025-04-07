@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * ECA Base submodule.
+ */
+
+use Drupal\eca_base\HookHandler;
+
+/**
+ * Helper method return hook handler service.
+ *
+ * @return \Drupal\eca_base\HookHandler
+ *   The hook handler service.
+ */
+function _eca_base_hook_handler(): HookHandler {
+  return \Drupal::service('eca_base.hook_handler');
+}
+
+/**
+ * Implements hook_cron().
+ */
+function eca_base_cron(): void {
+  _eca_base_hook_handler()->cron();
+}

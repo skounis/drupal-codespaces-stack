@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * ECA Form submodule.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\eca_form\HookHandler;
+
+/**
+ * Helper function to return the hook handler service.
+ *
+ * @return \Drupal\eca_form\HookHandler
+ *   The hook handler service.
+ */
+function _eca_form_hook_handler(): HookHandler {
+  return \Drupal::service('eca_form.hook_handler');
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function eca_form_form_alter(array &$form, FormStateInterface $form_state): void {
+  _eca_form_hook_handler()->alter($form, $form_state);
+}
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function eca_form_inline_entity_form_entity_form_alter(array &$entity_form, FormStateInterface $form_state): void {
+  _eca_form_hook_handler()->alterInlineEntityForm($entity_form, $form_state);
+}
+
+/**
+ * Implements hook_field_widget_single_element_WIDGET_TYPE_form_alter().
+ *
+ * For the "inline_entity_form_complex" widget plugin ID.
+ */
+function eca_form_field_widget_single_element_inline_entity_form_complex_form_alter(array &$element, FormStateInterface $form_state, array &$context): void {
+  _eca_form_hook_handler()->fieldWidgetSingleElementInlineEntityFormComplexFormAlter($element, $form_state, $context);
+}
+
+/**
+ * Implements hook_field_widget_single_element_WIDGET_TYPE_form_alter().
+ *
+ * For the "inline_entity_form_simple" widget plugin ID.
+ */
+function eca_form_field_widget_single_element_inline_entity_form_simple_form_alter(array &$element, FormStateInterface $form_state, array &$context): void {
+  _eca_form_hook_handler()->FieldWidgetSingleElementInlineEntityFormSimpleFormAlter($element, $form_state, $context);
+}
+
+/**
+ * Implements hook_field_widget_single_element_WIDGET_TYPE_form_alter().
+ *
+ * For the "paragraphs" widget plugin ID.
+ */
+function eca_form_field_widget_single_element_paragraphs_form_alter(array &$element, FormStateInterface $form_state, array &$context): void {
+  _eca_form_hook_handler()->fieldWidgetSingleElementParagraphsFormAlter($element, $form_state, $context);
+}
+
+/**
+ * Implements hook_field_widget_single_element_WIDGET_TYPE_form_alter().
+ *
+ * For the "entity_reference_paragraphs" widget plugin ID.
+ */
+function eca_form_field_widget_single_element_entity_reference_paragraphs_form_alter(array &$element, FormStateInterface $form_state, array &$context): void {
+  _eca_form_hook_handler()->fieldWidgetSingleElementEntityReferenceParagraphsFormAlter($element, $form_state, $context);
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function eca_form_module_implements_alter(array &$implementations, string $hook): void {
+  if ($hook === 'form_alter') {
+    // Move eca_form_form_alter() to the end of the list.
+    // Other components should be applied first, before ECA takes effect.
+    $group = $implementations['eca_form'];
+    unset($implementations['eca_form']);
+    $implementations['eca_form'] = $group;
+  }
+}

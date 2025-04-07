@@ -1,0 +1,38 @@
+name: {{ name }}
+type: profile
+
+# Change this to whatever your minimum required version of core is, depending on the
+# needs of the recipes you want to apply.
+core_version_requirement: '^11.1'
+
+# Change this to whatever you like. It's only visible to users in the installer's profile
+# selection step, which is skipped if you mark this profile as a distribution.
+description: 'Provides install-time tweaks. Not to be used in production.'
+
+# Remove this entire `distribution` section if you'd like users to choose which profile
+# to use at the start of the install.
+distribution:
+  name: {{ name }}
+  install:
+    theme: {{ theme }}
+{% if finish_url %}
+    finish_url: '{{ finish_url }}'
+{% endif %}
+
+# A list of forms that should be presented to the user before choosing database
+# settings and installing the system. Each of these forms must implement
+# \Drupal\RecipeKit\Installer\FormInterface.
+forms:
+  - '\Drupal\RecipeKit\Installer\Form\RecipesForm'
+  - '\Drupal\RecipeKit\Installer\Form\SiteNameForm'
+
+recipes:
+  # This should be a list of recipes' Composer package names that should always be
+  # applied during the install process.
+  required: []
+
+  # This should be a set of recipe combinations to show to the user as choices at the
+  # start of the install process. The keys should be the user-facing names of the
+  # combinations, and the values should be lists of the Composer package names of the
+  # recipes that make up that combination.
+  optional: {}

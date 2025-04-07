@@ -1,0 +1,54 @@
+uuid: a46cedee-917e-4576-9b67-ecbd2fc01501
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_type.scheduler_api_product_test
+    - field.field.commerce_product.scheduler_api_product_test.field_approved_publishing
+    - field.field.commerce_product.scheduler_api_product_test.field_approved_unpublishing
+id: commerce_product.scheduler_api_product_test.default
+targetEntityType: commerce_product
+bundle: scheduler_api_product_test
+mode: default
+content:
+  field_approved_publishing:
+    type: boolean
+    weight: 2
+    region: content
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  field_approved_unpublishing:
+    type: boolean
+    weight: 3
+    region: content
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  title:
+    label: hidden
+    type: string
+    weight: 0
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  variations:
+    type: entity_reference_entity_view
+    weight: 1
+    region: content
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+hidden:
+  created: true
+  stores: true
+  uid: true

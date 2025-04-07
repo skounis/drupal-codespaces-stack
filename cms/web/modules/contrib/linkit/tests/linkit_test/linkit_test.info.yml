@@ -1,0 +1,13 @@
+name: 'Linkit test module'
+description: 'Support module for Linkit testing.'
+package: Testing
+type: module
+dependencies:
+  - linkit:linkit
+  - drupal:field
+  - drupal:text
+
+# Information added by Drupal.org packaging script on 2025-01-30
+version: '7.0.3'
+project: 'linkit'
+datestamp: 1738264706

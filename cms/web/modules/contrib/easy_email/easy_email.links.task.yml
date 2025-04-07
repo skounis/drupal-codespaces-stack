@@ -1,0 +1,38 @@
+entity.easy_email_type.edit_form:
+  route_name: entity.easy_email_type.edit_form
+  base_route: entity.easy_email_type.edit_form
+  title: 'Edit template'
+
+entity.easy_email.canonical:
+  route_name: entity.easy_email.canonical
+  base_route: entity.easy_email.canonical
+  title: 'View'
+
+entity.easy_email.edit_form:
+  route_name: entity.easy_email.edit_form
+  base_route: entity.easy_email.canonical
+  title: 'Edit'
+  weight: 5
+
+entity.easy_email.delete_form:
+  route_name:  entity.easy_email.delete_form
+  base_route:  entity.easy_email.canonical
+  title: Delete
+  weight: 10
+
+entity.easy_email_type.collection:
+  route_name: entity.easy_email_type.collection
+  base_route: entity.easy_email_type.collection
+  title: 'Templates'
+
+easy_email.settings:
+  route_name: easy_email.settings
+  base_route: entity.easy_email_type.collection
+  title: 'Settings'
+  weight: 20
+
+entity.easy_email_type.preview:
+  route_name: entity.easy_email_type.preview
+  base_route: entity.easy_email_type.edit_form
+  title: 'Preview template'
+

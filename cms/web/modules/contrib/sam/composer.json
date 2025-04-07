@@ -1,0 +1,17 @@
+{
+  "name": "drupal/sam",
+  "type": "drupal-module",
+  "description": "Improves limited-cardinality widgets by displaying only one empty element at a time",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/sam",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "http://drupal.org/project/issues/sam",
+    "source": "http://cgit.drupalcode.org/sam"
+  },
+  "require": { },
+  "require-dev": {
+    "drupal/paragraphs": "dev-1.x"
+  }
+}

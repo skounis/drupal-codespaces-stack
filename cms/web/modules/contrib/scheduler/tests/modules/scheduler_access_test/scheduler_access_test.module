@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Scheduler Access Test module.
+ *
+ * This module is used in SchedulerEntityAccessTest and removes access to all
+ * published nodes. The Media module does not provide any corresponding hooks to
+ * restrict Media access. This module, and the tests, can be expanded when a
+ * suitable access restriction method becomes available for Media entities.
+ */
+
+use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_node_access_records().
+ */
+function scheduler_access_test_node_access_records(NodeInterface $node) {
+  // For the purpose of this test we deny access to every node regardless of
+  // its published status. However, users with 'View own unpublished {type}'
+  // permission will still be able to view their unpublished nodes.
+  $grants = [[
+    'realm' => 'scheduler',
+    'gid' => 1,
+    'grant_view' => 0,
+    'grant_update' => 0,
+    'grant_delete' => 0,
+  ],
+  ];
+  return $grants;
+}
+
+/**
+ * Implements hook_node_grants().
+ */
+function scheduler_access_test_node_grants(AccountInterface $account, $op) {
+  // This hook needs to exist, but we do not return any grants.
+  return [];
+}

@@ -1,0 +1,11 @@
+{
+	"country_code": "KN",
+	"subdivisions": {
+		"N": {
+			"name": "Nevis"
+		},
+		"K": {
+			"name": "St. Kitts"
+		}
+	}
+}

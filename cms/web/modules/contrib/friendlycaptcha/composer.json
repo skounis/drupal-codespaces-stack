@@ -1,0 +1,14 @@
+{
+  "name": "drupal/friendlycaptcha",
+  "description": "Protect your website from spam and abuse while letting real people pass through with ease.",
+  "type": "drupal-module",
+  "homepage": "https://www.drupal.org/project/friendlycaptcha",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/friendlycaptcha",
+    "source": "https://git.drupal.org/project/friendlycaptcha.git"
+  },
+  "license": "GPL-2.0+",
+  "require": {
+    "drupal/captcha": ">=1 || <=2"
+  }
+}

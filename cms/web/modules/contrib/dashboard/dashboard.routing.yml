@@ -1,0 +1,65 @@
+dashboard:
+  path: '/admin/dashboard'
+  defaults:
+    _controller: '\Drupal\dashboard\Controller\DashboardController::build'
+    _title: 'Dashboard'
+  requirements:
+    _custom_access: '\Drupal\dashboard\Controller\DashboardController::access'
+
+entity.dashboard.canonical:
+  path: '/admin/dashboard/{dashboard}'
+  defaults:
+    _controller: '\Drupal\dashboard\Controller\DashboardController::build'
+    _title: 'Dashboard'
+  requirements:
+    _entity_access: 'dashboard.view'
+
+entity.dashboard.preview:
+  path: '/admin/structure/dashboard/{dashboard}/preview'
+  defaults:
+    _controller: '\Drupal\dashboard\Controller\DashboardController::build'
+    _title: 'Dashboard'
+  requirements:
+    _entity_access: 'dashboard.preview'
+
+entity.dashboard.collection:
+  path: '/admin/structure/dashboard'
+  defaults:
+    _entity_list: 'dashboard'
+    _title: 'Dashboard configuration'
+  requirements:
+    _permission: 'administer dashboard'
+
+entity.dashboard.add_form:
+  path: '/admin/structure/dashboard/add'
+  defaults:
+    _entity_form: 'dashboard.add'
+    _title: 'Add a dashboard'
+  requirements:
+    _permission: 'administer dashboard'
+
+entity.dashboard.edit_form:
+  path: '/admin/structure/dashboard/{dashboard}'
+  defaults:
+    _entity_form: 'dashboard.edit'
+    _title: 'Edit a dashboard'
+  requirements:
+    _permission: 'administer dashboard'
+
+entity.dashboard.delete_form:
+  path: '/admin/structure/dashboard/{dashboard}/delete'
+  defaults:
+    _entity_form: 'dashboard.delete'
+    _title: 'Delete a dashboard'
+  requirements:
+    _permission: 'administer dashboard'
+
+entity.dashboard.permissions_form:
+  path: '/admin/structure/dashboard/{dashboard}/permissions'
+  defaults:
+    _title: 'Manage permissions'
+    _form: 'Drupal\dashboard\Form\DashboardPermissionsForm'
+    entity_type_id: dashboard
+    bundle_entity_type: dashboard
+  requirements:
+    _permission: 'administer permissions'

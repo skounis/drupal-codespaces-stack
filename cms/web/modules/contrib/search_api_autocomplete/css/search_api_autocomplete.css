@@ -1,0 +1,42 @@
+.search-api-autocomplete-suggestion {
+  position: relative;
+  padding: 3px 5px;
+}
+
+.search-api-autocomplete-search .ui-menu-item-wrapper {
+  margin: 0;
+  padding: 0;
+  color: #333;
+  border: 0;
+}
+
+/* stylelint-disable-next-line -- Error reported inconsistently. */
+.search-api-autocomplete-search .ui-menu-item-wrapper.ui-state-active .search-api-autocomplete-suggestion {
+  color: #fff;
+  background: #0072b9;
+}
+
+.search-api-autocomplete-search .ui-menu-item {
+  list-style-image: none;
+}
+
+.search-api-autocomplete-search .ui-menu-item:hover {
+  background: #eee;
+}
+
+.search-api-autocomplete-search .ui-menu-item a {
+  text-decoration: none;
+}
+
+.search-api-autocomplete-suggestion .autocomplete-suggestion-note {
+  font-size: 90%;
+}
+
+.search-api-autocomplete-suggestion .autocomplete-suggestion-user-input {
+  font-weight: bold;
+}
+
+.search-api-autocomplete-suggestion .autocomplete-suggestion-results-count {
+  position: absolute;
+  right: 0.2em;
+}

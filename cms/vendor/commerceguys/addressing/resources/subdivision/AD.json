@@ -1,0 +1,27 @@
+{
+	"country_code": "AD",
+	"subdivisions": {
+		"07": {
+			"code": "Parròquia d'Andorra la Vella",
+			"name": "Andorra la Vella"
+		},
+		"02": {
+			"name": "Canillo"
+		},
+		"03": {
+			"name": "Encamp"
+		},
+		"08": {
+			"name": "Escaldes-Engordany"
+		},
+		"04": {
+			"name": "La Massana"
+		},
+		"05": {
+			"name": "Ordino"
+		},
+		"06": {
+			"name": "Sant Julià de Lòria"
+		}
+	}
+}

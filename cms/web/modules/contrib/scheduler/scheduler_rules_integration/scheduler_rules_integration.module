@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * @file
+ * Scheduler Rules Integration.
+ *
+ * This sub-module provides actions, conditions and events for use with the
+ * Rules module. All rules code is now moved into this sub-module so that the
+ * main Scheduler module does not need Rules as a pre-requisite.
+ * @see https://www.drupal.org/node/2790459
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Dispatch a Rules Integration event for an entity.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity object being processed.
+ * @param string $event_id
+ *   The internal event id, for example NEW_FOR_PUBLISHING or CRON_PUBLISHED.
+ */
+function _scheduler_rules_integration_event(EntityInterface $entity, $event_id) {
+  // Derive the fully namespaced event class for the given type of entity. The
+  // entity type id may contain underscores and these need to be converted to
+  // camelCase to match the event class. For example the class for 'node' is
+  // simply RulesNodeEvent, but the class for commerce_product is
+  // RulesCommerceProductEvent.
+  $camelCaseEntityType = str_replace(' ', '', ucwords(str_replace('_', ' ', $entity->getEntityTypeId())));
+  $event_class = "\Drupal\scheduler_rules_integration\Event\Rules{$camelCaseEntityType}Event";
+  $event = new $event_class($entity);
+  $event_name = constant(get_class($event) . "::$event_id");
+  \Drupal::service('scheduler.manager')->dispatch($event, $event_name);
+}
+
+/**
+ * Trigger Rules events during cron.
+ *
+ * This function is called from the main Scheduler module publish() and
+ * unpublish() functions in the SchedulerManager class.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity object being processed.
+ * @param string $action
+ *   The action being performed - 'publish' or 'unpublish'.
+ */
+function _scheduler_rules_integration_dispatch_cron_event(EntityInterface $entity, $action) {
+  $event_id = strtoupper("CRON_{$action}ED");
+  _scheduler_rules_integration_event($entity, $event_id);
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function scheduler_rules_integration_entity_insert(EntityInterface $entity) {
+  // Invoke the Rules events to indicate that a new entity has been scheduled.
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  // If this entity type is is not supported by Scheduler then go further.
+  if (!$scheduler_manager->getPlugin($entity->getEntityTypeId())) {
+    return;
+  }
+  if (!empty($entity->publish_on->value)) {
+    _scheduler_rules_integration_event($entity, 'NEW_FOR_PUBLISHING');
+  }
+  if (!empty($entity->unpublish_on->value)) {
+    _scheduler_rules_integration_event($entity, 'NEW_FOR_UNPUBLISHING');
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function scheduler_rules_integration_entity_update(EntityInterface $entity) {
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  // If this entity type is is not supported by Scheduler then go further.
+  if (!$scheduler_manager->getPlugin($entity->getEntityTypeId())) {
+    return;
+  }
+
+  // Invoke Rules events to indicate that an existing entity has been scheduled.
+  if (!empty($entity->publish_on->value)) {
+    _scheduler_rules_integration_event($entity, 'EXISTING_FOR_PUBLISHING');
+  }
+
+  if (!empty($entity->unpublish_on->value)) {
+    _scheduler_rules_integration_event($entity, 'EXISTING_FOR_UNPUBLISHING');
+  }
+}

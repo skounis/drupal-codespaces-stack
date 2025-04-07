@@ -1,0 +1,29 @@
+views.display_extender.simple_sitemap_display_extender:
+  type: views_display_extender
+  mapping:
+    variants:
+      type: sequence
+      label: 'Variants'
+      sequence:
+        type: simple_sitemap_views_variant_settings
+
+simple_sitemap_views_variant_settings:
+  type: mapping
+  mapping:
+    index:
+      label: 'Index'
+      type: boolean
+    priority:
+      label: 'Priority'
+      type: string
+    changefreq:
+      label: 'Change frequency'
+      type: string
+    arguments:
+      label: 'Indexed arguments'
+      type: sequence
+      sequence:
+        type: string
+    max_links:
+      label: 'Max links'
+      type: integer

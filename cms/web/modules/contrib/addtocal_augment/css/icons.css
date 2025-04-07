@@ -1,0 +1,74 @@
+/* Icon label. */
+span.add-to-calendar {
+  display: inline-flex;
+}
+
+.layout--twocol-section--67-33 .layout__region--second .add-to-calendar,
+.layout--twocol-section--33-67 .layout__region--first .add-to-calendar {
+  margin: 0.5rem 0 2.5rem;
+}
+
+button.addtocal__label {
+  position: relative;
+  bottom: -0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  border: 0;
+  background: url("../img/calendar.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.layout--twocol-section--67-33 .layout__region--second button.addtocal__label,
+.layout--twocol-section--33-67 .layout__region--first button.addtocal__label {
+  margin-left: 0;
+}
+
+/* Text label */
+label.addtocal__label {
+  display: inline-block;
+  width: 2.25rem;
+  height: 1.4rem;
+  margin-left: 0.75rem;
+  text-indent: -9999px;
+  opacity: 0.5;
+  border-right: 2px solid #999;
+  background: url("../img/calendar.svg") no-repeat left 50%;
+  background-size: contain;
+}
+
+.layout--twocol-section--67-33 .layout__region--second label.addtocal__label,
+.layout--twocol-section--33-67 .layout__region--first label.addtocal__label {
+  margin-left: 0;
+}
+
+.add-to-calendar:has(.addtocal__link:hover) label.addtocal__label {
+  opacity: 0.8;
+}
+
+.addtocal__link {
+  display: inline-block;
+  width: 1rem;
+  height: 1.25rem;
+  margin-left: 0.5rem;
+  text-indent: -9999px;
+  background: currentColor;
+}
+
+.addtocal__google {
+  mask: url("../img/google.svg") no-repeat left 50%;
+}
+
+.addtocal__ical {
+  mask: url("../img/apple.svg") no-repeat left 50%;
+}
+
+.addtocal__outlook {
+  mask: url("../img/outlook.svg") no-repeat left 50%;
+}
+
+dialog .addtocal__link {
+  transform: scale(2.5);
+}

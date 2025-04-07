@@ -1,0 +1,5 @@
+administer dashboard:
+  title: 'Administer dashboard'
+
+permission_callbacks:
+  - \Drupal\dashboard\DashboardPermissions::permissions

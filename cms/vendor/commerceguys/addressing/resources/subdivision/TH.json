@@ -1,0 +1,314 @@
+{
+	"country_code": "TH",
+	"locale": "th",
+	"subdivisions": {
+		"81": {
+			"name": "Krabi",
+			"local_name": "กระบี่"
+		},
+		"10": {
+			"name": "Bangkok",
+			"local_name": "กรุงเทพมหานคร"
+		},
+		"71": {
+			"name": "Kanchanaburi",
+			"local_name": "กาญจนบุรี"
+		},
+		"46": {
+			"name": "Kalasin",
+			"local_name": "กาฬสินธุ์"
+		},
+		"62": {
+			"name": "Kamphaeng Phet",
+			"local_name": "กำแพงเพชร"
+		},
+		"40": {
+			"name": "Khon Kaen",
+			"local_name": "ขอนแก่น"
+		},
+		"38": {
+			"name": "Bueng Kan",
+			"local_name": "จังหวัด บึงกาฬ"
+		},
+		"22": {
+			"name": "Chanthaburi",
+			"local_name": "จันทบุรี"
+		},
+		"24": {
+			"name": "Chachoengsao",
+			"local_name": "ฉะเชิงเทรา"
+		},
+		"20": {
+			"name": "Chon Buri",
+			"local_name": "ชลบุรี"
+		},
+		"18": {
+			"name": "Chai Nat",
+			"local_name": "ชัยนาท"
+		},
+		"36": {
+			"name": "Chaiyaphum",
+			"local_name": "ชัยภูมิ"
+		},
+		"86": {
+			"name": "Chumpon",
+			"local_name": "ชุมพร"
+		},
+		"57": {
+			"name": "Chiang Rai",
+			"local_name": "เชียงราย"
+		},
+		"50": {
+			"name": "Chiang Mai",
+			"local_name": "เชียงใหม่"
+		},
+		"92": {
+			"name": "Trang",
+			"local_name": "ตรัง"
+		},
+		"23": {
+			"name": "Trat",
+			"local_name": "ตราด"
+		},
+		"63": {
+			"name": "Tak",
+			"local_name": "ตาก"
+		},
+		"26": {
+			"name": "Nakhon Nayok",
+			"local_name": "นครนายก"
+		},
+		"73": {
+			"name": "Nakhon Pathom",
+			"local_name": "นครปฐม"
+		},
+		"48": {
+			"name": "Nakhon Phanom",
+			"local_name": "นครพนม"
+		},
+		"30": {
+			"name": "Nakhon Ratchasima",
+			"local_name": "นครราชสีมา"
+		},
+		"80": {
+			"name": "Nakhon Si Thammarat",
+			"local_name": "นครศรีธรรมราช"
+		},
+		"60": {
+			"name": "Nakhon Sawan",
+			"local_name": "นครสวรรค์"
+		},
+		"12": {
+			"name": "Nonthaburi",
+			"local_name": "นนทบุรี"
+		},
+		"96": {
+			"name": "Narathiwat",
+			"local_name": "นราธิวาส"
+		},
+		"55": {
+			"name": "Nan",
+			"local_name": "น่าน"
+		},
+		"31": {
+			"name": "Buri Ram",
+			"local_name": "บุรีรัมย์"
+		},
+		"13": {
+			"name": "Pathum Thani",
+			"local_name": "ปทุมธานี"
+		},
+		"77": {
+			"name": "Prachuap Khiri Khan",
+			"local_name": "ประจวบคีรีขันธ์"
+		},
+		"25": {
+			"name": "Prachin Buri",
+			"local_name": "ปราจีนบุรี"
+		},
+		"94": {
+			"name": "Pattani",
+			"local_name": "ปัตตานี"
+		},
+		"14": {
+			"name": "Phra Nakhon Si Ayutthaya",
+			"local_name": "พระนครศรีอยุธยา"
+		},
+		"56": {
+			"name": "Phayao",
+			"local_name": "พะเยา"
+		},
+		"82": {
+			"name": "Phang Nga",
+			"local_name": "พังงา"
+		},
+		"93": {
+			"name": "Phattalung",
+			"local_name": "พัทลุง"
+		},
+		"66": {
+			"name": "Phichit",
+			"local_name": "พิจิตร"
+		},
+		"65": {
+			"name": "Phitsanulok",
+			"local_name": "พิษณุโลก"
+		},
+		"76": {
+			"name": "Phetchaburi",
+			"local_name": "เพชรบุรี"
+		},
+		"67": {
+			"name": "Phetchabun",
+			"local_name": "เพชรบูรณ์"
+		},
+		"54": {
+			"name": "Phrae",
+			"local_name": "แพร่"
+		},
+		"83": {
+			"name": "Phuket",
+			"local_name": "ภูเก็ต"
+		},
+		"44": {
+			"name": "Maha Sarakham",
+			"local_name": "มหาสารคาม"
+		},
+		"49": {
+			"name": "Mukdahan",
+			"local_name": "มุกดาหาร"
+		},
+		"58": {
+			"name": "Mae Hong Son",
+			"local_name": "แม่ฮ่องสอน"
+		},
+		"35": {
+			"name": "Yasothon",
+			"local_name": "ยโสธร"
+		},
+		"95": {
+			"name": "Yala",
+			"local_name": "ยะลา"
+		},
+		"45": {
+			"name": "Roi Et",
+			"local_name": "ร้อยเอ็ด"
+		},
+		"85": {
+			"name": "Ranong",
+			"local_name": "ระนอง"
+		},
+		"21": {
+			"name": "Rayong",
+			"local_name": "ระยอง"
+		},
+		"70": {
+			"name": "Ratchaburi",
+			"local_name": "ราชบุรี"
+		},
+		"16": {
+			"name": "Lop Buri",
+			"local_name": "ลพบุรี"
+		},
+		"52": {
+			"name": "Lampang",
+			"local_name": "ลำปาง"
+		},
+		"51": {
+			"name": "Lamphun",
+			"local_name": "ลำพูน"
+		},
+		"42": {
+			"name": "Loei",
+			"local_name": "เลย"
+		},
+		"33": {
+			"name": "Si Sa Ket",
+			"local_name": "ศรีสะเกษ"
+		},
+		"47": {
+			"name": "Sakon Nakhon",
+			"local_name": "สกลนคร"
+		},
+		"90": {
+			"name": "Songkhla",
+			"local_name": "สงขลา"
+		},
+		"91": {
+			"name": "Satun",
+			"local_name": "สตูล"
+		},
+		"11": {
+			"name": "Samut Prakan",
+			"local_name": "สมุทรปราการ"
+		},
+		"75": {
+			"name": "Samut Songkhram",
+			"local_name": "สมุทรสงคราม"
+		},
+		"74": {
+			"name": "Samut Sakhon",
+			"local_name": "สมุทรสาคร"
+		},
+		"27": {
+			"name": "Sa Kaeo",
+			"local_name": "สระแก้ว"
+		},
+		"19": {
+			"name": "Saraburi",
+			"local_name": "สระบุรี"
+		},
+		"17": {
+			"name": "Sing Buri",
+			"local_name": "สิงห์บุรี"
+		},
+		"64": {
+			"name": "Sukhothai",
+			"local_name": "สุโขทัย"
+		},
+		"72": {
+			"name": "Suphanburi",
+			"local_name": "สุพรรณบุรี"
+		},
+		"84": {
+			"name": "Surat Thani",
+			"local_name": "สุราษฎร์ธานี"
+		},
+		"32": {
+			"name": "Surin",
+			"local_name": "สุรินทร์"
+		},
+		"43": {
+			"name": "Nong Khai",
+			"local_name": "หนองคาย"
+		},
+		"39": {
+			"name": "Nong Bua Lam Phu",
+			"local_name": "หนองบัวลำภู"
+		},
+		"15": {
+			"name": "Ang Thong",
+			"local_name": "อ่างทอง"
+		},
+		"37": {
+			"name": "Amnat Charoen",
+			"local_name": "อำนาจเจริญ"
+		},
+		"41": {
+			"name": "Udon Thani",
+			"local_name": "อุดรธานี"
+		},
+		"53": {
+			"name": "Uttaradit",
+			"local_name": "อุตรดิตถ์"
+		},
+		"61": {
+			"name": "Uthai Thani",
+			"local_name": "อุทัยธานี"
+		},
+		"34": {
+			"name": "Ubon Ratchathani",
+			"local_name": "อุบลราชธานี"
+		}
+	}
+}

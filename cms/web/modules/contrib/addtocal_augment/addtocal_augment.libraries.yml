@@ -1,0 +1,13 @@
+modal:
+  js:
+    js/modal.js: {}
+  css:
+    theme:
+      css/modal.css: {}
+  dependencies:
+    - core/drupal
+    - core/once
+icons:
+  css:
+    theme:
+      css/icons.css: {}

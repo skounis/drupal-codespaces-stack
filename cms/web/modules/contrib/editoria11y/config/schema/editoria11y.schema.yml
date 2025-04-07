@@ -1,0 +1,177 @@
+editoria11y.settings:
+  type: config_object
+  label: 'Editoria11y Settings'
+  mapping:
+    content_root:
+      type: string
+      label: 'Check elements in these containers'
+    assertiveness:
+      type: string
+      label: 'Alert panel assertiveness'
+    no_load:
+      type: string
+      label: 'Do not run if these elements are on the page'
+    ignore_all_if_absent:
+      type: string
+      label: 'Suppress all alerts if none of these elements are present'
+    ignore_elements:
+      type: string
+      label: 'Do not run tests on these containers'
+    panel_no_cover:
+      type: string
+      label: 'Move toggle to avoid colliding with these widgets'
+    embedded_content_warning:
+      type: string
+      label: 'Full check should warn on these elements with embedded uncheckable content'
+    download_links:
+      type: string
+      label: 'These links download a document or image and need a manual review'
+    link_strings_new_windows:
+      type: string
+      label: 'Strings that indicate a link opens in a new window'
+    ignore_link_strings:
+      type: string
+      label: 'Remove these strings from link text before checking for bad link text'
+    link_ignore_selector:
+      type: string
+      label: 'Remove strings in this selector before checking for bad link text'
+    hidden_handlers:
+      type: string
+      label: 'Hidden elements in these containers will be revealed by theme JS on request via a dispatched event'
+    element_hides_overflow:
+      type: string
+      label: 'Elements that truncate overflow, partially hiding buttons'
+    ed11y_theme:
+      type: string
+      label: 'Color scheme for panel and tooltips'
+    shadow_components:
+      type: string
+      label: 'Web components the checker should check'
+    detect_shadow:
+      type: boolean
+      label: 'Auto-detects for additional shadow components'
+    watch_for_changes:
+      type: string
+      label: 'Auto-detects and checks new content'
+    disable_sync:
+      type: boolean
+      label: 'Disables dashboard and synchronized marking of elements as OK'
+    preserve_params:
+      type: string
+      label: 'URL query parameters that should be recorded as separate pages'
+    redundant_prefix:
+      type: string
+      label: 'Remove string from URL for dashboard page links'
+    custom_tests:
+      type: integer
+      label: 'Number of custom test finished events the checker should wait for'
+    disable_live:
+      type: boolean
+      label: 'Disables live editor checking'
+    live_h_inherit:
+      type: string
+      label: 'Selector for frontend-context editors that should inherit the document outline'
+    live_h2:
+      type: string
+      label: 'Selector for editors where their first heading should be h2'
+    live_h3:
+      type: string
+      label: 'Selector for editors where their first heading should be h3'
+    live_h4:
+      type: string
+      label: 'Selector for editors where their first heading should be h4'
+    hide_edit_links:
+      type: string
+      label: 'Selectors for components where edit links are meaningless on tips'
+    ignore_tests:
+      type: mapping
+      label: 'Disable the tests you are not ready for'
+      mapping:
+        linkNewWindow:
+          type: string
+          label: 'linkNewWindow'
+        linkNoText:
+          type: string
+          label: 'linkNoText'
+        altEmptyLinked:
+          type: string
+          label: 'altEmptyLinked'
+        linkDocument:
+          type: string
+          label: 'linkDocument'
+        linkTextIsURL:
+          type: string
+          label: 'linkTextIsURL'
+        linkTextIsGeneric:
+          type: string
+          label: 'linkTextIsGeneric'
+        textPossibleList:
+          type: string
+          label: 'textPossibleList'
+        textPossibleHeading:
+          type: string
+          label: 'textPossibleHeading'
+        textUppercase:
+          type: string
+          label: 'textUppercase'
+        tableNoHeaderCells:
+          type: string
+          label: 'tableNoHeaderCells'
+        tableEmptyHeaderCell:
+          type: string
+          label: 'tableEmptyHeaderCell'
+        tableContainsContentHeading:
+          type: string
+          label: 'tableContainsContentHeading'
+        embedVideo:
+          type: string
+          label: 'embedVideo'
+        embedAudio:
+          type: string
+          label: 'embedAudio'
+        embedVisualization:
+          type: string
+          label: 'embedVisualization'
+        embedTwitter:
+          type: string
+          label: 'embedTwitter'
+        embedCustom:
+          type: string
+          label: 'embedCustom'
+        headingEmpty:
+          type: string
+          label: 'headingEmpty'
+        headingIsLong:
+          type: string
+          label: 'headingIsLong'
+        headingLevelSkipped:
+          type: string
+          label: 'headingLevelSkipped'
+        blockquoteIsShort:
+          type: string
+          label: 'blockquoteIsShort'
+        altMissing:
+          type: string
+          label: 'altMissing'
+        altNull:
+          type: string
+          label: 'altNull'
+        altMeaningless:
+          type: string
+          label: 'altMeaningless'
+        altURL:
+          type: string
+          label: 'altURL'
+        altImageOf:
+          type: string
+          label: 'altImageOf'
+        altDeadspace:
+          type: string
+          label: 'altDeadspace'
+        altLong:
+          type: string
+          label: 'altLong'
+        altPartOfLinkWithText:
+          type: string
+          label: 'altPartOfLinkWithText'
+

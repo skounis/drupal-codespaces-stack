@@ -1,0 +1,27 @@
+includes:
+    - phpstan-baseline.neon
+parameters:
+    level: 5
+    paths:
+        - .
+    excludePaths:
+        - tests/scripts/performance_test.php
+    ignoreErrors:
+        # new static() is a best practice in Drupal, so we cannot fix that.
+        - "#^Unsafe usage of new static#"
+        # See https://www.drupal.org/project/simple_sitemap/issues/3344735
+        - message: '#^Variable \$path on left side of \?\? always exists and is not nullable\.$#'
+          paths:
+              - modules/simple_sitemap_engines/src/PathProcessor/IndexNowPathProcessor.php
+              - src/PathProcessor/SitemapPathProcessor.php
+    drupal:
+        entityMapping:
+            simple_sitemap:
+                class: Drupal\simple_sitemap\Entity\SimpleSitemap
+                storage: Drupal\simple_sitemap\Entity\SimpleSitemapStorage
+            simple_sitemap_type:
+                class: Drupal\simple_sitemap\Entity\SimpleSitemapType
+                storage: Drupal\simple_sitemap\Entity\SimpleSitemapTypeStorage
+            simple_sitemap_engine:
+                class: Drupal\simple_sitemap_engines\Entity\SimpleSitemapEngine
+                storage: Drupal\simple_sitemap_engines\Entity\SimpleSitemapEngineStorage

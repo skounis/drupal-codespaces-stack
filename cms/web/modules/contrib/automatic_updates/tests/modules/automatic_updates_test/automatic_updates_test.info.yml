@@ -1,0 +1,12 @@
+name: 'Automatic Updates Test module'
+type: module
+description: 'Module for testing Automatic Updates.'
+package: Testing
+dependencies:
+  - drupal:automatic_updates
+  - automatic_updates:package_manager_test_validation
+
+# Information added by Drupal.org packaging script on 2025-01-13
+version: '3.1.7'
+project: 'automatic_updates'
+datestamp: 1736800616

@@ -1,0 +1,30 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a Drupal developer who can generate Drupal content. Based on the following
+    context of a task description and comments together with the list of all the
+    fields and whether they are required and their cardinality, will this content
+    be possible to fill out?
+
+    Read the task description and comments and determine if the content
+    should be filled out even if some of the contents does not work to fill
+    out. If no indication is given, then you should answer that it is not possible
+    to fill out the content.
+
+    If the content is not possible to fill out, then you should answer with what is
+    missing or what is wrong with the content.
+  possible_actions:
+    will_work: If the content will work to fill out.
+    will_partially_work: If the content will partially work to fill out.
+    will_not_work: If the content will not work to fill out.
+  formats:
+    - action: action id from list.
+      message: If it will not work or partially work, then what is missing or what is wrong with the content.
+  one_shot_learning_examples:
+    - action: will_work
+    - action: will_partially_work
+      message: For one of the contents the required field field_image is missing, so it was not created.
+    - action: will_not_work
+      message: The field field_image is required, but it is not possible to fill out in one of the contents.

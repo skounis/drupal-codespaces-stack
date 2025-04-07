@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Trash module.
+ */
+
+/**
+ * Update the enabled entity types and bundles configuration.
+ */
+function trash_update_9301(): void {
+  // This was moved from trash_post_update_set_enabled_entity_types_bundles().
+  // @see https://www.drupal.org/project/trash/issues/3453832
+  $config = \Drupal::configFactory()->getEditable('trash.settings');
+  $enabledEntityTypes = $config->get('enabled_entity_types');
+  if (array_is_list($enabledEntityTypes)) {
+    $enabledEntityTypesBundles = array_combine(
+      $enabledEntityTypes,
+      array_fill(0, count($enabledEntityTypes), [])
+    );
+
+    $config->set('enabled_entity_types', $enabledEntityTypesBundles);
+    $config->save();
+  }
+}
+
+/**
+ * Add the compact_overview configuration.
+ */
+function trash_update_10301(): void {
+  $config = \Drupal::configFactory()->getEditable('trash.settings');
+  $config->set('compact_overview', FALSE)->save();
+}

@@ -1,0 +1,21 @@
+access sitemap:
+  title: 'View published sitemap'
+
+administer sitemap:
+  title: 'Administer sitemap'
+  description: 'Change what is displayed on the sitemap.'
+
+set front page rss link on sitemap:
+  title: 'Set front page RSS link on sitemap'
+  description: 'Link to external sites, and bypass access checking when linking to internal paths.'
+  restrict access: true
+
+show disabled menu items on sitemap:
+  title: 'Choose whether to show disabled menu items on the sitemap'
+  description: "Choose whether or not to show disabled menu links to users with the 'View published sitemap' permission. Disabled menu links reveal information that would normally require the 'Administer menus and menu links' permission."
+  restrict access: true
+
+show unpublished taxonomy terms on sitemap:
+  title: 'Choose whether to show unpublished taxonomy terms on the sitemap'
+  description: "Choose whether or not to show unpublished taxonomy terms to users with the 'View published sitemap' permission. Unpublished taxonomy terms reveal information that would normally require the 'Administer vocabularies and terms' permission."
+  restrict access: true

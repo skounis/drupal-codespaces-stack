@@ -1,0 +1,11 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following Prompt, what is the title they want to change to?
+  formats:
+    - title: the new title
+      response: A one sentence response that the title got changed to, with the title inside HTML strong tag.
+  one_shot_learning_examples:
+    - title: The Wild West
+      response: We changed the title to <strong>The Wild West</strong>.

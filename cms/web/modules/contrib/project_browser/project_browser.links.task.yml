@@ -1,0 +1,14 @@
+project_browser.browse:
+  route_name: project_browser.browse
+  base_route: system.modules_list
+  deriver: 'Drupal\project_browser\Plugin\Derivative\LocalTaskDeriver'
+
+project_browser.settings:
+  title: 'Settings'
+  route_name: project_browser.settings
+  base_route: project_browser.settings
+
+project_browser.actions_form:
+  title: 'Actions'
+  route_name: project_browser.actions_form
+  base_route: project_browser.settings

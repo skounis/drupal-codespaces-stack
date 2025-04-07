@@ -1,0 +1,12 @@
+dialog.add-to-calendar .addtocal__link {
+  margin: 1.5rem;
+}
+
+dialog.add-to-calendar button.close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  padding-inline: 3px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}

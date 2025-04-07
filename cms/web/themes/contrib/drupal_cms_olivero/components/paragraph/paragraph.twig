@@ -1,0 +1,12 @@
+{%
+  set classes = [
+    'paragraph',
+    style ? 'paragraph--' ~ style,
+  ]
+%}
+
+<div{{ attributes.addClass(classes) }}>
+  <div class="paragraph__content">
+    {{ text }}
+  </div>
+</div>

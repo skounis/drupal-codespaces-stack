@@ -1,0 +1,15 @@
+Module maintainers
+------------------
+
+Creator and lead
+- Travis Carden 'TravisCarden' https://www.drupal.org/u/traviscarden
+
+Branch maintainers
+
+  9.x - 11.x
+  - Ankit Pathak 'ankitv18' https://www.drupal.org/u/ankitv18
+  - Pravin Gaikwad 'Rajeshreeputra' https://www.drupal.org/u/rajeshreeputra
+  - Ilcho Vuchkov 'vuil' https://www.drupal.org/u/vuil
+
+  7.x
+  - Vladimir Roudakov 'VladimirAus' https://www.drupal.org/u/vladimiraus

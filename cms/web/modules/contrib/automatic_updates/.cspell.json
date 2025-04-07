@@ -1,0 +1,9 @@
+{
+  "dictionaries": ["drupal","companies", "fonts", "html", "php", "softwareTerms", "automatic_updates"],
+  "dictionaryDefinitions": [
+    { "name": "automatic_updates", "path": "./dictionary.txt"}
+  ],
+  "ignorePaths": [
+    "README.md"
+  ]
+}

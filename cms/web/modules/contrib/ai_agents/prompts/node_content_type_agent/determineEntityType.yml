@@ -1,0 +1,32 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a Drupal developer who can generate Drupal content. Based on the following
+    context of a task description and comments together with the list of current
+    entity types and possible bundles, could you answer which type and bundle to
+    use?
+  possible_actions:
+    found_entity_type: If you did or did not find the node type.
+  formats:
+    - action: action id from list.
+      status: boolean if it found the entity type and bundle type.
+      entity_type: The entity type that was found.
+      bundle: The bundle type that was found.
+  one_shot_learning_examples:
+    - action: found_entity_type
+      status: true
+      entity_type: node
+      bundle: article
+    - action: found_entity_type
+      status: true
+      entity_type: node
+      bundle: page
+    - action: found_entity_type
+      status: true
+      entity_type: custom_article
+      bundle: null
+    - action: found_entity_type
+      status: false
+      node_type: ""

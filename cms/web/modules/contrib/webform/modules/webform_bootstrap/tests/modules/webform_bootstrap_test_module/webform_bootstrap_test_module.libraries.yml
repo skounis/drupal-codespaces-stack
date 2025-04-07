@@ -1,0 +1,6 @@
+webform_bootstrap_test_module:
+  css:
+    theme:
+      css/webform_bootstrap_test_module.css: {}
+  js:
+    js/webform_bootstrap_test_module.js: {}

@@ -1,0 +1,50 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display a search suggestion.
+ *
+ * Keywords suggestions (which will fill the keywords input field) can be
+ * distinguished from direct results/links (which will take the user to a
+ * different page) by checking whether the "keys" or the "url" key is set.
+ *
+ * Keywords suggestions will usually contain the keywords as a concatenation of
+ * "suggestion_prefix", "user_input" and "suggestion_suffix".
+ *
+ * Available variables:
+ * - keys: The fulltext keywords this suggestion will put into the search field.
+ * - url: The URL (\Drupal\Core\Url object) to which the suggestion will
+ *   redirect the user.
+ * - label: A complete label to display for the suggestion.
+ * - note: Text to display in front of the label.
+ * - results_count: The (approximate) number of results the suggested keywords
+ *   will yield.
+ * - suggestion_prefix: A suggested prefix for the entered user input.
+ * - suggestion_suffix: A suggested suffix for the entered user input.
+ * - user_input: The input entered by the user so far.
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div class="search-api-autocomplete-suggestion">
+  {% if note %}
+    <span class="autocomplete-suggestion-note">{{ note }}</span>
+  {% endif %}
+  {% if label %}
+    <span class="autocomplete-suggestion-label">{{ label }}</span>
+  {% endif %}
+  {% apply spaceless %}
+    {% if suggestion_prefix %}
+      <span class="autocomplete-suggestion-suggestion-prefix">{{ suggestion_prefix }}</span>
+    {% endif %}
+    {% if user_input %}
+      <span class="autocomplete-suggestion-user-input">{{ user_input }}</span>
+    {% endif %}
+    {% if suggestion_suffix %}
+      <span class="autocomplete-suggestion-suggestion-suffix">{{ suggestion_suffix }}</span>
+    {% endif %}
+  {% endapply %}
+  {% if results_count %}
+    <span class="autocomplete-suggestion-results-count">{{ results_count }}</span>
+  {% endif %}
+</div>

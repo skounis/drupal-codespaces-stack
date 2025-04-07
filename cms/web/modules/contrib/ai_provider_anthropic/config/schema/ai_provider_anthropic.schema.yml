@@ -1,0 +1,13 @@
+ai_provider_anthropic.settings:
+  type: config_object
+  label: 'Anthropic Settings'
+  mapping:
+    api_key:
+      type: string
+      label: 'The API key for Anthropic via Key module'
+    openai_moderation:
+      type: boolean
+      label: 'Enable moderation requests before each request.'
+    version:
+      type: string
+      label: 'The version of Anthropic API to use.'

@@ -1,0 +1,7 @@
+sam.admin_settings:
+  path: '/admin/config/content/simple-add-more-settings'
+  defaults:
+    _form: '\Drupal\sam\Form\SamSettings'
+    _title: 'Simple Add More - Settings'
+  requirements:
+    _permission: 'administer sam'

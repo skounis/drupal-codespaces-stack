@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the SBEF module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function selective_better_exposed_filters_install() {
+  module_set_weight('selective_better_exposed_filters', 1);
+}
+
+/**
+ * Change module weight.
+ */
+function selective_better_exposed_filters_update_8102() {
+  selective_better_exposed_filters_install();
+}

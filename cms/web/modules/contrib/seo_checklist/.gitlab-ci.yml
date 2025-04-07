@@ -1,0 +1,20 @@
+# Drupal GitLab CI configuration.
+# https://www.drupal.org/docs/develop/git/using-gitlab-to-contribute-to-drupal/gitlab-ci
+# https://git.drupalcode.org/project/gitlab_templates/
+
+include:
+  - project: $_GITLAB_TEMPLATES_REPO
+    ref: $_GITLAB_TEMPLATES_REF
+    file:
+      - '/includes/include.drupalci.main.yml' # https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.main.yml
+      - '/includes/include.drupalci.variables.yml' # https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.variables.yml
+      - '/includes/include.drupalci.workflows.yml' # https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.workflows.yml
+
+# Pipeline configuration variables.
+# These are the variables provided to the Run Pipeline form that a user may want to override.
+# https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.variables.yml
+variables:
+  OPT_IN_TEST_PREVIOUS_MAJOR: 1
+  OPT_IN_TEST_PREVIOUS_MINOR: 1
+  OPT_IN_TEST_NEXT_MINOR: 1
+  OPT_IN_TEST_NEXT_MAJOR: 1

@@ -1,0 +1,12 @@
+includes:
+  - phpstan-baseline.neon
+
+parameters:
+  level: 9
+  drupal:
+    drupal_root: %currentWorkingDirectory%/../../../core
+  ignoreErrors:
+    - '#Unsafe usage of new static\(\)#'
+    # We use \Drupal as a fallback for backwards compatibility sometimes.
+    # We'll fix this in the future.
+    - "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"

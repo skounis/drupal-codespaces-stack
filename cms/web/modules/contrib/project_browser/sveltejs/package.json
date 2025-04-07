@@ -1,0 +1,43 @@
+{
+  "name": "drupal-project-browser",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "yarn": ">= 1.6",
+    "node": ">= 16.0"
+  },
+  "scripts": {
+    "build": "yarn yarncheck && rollup -c",
+    "dev": "yarn yarncheck && rollup -c -w",
+    "start": "sirv public --no-clear",
+    "preinstall": "yarn yarncheck",
+    "postinstall": "scripts/setup-git-hooks.sh",
+    "yarncheck": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('Application requires Yarn. Do not use NPM or other package managers')\"",
+    "lint:svelte": "node ./node_modules/eslint/bin/eslint.js . --ext .svelte && yarn prettier:svelte-check",
+    "prettier:svelte": "prettier --write \"src/**/*.svelte\"",
+    "prettier:svelte-check": "prettier --check \"src/**/*.svelte\""
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "prettier": "^2.1.2",
+    "prettier-plugin-svelte": "^2.7.0",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "svelte": "^3.0.0",
+    "svelte-previous": "^2.1.1"
+  },
+  "dependencies": {
+    "sirv-cli": "^1.0.0"
+  },
+  "packageManager": "yarn@4.3.1"
+}

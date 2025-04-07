@@ -1,0 +1,7 @@
+explorer:
+  css:
+    theme:
+      css/api_explorer.css: {}
+stream:
+  js:
+    js/stream.js: {}

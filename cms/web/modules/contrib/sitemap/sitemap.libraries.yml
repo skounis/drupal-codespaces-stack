@@ -1,0 +1,14 @@
+sitemap.admin:
+  version: VERSION
+  js:
+    js/sitemap.admin.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+sitemap.theme:
+  version: VERSION
+  css:
+    theme:
+      css/sitemap.theme.css: {}

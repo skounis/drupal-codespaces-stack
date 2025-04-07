@@ -1,0 +1,5 @@
+drupal.tagify_facets.tagify-widget:
+  js:
+    js/tagify-widget.js: {}
+  dependencies:
+    - facets/widget

@@ -1,0 +1,11 @@
+editoria11y.settings:
+  title: 'Editoria11y'
+  description: 'Accessibility checker notifications and exclusions.'
+  route_name: editoria11y.settings
+  parent: system.admin_config_content
+
+editoria11y.reports_dashboard:
+  title: 'Content Accessibility'
+  description: 'Results from the Editoria11y checker.'
+  route_name: editoria11y.reports_dashboard
+  parent: system.admin_reports

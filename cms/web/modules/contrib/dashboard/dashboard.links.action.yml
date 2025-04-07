@@ -1,0 +1,13 @@
+entity.dashboard.add_form:
+  route_name: 'entity.dashboard.add_form'
+  title: 'Add dashboard'
+  appears_on:
+    - entity.dashboard.collection
+
+layout_builder.dashboard.view:
+  route_name: layout_builder.dashboard.view
+  title: 'Edit layout'
+  class: '\Drupal\dashboard\Plugin\Menu\LocalAction\DashboardLocalAction'
+  appears_on:
+    - dashboard
+    - entity.dashboard.canonical

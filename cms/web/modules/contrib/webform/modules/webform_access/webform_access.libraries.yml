@@ -1,0 +1,7 @@
+webform_access.admin:
+  js:
+    js/webform_access.admin.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once

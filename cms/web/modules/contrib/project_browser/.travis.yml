@@ -1,0 +1,29 @@
+language: php
+
+branches:
+  # Only test the master branch and SemVer tags.
+  only:
+    - master
+    - /^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+.*$/
+
+php:
+  - 7.4
+
+matrix:
+  fast_finish: true
+
+cache:
+  apt: true
+  directories:
+    - "$HOME/.composer/cache"
+    - "vendor"
+
+install:
+  - composer install
+
+before_script:
+  # Additional PHP config
+  - phpenv config-add travis.php.ini
+
+script:
+  - composer test

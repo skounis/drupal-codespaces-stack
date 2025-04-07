@@ -1,0 +1,388 @@
+<?php
+
+/**
+ * @file
+ * Editoria11y module file.
+ */
+
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Url;
+use Drupal\taxonomy\TermInterface;
+
+/**
+ * Implements hook_post_update().
+ */
+function editoria11y_hook_post_update() {
+  if (!\Drupal::state()->get('editoria11y.show_help_message')) {
+    return;
+  }
+  $messenger = \Drupal::messenger();
+
+  $config_url = Url::fromRoute('editoria11y.settings');
+  $config_link = Link::fromTextAndUrl(t('Editoria11y config'), $config_url)->toString();
+
+  $permissions_url = Url::fromRoute('user.admin_permissions');
+  $permissions_link = Link::fromTextAndUrl(t('confirm editor roles have permission'), $permissions_url)->toString();
+
+  $messenger->addStatus(
+    t('Please remember to set up @config for live editing, and @permissions to "View Editoria11y Checker"', [
+      '@config' => $config_link,
+      '@permissions' => $permissions_link,
+    ]));
+}
+
+/**
+ * Implements template_preprocess_views_view()
+ *
+ * @param array $variables
+ *   View settings.
+ */
+function editoria11y_preprocess_views_view(array &$variables): void {
+  $view = $variables['view'];
+  if ($view->id() === 'editoria11y_results' || $view->id() === 'editoria11y_dismissals') {
+    $variables['more']['#options']['attributes']['class'][] = 'button button--primary';
+    $apiUrl = Url::fromRoute('editoria11y.api_report')->toString();
+    if (Drupal::currentUser()->hasPermission('manage editoria11y results')) {
+      $sessionUrl = Url::fromRoute('system.csrftoken')->toString();
+      $variables['#attached']['drupalSettings']['editoria11y']['api_url'] = $apiUrl;
+      $variables['#attached']['drupalSettings']['editoria11y']['session_url'] = $sessionUrl;
+      $variables['#attached']['library'][] = 'editoria11y/editoria11y-admin';
+      $variables['#attached']['drupalSettings']['editoria11y']['admin'] = Drupal::currentUser()->hasPermission('administer editoria11y checker');
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_predelete().
+ *
+ * Removes relevant records from DB.
+ */
+function editoria11y_entity_predelete(EntityInterface $entity): void {
+
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
+
+  $id = $entity->id();
+  $type = $entity->getEntityTypeId();
+
+  if (is_numeric($id) && $id > 0) {
+
+    // Get type from basetype.type.subtype pattern.
+    $connection = Drupal::database();
+    $connection->delete("editoria11y_dismissals")
+      ->condition('entity_id', $id)
+      ->condition('route_name', '%.' . $connection->escapeLike($type) . '.%', 'LIKE')
+      ->execute();
+    $connection->delete("editoria11y_results")
+      ->condition('entity_id', $id)
+      ->condition('route_name', '%.' . $connection->escapeLike($type) . '.%', 'LIKE')
+      ->execute();
+
+    // Clear cache for the referring page and dashboard.
+    Cache::invalidateTags(['editoria11y:dashboard']);
+  }
+
+}
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Attaches Editoria11y library and config based on context.
+ */
+function editoria11y_page_attachments(array &$attachments): void {
+
+  // Exit if user does not have "view" permission.
+  $attachments['#cache']['contexts'][] = 'user.permissions';
+  if (!Drupal::currentUser()->hasPermission('view editoria11y checker')) {
+    return;
+  }
+
+  // Determine which dismissals are permitted.
+  // "Ignore" is a global toggle, "mark OK" is per-user.
+  $attachments['#cache']['tags'][] = 'config:editoria11y.settings';
+  $config = Drupal::config('editoria11y.settings');
+
+  // Confirm this is a "view" (not edit) route, and set last-changed time.
+  // @todo convert to standard Bool call once schema is updated
+  $sync = !$config->get('disable_sync');
+
+  $attachments['#cache']['contexts'][] = 'url';
+
+  $route_match = Drupal::routeMatch();
+  $route_name = $route_match->getRouteName();
+  if (str_starts_with($route_name, 'layout_builder.')) {
+    // Do not load library on layout builder routes.
+    return;
+  }
+
+  $request = Drupal::request();
+
+  // Get languages.
+  $attachments['#cache']['contexts'][] = 'languages';
+  $language = Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  $library = $language && $language !== 'en' ?
+    'editoria11y/editoria11y-localized' :
+    'editoria11y/editoria11y';
+  $attachments['#attached']['library'][] = $library;
+
+  $allow_ok = FALSE;
+  if ($sync) {
+    // Null or false unless both sync and permission are true.
+    $allow_ok = Drupal::currentUser()->hasPermission('mark as ok in editoria11y');
+  }
+  // Hiding can work via localStorage.
+  $allow_hide = Drupal::currentUser()->hasPermission('mark as hidden in editoria11y');
+  $view_reports = Drupal::currentUser()->hasPermission('manage editoria11y results');
+  $entity_type = FALSE;
+  $page_path = FALSE;
+  $entity_id = 0;
+  $changed = 0;
+
+  if ($route_name === 'entity.node.canonical') {
+    // We can expect nodes to have a $changed value for smart loading.
+    $changed = $route_match->getParameter('node')->changed->value;
+    // The NID.
+    $entity_id = $route_match->getParameter('node')->id();
+  }
+  elseif (substr($route_name, 0, 5) == 'view.') {
+    // Ignore PHPStorm str_starts_with suggestion; requires PHP 8
+    // Polite mode for views.
+    // @todo figure out how to get view and media nice names
+    $route_chunk = explode('.', $route_name);
+    $entity_type = ucfirst($route_chunk[0]) . ": " . ucfirst(str_replace("_", " ", $route_chunk[1]));
+  }
+  elseif (strrpos($route_name, 'preview', -1)) {
+    // We load previews in assertive mode AND disable reporting new issues.
+    $changed = Drupal::time()->getRequestTime();
+    $sync = $sync ? 'dismissals' : FALSE;
+    // $allow_ok = FALSE;
+    // $allow_hide = $allow_hide;
+  }
+  elseif (str_ends_with($route_name, '.add') ||
+    str_ends_with($route_name, '.add_form') ||
+    str_ends_with($route_name, '.form_add') ||
+    str_ends_with($route_name, '_create')
+  ) {
+    // @todo media?
+    // Add: Node. Add_form: blocks, terms. Form_add: forms. Create: users.
+    // Disable reporting.
+    $sync = 'disable';
+    // Disable localStorage.
+    $dismissals = [];
+  }
+  elseif (!strrpos($route_name, 'canonical', -1)) {
+    // Disable reporting new issues on edit and revisions.
+    $sync = $sync ? 'dismissals' : FALSE;
+    // $allow_ok = FALSE;
+    // $allow_hide = $allow_hide;
+  }
+
+  if (!$sync) {
+    $dismissals = FALSE;
+  }
+  elseif ($sync && $sync !== 'disable') {
+    // Get extra dashboard data if we plan to sync information.
+    if ($route = $request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)) {
+      // We need the title if sync is enabled.
+      $page_title = Drupal::service('title_resolver')->getTitle($request, $route);
+
+      // @todo this fails on user route?
+      if (is_array($page_title)) {
+        /** @var \Drupal\Core\Render\RendererInterface $renderer */
+        // @phpstan-ignore-next-line
+        $page_title = Drupal::service('renderer')->renderPlain($page_title);
+        // @todo For d12: tag 3.x branch with below, which will break <10.1.
+        /*$renderer = \Drupal::service('renderer');
+        $page_title = DeprecationHelper::backwardsCompatibleCall(
+        currentVersion: \Drupal::VERSION,
+        deprecatedVersion: '10.3',
+        currentCallable: fn() => $renderer->renderInIsolation($page_title),
+        // @phpstan-ignore-next-line (Handled deprecation)
+        deprecatedCallable: fn() => $renderer->renderPlain($page_title),
+        );*/
+      }
+    }
+    if (empty($page_title)) {
+      $page_title = $route_name;
+    }
+
+    // Entity will be found in the route parameters.
+    if (($route = $route_match->getRouteObject()) && ($parameters = $route->getOption('parameters'))) {
+      // Determine if the current route represents an entity.
+      foreach ($parameters as $name => $options) {
+        if (isset($options['type']) && strpos($options['type'], 'entity:') === 0) {
+          $entity = $route_match->getParameter($name);
+          /* @noinspection PhpUndefinedFieldInspection */
+          if ($entity instanceof ContentEntityInterface && $entity->hasLinkTemplate('canonical') && $entity->type && $entity->type->entity) {
+            /* @noinspection PhpUndefinedFieldInspection */
+            $entity_type = $entity->type->entity->label();
+          }
+        }
+      }
+    }
+
+    if (!$entity_type) {
+      // Bundleless entities.
+      if ($route_match->getParameter('taxonomy_term') instanceof TermInterface) {
+        $entity_type = "Taxonomy: " . $route_match->getParameter('taxonomy_term')->label();
+        // The TID.
+        $entity_id = $route_match->getParameter('taxonomy_term')->id();
+        $page_path = \Drupal::service('path_alias.manager')->getAliasByPath('/taxonomy/term/' . $entity_id, $language);
+      }
+      else {
+        $route_chunk = explode('.', $route_name);
+        if (count($route_chunk) > 1) {
+          $entity_type = ucfirst($route_chunk[0]) . ": " . ucfirst(str_replace("_", " ", $route_chunk[1]));
+        }
+        else {
+          $entity_type = ucfirst($route_name);
+        }
+      }
+    }
+
+    // Build URI after filtering nonpreserved parameters
+    // $page_path = $request->getPathInfo();
+    if (!$page_path) {
+      // Attempt to get aliased path even while in edit mode.
+      if (str_starts_with($route_name, 'entity.node.') && $route_match->getParameter('node') !== NULL) {
+        $nid = $route_match->getParameter('node')->id();
+        if ($nid) {
+          // @todo language tag isn't making it in.
+          $page_path = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $nid, $language);
+          $lang_check = Url::fromRoute('<current>')->toString();
+          if ($language &&
+          str_starts_with($lang_check, '/' . $language . '/') &&
+          !str_starts_with($page_path, '/' . $language . '/')) {
+            $page_path = '/' . $language . $page_path;
+          }
+        }
+      }
+    }
+    if (!$page_path) {
+      // If all else fails. This will not match in edit routes.
+      $page_path = Url::fromRoute('<current>')->toString();
+    }
+    if (!empty($config->get('preserve_params'))) {
+      // Based on core "request->normalizeQueryString()"
+      $query = $request->getQueryString();
+      if ('' !== $query) {
+        $parts = [];
+        $order = [];
+        $preserved_params = explode(',', $config->get('preserve_params') ?? '');
+        foreach (explode('&', $query ?? '') as $param) {
+          if ('' === $param || '=' === $param[0]) {
+            // Ignore useless delimiters, e.g. "x=y&".
+            // Also ignore pairs with empty key, even if there was a value, e.g.
+            // "=value", as such nameless values cannot be retrieved anyway.
+            // PHP also does not include them when building _GET.
+            continue;
+          }
+          $keyValuePair = explode('=', $param, 2);
+
+          if (in_array($keyValuePair[0], $preserved_params)) {
+            // GET parameters submitted from a HTML form, encode spaces
+            // as "+" by default
+            // (as defined in enctype application/x-www-form-urlencoded).
+            // PHP also converts "+" to spaces when filling the global _GET or
+            // when using the function parse_str. We use urldecode and
+            // then normalize to RFC 3986 with rawurlencode.
+            $parts[] = isset($keyValuePair[1]) ? rawurlencode(urldecode($keyValuePair[0])) . '=' . rawurlencode(urldecode($keyValuePair[1])) : rawurlencode(urldecode($keyValuePair[0]));
+            $order[] = urldecode($keyValuePair[0]);
+          }
+        }
+        if (!empty($parts)) {
+          array_multisort($order, SORT_ASC, $parts);
+          $page_path .= "?" . implode('&', $parts);
+        }
+      }
+    }
+    $page_path = substr($page_path, 0, 1000);
+
+    $attachments['#cache']['tags'][] = 'editoria11y:dismissals_' . preg_replace('/[^a-zA-Z0-9]/', '', substr($page_path, -80));
+
+    // Get all dismissals for this page. We want all of OK and some of ignore.
+    $results = Drupal::service('editoria11y.dismissals_on_page');
+    if ($sync === 'dismissals') {
+      $replace = '/\/edit$|\/preview$/';
+      $page_path = preg_replace($replace, '', $page_path);
+    }
+    $result = $results->getDismissals($page_path);
+    $dismissals = [];
+    foreach ($result as $record) {
+      if ($record->dismissal_status === "ok") {
+        $dismissals[$record->result_key][$record->element_id] = "ok";
+      }
+      elseif ($record->uid == Drupal::currentUser()->id()) {
+        $dismissals[$record->result_key][$record->element_id] = "hide";
+      }
+    }
+    $attachments['#attached']['drupalSettings']['editoria11y']['page_title'] = $page_title;
+    $attachments['#attached']['drupalSettings']['editoria11y']['allow_ok'] = $allow_ok;
+    $attachments['#attached']['drupalSettings']['editoria11y']['view_reports'] = $view_reports;
+    $attachments['#attached']['drupalSettings']['editoria11y']['dashboard_url'] = Url::fromRoute('editoria11y.reports_dashboard')->toString();
+  }
+  // @todo can we sync dismissals with the canonical URL? url is /node/1/edit
+  // and we have results for /node/1, so this should be possible.
+  $attachments['#attached']['drupalSettings']['editoria11y']['allow_hide'] = $allow_hide;
+
+  $apiUrl = Url::fromRoute('editoria11y.api_report')->toString();
+  $sessionUrl = Url::fromRoute('system.csrftoken')->toString();
+  $attachments['#attached']['drupalSettings']['editoria11y']['api_url'] = $apiUrl;
+  $attachments['#attached']['drupalSettings']['editoria11y']['session_url'] = $sessionUrl;
+  $attachments['#attached']['drupalSettings']['editoria11y']['lang'] = $language;
+  $attachments['#attached']['drupalSettings']['editoria11y']['page_path'] = $page_path;
+  $attachments['#attached']['drupalSettings']['editoria11y']['entity_type'] = substr($entity_type, 0, 32);
+  $attachments['#attached']['drupalSettings']['editoria11y']['entity_id'] = $entity_id;
+  $attachments['#attached']['drupalSettings']['editoria11y']['route_name'] = $route_name;
+  $attachments['#attached']['drupalSettings']['editoria11y']['preserve_params'] = $config->get('preserve_params');
+  $attachments['#attached']['drupalSettings']['editoria11y']['include_null_params'] = $config->get('include_null_params');
+  $attachments['#attached']['drupalSettings']['editoria11y']['assertiveness'] = $config->get('assertiveness');
+  $attachments['#attached']['drupalSettings']['editoria11y']['changed'] = $changed;
+  $attachments['#attached']['drupalSettings']['editoria11y']['no_load'] = $config->get('no_load');
+  $attachments['#attached']['drupalSettings']['editoria11y']['hide_edit_links'] = $config->get('hide_edit_links');
+  $attachments['#attached']['drupalSettings']['editoria11y']['ignore_all_if_absent'] = $config->get('ignore_all_if_absent');
+  $attachments['#attached']['drupalSettings']['editoria11y']['content_root'] = $config->get('content_root');
+  $attachments['#attached']['drupalSettings']['editoria11y']['shadow_components'] = $config->get('shadow_components');
+  $ignore_test_config = $config->get('ignore_tests');
+  if (is_array($ignore_test_config)) {
+    $ignore_tests = [];
+    foreach ($ignore_test_config as $ignore_test) {
+      if ($ignore_test) {
+        $ignore_tests[] = $ignore_test;
+      }
+    }
+    $attachments['#attached']['drupalSettings']['editoria11y']['ignore_tests'] = $ignore_tests;
+  }
+
+  $attachments['#attached']['drupalSettings']['editoria11y']['detect_shadow'] = $config->get('detect_shadow');
+  $attachments['#attached']['drupalSettings']['editoria11y']['ignore_elements'] = $config->get('ignore_elements');
+  $attachments['#attached']['drupalSettings']['editoria11y']['panel_no_cover'] = $config->get('panel_no_cover');
+  $attachments['#attached']['drupalSettings']['editoria11y']['embedded_content_warning'] = $config->get('embedded_content_warning');
+  $attachments['#attached']['drupalSettings']['editoria11y']['hidden_handlers'] = $config->get('hidden_handlers');
+  $attachments['#attached']['drupalSettings']['editoria11y']['live_h_inherit'] = $config->get('live_h_inherit');
+  $attachments['#attached']['drupalSettings']['editoria11y']['live_h2'] = $config->get('live_h2');
+  $attachments['#attached']['drupalSettings']['editoria11y']['live_h3'] = $config->get('live_h3');
+  $attachments['#attached']['drupalSettings']['editoria11y']['live_h4'] = $config->get('live_h4');
+  $attachments['#attached']['drupalSettings']['editoria11y']['disable_live'] = $config->get('disable_live');
+  $attachments['#attached']['drupalSettings']['editoria11y']['download_links'] = $config->get('download_links');
+  $attachments['#attached']['drupalSettings']['editoria11y']['link_strings_new_windows'] = $config->get('link_strings_new_windows');
+  $attachments['#attached']['drupalSettings']['editoria11y']['ignore_link_strings'] = $config->get('ignore_link_strings');
+  $attachments['#attached']['drupalSettings']['editoria11y']['link_ignore_selector'] = $config->get('link_ignore_selector');
+  $attachments['#attached']['drupalSettings']['editoria11y']['sync'] = $sync;
+  $attachments['#attached']['drupalSettings']['editoria11y']['watch_for_changes'] = $config->get('watch_for_changes');
+  $attachments['#attached']['drupalSettings']['editoria11y']['dismissals'] = $dismissals;
+  $attachments['#attached']['drupalSettings']['editoria11y']['theme'] = $config->get('ed11y_theme');
+  $attachments['#attached']['drupalSettings']['editoria11y']['custom_tests'] = $config->get('custom_tests');
+  $attachments['#attached']['drupalSettings']['editoria11y']['element_hides_overflow'] = $config->get('element_hides_overflow');
+  /** @var \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator */
+  $fileUrlGenerator = \Drupal::service('file_url_generator');
+  $attachments['#attached']['drupalSettings']['editoria11y']['css_url'] = $fileUrlGenerator
+    ->generateString(Drupal::service('extension.list.module')->getPath('editoria11y'));
+
+}

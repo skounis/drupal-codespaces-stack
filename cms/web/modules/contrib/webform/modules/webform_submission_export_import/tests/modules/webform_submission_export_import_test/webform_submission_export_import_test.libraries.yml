@@ -1,0 +1,7 @@
+webform_submission_export_import_test:
+  js:
+    js/webform_submission_export_import_test.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once

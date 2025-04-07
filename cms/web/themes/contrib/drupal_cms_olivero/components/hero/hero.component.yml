@@ -1,0 +1,55 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Hero
+status: experimental
+props:
+  type: object
+  required:
+    - title
+    - link_url_1
+  properties:
+    title:
+      type: string
+      title: Title
+      description: The title text
+      examples:
+        - Hero title text
+    summary:
+      $ref: json-schema-definitions://experience_builder.module/textarea
+      type: string
+      title: Summary
+      description: The optional summary text
+      examples:
+        - Hero summary is an optional field and can span multiple lines
+    image:
+      $ref: json-schema-definitions://experience_builder.module/image
+      type: object
+      title: Image
+      description: "Image for the hero. Recommended size: 2:1 aspect ratio"
+      examples:
+        - src: images/example-hero.jpg
+          alt: 'Grand Canyon with snow'
+          width: 2000
+          height: 1500
+    link_text_1:
+      type: string
+      title: Primary link text
+      default: Learn more
+      examples:
+        - Primary link
+    link_url_1:
+      type: string
+      format: uri
+      title: Primary link URL
+      examples:
+        - https://example.com
+    link_text_2:
+      type: string
+      title: Secondary link text
+      examples:
+        - Secondary link
+    link_url_2:
+      type: string
+      format: uri
+      title: Secondary link URL
+      examples:
+        - https://example.com

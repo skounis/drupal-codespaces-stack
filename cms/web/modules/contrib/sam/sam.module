@@ -1,0 +1,173 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for sam.module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\WidgetBaseInterface;
+use Drupal\Core\Field\WidgetInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Widget IDs that can be simplified with the SAM module.
+ */
+const SAM_ALLOWED_WIDGET_TYPES = [
+  'email_default',
+  'entity_reference_autocomplete',
+  'link_attributes',
+  'link_default',
+  'linkit',
+  'number',
+  'path',
+  'string_textarea',
+  'string_textfield',
+  'telephone',
+  'telephone_default',
+  'text_textarea',
+  'text_textarea_with_summary',
+  'text_textfield',
+  'uri',
+];
+
+/**
+ * Implements hook_field_widget_complete_form_alter().
+ */
+function sam_field_widget_complete_form_alter(&$field_widget_complete_form, FormStateInterface $form_state, $context) {
+  $widget = $context['widget'] ?? NULL;
+  assert($widget instanceof WidgetBaseInterface);
+  $field_definition = $context['items']->getFieldDefinition() ?? NULL;
+  assert($field_definition instanceof FieldDefinitionInterface);
+  if (empty($widget) || empty($field_definition)) {
+    return;
+  }
+  // Abort early if this is a widget whose markup we can't simplify, or if the
+  // field cardinality isn't limited > 1.
+  if (sam_skip_widget($widget, $field_definition)) {
+    return;
+  }
+  $items = $context['items'];
+  assert($items instanceof FieldItemListInterface);
+  // We only have something to simplify if the maximum cardinality hasn't
+  // already been reached.
+  $should_simplify = FALSE;
+  $deltas = array_filter(Element::children($field_widget_complete_form['widget']), 'is_numeric');
+  foreach ($deltas as $delta) {
+    $item = $items->get($delta);
+    // We trust the field telling us it's empty or not. Also, when the field
+    // has 0 values, we leave the first empty element visible, so we only
+    // want to affect deltas >= 1 unless they have errors.
+    if ($item->isEmpty() && $delta > 0) {
+      // In an ideal world, we would be able to add all we need to the markup
+      // here. Unfortunately, the field_multiple_value_form theme function
+      // disregards all item-level attributes when building the table markup.
+      // See sam_preprocess_field_multiple_value_form() for where this
+      // flag is being used.
+      $field_widget_complete_form['widget'][$delta]['#attributes']['data-sam-simplify'] = TRUE;
+    }
+  }
+  // Even if there are no empty items, we still need to process it for adding
+  // the "Remove" button.
+  $field_widget_complete_form['widget']['#attributes']['data-sam-wrapper-simplify'] = TRUE;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for field_multiple_value_form().
+ */
+function sam_preprocess_field_multiple_value_form(&$variables) {
+  // Unfortunately, we don't have the field object available here, to identify
+  // if the element is empty. Because of this we check that in the form alter,
+  // and here we just alter the markup where necessary.
+  // See sam_field_widget_complete_form_alter().
+  if (!empty($variables['element']['#attributes']['data-sam-wrapper-simplify'])) {
+    $errored = _sam_find_errors_on_preprocess($variables['element']);
+    foreach (Element::children($variables['element']) as $delta) {
+      if (!empty($variables['element'][$delta]['#attributes']['data-sam-simplify']) && ($errored === FALSE || $delta > $errored)) {
+        $variables['table']['#rows'][$delta]['class'][] = 'sam-simplify';
+      }
+    }
+    $variables['table']['#attributes']['class'][] = 'sam-wrapper-simplify';
+    $variables['table']['#attached']['library'][] = 'sam/simplify';
+    $config = \Drupal::config('sam.settings');
+    $add_more_label = $config->get('add_more_label') ?? t('Add another item');
+    $help_text_singular = $config->get('help_text_singular') ?? t('@count additional item can be added');
+    $remove_label = $config->get('remove_label') ?? t('Remove');
+    $help_text_plural = $config->get('help_text_plural') ?? t('@count additional items can be added');
+    $variables['#attached']['drupalSettings']['sam']['add_more_label_var'] = $add_more_label;
+    $variables['#attached']['drupalSettings']['sam']['remove_label_var'] = $remove_label;
+    $variables['#attached']['drupalSettings']['sam']['help_text_var'] = $help_text_singular;
+    $variables['#attached']['drupalSettings']['sam']['help_text_plural_var'] = $help_text_plural;
+  }
+}
+
+/**
+ * Implements hook_field_widget_third_party_settings_form().
+ */
+function sam_field_widget_third_party_settings_form(WidgetInterface $plugin, FieldDefinitionInterface $field_definition, $form_mode, array $form, FormStateInterface $form_state) {
+  $element = [];
+  if (!sam_skip_widget($plugin, $field_definition)) {
+    $element['skip_simplification'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Skip "Simple Add More" simplification (i.e. show all elements, even if empty).'),
+      '#default_value' => $plugin->getThirdPartySetting('sam', 'skip_simplification'),
+    ];
+  }
+  return $element;
+}
+
+/**
+ * Helper to decide if our code should affect a widget/field.
+ *
+ * @param \Drupal\Core\Field\WidgetInterface $widget_plugin
+ *   The widget plugin instance.
+ * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ *   The field definition object.
+ *
+ * @return bool
+ *   TRUE (meaning we should skip this field/widget) if:
+ *   - The cardinality is not > 1, or
+ *   - The widget has been explicitly marked to be skipped in the settings, or
+ *   - The widget is not one of the ones we can simplify, due to its markup.
+ *   FALSE in all other cases.
+ */
+function sam_skip_widget(WidgetInterface $widget_plugin, FieldDefinitionInterface $field_definition) {
+  $cardinality = $field_definition->getFieldStorageDefinition()->getCardinality();
+  if ($cardinality <= 1) {
+    return TRUE;
+  }
+  if ($widget_plugin->getThirdPartySetting('sam', 'skip_simplification', FALSE)) {
+    return TRUE;
+  }
+  $widget_types = SAM_ALLOWED_WIDGET_TYPES;
+  \Drupal::moduleHandler()->alter('sam_allowed_widget_types', $widget_types);
+  if (!in_array($widget_plugin->getPluginId(), $widget_types, TRUE)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+function _sam_find_errors_on_preprocess($element) {
+  foreach (Element::children($element) as $widget) {
+    if (_sam_check_errors_on_preprocess($element[$widget])) {
+      return $widget;
+    }
+  }
+  return FALSE;
+}
+
+function _sam_check_errors_on_preprocess($widget) {
+  if (!empty($widget['#errors'])) {
+    return TRUE;
+  }
+  foreach (Element::children($widget) as $subwidget) {
+    if (!empty($widget[$subwidget]['#errors'])) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}

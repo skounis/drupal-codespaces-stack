@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * @file
+ * Allows users to exclude specific nodes from indexing by Search API.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeTypeInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function search_api_exclude_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $form_state->getFormObject()->getEntity();
+  $type = NodeType::load($node->bundle());
+
+  if (!$type->getThirdPartySetting('search_api_exclude', 'enabled', FALSE)) {
+    return;
+  }
+
+  $form['search_api_exclude'] = [
+    '#type' => 'details',
+    '#title' => t('Search API Exclude'),
+    '#group' => 'advanced',
+    '#tree' => TRUE,
+    '#open' => $node->get('sae_exclude')->getString(),
+  ];
+
+  $form['search_api_exclude']['exclude'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Prevent this node from being indexed.'),
+    '#default_value' => $node->get('sae_exclude')->getString(),
+  ];
+
+  $form['#entity_builders'][] = 'search_api_exclude_form_node_form_builder';
+}
+
+/**
+ * Entity builder for the node form with search_api_exclude options.
+ *
+ * @see search_api_exclude_form_node_form_alter()
+ */
+function search_api_exclude_form_node_form_builder($entity_type, EntityInterface $entity, array $form, FormStateInterface $form_state) {
+  $entity->set('sae_exclude', $form_state->getValue(['search_api_exclude', 'exclude']));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function search_api_exclude_form_node_type_form_alter(&$form, FormStateInterface $form_state) {
+  /** @var \Drupal\node\NodeTypeInterface $type */
+  $type = $form_state->getFormObject()->getEntity();
+  $form['search_api_exclude'] = [
+    '#type' => 'details',
+    '#title' => t('Search API Exclude'),
+    '#group' => 'additional_settings',
+  ];
+
+  $form['search_api_exclude']['search_api_exclude_enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enabled'),
+    '#default_value' => $type->getThirdPartySetting('search_api_exclude', 'enabled', FALSE),
+    '#description' => t('Allow setting the inclusivity of a node.'),
+  ];
+
+  $form['#entity_builders'][] = 'search_api_exclude_form_node_type_form_builder';
+}
+
+/**
+ * Entity builder for the node type form with search_api_exclude options.
+ *
+ * @see search_api_exclude_form_node_type_form_alter()
+ */
+function search_api_exclude_form_node_type_form_builder($entity_type, NodeTypeInterface $type, &$form, FormStateInterface $form_state) {
+  $newValue = $form_state->getValue('search_api_exclude_enabled');
+
+  if ($type->getThirdPartySetting('search_api_exclude', 'enabled') !== $newValue) {
+    \Drupal::messenger()->addMessage(t('For the changes to have effect, please @link.', [
+      '@link' => Link::createFromRoute(t('reindex all items'), 'search_api.overview')->toString(),
+    ]));
+  }
+
+  $type->setThirdPartySetting('search_api_exclude', 'enabled', $newValue);
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function search_api_exclude_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+
+  if ($entity_type->id() === 'node') {
+    $fields['sae_exclude'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Search API Exclude'))
+      ->setDescription(t('Specify whether the node may be indexed or not.'));
+  }
+
+  return $fields;
+}

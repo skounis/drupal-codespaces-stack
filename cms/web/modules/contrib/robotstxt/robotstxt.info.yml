@@ -1,0 +1,11 @@
+name: RobotsTxt
+type: module
+description: 'Generates the robots.txt file dynamically and gives you the chance to edit it, on a per-site basis, from the web UI.'
+package: Other
+core_version_requirement: ^9.3 || ^10 || ^11
+configure: robotstxt.admin_settings_form
+
+# Information added by Drupal.org packaging script on 2024-08-13
+version: '8.x-1.6'
+project: 'robotstxt'
+datestamp: 1723570933

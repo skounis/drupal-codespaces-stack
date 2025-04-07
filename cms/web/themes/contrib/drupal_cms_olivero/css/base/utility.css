@@ -1,0 +1,8 @@
+/*
+ * Utility CSS classes.
+ */
+
+.visually-hidden:not(.skip-link) {
+  /* Necessary to override Olivero's specificity. */
+  width: 1px !important;
+}

@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Contains hooks for the svg_image_responsive module.
+ */
+
+use Drupal\svg_image\Plugin\Field\FieldFormatter\SvgImageFormatter;
+use Drupal\svg_image_responsive\Plugin\Field\FieldFormatter\SvgResponsiveImageFormatter;
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function svg_image_responsive_field_formatter_info_alter(array &$info) {
+  $info['image']['class'] = SvgImageFormatter::class;
+  $info['responsive_image']['class'] = SvgResponsiveImageFormatter::class;
+}
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function svg_image_responsive_config_schema_info_alter(&$definitions) {
+  $definitions['field.formatter.settings.responsive_image']['mapping']['responsive_image_style'] = [
+    'type' => 'string',
+    'label' => 'Responsive image style',
+  ];
+  $definitions['field.formatter.settings.responsive_image']['mapping']['image_link'] = [
+    'type' => 'string',
+    'label' => 'Link image to',
+  ];
+  $definitions['field.formatter.settings.responsive_image']['mapping']['svg_attributes'] = [
+    'type' => 'mapping',
+    'label' => 'SVG attributes',
+    'mapping' => [
+      'width' => [
+        'type' => 'integer',
+        'label' => 'Width',
+      ],
+      'height' => [
+        'type' => 'integer',
+        'label' => 'Height',
+      ],
+    ],
+  ];
+  $definitions['field.formatter.settings.responsive_image']['mapping']['svg_render_as_image'] = [
+    'type' => 'boolean',
+    'label' => 'Render SVG image as <img>',
+  ];
+}

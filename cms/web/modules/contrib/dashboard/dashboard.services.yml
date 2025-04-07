@@ -1,0 +1,29 @@
+services:
+  dashboard.user_redirect:
+    class: Drupal\dashboard\DashboardRedirectHandler
+    arguments: ['@url_generator', '@request_stack', '@entity_type.manager', '@current_route_match']
+
+  dashboard.manager:
+    class: Drupal\dashboard\DashboardManager
+    arguments: ['@current_user', '@entity_type.manager']
+
+  dashboard.block_build_render_subscriber:
+    class: Drupal\dashboard\EventSubscriber\DashboardBlockBuildRenderSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  Drupal\dashboard\Hook\GinThemeIntegration:
+    class: Drupal\dashboard\Hook\GinThemeIntegration
+    autowire: true
+  Drupal\dashboard\Hook\MenuLocalTasks:
+    class: Drupal\dashboard\Hook\MenuLocalTasks
+    autowire: true
+  Drupal\dashboard\Hook\NavigationIntegration:
+    class: Drupal\dashboard\Hook\NavigationIntegration
+    autowire: true
+  Drupal\dashboard\Hook\ToolbarIntegration:
+    class: Drupal\dashboard\Hook\ToolbarIntegration
+    autowire: true
+  Drupal\dashboard\Hook\UserLoginRedirect:
+    class: Drupal\dashboard\Hook\UserLoginRedirect
+    autowire: true

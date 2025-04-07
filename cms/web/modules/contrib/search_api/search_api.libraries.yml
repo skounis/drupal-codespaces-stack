@@ -1,0 +1,10 @@
+drupal.search_api.admin_css:
+  css:
+    theme:
+      css/search_api.admin.css: {}
+drupal.search_api.processors:
+  js:
+    js/search_api.processors.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery

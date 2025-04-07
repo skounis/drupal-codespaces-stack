@@ -1,0 +1,1471 @@
+<?php
+
+/**
+ * @file
+ * Scheduler publishes and unpublishes entities on dates specified by the user.
+ */
+
+use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Action\Plugin\Action\UnpublishAction;
+use Drupal\Core\Config\ConfigImporter;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\migrate\Exception\RequirementsException;
+use Drupal\migrate\Plugin\MigrateSourceInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
+use Drupal\scheduler\Form\SchedulerCronForm;
+use Drupal\workbench_moderation\Plugin\Action\ModerationOptOutPublishNode;
+use Drupal\workbench_moderation\Plugin\Action\ModerationOptOutUnpublishNode;
+
+/**
+ * Create class aliases to maintain backwards-compatibility.
+ *
+ * Scheduler 2.x supports non-node entities and each entity type has to have its
+ * own specific event class named 'Scheduler{Type}Events'. These are now located
+ * in the Drupal\scheduler\Event\ namespace, with all event files being stored
+ * in a src/Event folder.
+ *
+ * The event classes in 8.x-1.x were just for nodes, and they were named
+ * Drupal\scheduler\SchedulerEvent and Drupal\scheduler\SchedulerEvents. These
+ * namespaces must remain for backwards-compatibility with existing
+ * implementations of event subscribers for Node events. The namespace should
+ * have been Drupal\scheduler\Event in the first place.
+ *
+ * These two aliases allow existing event subscribers to continue unchanged.
+ * They are also still defined in /src/SchedulerEvent and src/SchedulerEvents.
+ * See https://www.drupal.org/project/scheduler/issues/3498553
+ */
+@class_alias('Drupal\scheduler\Event\SchedulerEvent', 'Drupal\scheduler\SchedulerEvent');
+@class_alias('Drupal\scheduler\Event\SchedulerNodeEvents', 'Drupal\scheduler\SchedulerEvents');
+
+/**
+ * Implements hook_help().
+ */
+function scheduler_help($route_name, RouteMatchInterface $route_match) {
+  $output = '';
+  switch ($route_name) {
+    case 'help.page.scheduler':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Scheduler module provides the functionality for automatic publishing and unpublishing of entities, such and nodes and media items, at specified future dates.') . '</p>';
+      $output .= '<p>' . t('You can read more in the <a href="@readme">readme</a> file or our <a href="@project">project page on Drupal.org</a>.', [
+        '@readme' => $GLOBALS['base_url'] . '/' . \Drupal::service('extension.list.module')->getPath('scheduler') . '/README.md',
+        '@project' => 'https://drupal.org/project/scheduler',
+      ]) . '</p>';
+      break;
+
+    case 'scheduler.cron_form':
+      $base_url = $GLOBALS['base_url'];
+      $access_key = \Drupal::state()->get(SchedulerCronForm::CRON_ACCESS_KEY, '');
+      $cron_url = $base_url . '/scheduler/cron/' . $access_key;
+      $output = '<p>' . t("When you have set up Drupal's standard crontab job cron.php then Scheduler will be executed during each cron run. However, if you would like finer granularity to scheduler, but don't want to run Drupal's cron more often then you can use the lightweight cron handler provided by Scheduler. This is an independent cron job which only runs the scheduler process and does not execute any cron tasks defined by Drupal core or any other modules.") . '</p>';
+      $output .= '<p>' . t("Scheduler's cron is at /scheduler/cron/{access-key} and a sample crontab entry to run scheduler every minute might look like:") . '</p>';
+      $output .= '<code>* * * * * wget -q -O /dev/null "' . $cron_url . '"</code>';
+      $output .= '<p>' . t('or') . '</p>';
+      $output .= '<code>* * * * * curl -s -o /dev/null "' . $cron_url . '"</code><br/><br/>';
+      break;
+
+    default:
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function scheduler_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+
+  if (in_array($form_id, $scheduler_manager->getEntityFormIds())) {
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $form_state->getFormObject()->getEntity();
+    _scheduler_entity_form_alter($form, $form_state, $form_id, $entity);
+  }
+  elseif (in_array($form_id, $scheduler_manager->getEntityTypeFormIds())) {
+    _scheduler_entity_type_form_alter($form, $form_state, $form_id);
+  }
+  elseif ($entityTypeId = array_search($form_id, $scheduler_manager->getDevelGenerateFormIds())) {
+    // Devel Generate forms are different from the other types above. There is
+    // only one form id per entity type, but also no direct way to get the
+    // entity from the form. Hence we add the entityTypeId as a key in the array
+    // of returned possible form ids, and pass that on to the helper function.
+    _scheduler_devel_generate_form_alter($form, $form_state, $form_id, $entityTypeId);
+  }
+  elseif (in_array($form_id, ['media_library_add_form_oembed', 'media_library_add_form_upload'])) {
+    if (isset($form['media'])) {
+      $media = $form_state->get('media');
+      // Call the entity form alter function for each of the new media items
+      // being uploaded.
+      foreach ($media as $key => $entity) {
+        _scheduler_entity_form_alter($form['media'][$key]['fields'], $form_state, $form_id, $entity);
+      }
+    }
+  }
+}
+
+/**
+ * Form alter handling for entity forms - add and edit.
+ */
+function _scheduler_entity_form_alter(&$form, FormStateInterface $form_state, $form_id, $entity) {
+  // When a content type, such as a page, has an entity reference field linked
+  // to media items the Media Library module allows new media to be uploaded and
+  // inserted when adding/editing the page. The media upload form is not an
+  // 'entity' form and does not have a getFormDisplay() method. Hence we cannot
+  // properly amend the form in this scenario and the best we can do is remove
+  // the Scheduler fields for safety. The Scheduler issue discussing this is
+  // https://www.drupal.org/project/scheduler/issues/2916730
+  if (!method_exists($form_state->getFormObject(), 'getFormDisplay')) {
+    unset($form['publish_on']);
+    unset($form['unpublish_on']);
+    return;
+  }
+
+  // Get the form display object. If this does not exist because the form is
+  // prevented from displaying, such as in Commerce Add Product before any store
+  // has been created, we can not (and do not need to) do anything, so exit.
+  $param = ($form_id == 'media_library_add_form_upload') ? $entity : $form_state;
+  if (!$display = $form_state->getFormObject()->getFormDisplay($param)) {
+    return;
+  }
+
+  $config = \Drupal::config('scheduler.settings');
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $entityTypeId = $entity->getEntityTypeId();
+
+  $publishing_enabled = $scheduler_manager->getThirdPartySetting($entity, 'publish_enable', $config->get('default_publish_enable'));
+  $unpublishing_enabled = $scheduler_manager->getThirdPartySetting($entity, 'unpublish_enable', $config->get('default_unpublish_enable'));
+
+  // If neither publishing nor unpublishing are enabled then there is nothing to
+  // do so remove the fields from the form and exit early.
+  if (!$publishing_enabled && !$unpublishing_enabled) {
+    unset($form['publish_on']);
+    unset($form['unpublish_on']);
+    return;
+  }
+
+  // Determine if the scheduler fields have been set to hidden (disabled).
+  $publishing_displayed = !empty($display->getComponent('publish_on'));
+  $unpublishing_displayed = !empty($display->getComponent('unpublish_on'));
+
+  // Invoke all implementations of hook_scheduler_hide_publish_date() and
+  // hook_scheduler_{type}_hide_publish_date() to allow other modules to hide
+  // the field on the entity edit form.
+  if ($publishing_enabled && $publishing_displayed) {
+    $hook_implementations = $scheduler_manager->getHookImplementations('hide_publish_date', $entity);
+    foreach ($hook_implementations as $function) {
+      $publishing_displayed = ($function($form, $form_state, $entity) !== TRUE) && $publishing_displayed;
+    }
+  }
+  // Invoke all implementations of hook_scheduler_hide_unpublish_date() and
+  // hook_scheduler_{type}_hide_unpublish_date() to allow other modules to hide
+  // the field on the entity edit form.
+  if ($unpublishing_enabled && $unpublishing_displayed) {
+    $hook_implementations = $scheduler_manager->getHookImplementations('hide_unpublish_date', $entity);
+    foreach ($hook_implementations as $function) {
+      $unpublishing_displayed = ($function($form, $form_state, $entity) !== TRUE) && $unpublishing_displayed;
+    }
+  }
+
+  // If both publishing and unpublishing are either not enabled or are hidden
+  // for this entity type then the only thing to do is remove the fields from
+  // the form, then exit.
+  if ((!$publishing_enabled || !$publishing_displayed) && (!$unpublishing_enabled || !$unpublishing_displayed)) {
+    unset($form['publish_on']);
+    unset($form['unpublish_on']);
+    return;
+  }
+
+  $allow_date_only = $config->get('allow_date_only');
+
+  // A publish_on date is required if the content type option is set and the
+  // entity is being created or it is currently not published but has a
+  // scheduled publishing date.
+  $publishing_required = $publishing_enabled
+    && $scheduler_manager->getThirdPartySetting($entity, 'publish_required', $config->get('default_publish_required'))
+    && ($entity->isNew() || (!$entity->isPublished() && !empty($entity->publish_on->value)));
+
+  // An unpublish_on date is required if the content type option is set and the
+  // entity is being created or the current status is published or the entity is
+  // scheduled to be published.
+  $unpublishing_required = $unpublishing_enabled
+    && $scheduler_manager->getThirdPartySetting($entity, 'unpublish_required', $config->get('default_unpublish_required'))
+    && ($entity->isNew() || $entity->isPublished() || !empty($entity->publish_on->value));
+
+  // Create a 'details' field group to wrap the scheduling fields, and expand it
+  // if publishing or unpublishing is required, if a date already exists or the
+  // fieldset is configured to be always expanded.
+  $has_data = isset($entity->publish_on->value) || isset($entity->unpublish_on->value);
+  $always_expand = $scheduler_manager->getThirdPartySetting($entity, 'expand_fieldset', $config->get('default_expand_fieldset')) === 'always';
+  $expand_details = $publishing_required || $unpublishing_required || $has_data || $always_expand;
+
+  // Create the group for the fields. The array key has to be distinct when more
+  // than one $entity appears in the form, for example in Media Library uploads.
+  // Keep the first key the same as before, without any suffix, as this is used
+  // in drupal.behaviors javascript and could be used by third-party modules.
+  static $group_number;
+  $group_number += 1;
+  $scheduler_field_group = ($group_number == 1) ? 'scheduler_settings' : "scheduler_settings_{$group_number}";
+  $form[$scheduler_field_group] = [
+    '#type' => 'details',
+    '#title' => t('Scheduling options'),
+    '#open' => $expand_details,
+    '#weight' => 35,
+    '#attributes' => ['class' => ['scheduler-form']],
+    '#optional' => FALSE,
+  ];
+
+  // Attach the fields to group.
+  $form['publish_on']['#group'] = $form['unpublish_on']['#group'] = $scheduler_field_group;
+
+  // Show the field group as a vertical tab if this option is enabled.
+  $use_vertical_tabs = $scheduler_manager->getThirdPartySetting($entity, 'fields_display_mode', $config->get('default_fields_display_mode')) === 'vertical_tab';
+  if ($use_vertical_tabs) {
+    $form[$scheduler_field_group]['#group'] = 'advanced';
+
+    // Attach the javascript for the vertical tabs.
+    $form[$scheduler_field_group]['#attached']['library'][] = 'scheduler/vertical-tabs';
+  }
+
+  // The 'once' library was moved from jQuery into core at 9.2. The original js
+  // library file is kept to maintain compatibility with Drupal 8.9.
+  // @see https://www.drupal.org/project/scheduler/issues/3314158
+  $default_time_library = version_compare(\Drupal::VERSION, '9.2', '>=') ? 'scheduler/default-time' : 'scheduler/default-time-8x';
+
+  // Define the descriptions depending on whether the time can be skipped.
+  $descriptions = [];
+  if ($allow_date_only) {
+    $descriptions['format'] = t('Enter a date. The time part is optional.');
+    // Show the default time so users know what they will get if they do not
+    // enter a time.
+    $descriptions['default'] = t('The default time is @default_time.', [
+      '@default_time' => $config->get('default_time'),
+    ]);
+
+    // Use javascript to pre-fill the time parts if the dates are required.
+    // See js/scheduler_default_time.js for more details.
+    if ($publishing_required || $unpublishing_required) {
+      $form[$scheduler_field_group]['#attached']['library'][] = $default_time_library;
+      $form[$scheduler_field_group]['#attached']['drupalSettings']['schedulerDefaultTime'] = $config->get('default_time');
+    }
+  }
+  else {
+    $descriptions['format'] = t('Enter a date and time.');
+  }
+
+  if (!$publishing_required) {
+    $descriptions['blank'] = t('Leave the date blank for no scheduled publishing.');
+  }
+
+  $form['publish_on']['#access'] = $publishing_enabled && $publishing_displayed;
+  $form['publish_on']['widget'][0]['value']['#required'] = $publishing_required;
+  $form['publish_on']['widget'][0]['value']['#description'] = Xss::filter(implode(' ', $descriptions));
+
+  if (!$unpublishing_required) {
+    $descriptions['blank'] = t('Leave the date blank for no scheduled unpublishing.');
+  }
+  else {
+    unset($descriptions['blank']);
+  }
+
+  $form['unpublish_on']['#access'] = $unpublishing_enabled && $unpublishing_displayed;
+  $form['unpublish_on']['widget'][0]['value']['#required'] = $unpublishing_required;
+  $form['unpublish_on']['widget'][0]['value']['#description'] = Xss::filter(implode(' ', $descriptions));
+
+  // When hiding the seconds on time input, we need to remove the seconds from
+  // the form value, as some browsers HTML5 rendering still show the seconds.
+  // We can use the same jQuery drupal behaviors file as for default time.
+  // This functionality is not covered by tests.
+  if ($config->get('hide_seconds')) {
+    // If there is a publish_on time, then use jQuery to remove the seconds.
+    if (isset($entity->publish_on->value)) {
+      $form[$scheduler_field_group]['#attached']['library'][] = $default_time_library;
+      $form[$scheduler_field_group]['#attached']['drupalSettings']['schedulerHideSecondsPublishOn'] = date('H:i', $entity->publish_on->value);
+    }
+    // Likewise for the unpublish_on time.
+    if (isset($entity->unpublish_on->value)) {
+      $form[$scheduler_field_group]['#attached']['library'][] = $default_time_library;
+      $form[$scheduler_field_group]['#attached']['drupalSettings']['schedulerHideSecondsUnpublishOn'] = date('H:i', $entity->unpublish_on->value);
+    }
+  }
+
+  // Check the permission for entering scheduled dates.
+  $permission = $scheduler_manager->permissionName($entityTypeId, 'schedule');
+  if (!\Drupal::currentUser()->hasPermission($permission)) {
+    // Do not show the scheduler fields for users who do not have permission.
+    // Setting #access to FALSE for the group fieldset is enough to hide the
+    // fields. Setting FALSE for the individual fields is necessary to keep any
+    // existing scheduled dates preserved and remain unchanged on saving.
+    $form[$scheduler_field_group]['#access'] = FALSE;
+    $form['publish_on']['#access'] = FALSE;
+    $form['unpublish_on']['#access'] = FALSE;
+
+    // @todo Find a more elegant solution for bypassing the validation of
+    // scheduler fields when the user does not have permission.
+    // Note: This scenario is NOT yet covered by any tests, neither in
+    // SchedulerPermissionsTest.php nor SchedulerRequiredTest.php
+    // @see https://www.drupal.org/node/2651448
+    $form['publish_on']['widget'][0]['value']['#required'] = FALSE;
+    $form['unpublish_on']['widget'][0]['value']['#required'] = FALSE;
+  }
+
+  // Check which widget is set for the scheduler fields, and give a warning and
+  // provide a hint and link for how to fix it. Allow third-party modules to
+  // provide their own custom widget, we are only interested in checking that it
+  // has not reverted back to the core 'datetime_timestamp' widget.
+  $pluginDefinitions = $display->get('pluginManager')->getDefinitions();
+  $fields_to_check = [];
+  if ($publishing_enabled && $publishing_displayed) {
+    $fields_to_check[] = 'publish_on';
+  }
+  if ($unpublishing_enabled && $unpublishing_displayed) {
+    $fields_to_check[] = 'unpublish_on';
+  }
+  $correct_widget_id = 'datetime_timestamp_no_default';
+  foreach ($fields_to_check as $field) {
+    $actual_widget_id = $display->getComponent($field)['type'];
+    if ($actual_widget_id == 'datetime_timestamp') {
+      $link = \Drupal::moduleHandler()->moduleExists('field_ui') ?
+        Url::fromRoute("entity.entity_form_display.$entityTypeId.default", ["{$entityTypeId}_type" => $entity->bundle()])->toString()
+        : '#';
+      \Drupal::messenger()->addMessage(t('The widget for field %field is incorrectly set to %wrong. This should be changed to %correct by an admin user via the <a href="@link">Field UI form display</a> :not_available', [
+        '%field' => (string) $form[$field]['widget']['#title'],
+        '%correct' => (string) $pluginDefinitions[$correct_widget_id]['label'],
+        '%wrong' => (string) $pluginDefinitions[$actual_widget_id]['label'],
+        '@link' => $link,
+        ':not_available' => \Drupal::moduleHandler()->moduleExists('field_ui') ? '' : ('(' . t('not available') . ')'),
+      ]), 'warning', FALSE);
+    }
+  }
+}
+
+/**
+ * Form alter handling for entity type forms.
+ */
+function _scheduler_entity_type_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $config = \Drupal::config('scheduler.settings');
+
+  /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
+  $type = $form_state->getFormObject()->getEntity();
+
+  /** @var Drupal\Core\Entity\ContentEntityTypeInterface $contentEntityType */
+  $contentEntityType = \Drupal::entityTypeManager()->getDefinition($type->getEntityType()->getBundleOf());
+
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $contentEntity */
+  $contentEntity = \Drupal::entityTypeManager()->getStorage($contentEntityType->id())->create([$contentEntityType->getKey('bundle') => 'scaffold']);
+
+  $params = [
+    '@type' => $type->label() ?? '',
+    '%type' => strtolower($type->label() ?? ''),
+    '@singular' => $contentEntityType->getSingularLabel(),
+    '@plural' => $contentEntityType->getPluralLabel(),
+  ];
+
+  $form['#attached']['library'][] = 'scheduler/vertical-tabs';
+
+  $form['scheduler'] = [
+    '#type' => 'details',
+    '#title' => t('Scheduler'),
+    '#weight' => 35,
+    '#group' => 'additional_settings',
+  ];
+
+  // Publishing options.
+  $form['scheduler']['publish'] = [
+    '#type' => 'details',
+    '#title' => t('Publishing'),
+    '#weight' => 1,
+    '#group' => 'scheduler',
+    '#open' => TRUE,
+  ];
+  $form['scheduler']['publish']['scheduler_publish_enable'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enable scheduled publishing for %type @plural', $params),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'publish_enable', $config->get('default_publish_enable')),
+  ];
+  $form['scheduler']['publish']['scheduler_publish_touch'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Change %type creation time to match the scheduled publish time', $params),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'publish_touch', $config->get('default_publish_touch')),
+    '#states' => [
+      'visible' => [
+        ':input[name="scheduler_publish_enable"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+
+  // Entity types that do not implement the 'getCreatedTime' method should have
+  // the option set to FALSE and the field disabled and hidden.
+  if (!method_exists($contentEntity, 'getCreatedTime')) {
+    $form['scheduler']['publish']['scheduler_publish_touch']['#disabled'] = TRUE;
+    $form['scheduler']['publish']['scheduler_publish_touch']['#description'] = t('The entity type does not support the change of creation time.');
+    $form['scheduler']['publish']['scheduler_publish_touch']['#default_value'] = FALSE;
+    $form['scheduler']['publish']['scheduler_publish_touch']['#access'] = FALSE;
+  }
+
+  $form['scheduler']['publish']['scheduler_publish_required'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Require scheduled publishing'),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'publish_required', $config->get('default_publish_required')),
+    '#states' => [
+      'visible' => [
+        ':input[name="scheduler_publish_enable"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+  if ($contentEntityType->isRevisionable()) {
+    $form['scheduler']['publish']['scheduler_publish_revision'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Create a new revision on publishing'),
+      '#default_value' => $type->getThirdPartySetting('scheduler', 'publish_revision', $config->get('default_publish_revision')),
+      '#states' => [
+        'visible' => [
+          ':input[name="scheduler_publish_enable"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+  }
+  $form['scheduler']['publish']['advanced'] = [
+    '#type' => 'details',
+    '#title' => t('Advanced options'),
+    '#open' => FALSE,
+    '#states' => [
+      'visible' => [
+        ':input[name="scheduler_publish_enable"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+  $form['scheduler']['publish']['advanced']['scheduler_publish_past_date'] = [
+    '#type' => 'radios',
+    '#title' => t('Action to be taken for publication dates in the past'),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'publish_past_date', $config->get('default_publish_past_date')),
+    '#options' => [
+      'error' => t('Display an error message - do not allow dates in the past'),
+      'publish' => t('Publish the %type @singular immediately after saving', $params),
+      'schedule' => t('Schedule the %type @singular for publication on the next cron run', $params),
+    ],
+  ];
+  $form['scheduler']['publish']['advanced']['scheduler_publish_past_date_created'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Change %type creation time to match the published time, for dates before the %type was created', $params),
+    '#description' => t("The created time will only be altered when the scheduled publishing time is earlier than the existing creation time"),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'publish_past_date_created', $config->get('default_publish_past_date_created')),
+    // This option is not relevant if the full 'change creation time' option is
+    // selected, or when past dates are not allowed. Hence only show it when
+    // the main option is not checked and the past dates option is not 'error'.
+    '#states' => [
+      'visible' => [
+        ':input[name="scheduler_publish_touch"]' => ['checked' => FALSE],
+        ':input[name="scheduler_publish_past_date"]' => ['!value' => 'error'],
+      ],
+    ],
+  ];
+
+  // Entity types that do not implement the 'getCreatedTime' method should have
+  // the option set to FALSE and the field disabled. It will be hidden due to
+  // the #states setting above, as scheduler_publish_touch has #access = FALSE.
+  if (!method_exists($contentEntity, 'getCreatedTime')) {
+    $form['scheduler']['publish']['advanced']['scheduler_publish_past_date_created']['#disabled'] = TRUE;
+    $form['scheduler']['publish']['advanced']['scheduler_publish_past_date_created']['#description'] = t('The entity type does not support the change of creation time.');
+    $form['scheduler']['publish']['advanced']['scheduler_publish_past_date_created']['#default_value'] = FALSE;
+  }
+
+  // Unpublishing options.
+  $form['scheduler']['unpublish'] = [
+    '#type' => 'details',
+    '#title' => t('Unpublishing'),
+    '#weight' => 2,
+    '#group' => 'scheduler',
+    '#open' => TRUE,
+  ];
+  $form['scheduler']['unpublish']['scheduler_unpublish_enable'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enable scheduled unpublishing for %type @plural', $params),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'unpublish_enable', $config->get('default_unpublish_enable')),
+  ];
+  $form['scheduler']['unpublish']['scheduler_unpublish_required'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Require scheduled unpublishing'),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'unpublish_required', $config->get('default_unpublish_required')),
+    '#states' => [
+      'visible' => [
+        ':input[name="scheduler_unpublish_enable"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+  if ($contentEntityType->isRevisionable()) {
+    $form['scheduler']['unpublish']['scheduler_unpublish_revision'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Create a new revision on unpublishing'),
+      '#default_value' => $type->getThirdPartySetting('scheduler', 'unpublish_revision', $config->get('default_unpublish_revision')),
+      '#states' => [
+        'visible' => [
+          ':input[name="scheduler_unpublish_enable"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+  }
+
+  // The 'entity_edit_layout' fieldset contains options to alter the layout of
+  // entity edit pages.
+  $form['scheduler']['entity_edit_layout'] = [
+    '#type' => 'details',
+    '#title' => t('@type edit page', $params),
+    '#weight' => 3,
+    '#group' => 'scheduler',
+    // The #states processing only caters for AND and does not do OR. So to set
+    // the state to visible if either of the boxes are ticked we use the fact
+    // that logical 'X = A or B' is equivalent to 'not X = not A and not B'.
+    '#states' => [
+      '!visible' => [
+        ':input[name="scheduler_publish_enable"]' => ['!checked' => TRUE],
+        ':input[name="scheduler_unpublish_enable"]' => ['!checked' => TRUE],
+      ],
+    ],
+  ];
+  $form['scheduler']['entity_edit_layout']['scheduler_fields_display_mode'] = [
+    '#type' => 'radios',
+    '#title' => t('Display scheduling date input fields in'),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'fields_display_mode', $config->get('default_fields_display_mode')),
+    '#options' => [
+      'vertical_tab' => t('Vertical tab'),
+      'fieldset' => t('Separate fieldset'),
+    ],
+    '#description' => t('Use this option to specify how the scheduler fields are displayed when editing %type @plural', $params),
+  ];
+  $form['scheduler']['entity_edit_layout']['scheduler_expand_fieldset'] = [
+    '#type' => 'radios',
+    '#title' => t('Expand fieldset or vertical tab'),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'expand_fieldset', $config->get('default_expand_fieldset')),
+    '#options' => [
+      'when_required' => t('Expand only when a scheduled date exists or when a date is required'),
+      'always' => t('Always open the fieldset or vertical tab'),
+    ],
+  ];
+  $form['scheduler']['entity_edit_layout']['scheduler_show_message_after_update'] = [
+    '#type' => 'checkbox',
+    '#prefix' => '<strong>' . t('Show message') . '</strong>',
+    '#title' => t('Show a confirmation message when a scheduled %type @singular is saved', $params),
+    '#default_value' => $type->getThirdPartySetting('scheduler', 'show_message_after_update', $config->get('default_show_message_after_update')),
+  ];
+
+  $form['#entity_builders'][] = '_scheduler_form_entity_type_form_builder';
+
+  // Add a custom submit handler to adjust the fields in the form displays.
+  $form['actions']['submit']['#submit'][] = '_scheduler_form_entity_type_submit';
+}
+
+/**
+ * Entity builder for the entity type form with scheduler options.
+ */
+function _scheduler_form_entity_type_form_builder($entity_type, $type, &$form, FormStateInterface $form_state) {
+  $type->setThirdPartySetting('scheduler', 'expand_fieldset', $form_state->getValue('scheduler_expand_fieldset'));
+  $type->setThirdPartySetting('scheduler', 'fields_display_mode', $form_state->getValue('scheduler_fields_display_mode'));
+  $type->setThirdPartySetting('scheduler', 'publish_enable', $form_state->getValue('scheduler_publish_enable'));
+  $type->setThirdPartySetting('scheduler', 'publish_past_date', $form_state->getValue('scheduler_publish_past_date'));
+  $type->setThirdPartySetting('scheduler', 'publish_past_date_created', $form_state->getValue('scheduler_publish_past_date_created'));
+  $type->setThirdPartySetting('scheduler', 'publish_required', $form_state->getValue('scheduler_publish_required'));
+  $type->setThirdPartySetting('scheduler', 'publish_revision', $form_state->getValue('scheduler_publish_revision'));
+  $type->setThirdPartySetting('scheduler', 'publish_touch', $form_state->getValue('scheduler_publish_touch'));
+  $type->setThirdPartySetting('scheduler', 'show_message_after_update', $form_state->getValue('scheduler_show_message_after_update'));
+  $type->setThirdPartySetting('scheduler', 'unpublish_enable', $form_state->getValue('scheduler_unpublish_enable'));
+  $type->setThirdPartySetting('scheduler', 'unpublish_required', $form_state->getValue('scheduler_unpublish_required'));
+  $type->setThirdPartySetting('scheduler', 'unpublish_revision', $form_state->getValue('scheduler_unpublish_revision'));
+}
+
+/**
+ * Entity type form submit handler.
+ */
+function _scheduler_form_entity_type_submit($form, FormStateInterface $form_state) {
+  // Get the entity type id (node, media, taxonomy_term, etc.)
+  $entity_type_id = $form_state->getFormObject()->getEntity()->getEntityType()->getBundleOf();
+  // Get the entity bundle id (page, article, image, etc.)
+  $bundle_id = $form_state->getFormObject()->getEntity()->id();
+
+  /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+  $display_repository = \Drupal::service('entity_display.repository');
+
+  // Get all active display modes. getFormModes() returns the additional modes
+  // then add the default.
+  $all_display_modes = array_keys($display_repository->getFormModes($entity_type_id));
+  $all_display_modes[] = $display_repository::DEFAULT_DISPLAY_MODE;
+
+  $supported_display_modes = \Drupal::service('scheduler.manager')->getPlugin($entity_type_id)->entityFormDisplayModes();
+
+  // Each of the active form display modes may need to be adjusted to add or
+  // remove the scheduler fields depending on the 'enable' setting.
+  foreach ($all_display_modes as $display_mode) {
+    $form_display = $display_repository->getFormDisplay($entity_type_id, $bundle_id, $display_mode);
+
+    // If this bundle is not enabled for scheduled publishing or the form
+    // display mode is not supported then make sure the publish_on field is
+    // disabled in the form display.
+    if (!$form_state->getValue('scheduler_publish_enable') || !in_array($display_mode, $supported_display_modes)) {
+      $form_display->removeComponent('publish_on')->save();
+    }
+    // @todo Find a more robust way to detect that the checkbox was off before.
+    elseif (!$form['scheduler']['publish']['scheduler_publish_enable']['#default_value']) {
+      // If the entity bundle is now enabled for scheduled publishing but was
+      // not enabled before then set the publish_on field to be displayed and
+      // set the widget type to 'datetime_timestamp_no_default'. Only do this
+      // when the checkbox has been changed, because the widget could be altered
+      // or the field moved by a subsequent process or manually by admin.
+      $form_display->setComponent('scheduler_settings', ['weight' => 50])
+        ->setComponent('publish_on', ['type' => 'datetime_timestamp_no_default', 'weight' => 52])->save();
+    }
+
+    // Do the same for the unpublish_on field.
+    if (!$form_state->getValue('scheduler_unpublish_enable') || !in_array($display_mode, $supported_display_modes)) {
+      $form_display->removeComponent('unpublish_on')->save();
+    }
+    elseif (!$form['scheduler']['unpublish']['scheduler_unpublish_enable']['#default_value']) {
+      $form_display->setComponent('scheduler_settings', ['weight' => 50])
+        ->setComponent('unpublish_on', ['type' => 'datetime_timestamp_no_default', 'weight' => 54])->save();
+    }
+
+    // If the display mode is not supported then also remove the
+    // scheduler_settings group fieldset.
+    if (!in_array($display_mode, $supported_display_modes)) {
+      $form_display->removeComponent('scheduler_settings')->save();
+    }
+  }
+}
+
+/**
+ * Form alter handling for Devel Generate forms.
+ */
+function _scheduler_devel_generate_form_alter(array &$form, FormStateInterface $form_state, $form_id, $entityTypeId) {
+  // Show which types are enabled for scheduled publishing and unpublishing. If
+  // the form does not have a table but has a selection list instead, then
+  // nothing is added here.
+  $type_table = $entityTypeId . '_types';
+  if (isset($form[$type_table]['#header']) && isset($form[$type_table]['#options'])) {
+    // Add an extra column to the table to show which types are enabled for
+    // scheduled publishing and unpublishing.
+    $scheduler_manager = \Drupal::service('scheduler.manager');
+    $publishing_enabled_types = $scheduler_manager->getEnabledTypes($entityTypeId, 'publish');
+    $unpublishing_enabled_types = $scheduler_manager->getEnabledTypes($entityTypeId, 'unpublish');
+    $form[$type_table]['#header']['scheduler'] = t('Scheduler settings');
+
+    foreach (array_keys($form[$type_table]['#options']) as $type) {
+      $items = [];
+      if (in_array($type, $publishing_enabled_types)) {
+        $items[] = t('Enabled for publishing');
+      }
+      if (in_array($type, $unpublishing_enabled_types)) {
+        $items[] = t('Enabled for unpublishing');
+      }
+      if (empty($items)) {
+        $scheduler_settings = t('None');
+      }
+      else {
+        $scheduler_settings = [
+          'data' => [
+            '#theme' => 'item_list',
+            '#items' => $items,
+          ],
+        ];
+      }
+      $form[$type_table]['#options'][$type]['scheduler'] = $scheduler_settings;
+    }
+  }
+
+  if (!isset($form['time_range'])) {
+    // Add the time range field if it was not added by Devel Generate.
+    $options = [1 => t('Now')];
+    foreach ([3600, 86400, 604800, 2592000, 31536000] as $interval) {
+      $options[$interval] = \Drupal::service('date.formatter')->formatInterval($interval, 1);
+    }
+    $form['time_range'] = [
+      '#type' => 'select',
+      '#title' => t('How far into the future should the items be scheduled?'),
+      '#description' => t('Scheduled dates will be set randomly within the selected time span.'),
+      '#options' => $options,
+      '#default_value' => 86400,
+    ];
+  }
+
+  // Add form items to specify what proportion of generated entities should have
+  // a publish-on and/or unpublish-on date assigned. See hook_entity_presave()
+  // for the code that sets these values in the generated entity. Allow for any
+  // previously-executed form_alter to have already set the percentages.
+  $form['scheduler_publishing'] = [
+    '#type' => 'number',
+    '#title' => t('Publishing date for Scheduler'),
+    '#description' => t('Enter a percentage for randomly selecting Scheduler-enabled entities to be given a publish-on date. Enter 0 for none, 100 for all. The date and time will be random within the range starting at entity creation date, up to a time in the future matching the same span as selected above.'),
+    '#default_value' => $form['scheduler_publishing']['#default_value'] ?? 50,
+    '#required' => TRUE,
+    '#min' => 0,
+    '#max' => 100,
+  ];
+  $form['scheduler_unpublishing'] = [
+    '#type' => 'number',
+    '#title' => t('Unpublishing date for Scheduler'),
+    '#description' => t('Enter a percentage for randomly selecting Scheduler-enabled entities to be given an unpublish-on date. Enter 0 for none, 100 for all. The date and time will be random within the range starting at the later of entity creation date and publish-on date, up to a time in the future matching the same span as selected above.'),
+    '#default_value' => $form['scheduler_unpublishing']['#default_value'] ?? 50,
+    '#required' => TRUE,
+    '#min' => 0,
+    '#max' => 100,
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for language_content_settings_form.
+ */
+function scheduler_form_language_content_settings_form_alter(array &$form, FormStateInterface $form_state) {
+  // Add our validation function for the translation field settings form at
+  // admin/config/regional/content-language
+  // This hook function caters for all entity types, not just nodes.
+  $form['#validate'][] = '_scheduler_translation_validate';
+}
+
+/**
+ * Validation handler for language_content_settings_form.
+ *
+ * For each entity type, if it is translatable and also enabled for Scheduler,
+ * but the translation setting for the publish_on / unpublish_on field does not
+ * match the 'published status' field setting then throw a validation error.
+ *
+ * @see https://www.drupal.org/project/scheduler/issues/2871164
+ */
+function _scheduler_translation_validate($form, FormStateInterface $form_state) {
+  $settings = $form_state->getValues()['settings'];
+  /** @var \Drupal\scheduler\SchedulerManager $scheduler_manager */
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  foreach ($settings as $entity_type => $content_types) {
+    $publishing_enabled_types = $scheduler_manager->getEnabledTypes($entity_type, 'publish');
+    $unpublishing_enabled_types = $scheduler_manager->getEnabledTypes($entity_type, 'unpublish');
+    if (empty($publishing_enabled_types) && empty($unpublishing_enabled_types)) {
+      continue;
+    }
+
+    $enabled = [];
+    foreach ($content_types as $name => $options) {
+      $enabled['publish_on'] = in_array($name, $publishing_enabled_types);
+      $enabled['unpublish_on'] = in_array($name, $unpublishing_enabled_types);
+      if ($options['translatable'] && ($enabled['publish_on'] || $enabled['unpublish_on'])) {
+        $params = [
+          '@entity' => $form['settings'][$entity_type]['#bundle_label'],
+          '@type' => $form['settings'][$entity_type][$name]['settings']['#label'],
+          '%status' => $form['settings'][$entity_type][$name]['fields']['status']['#label'],
+        ];
+        foreach (['publish_on', 'unpublish_on'] as $var) {
+          $mismatch = $enabled[$var] && ($options['fields'][$var] <> $options['fields']['status']);
+          if ($mismatch) {
+            $params['%scheduler_field'] = $form['settings'][$entity_type][$name]['fields'][$var]['#label'];
+            $message = t("There is a problem with @entity '@type' - The translatable settings for status field '%status' and Scheduler field '%scheduler_field' should match, either both on or both off", $params);
+            $form_state->setErrorByName("settings][$entity_type][$name][fields][status", $message);
+            $form_state->setErrorByName("settings][$entity_type][$name][fields][$var", $message);
+          }
+        }
+      }
+    }
+  }
+
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function scheduler_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  $entity_types = \Drupal::service('scheduler.manager')->getPluginEntityTypes();
+
+  if (in_array($entity_type->id(), $entity_types)) {
+    $fields['publish_on'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Publish on'))
+      ->setDisplayOptions('form', [
+        'type' => 'datetime_timestamp_no_default',
+        'region' => 'hidden',
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->addConstraint('SchedulerPublishOn');
+
+    $fields['unpublish_on'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Unpublish on'))
+      ->setDisplayOptions('form', [
+        'type' => 'datetime_timestamp_no_default',
+        'region' => 'hidden',
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->addConstraint('SchedulerUnpublishOn');
+  }
+
+  return $fields;
+}
+
+/**
+ * Implements hook_action_info_alter().
+ */
+function scheduler_action_info_alter(&$definitions) {
+
+  // Workbench Moderation has a bug where the wrong actions are assigned which
+  // causes scheduled publishing of non-moderated content to fail. This fix will
+  // work regardless of the relative weights of the two modules, and will
+  // continue to work even if WBM is fixed before this code is removed.
+  // See https://www.drupal.org/project/workbench_moderation/issues/3238576
+  if (\Drupal::moduleHandler()->moduleExists('workbench_moderation')) {
+    if (isset($definitions['entity:publish_action:node']['class']) && $definitions['entity:publish_action:node']['class'] == ModerationOptOutUnpublishNode::class) {
+      $definitions['entity:publish_action:node']['class'] = ModerationOptOutPublishNode::class;
+    }
+    if (isset($definitions['entity:unpublish_action:node']['class']) && $definitions['entity:unpublish_action:node']['class'] == UnpublishAction::class) {
+      $definitions['entity:unpublish_action:node']['class'] = ModerationOptOutUnpublishNode::class;
+    }
+  }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function scheduler_views_data_alter(array &$data) {
+  // By default the 'is null' and 'is not null' operators are only added to the
+  // list of filter options if the view contains a relationship. We want them to
+  // be always available for the scheduler date fields.
+  $entity_types = \Drupal::service('scheduler.manager')->getPluginEntityTypes();
+  foreach ($entity_types as $entityTypeId) {
+    // Not every entity that has a plugin will have these tables, so only set
+    // the allow_empty filter if the top-level key exists.
+    if (isset($data["{$entityTypeId}_field_data"])) {
+      $data["{$entityTypeId}_field_data"]['publish_on']['filter']['allow empty'] = TRUE;
+      $data["{$entityTypeId}_field_data"]['unpublish_on']['filter']['allow empty'] = TRUE;
+    }
+    if (isset($data["{$entityTypeId}_field_revision"])) {
+      $data["{$entityTypeId}_field_revision"]['publish_on']['filter']['allow empty'] = TRUE;
+      $data["{$entityTypeId}_field_revision"]['unpublish_on']['filter']['allow empty'] = TRUE;
+    }
+  }
+
+  // Add a relationship from Media Field Revision back to Media Field Data.
+  // @todo This can be removed when the relationship is added to core.
+  // @see https://www.drupal.org/project/drupal/issues/3036192
+  // Replace the existing 'argument' item.
+  $data['media_field_revision']['mid']['argument'] = [
+    'id' => 'media_mid',
+    'numeric' => TRUE,
+  ];
+  // Add a 'relationship' item.
+  $data['media_field_revision']['mid']['relationship'] = [
+    'id' => 'standard',
+    'base' => 'media_field_data',
+    'field' => 'mid',
+    'base field' => 'mid',
+    'title' => t('Media Field Data'),
+    'help' => t('Relationship to access the Media fields that are not on Media Revision.'),
+    'label' => t('Media Field'),
+    'extra' => [
+      [
+        'field' => 'langcode',
+        'left_field' => 'langcode',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function scheduler_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, string $view_mode) {
+  // If the entity is going to be unpublished, then add this information to the
+  // http header for search engines. Only do this when the current page is the
+  // full-page view of the entity.
+  // @see https://googleblog.blogspot.be/2007/07/robots-exclusion-protocol-now-with-even.html
+  if ($view_mode == 'full' && isset($entity->unpublish_on->value)) {
+    $unavailable_after = date(DATE_RFC850, $entity->unpublish_on->value);
+    $build['#attached']['http_header'][] = ['X-Robots-Tag', 'unavailable_after: ' . $unavailable_after];
+
+    // Also add the information as a meta tag in the html head section.
+    $unavailable_meta_tag = [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'robots',
+        'content' => 'unavailable_after: ' . $unavailable_after,
+      ],
+    ];
+    // Any value seems to be OK for the second item, but it must not be omitted.
+    $build['#attached']['html_head'][] = [$unavailable_meta_tag, 'robots_unavailable_date'];
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function scheduler_entity_presave(EntityInterface $entity) {
+  $config = \Drupal::config('scheduler.settings');
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $request_time = \Drupal::time()->getRequestTime();
+
+  $publishing_enabled_types = $scheduler_manager->getEnabledTypes($entity->getEntityTypeId(), 'publish');
+  $unpublishing_enabled_types = $scheduler_manager->getEnabledTypes($entity->getEntityTypeId(), 'unpublish');
+  $publishing_enabled = in_array($entity->bundle(), $publishing_enabled_types);
+  $unpublishing_enabled = in_array($entity->bundle(), $unpublishing_enabled_types);
+
+  if (!$publishing_enabled && !$unpublishing_enabled) {
+    // Neither scheduled publishing nor unpublishing are enabled for this
+    // specific bundle/type, so end here.
+    return;
+  }
+
+  // If this entity is being created via Devel Generate then set values for the
+  // publish_on and unpublish_on dates as specified in the devel_generate form.
+  if (isset($entity->devel_generate)) {
+    static $publishing_percent;
+    static $unpublishing_percent;
+    static $entity_created;
+    static $time_range;
+
+    if (!isset($publishing_percent)) {
+      // The values may not be set if calling via drush, so default to zero.
+      $publishing_percent = @$entity->devel_generate['scheduler_publishing'] ?: 0;
+      $unpublishing_percent = @$entity->devel_generate['scheduler_unpublishing'] ?: 0;
+      $entity_created = isset($entity->created) ? $entity->created->value : $request_time;
+      // Reuse the selected 'creation' time range for our future date span.
+      // If not set, default to 1 week (60 * 60 * 24 * 7 seconds).
+      $time_range = @$entity->devel_generate['time_range'] ?: 604800;
+    }
+    if ($publishing_percent && $publishing_enabled) {
+      if (rand(1, 100) <= $publishing_percent) {
+        // Randomly assign a publish_on value in the range starting with the
+        // created date and up to the selected time range in the future.
+        $entity->set('publish_on', rand($entity_created, $request_time + $time_range));
+      }
+    }
+    if ($unpublishing_percent && $unpublishing_enabled) {
+      if (rand(1, 100) <= $unpublishing_percent) {
+        // Randomly assign an unpublish_on value in the range from the later of
+        // created date/publish_on date up to the time range in the future.
+        $entity->set('unpublish_on', rand(max($entity_created, $entity->publish_on->value), $request_time + $time_range));
+      }
+    }
+  }
+
+  $publish_message = FALSE;
+  $unpublish_message = FALSE;
+
+  // If the entity type is enabled for scheduled publishing and has a publish_on
+  // date then check if publishing is allowed and if the content needs to be
+  // published immediately.
+  if ($publishing_enabled && !empty($entity->publish_on->value)) {
+    // Check that other modules allow the action on this entity.
+    $publication_allowed = $scheduler_manager->isAllowed($entity, 'publish');
+
+    // Publish the entity immediately if the publication date is in the past.
+    $publish_immediately = $scheduler_manager->getThirdPartySetting($entity, 'publish_past_date', $config->get('default_publish_past_date')) == 'publish';
+
+    if ($publication_allowed && $publish_immediately && $entity->publish_on->value <= $request_time) {
+      // Trigger the PRE_PUBLISH_IMMEDIATELY event so that modules can react
+      // before the entity has been published.
+      $scheduler_manager->dispatchSchedulerEvent($entity, 'PRE_PUBLISH_IMMEDIATELY');
+
+      // Set the 'changed' timestamp to match what would have been done had this
+      // content been published via cron.
+      if ($entity instanceof EntityChangedInterface) {
+        $entity->setChangedTime($entity->publish_on->value);
+      }
+
+      // If required, set the created date to match published date.
+      if ($scheduler_manager->getThirdPartySetting($entity, 'publish_touch', $config->get('default_publish_touch')) ||
+        ($scheduler_manager->getThirdPartySetting($entity, 'publish_past_date_created', $config->get('default_publish_past_date_created')) && $entity->getCreatedTime() > $entity->publish_on->value)) {
+        $entity->setCreatedTime($entity->publish_on->value);
+      }
+      $entity->publish_on->value = NULL;
+      $entity->setPublished();
+
+      // Trigger the PUBLISH_IMMEDIATELY event so that modules can react after
+      // the entity has been published.
+      $scheduler_manager->dispatchSchedulerEvent($entity, 'PUBLISH_IMMEDIATELY');
+    }
+    else {
+      // Ensure the entity is unpublished as it will be published by cron later.
+      $entity->setUnpublished();
+
+      // Only inform the user that the entity is scheduled if publication has
+      // not been prevented by other modules. Those modules have to display a
+      // message themselves explaining why publication is denied.
+      $publish_message = ($publication_allowed && $scheduler_manager->getThirdPartySetting($entity, 'show_message_after_update', $config->get('default_show_message_after_update')));
+    }
+  } // Entity has a publish_on date.
+
+  if ($unpublishing_enabled && !empty($entity->unpublish_on->value)) {
+    // Scheduler does not do the same 'immediate' processing for unpublishing.
+    // However, the api hook should still be called during presave as there may
+    // be messages to be displayed if the unpublishing will be disallowed later.
+    $unpublication_allowed = $scheduler_manager->isAllowed($entity, 'unpublish');
+    $unpublish_message = ($unpublication_allowed && $scheduler_manager->getThirdPartySetting($entity, 'show_message_after_update', $config->get('default_show_message_after_update')));
+  }
+
+  // Give one message, which will include the publish_on date, the unpublish_on
+  // date or both dates. Cannot make the title into a link here when the entity
+  // is being created. But core provides the link in the subsequent message.
+  $date_formatter = \Drupal::service('date.formatter');
+  if ($publish_message && $unpublish_message) {
+    \Drupal::messenger()->addMessage(t('%title is scheduled to be published @publish_time and unpublished @unpublish_time.', [
+      '%title' => $entity->label(),
+      '@publish_time' => $date_formatter->format($entity->publish_on->value, 'long'),
+      '@unpublish_time' => $date_formatter->format($entity->unpublish_on->value, 'long'),
+    ]), 'status', FALSE);
+  }
+  elseif ($publish_message) {
+    \Drupal::messenger()->addMessage(t('%title is scheduled to be published @publish_time.', [
+      '%title' => $entity->label(),
+      '@publish_time' => $date_formatter->format($entity->publish_on->value, 'long'),
+    ]), 'status', FALSE);
+  }
+  elseif ($unpublish_message) {
+    \Drupal::messenger()->addMessage(t('%title is scheduled to be unpublished @unpublish_time.', [
+      '%title' => $entity->label(),
+      '@unpublish_time' => $date_formatter->format($entity->unpublish_on->value, 'long'),
+    ]), 'status', FALSE);
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function scheduler_cron() {
+  // Use drupal_static so that any function can find out if we are running
+  // Scheduler cron. Set the default value to FALSE, then turn on the flag.
+  // @see scheduler_cron_is_running()
+  $scheduler_cron = &drupal_static(__FUNCTION__, FALSE);
+  $scheduler_cron = TRUE;
+
+  /** @var \Drupal\scheduler\SchedulerManager $scheduler_manager */
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $scheduler_manager->publish();
+  $scheduler_manager->unpublish();
+
+  // Scheduler 7.x provided hook_scheduler_api() which has been replaced by
+  // event dispatching in 8.x. Display a warning in the log if any of these
+  // hooks still exist, so that admins and developers are informed.
+  if (version_compare(\Drupal::VERSION, '9.4', '>=')) {
+    // getImplementations() is deprecated in D9.4, use invokeAllWith().
+    \Drupal::moduleHandler()->invokeAllWith('scheduler_api', function (callable $hook, string $module) {
+      \Drupal::logger('scheduler')->warning('Function %function has not been executed. Implementations of hook_scheduler_api() should be replaced by Scheduler event listeners.', [
+        '%function' => $module . '_scheduler_api',
+      ]);
+    });
+  }
+  else {
+    // Use getImplementations() to maintain compatibility with Drupal 8.9.
+    foreach (Drupal::moduleHandler()->getImplementations('scheduler_api') as $module) {
+      \Drupal::logger('scheduler')->warning('Function %function has not been executed. Implementations of hook_scheduler_api() should be replaced by Scheduler event listeners.', [
+        '%function' => $module . '_scheduler_api',
+      ]);
+    }
+  }
+
+  // Reset the static scheduler_cron flag.
+  drupal_static_reset(__FUNCTION__);
+}
+
+/**
+ * Return whether Scheduler cron is running.
+ *
+ * This function can be called from any Scheduler function, from any contrib
+ * module or from custom PHP in a view or rule.
+ *
+ * @return bool
+ *   TRUE if scheduler_cron is currently running. FALSE if not.
+ */
+function scheduler_cron_is_running() {
+  return drupal_static('scheduler_cron');
+}
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function scheduler_entity_extra_field_info() {
+  $config = \Drupal::config('scheduler.settings');
+
+  $plugins = \Drupal::service('scheduler.manager')->getPlugins();
+
+  // Expose the Scheduler group on the 'Manage Form Display' tab when editing a
+  // content type. This allows admins to adjust the weight of the group, and it
+  // works for vertical tabs and separate fieldsets.
+  $fields = [];
+
+  foreach ($plugins as $entityTypeId => $plugin) {
+    $types = $plugin->getTypes();
+    foreach ($types as $type) {
+      $publishing_enabled = $type->getThirdPartySetting('scheduler', 'publish_enable', $config->get('default_publish_enable'));
+      $unpublishing_enabled = $type->getThirdPartySetting('scheduler', 'unpublish_enable', $config->get('default_unpublish_enable'));
+
+      if ($publishing_enabled || $unpublishing_enabled) {
+        // Weight 50 puts this below the core fields by default.
+        $fields[$entityTypeId][$type->id()]['form']['scheduler_settings'] = [
+          'label' => t('Scheduler Dates'),
+          'description' => t('Fieldset containing Scheduler Publish-on and Unpublish-on date input fields'),
+          'weight' => 50,
+        ];
+      }
+    }
+  }
+
+  return $fields;
+}
+
+/**
+ * Implements hook_preprocess().
+ */
+function scheduler_preprocess(&$variables, $hook) {
+  // For entity types that can be processed by Scheduler add the formatted
+  // publish_on and unpublish_on dates as variables for use in theme templates.
+  $plugins = &drupal_static(__FUNCTION__);
+  if (empty($plugins)) {
+    $plugins = \Drupal::service('scheduler.manager')->getPluginEntityTypes();
+  }
+  // For $hook = 'node' and 'media' the entity is stored in $variables[$hook].
+  // This is not guaranteed, for example in commerce_product the entity is in
+  // $variables['product_entity']. This could be extracted if there is a need,
+  // but for now just skip if the entity is not immediately available.
+  if (in_array($hook, $plugins) && isset($variables[$hook])) {
+    $date_formatter = \Drupal::service('date.formatter');
+    $entity = $variables[$hook];
+    if (!empty($entity->publish_on->value) && $entity->publish_on->value && is_numeric($entity->publish_on->value)) {
+      $variables['publish_on'] = $date_formatter->format($entity->publish_on->value, 'long');
+    }
+    if (!empty($entity->unpublish_on->value) && $entity->unpublish_on->value && is_numeric($entity->unpublish_on->value)) {
+      $variables['unpublish_on'] = $date_formatter->format($entity->unpublish_on->value, 'long');
+    }
+  }
+}
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ *
+ * This function exposes publish_on and unpublish_on as mappable targets to the
+ * Feeds module.
+ *
+ * @see https://www.drupal.org/project/feeds
+ *
+ * @todo Port to Drupal 8.
+ *
+ * @see https://www.drupal.org/project/scheduler/issues/2651354
+ */
+function scheduler_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+  // The plugins processing has not been tested, because the function has not
+  // been converted to Drupal 8. The processing below will need to be adjusted
+  // depending on whether $entity_type is a string or an object.
+  // See scheduler_entity_extra_field_info() for an example.
+  // May need to use $scheduler_manager->getThirdPartySetting.
+  $plugins = &drupal_static(__FUNCTION__);
+  if (empty($plugins)) {
+    $plugins = \Drupal::service('scheduler.manager')->getPluginEntityTypes();
+  }
+  if (in_array($entity_type, $plugins)) {
+    $config = \Drupal::config('scheduler.settings');
+    // @todo Get the entity object if $entity_type is a string.
+    $publishing_enabled = $entity_type->getThirdPartySetting('scheduler', 'publish_enable', $config->get('default_publish_enable'));
+    $unpublishing_enabled = $entity_type->getThirdPartySetting('scheduler', 'unpublish_enable', $config->get('default_unpublish_enable'));
+
+    if ($publishing_enabled) {
+      $targets['publish_on'] = [
+        'name' => t('Scheduler: publish on'),
+        'description' => t('The date when the Scheduler module will publish the content.'),
+        'callback' => 'scheduler_feeds_set_target',
+      ];
+    }
+    if ($unpublishing_enabled) {
+      $targets['unpublish_on'] = [
+        'name' => t('Scheduler: unpublish on'),
+        'description' => t('The date when the Scheduler module will unpublish the content.'),
+        'callback' => 'scheduler_feeds_set_target',
+      ];
+    }
+  }
+}
+
+/**
+ * Mapping callback for the Feeds module.
+ *
+ * @todo Port to Drupal 8.
+ *
+ * @see https://www.drupal.org/project/scheduler/issues/2651354
+ */
+function scheduler_feeds_set_target($source, $entity, $target, $value, $mapping) {
+  // We expect a string or integer, but can accommodate an array, by taking the
+  // first item. Use trim() so that a string of blanks is reduced to empty.
+  $value = is_array($value) ? trim(reset($value)) : trim($value);
+
+  // Convert input from parser to timestamp form. If $value is empty or blank
+  // then strtotime() must not be used, otherwise it returns the current time.
+  if (!empty($value) && !is_numeric($value)) {
+    if (!$timestamp = strtotime($value)) {
+      // Throw an exception if the date format was not recognized.
+      $mapping_source = $mapping['source'];
+      throw new FeedsValidationException("Value '$value' for '$mapping_source' could not be converted to a valid '$target' date.");
+    }
+  }
+  else {
+    $timestamp = $value;
+  }
+
+  // If the timestamp is valid, use it to set the target field in the entity.
+  if (is_numeric($timestamp)) {
+    $entity->$target = $timestamp;
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function scheduler_modules_installed($modules, $is_syncing) {
+  if ($is_syncing) {
+    // During config import a subset of the processing below is performed as an
+    // additional step. See scheduler_config_import_steps_alter().
+    return;
+  }
+  /** @var \Drupal\scheduler\SchedulerManager $scheduler_manager */
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $scheduler_manager->invalidatePluginCache();
+
+  // If there is a Scheduler plugin for a newly installed module then update
+  // the base tables by adding publish_on and unpublish_on for that entity type,
+  // and load/refresh the scheduled view. Third-party modules can provide
+  // Scheduler plugins for entity types that are not defined by that module, or
+  // that do not have the same id as the module name. Similarly, core modules
+  // define entity types for which Scheduler provides the plugin. Hence we need
+  // to check both the plugin entity type and the provider and if either of
+  // these match a module that is being installed we run the update functions.
+  $entity_types = [];
+  $plugin_definitions = $scheduler_manager->getPluginDefinitions();
+  foreach ($plugin_definitions as $definition) {
+    // If the plugin entity type, provider or dependency match any of the
+    // modules being installed then add the entity type to the list.
+    if (array_intersect([$definition['entityType'], $definition['provider'], $definition['dependency']], $modules)) {
+      $entity_types[] = $definition['entityType'];
+    }
+  }
+  if (!empty($entity_types)) {
+    // Add the database fields.
+    $scheduler_manager->entityUpdate();
+    // Load/refresh the scheduler view(s).
+    $scheduler_manager->viewsUpdate($entity_types);
+  }
+}
+
+/**
+ * Implements hook_cache_flush().
+ */
+function scheduler_cache_flush() {
+  \Drupal::service('scheduler.manager')->invalidatePluginCache();
+}
+
+/**
+ * Implements hook_migrate_prepare_row().
+ */
+function scheduler_migrate_prepare_row(Row $row, MigrateSourceInterface $source, MigrationInterface $migration) {
+  // getMigrationTags can return null for a custom migration, so skip these.
+  if (is_null($migration->getMigrationTags())) {
+    return;
+  }
+
+  // Process node type third-party-settings.
+  if (in_array('Scheduler Settings', $migration->getMigrationTags())) {
+    $scheduler_config_name = [
+      'scheduler_expand_fieldset_' . $row->getSourceProperty('type'),
+      'scheduler_publish_enable_' . $row->getSourceProperty('type'),
+      'scheduler_publish_past_date_' . $row->getSourceProperty('type'),
+      'scheduler_publish_required_' . $row->getSourceProperty('type'),
+      'scheduler_publish_revision_' . $row->getSourceProperty('type'),
+      'scheduler_publish_touch_' . $row->getSourceProperty('type'),
+      'scheduler_unpublish_enable_' . $row->getSourceProperty('type'),
+      'scheduler_unpublish_required_' . $row->getSourceProperty('type'),
+      'scheduler_unpublish_revision_' . $row->getSourceProperty('type'),
+      'scheduler_use_vertical_tabs_' . $row->getSourceProperty('type'),
+    ];
+    $query = $source->getDatabase()->select('variable', 'v')
+      ->fields('v', ['name', 'value'])
+      ->condition('name', $scheduler_config_name, 'IN');
+    $settings = $query->execute()->fetchAll();
+    $third_party_settings = [];
+    foreach ($settings as $setting) {
+      // Remove 'scheduler_' from the start and '_{type}' from the end to get
+      // the short config name from the full $setting->name.
+      $config_name = str_replace(
+        ['scheduler_', '_' . $row->getSourceProperty('type')],
+        ['', ''],
+        $setting->name
+      );
+      // Two third-party-settings have changed name or values, so convert these.
+      if ($config_name == 'use_vertical_tabs') {
+        if (unserialize($setting->value, ['allowed_classes' => FALSE]) == 1) {
+          $third_party_settings['fields_display_mode'] = 'vertical_tab';
+        }
+        else {
+          $third_party_settings['fields_display_mode'] = 'fieldset';
+        }
+      }
+      elseif ($config_name == 'expand_fieldset') {
+        if (unserialize($setting->value, ['allowed_classes' => FALSE]) == 1) {
+          $third_party_settings['expand_fieldset'] = 'always';
+        }
+        else {
+          $third_party_settings['expand_fieldset'] = 'when_required';
+        }
+      }
+      else {
+        // The remaining eight settings are exactly the same as in Drupal 7.
+        $third_party_settings[$config_name] = unserialize($setting->value, ['allowed_classes' => FALSE]);
+      }
+    }
+    $row->setSourceProperty('scheduler_third_party_settings', $third_party_settings);
+  }
+
+  // Process publish_on and unpublish_on dates.
+  if (in_array('Scheduler Data', $migration->getMigrationTags())) {
+    $database_connection = $source->getDatabase();
+    $result = $database_connection->select('scheduler', 's')
+      ->fields('s', ['publish_on', 'unpublish_on'])
+      ->condition('nid', $row->getSourceProperty('nid'))
+      ->execute()
+      ->fetch();
+    if ($result && $result->publish_on) {
+      $row->setSourceProperty('scheduler_publish_on', $result->publish_on);
+    }
+    if ($result && $result->unpublish_on) {
+      $row->setSourceProperty('scheduler_unpublish_on', $result->unpublish_on);
+    }
+  }
+}
+
+/**
+ * Implements hook_migration_plugins_alter().
+ */
+function scheduler_migration_plugins_alter(array &$migrations) {
+  $migration_plugin_manager = \Drupal::service('plugin.manager.migration');
+  // Create a stub migration with the variable source plugin.
+  // We cannot use MigrationDeriverTrait::getSourcePlugin() directly, because
+  // in PHP 8.1+ calling trait methods is deprecated.
+  // See \Drupal\migrate\Plugin\MigrationDeriverTrait::getSourcePlugin().
+  try {
+    $stub_migration = $migration_plugin_manager->createStubMigration([
+      'source' => [
+        'ignore_map' => TRUE,
+        'plugin' => 'variable',
+        'variables' => [],
+      ],
+      'idMap' => ['plugin' => 'null'],
+      'destination' => ['plugin' => 'null'],
+    ]);
+    // The 'variables' key in source is required (but can be empty) to avoid the
+    // following getSourcePlugin() failing with unknown index 'variables'.
+    $variable_source = $stub_migration->getSourcePlugin();
+    $variable_source->checkRequirements();
+  }
+  catch (RequirementsException $e) {
+    \Drupal::logger('scheduler')->notice('Scheduler settings cannot be migrated due to RequirementsException: %message, %requirements, line %line in %file', [
+      '%message' => $e->getMessage(),
+      '%requirements' => $e->getRequirementsString(),
+      '%line' => $e->getLine(),
+      '%file' => $e->getFile(),
+    ]);
+    return;
+  }
+  catch (PluginException $e) {
+    // The 'variable' source plugin isn't available because Migrate Drupal
+    // isn't enabled. There is nothing we can do.
+    return;
+  }
+  // Before migrating Scheduler, check if the module is enabled.
+  assert($variable_source instanceof DrupalSqlBase);
+  $scheduler_enabled = !empty($variable_source->getSystemData()['module']['scheduler']['status']);
+  if (!$scheduler_enabled) {
+    return;
+  }
+
+  $node_type_migrations = array_filter(
+    $migrations,
+    function ($definition) {
+      return $definition['id'] === 'd7_node_type';
+    }
+  );
+
+  foreach (array_keys($node_type_migrations) as $plugin_id) {
+    $migrations[$plugin_id]['process']['third_party_settings/scheduler'] = 'scheduler_third_party_settings';
+    $migrations[$plugin_id]['migration_tags'][] = 'Scheduler Settings';
+  }
+
+  $node_migrations = array_filter(
+    $migrations,
+    function ($definition) {
+      return $definition['id'] === 'd7_node_complete' || $definition['id'] === 'd7_node';
+    }
+  );
+
+  foreach (array_keys($node_migrations) as $plugin_id) {
+    $migrations[$plugin_id]['process']['publish_on'] = 'scheduler_publish_on';
+    $migrations[$plugin_id]['process']['unpublish_on'] = 'scheduler_unpublish_on';
+    $migrations[$plugin_id]['migration_tags'][] = 'Scheduler Data';
+  }
+
+}
+
+/**
+ * Implements hook_local_tasks_alter().
+ */
+function scheduler_local_tasks_alter(&$local_tasks) {
+  // If the default local tasks for the overviews are also provided by another
+  // module or by Core, then remove the ones added by Scheduler in
+  // src/Plugin/Derivative/DynamicLocalTasks. This is to avoid duplicate links
+  // if this core issue gets committed at some time.
+  // @see https://www.drupal.org/project/drupal/issues/3199682
+
+  // Get the list of routes to check.
+  $routes_to_check = \Drupal::service('scheduler.manager')->getCollectionRoutes();
+
+  // Find all the local tasks with the routes we are searching for and that have
+  // a parent_id. These will be the links that are potential duplicates.
+  $found = [];
+  foreach ($local_tasks as $key => $value) {
+    foreach ($routes_to_check as $route) {
+      if ($value['route_name'] == $route && !empty($value['parent_id'])) {
+        // Save the key of the $local_tasks array in a two level array, keyed on
+        // the route and the module that provided it.
+        $found[$route][$value['provider']] = $key;
+      }
+    }
+  }
+
+  // If there is more than one for any of the routes being checked then remove
+  // the route added by Scheduler.
+  foreach ($found as $route => $data) {
+    if (count($data) > 1) {
+      unset($local_tasks[$data['scheduler']]);
+      unset($data['scheduler']);
+    }
+    // We assume that the duplicates are only caused by Scheduler. Other modules
+    // could be causing more. If count($data) is still > 1 after the unset above
+    // then look at $data to find out which module is adding the route.
+    // @see https://www.drupal.org/project/scheduler/issues/3388029
+  }
+}
+
+/**
+ * Implements hook_config_import_steps_alter().
+ */
+function scheduler_config_import_steps_alter(&$sync_steps, ConfigImporter $config_importer) {
+  if (!in_array('scheduler', $config_importer->getExtensionChangelist('module', 'uninstall'))) {
+    $sync_steps[] = '_scheduler_config_import_process_entity_definitions';
+  }
+}
+
+/**
+ * Helper function to process the entity definitions updates.
+ */
+function _scheduler_config_import_process_entity_definitions(&$context, ConfigImporter $config_importer) {
+  // Allow the scheduler manager to update entity definitions accordingly.
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $scheduler_manager->entityUpdate();
+  $context['finished'] = 1;
+}

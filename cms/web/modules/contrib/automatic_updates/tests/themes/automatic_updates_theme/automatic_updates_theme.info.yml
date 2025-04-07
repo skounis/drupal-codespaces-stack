@@ -1,0 +1,10 @@
+name: Automatic Updates Theme
+type: theme
+description: 'Empty theme for tests.'
+package: Testing
+base theme: false
+
+# Information added by Drupal.org packaging script on 2025-01-13
+version: '3.1.7'
+project: 'automatic_updates'
+datestamp: 1736800616

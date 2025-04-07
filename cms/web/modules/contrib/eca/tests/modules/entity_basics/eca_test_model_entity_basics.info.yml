@@ -1,0 +1,21 @@
+name: 'ECA model test: Entity basics'
+type: module
+description: 'Support module for the ECA model tests.'
+package: Testing
+dependencies:
+  - drupal:node
+  - eca:eca_content
+  - eca:eca_user
+
+config_devel:
+  - eca.eca.eca_test_0004
+  - eca.model.eca_test_0004
+  - eca.eca.eca_test_0002
+  - eca.model.eca_test_0002
+  - eca.eca.eca_test_0003
+  - eca.model.eca_test_0003
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

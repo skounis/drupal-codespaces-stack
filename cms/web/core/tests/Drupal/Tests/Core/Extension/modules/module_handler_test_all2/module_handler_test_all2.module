@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Test module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Test function.
+ */
+function module_handler_test_all2_hook($arg) {
+  return $arg;
+}
+
+/**
+ * Hook implementation, without hook implements doxygen to avoid conversion.
+ */
+function module_handler_test_all2_order1(): void {
+}
+
+/**
+ * Hook implementation, without hook implements doxygen to avoid conversion.
+ */
+function module_handler_test_all2_order2(): void {
+}

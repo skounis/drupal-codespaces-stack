@@ -1,0 +1,401 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
+use Drupal\Core\Site\Settings;
+use Drupal\update\UpdateFetcherInterface;
+use Drupal\update\UpdateManagerInterface;
+
+/**
+ * Resolves if the current user can access updater menu items.
+ *
+ * It both enforces the 'administer software updates' permission and the global
+ * kill switch for the authorize.php script.
+ *
+ * @return bool
+ *   TRUE if the current user can access the updater menu items; FALSE
+ *   otherwise.
+ */
+function _update_manager_access() {
+  return Settings::get('allow_authorize_operations', TRUE) && \Drupal::currentUser()->hasPermission('administer software updates');
+}
+
+/**
+ * Returns a warning message when there is no data about available updates.
+ */
+function _update_no_data() {
+  $destination = \Drupal::destination()->getAsArray();
+  return t('No update information available. <a href=":run_cron">Run cron</a> or <a href=":check_manually">check manually</a>.', [
+    ':run_cron' => Url::fromRoute('system.run_cron', [], ['query' => $destination])->toString(),
+    ':check_manually' => Url::fromRoute('update.manual_status', [], ['query' => $destination])->toString(),
+  ]);
+}
+
+/**
+ * Tries to get update information and refreshes it when necessary.
+ *
+ * In addition to checking the lifetime, this function also ensures that there
+ * are no .info.yml files for installed modules or themes that have a newer
+ * modification timestamp than the last time we checked for available update
+ * data. If any .info.yml file was modified, it almost certainly means a new
+ * version of something was installed. Without fresh available update data, the
+ * logic in update_calculate_project_data() will be wrong and produce confusing,
+ * bogus results.
+ *
+ * @param $refresh
+ *   (optional) Boolean to indicate if this method should refresh automatically
+ *   if there's no data. Defaults to FALSE.
+ *
+ * @return array
+ *   Array of data about available releases, keyed by project shortname.
+ *
+ * @see update_refresh()
+ * @see \Drupal\update\UpdateManager::getProjects()
+ */
+function update_get_available($refresh = FALSE) {
+  \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.compare');
+  $needs_refresh = FALSE;
+
+  // Grab whatever data we currently have.
+  $available = \Drupal::keyValueExpirable('update_available_releases')->getAll();
+  $projects = \Drupal::service('update.manager')->getProjects();
+  foreach ($projects as $key => $project) {
+    // If there's no data at all, we clearly need to fetch some.
+    if (empty($available[$key])) {
+      // update_create_fetch_task($project);
+      \Drupal::service('update.processor')->createFetchTask($project);
+      $needs_refresh = TRUE;
+      continue;
+    }
+
+    // See if the .info.yml file is newer than the last time we checked for
+    // data, and if so, mark this project's data as needing to be re-fetched.
+    // Any time an admin upgrades their local installation, the .info.yml file
+    // will be changed, so this is the only way we can be sure we're not showing
+    // bogus information right after they upgrade.
+    if ($project['info']['_info_file_ctime'] > $available[$key]['last_fetch']) {
+      $available[$key]['fetch_status'] = UpdateFetcherInterface::FETCH_PENDING;
+    }
+
+    // If we have project data but no release data, we need to fetch. This
+    // can be triggered when we fail to contact a release history server.
+    if (empty($available[$key]['releases']) && !$available[$key]['last_fetch']) {
+      $available[$key]['fetch_status'] = UpdateFetcherInterface::FETCH_PENDING;
+    }
+
+    // If we think this project needs to fetch, actually create the task now
+    // and remember that we think we're missing some data.
+    if (!empty($available[$key]['fetch_status']) && $available[$key]['fetch_status'] == UpdateFetcherInterface::FETCH_PENDING) {
+      \Drupal::service('update.processor')->createFetchTask($project);
+      $needs_refresh = TRUE;
+    }
+  }
+
+  if ($needs_refresh && $refresh) {
+    // Attempt to drain the queue of fetch tasks.
+    update_fetch_data();
+    // After processing the queue, we've (hopefully) got better data, so pull
+    // the latest data again and use that directly.
+    $available = \Drupal::keyValueExpirable('update_available_releases')->getAll();
+  }
+
+  return $available;
+}
+
+/**
+ * Adds a task to the queue for fetching release history data for a project.
+ *
+ * We only create a new fetch task if there's no task already in the queue for
+ * this particular project (based on 'update_fetch_task' key-value collection).
+ *
+ * @param $project
+ *   Associative array of information about a project as created by
+ *   \Drupal\update\UpdateManager::getProjects(), including keys such as 'name'
+ *   (short name), and the 'info' array with data from a .info.yml file for the
+ *   project.
+ *
+ * @see \Drupal\update\UpdateFetcher::createFetchTask()
+ */
+function update_create_fetch_task($project) {
+  \Drupal::service('update.processor')->createFetchTask($project);
+}
+
+/**
+ * Refreshes the release data after loading the necessary include file.
+ */
+function update_refresh() {
+  \Drupal::service('update.manager')->refreshUpdateData();
+}
+
+/**
+ * Attempts to fetch update data after loading the necessary include file.
+ *
+ * @see \Drupal\update\UpdateProcessor::fetchData()
+ */
+function update_fetch_data() {
+  \Drupal::service('update.processor')->fetchData();
+}
+
+/**
+ * Batch callback: Performs actions when all fetch tasks have been completed.
+ *
+ * @param $success
+ *   TRUE if the batch operation was successful; FALSE if there were errors.
+ * @param $results
+ *   An associative array of results from the batch operation, including the key
+ *   'updated' which holds the total number of projects we fetched available
+ *   update data for.
+ */
+function update_fetch_data_finished($success, $results) {
+  if ($success) {
+    if (!empty($results)) {
+      if (!empty($results['updated'])) {
+        \Drupal::messenger()->addStatus(\Drupal::translation()->formatPlural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
+      }
+      if (!empty($results['failures'])) {
+        \Drupal::messenger()->addError(\Drupal::translation()->formatPlural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'));
+      }
+    }
+  }
+  else {
+    \Drupal::messenger()->addError(t('An error occurred trying to get available update data.'), 'error');
+  }
+}
+
+/**
+ * Returns the appropriate message text when site is out of date or not secure.
+ *
+ * These error messages are shared by both update_requirements() for the
+ * site-wide status report at admin/reports/status and in the body of the
+ * notification email messages generated by update_cron().
+ *
+ * @param $msg_type
+ *   String to indicate what kind of message to generate. Can be either 'core'
+ *   or 'contrib'.
+ * @param $msg_reason
+ *   Integer constant specifying why message is generated.
+ * @param $langcode
+ *   (optional) A language code to use. Defaults to NULL.
+ *
+ * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+ *   The properly translated error message for the given key.
+ */
+function _update_message_text($msg_type, $msg_reason, $langcode = NULL) {
+  $text = '';
+  switch ($msg_reason) {
+    case UpdateManagerInterface::NOT_SECURE:
+      if ($msg_type == 'core') {
+        $text = t('There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!', [], ['langcode' => $langcode]);
+      }
+      else {
+        $text = t('There are security updates available for one or more of your modules or themes. To ensure the security of your server, you should update immediately!', [], ['langcode' => $langcode]);
+      }
+      break;
+
+    case UpdateManagerInterface::REVOKED:
+      if ($msg_type == 'core') {
+        $text = t('Your version of Drupal has been revoked and is no longer available for download. Upgrading is strongly recommended!', [], ['langcode' => $langcode]);
+      }
+      else {
+        $text = t('The installed version of at least one of your modules or themes has been revoked and is no longer available for download. Upgrading or uninstalling is strongly recommended!', [], ['langcode' => $langcode]);
+      }
+      break;
+
+    case UpdateManagerInterface::NOT_SUPPORTED:
+      if ($msg_type == 'core') {
+        $text = t('Your version of Drupal is no longer supported. Upgrading is strongly recommended!', [], ['langcode' => $langcode]);
+      }
+      else {
+        $text = t('The installed version of at least one of your modules or themes is no longer supported. Upgrading or uninstalling is strongly recommended. See the project homepage for more details.', [], ['langcode' => $langcode]);
+      }
+      break;
+
+    case UpdateManagerInterface::NOT_CURRENT:
+      if ($msg_type == 'core') {
+        $text = t('There are updates available for your version of Drupal. To ensure the proper functioning of your site, you should update as soon as possible.', [], ['langcode' => $langcode]);
+      }
+      else {
+        $text = t('There are updates available for one or more of your modules or themes. To ensure the proper functioning of your site, you should update as soon as possible.', [], ['langcode' => $langcode]);
+      }
+      break;
+
+    case UpdateFetcherInterface::UNKNOWN:
+    case UpdateFetcherInterface::NOT_CHECKED:
+    case UpdateFetcherInterface::NOT_FETCHED:
+    case UpdateFetcherInterface::FETCH_PENDING:
+      if ($msg_type == 'core') {
+        $text = t('There was a problem checking <a href=":update-report">available updates</a> for Drupal.', [':update-report' => Url::fromRoute('update.status')->toString()], ['langcode' => $langcode]);
+      }
+      else {
+        $text = t('There was a problem checking <a href=":update-report">available updates</a> for your modules or themes.', [':update-report' => Url::fromRoute('update.status')->toString()], ['langcode' => $langcode]);
+      }
+      break;
+  }
+
+  return $text;
+}
+
+/**
+ * Orders projects based on their status.
+ *
+ * Callback for uasort() within update_requirements().
+ */
+function _update_project_status_sort($a, $b) {
+  // The status constants are numerically in the right order, so we can
+  // usually subtract the two to compare in the order we want. However,
+  // negative status values should be treated as if they are huge, since we
+  // always want them at the bottom of the list.
+  $a_status = $a['status'] > 0 ? $a['status'] : (-10 * $a['status']);
+  $b_status = $b['status'] > 0 ? $b['status'] : (-10 * $b['status']);
+  return $a_status - $b_status;
+}
+
+/**
+ * Prepares variables for last time update data was checked templates.
+ *
+ * Default template: update-last-check.html.twig.
+ *
+ * In addition to properly formatting the given timestamp, this function also
+ * provides a "Check manually" link that refreshes the available update and
+ * redirects back to the same page.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - last: The timestamp when the site last checked for available updates.
+ *
+ * @see theme_update_report()
+ */
+function template_preprocess_update_last_check(&$variables): void {
+  $variables['time'] = \Drupal::service('date.formatter')->formatTimeDiffSince($variables['last']);
+  $variables['link'] = Link::fromTextAndUrl(t('Check manually'), Url::fromRoute('update.manual_status', [], ['query' => \Drupal::destination()->getAsArray()]))->toString();
+}
+
+/**
+ * Invalidates stored data relating to update status.
+ */
+function update_storage_clear() {
+  \Drupal::keyValueExpirable('update')->deleteAll();
+  \Drupal::keyValueExpirable('update_available_release')->deleteAll();
+}
+
+/**
+ * Returns a short unique identifier for this Drupal installation.
+ *
+ * @return string
+ *   An eight character string uniquely identifying this Drupal installation.
+ */
+function _update_manager_unique_identifier() {
+  static $id;
+  if (!isset($id)) {
+    $id = substr(hash('sha256', Settings::getHashSalt()), 0, 8);
+  }
+  return $id;
+}
+
+/**
+ * Returns the directory where update archive files should be extracted.
+ *
+ * @param $create
+ *   (optional) Whether to attempt to create the directory if it does not
+ *   already exist. Defaults to TRUE.
+ *
+ * @return string
+ *   The full path to the temporary directory where update file archives should
+ *   be extracted.
+ */
+function _update_manager_extract_directory($create = TRUE) {
+  static $directory;
+  if (!isset($directory)) {
+    $directory = 'temporary://update-extraction-' . _update_manager_unique_identifier();
+    if ($create && !file_exists($directory)) {
+      mkdir($directory);
+    }
+  }
+  return $directory;
+}
+
+/**
+ * Returns the directory where update archive files should be cached.
+ *
+ * @param $create
+ *   (optional) Whether to attempt to create the directory if it does not
+ *   already exist. Defaults to TRUE.
+ *
+ * @return string
+ *   The full path to the temporary directory where update file archives should
+ *   be cached.
+ */
+function _update_manager_cache_directory($create = TRUE) {
+  static $directory;
+  if (!isset($directory)) {
+    $directory = 'temporary://update-cache-' . _update_manager_unique_identifier();
+    if ($create && !file_exists($directory)) {
+      mkdir($directory);
+    }
+  }
+  return $directory;
+}
+
+/**
+ * Clears the temporary files and directories based on file age from disk.
+ */
+function update_clear_update_disk_cache() {
+  // List of update module cache directories. Do not create the directories if
+  // they do not exist.
+  $directories = [
+    _update_manager_cache_directory(FALSE),
+    _update_manager_extract_directory(FALSE),
+  ];
+
+  // Search for files and directories in base folder only without recursion.
+  foreach ($directories as $directory) {
+    if (is_dir($directory)) {
+      \Drupal::service('file_system')->scanDirectory($directory, '/.*/', ['callback' => 'update_delete_file_if_stale', 'recurse' => FALSE]);
+    }
+  }
+}
+
+/**
+ * Deletes stale files and directories from the update manager disk cache.
+ *
+ * Files and directories older than 6 hours and development snapshots older than
+ * 5 minutes are considered stale. We only cache development snapshots for 5
+ * minutes since otherwise updated snapshots might not be downloaded as
+ * expected.
+ *
+ * When checking file ages, we need to use the ctime, not the mtime
+ * (modification time) since many (all?) tar implementations go out of their way
+ * to set the mtime on the files they create to the timestamps recorded in the
+ * tarball. We want to see the last time the file was changed on disk, which is
+ * left alone by tar and correctly set to the time the archive file was
+ * unpacked.
+ *
+ * @param $path
+ *   A string containing a file path or (streamwrapper) URI.
+ *
+ * @return bool
+ *   TRUE if the file is stale and deleted successfully, FALSE otherwise.
+ */
+function update_delete_file_if_stale($path) {
+  if (file_exists($path)) {
+    $filectime = filectime($path);
+    $max_age = \Drupal::config('system.file')->get('temporary_maximum_age');
+    $request_time = \Drupal::time()->getRequestTime();
+    if ($request_time - $filectime > $max_age || (preg_match('/.*-dev\.(tar\.gz|zip)/i', $path) && $request_time - $filectime > 300)) {
+      try {
+        \Drupal::service('file_system')->deleteRecursive($path);
+        return TRUE;
+      }
+      catch (FileException) {
+        // Ignore failed deletes.
+      }
+    }
+  }
+
+  return FALSE;
+}

@@ -1,0 +1,16 @@
+id: focal_point_settings
+label: Focal Point Settings
+migration_tags:
+  - Drupal 7
+  - Configuration
+source:
+  plugin: md_empty
+  source_module: focal_point
+  constants:
+    entity_type: 'file'
+    crop_type: 'focal_point'
+process:
+  crop_type: 'constants/crop_type'
+destination:
+  plugin: config
+  config_name: 'focal_point.settings'

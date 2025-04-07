@@ -1,0 +1,22 @@
+/**
+ * @file
+ * Styles for project type.
+ */
+
+.field--name-field-project__client-logo {
+  margin-bottom: var(--sp2);
+}
+
+.field--name-field-project__client-name {
+  color: var(--color-text-neutral-medium);
+}
+
+.field--name-field-project__client-link a {
+  margin-block: 0;
+}
+
+.node--type-project {
+  .field--name-field-content {
+    margin-bottom: var(--sp3);
+  }
+}

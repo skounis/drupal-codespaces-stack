@@ -1,0 +1,19 @@
+services:
+  project_browser_test.drupalorg_client_middleware:
+    class: Drupal\project_browser_test\DrupalOrgClientMiddleware
+    tags:
+      - { name: http_client_middleware }
+    arguments: ['@module_handler', '@state']
+  Drupal\project_browser_test\TestActivator:
+    autowire: true
+    public: false
+    tags:
+      - { name: project_browser.activator, priority: 1000 }
+  Drupal\project_browser_test\Extension\TestModuleInstaller:
+    decorates: 'module_installer'
+    public: false
+    arguments:
+      - '@.inner'
+  Drupal\project_browser_test\TestUninstallValidator:
+    tags:
+      - { name: module_install.uninstall_validator }

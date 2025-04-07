@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+
+  simple_sitemap.views:
+    class: Drupal\simple_sitemap_views\SimpleSitemapViews
+  Drupal\simple_sitemap_views\SimpleSitemapViews: '@simple_sitemap.views'
+
+  simple_sitemap.views.argument_collector:
+    class: Drupal\simple_sitemap_views\EventSubscriber\ArgumentCollector
+    tags:
+      - {name: 'event_subscriber'}

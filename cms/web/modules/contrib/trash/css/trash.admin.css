@@ -1,0 +1,15 @@
+/**
+ * @file
+ * Visual styles for the Trash Admin UI.
+ */
+
+/**
+ * Indent bundle selection.
+ */
+.trash--bundles.fieldset {
+  margin-left: 2em; /* LTR */
+}
+[dir="rtl"] .trash--bundles.fieldset {
+  margin-right: 2em;
+  margin-left: 0;
+}

@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementation for Automatic Updates Extensions Test.
+ */
+
+/**
+ * Implements hook_update_status_alter().
+ */
+function automatic_updates_extensions_test_update_status_alter(&$projects) {
+  if (\Drupal::state()->get('testUninstallableRelease') && !empty($projects['semver_test'])) {
+    $projects['semver_test']['recommended'] = $projects['semver_test']['existing_version'];
+  }
+}

@@ -1,0 +1,15 @@
+services:
+  automatic_updates_test.checker:
+    class: Drupal\automatic_updates_test\EventSubscriber\TestSubscriber1
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@state']
+  automatic_updates_test.request.time:
+    class: Drupal\automatic_updates_test\EventSubscriber\RequestTimeRecorder
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@state', '@datetime.time']
+  automatic_updates_test.time:
+    class: Drupal\automatic_updates_test\Datetime\TestTime
+    decorates: datetime.time
+    arguments: ['@automatic_updates_test.time.inner','@request_stack']

@@ -1,0 +1,7 @@
+node.type.*.third_party.search_api_exclude:
+  type: mapping
+  label: 'Per-content type search api exclude setting'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enabled'

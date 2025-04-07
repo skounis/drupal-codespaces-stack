@@ -1,0 +1,8 @@
+ai_provider_anthropic.settings_form:
+  path: '/admin/config/ai/providers/anthropic'
+  defaults:
+    _form: '\Drupal\ai_provider_anthropic\Form\AnthropicConfigForm'
+    _title: 'Setup Anthropic Authentication'
+  requirements:
+    _permission: 'administer ai providers'
+

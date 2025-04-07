@@ -1,0 +1,37 @@
+{
+  "name": "drupal/editoria11y",
+  "description": "Editoria11y (\"editorial accessibility\") is a user-friendly accessibility checker.",
+  "type": "drupal-module",
+  "homepage": "https://drupal.org/project/editoria11y",
+  "authors": [
+    {
+      "name": "John Jameson",
+      "homepage": "https://www.drupal.org/u/itmaybejj",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Brian Osborne",
+      "homepage": "https://www.drupal.org/u/bkosborne",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Jason Partyka",
+      "homepage": "https://www.drupal.org/u/partyka",
+      "role": "Maintainer"
+    },
+    {
+      "name": "See other contributors",
+      "homepage": "https://www.drupal.org/node/3187132/committers",
+      "role": "contributor"
+    }
+  ],
+  "support": {
+    "issues": "https://drupal.org/project/issues/editoria11y",
+    "source": "https://git.drupalcode.org/project/editoria11y"
+  },
+  "conflict": {
+    "drupal/csp": "<1.24"
+  },
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev"
+}

@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * For use in Project Browser tests.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Asset\AttachedAssetsInterface;
+
+/**
+ * Implements hook_js_settings_alter().
+ */
+function project_browser_test_js_settings_alter(array &$settings, AttachedAssetsInterface $assets): void {
+  // For testing purposes, trick Project Browser into thinking Pinky and The
+  // Brain has been downloaded but not installed.
+  $settings['project_browser']['modules']['pinky_brain'] = 0;
+}
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function project_browser_test_config_schema_info_alter(array &$definitions): void {
+  $definitions['block.settings.project_browser_block:*']['mapping']['simulate_preview'] = [
+    'type' => 'boolean',
+    'label' => 'Whether to simulate preview mode',
+  ];
+}

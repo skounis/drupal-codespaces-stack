@@ -1,0 +1,10 @@
+{
+  "name": "drupal/friendly_captcha_challenge",
+  "description": "TBD",
+  "type": "drupal-library",
+  "homepage": "https://github.com/FriendlyCaptcha/friendly-challenge",
+  "license": "MIT",
+  "extra": {
+    "installer-name": "friendly-challenge"
+  }
+}

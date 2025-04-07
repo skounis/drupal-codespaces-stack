@@ -1,0 +1,326 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Form\SubformState;
+use Drupal\editor\Entity\Editor;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\filter\FilterFormatInterface;
+use Drupal\filter\Plugin\FilterInterface;
+use Drupal\text\Plugin\Field\FieldType\TextItemBase;
+
+/**
+ * Button submit handler for filter_format_form()'s 'editor_configure' button.
+ */
+function editor_form_filter_admin_format_editor_configure($form, FormStateInterface $form_state) {
+  $editor = $form_state->get('editor');
+  $editor_value = $form_state->getValue(['editor', 'editor']);
+  if ($editor_value !== NULL) {
+    if ($editor_value === '') {
+      $form_state->set('editor', FALSE);
+      $form_state->set('editor_plugin', NULL);
+    }
+    elseif (empty($editor) || $editor_value !== $editor->getEditor()) {
+      $format = $form_state->getFormObject()->getEntity();
+      $editor = Editor::create([
+        'format' => $format->isNew() ? NULL : $format->id(),
+        'editor' => $editor_value,
+        'image_upload' => [
+          'status' => FALSE,
+        ],
+      ]);
+      $form_state->set('editor', $editor);
+    }
+  }
+  $form_state->setRebuild();
+}
+
+/**
+ * AJAX callback handler for filter_format_form().
+ */
+function editor_form_filter_admin_form_ajax($form, FormStateInterface $form_state) {
+  return $form['editor']['settings'];
+}
+
+/**
+ * Additional validate handler for filter_format_form().
+ */
+function editor_form_filter_admin_format_validate($form, FormStateInterface $form_state) {
+  $editor_set = $form_state->getValue(['editor', 'editor']) !== "";
+  $subform_array_exists = (!empty($form['editor']['settings']['subform']) && is_array($form['editor']['settings']['subform']));
+  if ($editor_set && $subform_array_exists && $editor_plugin = $form_state->get('editor_plugin')) {
+    $subform_state = SubformState::createForSubform($form['editor']['settings']['subform'], $form, $form_state);
+    $editor_plugin->validateConfigurationForm($form['editor']['settings']['subform'], $subform_state);
+  }
+
+  // This validate handler is not applicable when using the 'Configure' button.
+  if ($form_state->getTriggeringElement()['#name'] === 'editor_configure') {
+    return;
+  }
+
+  // When using this form with JavaScript disabled in the browser, the
+  // 'Configure' button won't be clicked automatically. So, when the user has
+  // selected a text editor and has then clicked 'Save configuration', we should
+  // point out that the user must still configure the text editor.
+  if ($form_state->getValue(['editor', 'editor']) !== '' && !$form_state->get('editor')) {
+    $form_state->setErrorByName('editor][editor', t('You must configure the selected text editor.'));
+  }
+}
+
+/**
+ * Additional submit handler for filter_format_form().
+ */
+function editor_form_filter_admin_format_submit($form, FormStateInterface $form_state) {
+  // Delete the existing editor if disabling or switching between editors.
+  $format = $form_state->getFormObject()->getEntity();
+  $format_id = $format->isNew() ? NULL : $format->id();
+  $original_editor = editor_load($format_id);
+  if ($original_editor && $original_editor->getEditor() != $form_state->getValue(['editor', 'editor'])) {
+    $original_editor->delete();
+  }
+
+  $editor_set = $form_state->getValue(['editor', 'editor']) !== "";
+  $subform_array_exists = (!empty($form['editor']['settings']['subform']) && is_array($form['editor']['settings']['subform']));
+  if (($editor_plugin = $form_state->get('editor_plugin')) && $editor_set && $subform_array_exists) {
+    $subform_state = SubformState::createForSubform($form['editor']['settings']['subform'], $form, $form_state);
+    $editor_plugin->submitConfigurationForm($form['editor']['settings']['subform'], $subform_state);
+  }
+
+  // Create a new editor or update the existing editor.
+  if ($editor = $form_state->get('editor')) {
+    // Ensure the text format is set: when creating a new text format, this
+    // would equal the empty string.
+    $editor->set('format', $format_id);
+    if ($settings = $form_state->getValue(['editor', 'settings'])) {
+      $editor->setSettings($settings);
+    }
+    // When image uploads are disabled (status = FALSE), the schema for image
+    // upload settings does not allow other keys to be present.
+    // @see editor.image_upload_settings.*
+    // @see editor.image_upload_settings.1
+    // @see editor.schema.yml
+    $image_upload_settings = $editor->getImageUploadSettings();
+    if (!$image_upload_settings['status']) {
+      $editor->setImageUploadSettings(['status' => FALSE]);
+    }
+    $editor->save();
+  }
+}
+
+/**
+ * Loads an individual configured text editor based on text format ID.
+ *
+ * @param int $format_id
+ *   A text format ID.
+ *
+ * @return \Drupal\editor\Entity\Editor|null
+ *   A text editor object, or NULL.
+ */
+function editor_load($format_id) {
+  // Load all the editors at once here, assuming that either no editors or more
+  // than one editor will be needed on a page (such as having multiple text
+  // formats for administrators). Loading a small number of editors all at once
+  // is more efficient than loading multiple editors individually.
+  $editors = Editor::loadMultiple();
+  return $editors[$format_id] ?? NULL;
+}
+
+/**
+ * Applies text editor XSS filtering.
+ *
+ * @param string $html
+ *   The HTML string that will be passed to the text editor.
+ * @param \Drupal\filter\FilterFormatInterface|null $format
+ *   The text format whose text editor will be used or NULL if the previously
+ *   defined text format is now disabled.
+ * @param \Drupal\filter\FilterFormatInterface|null $original_format
+ *   (optional) The original text format (i.e. when switching text formats,
+ *   $format is the text format that is going to be used, $original_format is
+ *   the one that was being used initially, the one that is stored in the
+ *   database when editing).
+ *
+ * @return string|false
+ *   The XSS filtered string or FALSE when no XSS filtering needs to be applied,
+ *   because one of the next conditions might occur:
+ *   - No text editor is associated with the text format,
+ *   - The previously defined text format is now disabled,
+ *   - The text editor is safe from XSS,
+ *   - The text format does not use any XSS protection filters.
+ *
+ * @see https://www.drupal.org/node/2099741
+ */
+function editor_filter_xss($html, ?FilterFormatInterface $format = NULL, ?FilterFormatInterface $original_format = NULL) {
+  $editor = $format ? editor_load($format->id()) : NULL;
+
+  // If no text editor is associated with this text format or the previously
+  // defined text format is now disabled, then we don't need text editor XSS
+  // filtering either.
+  if (!isset($editor)) {
+    return FALSE;
+  }
+
+  // If the text editor associated with this text format guarantees security,
+  // then we also don't need text editor XSS filtering.
+  $definition = \Drupal::service('plugin.manager.editor')->getDefinition($editor->getEditor());
+  if ($definition['is_xss_safe'] === TRUE) {
+    return FALSE;
+  }
+
+  // If there is no filter preventing XSS attacks in the text format being used,
+  // then no text editor XSS filtering is needed either. (Because then the
+  // editing user can already be attacked by merely viewing the content.)
+  // e.g.: an admin user creates content in Full HTML and then edits it, no text
+  // format switching happens; in this case, no text editor XSS filtering is
+  // desirable, because it would strip style attributes, amongst others.
+  $current_filter_types = $format->getFilterTypes();
+  if (!in_array(FilterInterface::TYPE_HTML_RESTRICTOR, $current_filter_types, TRUE)) {
+    if ($original_format === NULL) {
+      return FALSE;
+    }
+    // Unless we are switching from another text format, in which case we must
+    // first check whether a filter preventing XSS attacks is used in that text
+    // format, and if so, we must still apply XSS filtering.
+    // e.g.: an anonymous user creates content in Restricted HTML, an admin user
+    // edits it (then no XSS filtering is applied because no text editor is
+    // used), and switches to Full HTML (for which a text editor is used). Then
+    // we must apply XSS filtering to protect the admin user.
+    else {
+      $original_filter_types = $original_format->getFilterTypes();
+      if (!in_array(FilterInterface::TYPE_HTML_RESTRICTOR, $original_filter_types, TRUE)) {
+        return FALSE;
+      }
+    }
+  }
+
+  // Otherwise, apply the text editor XSS filter. We use the default one unless
+  // a module tells us to use a different one.
+  $editor_xss_filter_class = '\Drupal\editor\EditorXssFilter\Standard';
+  \Drupal::moduleHandler()->alter('editor_xss_filter', $editor_xss_filter_class, $format, $original_format);
+
+  return call_user_func($editor_xss_filter_class . '::filterXss', $html, $format, $original_format);
+}
+
+/**
+ * Records file usage of files referenced by formatted text fields.
+ *
+ * Every referenced file that is temporally saved will be resaved as permanent.
+ *
+ * @param array $uuids
+ *   An array of file entity UUIDs.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   An entity whose fields to inspect for file references.
+ */
+function _editor_record_file_usage(array $uuids, EntityInterface $entity) {
+  foreach ($uuids as $uuid) {
+    if ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid)) {
+      /** @var \Drupal\file\FileInterface $file */
+      if ($file->isTemporary()) {
+        $file->setPermanent();
+        $file->save();
+      }
+      \Drupal::service('file.usage')->add($file, 'editor', $entity->getEntityTypeId(), $entity->id());
+    }
+  }
+}
+
+/**
+ * Deletes file usage of files referenced by formatted text fields.
+ *
+ * @param array $uuids
+ *   An array of file entity UUIDs.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   An entity whose fields to inspect for file references.
+ * @param $count
+ *   The number of references to delete. Should be 1 when deleting a single
+ *   revision and 0 when deleting an entity entirely.
+ *
+ * @see \Drupal\file\FileUsage\FileUsageInterface::delete()
+ */
+function _editor_delete_file_usage(array $uuids, EntityInterface $entity, $count) {
+  foreach ($uuids as $uuid) {
+    if ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid)) {
+      \Drupal::service('file.usage')->delete($file, 'editor', $entity->getEntityTypeId(), $entity->id(), $count);
+    }
+  }
+}
+
+/**
+ * Finds all files referenced (data-entity-uuid) by formatted text fields.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   An entity whose fields to analyze.
+ *
+ * @return array
+ *   An array of file entity UUIDs.
+ */
+function _editor_get_file_uuids_by_field(EntityInterface $entity) {
+  $uuids = [];
+
+  $formatted_text_fields = _editor_get_formatted_text_fields($entity);
+  foreach ($formatted_text_fields as $formatted_text_field) {
+    $text = '';
+    $field_items = $entity->get($formatted_text_field);
+    foreach ($field_items as $field_item) {
+      $text .= $field_item->value;
+      if ($field_item->getFieldDefinition()->getType() == 'text_with_summary') {
+        $text .= $field_item->summary;
+      }
+    }
+    $uuids[$formatted_text_field] = _editor_parse_file_uuids($text);
+  }
+  return $uuids;
+}
+
+/**
+ * Determines the formatted text fields on an entity.
+ *
+ * A field type is considered to provide formatted text if its class is a
+ * subclass of Drupal\text\Plugin\Field\FieldType\TextItemBase.
+ *
+ * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+ *   An entity whose fields to analyze.
+ *
+ * @return array
+ *   The names of the fields on this entity that support formatted text.
+ */
+function _editor_get_formatted_text_fields(FieldableEntityInterface $entity) {
+  $field_definitions = $entity->getFieldDefinitions();
+  if (empty($field_definitions)) {
+    return [];
+  }
+
+  // Only return formatted text fields.
+  // @todo improve as part of https://www.drupal.org/node/2732429
+  $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+  return array_keys(array_filter($field_definitions, function (FieldDefinitionInterface $definition) use ($field_type_manager) {
+    $type = $definition->getType();
+    $plugin_class = $field_type_manager->getPluginClass($type);
+    return is_subclass_of($plugin_class, TextItemBase::class);
+  }));
+}
+
+/**
+ * Parse an HTML snippet for any linked file with data-entity-uuid attributes.
+ *
+ * @param string $text
+ *   The partial (X)HTML snippet to load. Invalid markup will be corrected on
+ *   import.
+ *
+ * @return array
+ *   An array of all found UUIDs.
+ */
+function _editor_parse_file_uuids($text) {
+  $dom = Html::load($text);
+  $xpath = new \DOMXPath($dom);
+  $uuids = [];
+  foreach ($xpath->query('//*[@data-entity-type="file" and @data-entity-uuid]') as $node) {
+    $uuids[] = $node->getAttribute('data-entity-uuid');
+  }
+  return $uuids;
+}

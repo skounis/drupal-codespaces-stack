@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * Theme implementation to display the front page content in the sitemap.
+ *
+ * Available variables:
+ * - text: The text for the front page link.
+ * - url: The URL for the front page.
+ * - feed: The URL for the site's feed, if provided.
+ * - feed_icon: The icon to display for the RSS feed's link.
+ *
+ * @see template_preprocess_sitemap_frontpage_item()
+ */
+#}
+{% if url %}<a href="{{ url }}">{% endif %}{{ text }}{% if url %}</a>{% endif %} {% if feed and feed_icon %}<a href="{{ feed }}">{{ feed_icon }}</a>{% endif %}

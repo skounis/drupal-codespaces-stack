@@ -1,0 +1,10 @@
+search_api_autocomplete:
+  js:
+    js/search_api_autocomplete.js: {}
+  css:
+    theme:
+      css/search_api_autocomplete.css: {}
+  dependencies:
+    - core/drupal.autocomplete
+    - core/jquery
+    - core/once

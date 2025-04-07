@@ -1,0 +1,72 @@
+{
+	"country_code": "CL",
+	"subdivisions": {
+		"AN": {
+			"name": "Antofagasta",
+			"has_children": true
+		},
+		"AR": {
+			"name": "Araucanía",
+			"has_children": true
+		},
+		"AP": {
+			"name": "Arica y Parinacota",
+			"has_children": true
+		},
+		"AT": {
+			"name": "Atacama",
+			"has_children": true
+		},
+		"AI": {
+			"code": "Aysén",
+			"name": "Aysén del General Carlos Ibáñez del Campo",
+			"has_children": true
+		},
+		"BI": {
+			"name": "Biobío",
+			"has_children": true
+		},
+		"CO": {
+			"name": "Coquimbo",
+			"has_children": true
+		},
+		"LI": {
+			"code": "O'Higgins",
+			"name": "Libertador General Bernardo O'Higgins",
+			"has_children": true
+		},
+		"LL": {
+			"name": "Los Lagos",
+			"has_children": true
+		},
+		"LR": {
+			"name": "Los Ríos",
+			"has_children": true
+		},
+		"MA": {
+			"code": "Magallanes",
+			"name": "Magallanes y de la Antártica Chilena",
+			"has_children": true
+		},
+		"ML": {
+			"name": "Maule",
+			"has_children": true
+		},
+		"RM": {
+			"code": "Región Metropolitana",
+			"name": "Metropolitana de Santiago",
+			"has_children": true
+		},
+		"NB": {
+			"name": "Ñuble"
+		},
+		"TA": {
+			"name": "Tarapacá",
+			"has_children": true
+		},
+		"VS": {
+			"name": "Valparaíso",
+			"has_children": true
+		}
+	}
+}

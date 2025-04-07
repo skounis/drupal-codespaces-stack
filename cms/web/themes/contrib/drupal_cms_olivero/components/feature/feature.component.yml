@@ -1,0 +1,55 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Feature
+
+status: experimental
+
+props:
+  type: object
+  required:
+    - title
+  properties:
+    title:
+      type: string
+      title: Title
+      description: The title text
+      examples:
+        - Cool featured content
+    summary:
+      $ref: json-schema-definitions://experience_builder.module/textarea
+      type: string
+      title: Summary
+      description: The optional summary text
+      examples:
+        - A short and engaging summary to highlight the featured content and get
+          your audience interested in learning more about it.
+    link_text:
+      type: string
+      title: Link text
+      description: "The optional link text, default: Learn more"
+      default: Learn more
+      examples:
+        - Learn more
+    link_url:
+      type: string
+      format: uri
+      title: Link URL
+      description: The link URL for the link text
+      examples:
+        - https://example.com
+    image:
+      $ref: json-schema-definitions://experience_builder.module/image
+      type: object
+      title: Image
+      description: "Image for the card. Recommended size: 4:3 aspect ratio"
+      examples: []
+    image_position:
+      type: string
+      title: Image position
+      description: "The position for the image, default: left"
+      default: left
+      enum:
+        - left
+        - right
+      examples:
+        - left

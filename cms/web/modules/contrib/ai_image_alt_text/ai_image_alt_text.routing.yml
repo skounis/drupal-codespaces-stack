@@ -1,0 +1,17 @@
+ai_image_alt_text.settings_form:
+  path: '/admin/config/ai/ai_image_alt_text'
+  defaults:
+    _form: '\Drupal\ai_image_alt_text\Form\AiImageAltTextSettingsForm'
+    _title: 'AI Image Alt Text Settings'
+  requirements:
+    _permission: 'administer ai'
+ai_image_alt_text.generate:
+  path: '/admin/config/ai/ai_image_alt_text/generate/{file}/{lang_code}'
+  defaults:
+    _controller: \Drupal\ai_image_alt_text\Controller\GenerateAltText::generate
+  requirements:
+    _permission: 'generate ai alt tags'
+  options:
+    parameters:
+      file:
+        type: 'entity:file'

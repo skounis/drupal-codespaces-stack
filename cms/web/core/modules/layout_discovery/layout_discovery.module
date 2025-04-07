@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Render\Element;
+use Drupal\Core\Template\Attribute;
+
+/**
+ * Prepares variables for layout templates.
+ *
+ * @param array &$variables
+ *   An associative array containing:
+ *   - content: An associative array containing the properties of the element.
+ *     Properties used: #settings, #layout, #in_preview.
+ */
+function template_preprocess_layout(&$variables): void {
+  $variables['settings'] = $variables['content']['#settings'] ?? [];
+  $variables['layout'] = $variables['content']['#layout'] ?? [];
+  $variables['in_preview'] = $variables['content']['#in_preview'] ?? FALSE;
+
+  // Create an attributes variable for each region.
+  foreach (Element::children($variables['content']) as $name) {
+    if (!isset($variables['content'][$name]['#attributes'])) {
+      $variables['content'][$name]['#attributes'] = [];
+    }
+    $variables['region_attributes'][$name] = new Attribute($variables['content'][$name]['#attributes']);
+  }
+}

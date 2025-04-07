@@ -1,0 +1,11 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following Prompt, what is the url they want to change to?
+  formats:
+    - url: the new url
+      response: A one sentence response that the url got changed including a relative HTML link to the url.
+  one_shot_learning_examples:
+    - url: /test/test
+      response: We changed the url to <a href="/test/test">/test/test</a>.

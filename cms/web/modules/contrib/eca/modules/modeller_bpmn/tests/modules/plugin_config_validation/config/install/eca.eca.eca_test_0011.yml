@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_base
+    - eca_test_model_plugin_config_validation
+id: eca_test_0011
+modeller: dummy
+label: 'Validate plugin configuration'
+version: 1.0.0
+weight: null
+events:
+  custom:
+    plugin: 'eca_base:eca_custom'
+    label: 'Custom event'
+    configuration:
+      event_id: ''
+    successors:
+      -
+        id: Dummy
+        condition: ''
+conditions: {  }
+gateways: {  }
+actions:
+  Dummy:
+    plugin: eca_test_model_plugin_config_validation
+    label: Dummy
+    configuration:
+      dummy: correct
+    successors: {  }

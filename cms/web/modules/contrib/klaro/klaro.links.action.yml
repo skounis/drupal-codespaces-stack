@@ -1,0 +1,11 @@
+klaro.add_app_action:
+  route_name: entity.klaro_app.add_form
+  title: 'Add Service'
+  appears_on:
+    - entity.klaro_app.collection
+
+klaro.add_purpose_action:
+  route_name: entity.klaro_purpose.add_form
+  title: 'Add Purpose'
+  appears_on:
+    - entity.klaro_purpose.collection

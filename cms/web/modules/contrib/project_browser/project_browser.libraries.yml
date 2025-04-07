@@ -1,0 +1,34 @@
+app:
+  js:
+    sveltejs/public/build/bundle.js: { attributes: { defer: true }}
+  css:
+    theme:
+      css/pb.css: {}
+      sveltejs/css/seven.css: {}
+      sveltejs/css/claro.css: {}
+  dependencies:
+    - core/drupalSettings
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupal.announce
+    - core/drupal.debounce
+    - core/drupal.dialog
+    - core/drupal.dropbutton
+    - core/drupal.message
+    - core/once
+
+# Internal library. Do not depend on it outside of Project Browser.
+internal.tabledrag:
+  js:
+    js/project_browser.admin.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - core/drupal.message
+
+# Internal library. Do not depend on it outside of Project Browser.
+internal.gin-styles:
+  css:
+    theme:
+      css/gin.css: {}

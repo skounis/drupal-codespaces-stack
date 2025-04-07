@@ -1,0 +1,82 @@
+---
+title: ECA Library - {{ label }}
+version: {{ version }}
+tags:
+- bpmn
+- library
+{% for tag in tags %}
+- {{ tag }}
+{% endfor %}
+---
+# {{ label }}
+
+Version {{ version }}
+
+<script>url='{{ model_filename }}.xml';archive='{{ model_filename }}.tar.gz'</script>
+{!include/library/viewer.html!}
+
+Instead of downloading the archive, you can download and apply this model as a recipe (Drupal 10.3 or later):
+
+
+```shell
+## Import recipe
+composer require {{ namespace }}/{{ rawid }}
+
+# Enable recipe with Drush (requires version 13 or later):
+drush recipe ../recipes/{{ rawid }}
+
+# Enable recipe without Drush:
+cd web && php core/scripts/drupal recipe ../recipes/{{ rawid }}
+
+# Rebuilding caches is optional, sometimes required:
+drush cr
+```
+
+## Purpose
+
+{{ documentation }}
+
+## Dependencies
+
+{% for type, items in dependencies %}
+- {{ type }}
+{% for dependency in items %}
+    - {{ dependency }}
+{% endfor %}
+{% endfor %}
+{% if events or conditions or action %}
+
+## Used plugins
+{% if events %}
+
+### Events
+
+{% for event in events %}
+- {{ event }}
+{% endfor %}
+{% endif %}
+{% if conditions %}
+
+### Conditions
+
+{% for condition in conditions %}
+- {{ condition }}
+{% endfor %}
+{% endif %}
+{% if actions %}
+
+### Actions
+
+{% for action in actions %}
+- {{ action }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+## Changelog
+{% for version, description in changelog %}
+
+`{{ version }}`
+
+:   {{ description }}
+{% endfor %}

@@ -1,0 +1,6 @@
+services:
+  easy_email.purge_commands:
+    class: Drupal\easy_email\Drush\Commands\PurgeCommands
+    arguments: ['@easy_email.purger']
+    tags:
+      - { name: drush.command }

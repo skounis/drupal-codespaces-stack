@@ -1,0 +1,80 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a developer that can generate Drupal Views. Based on the following
+    context of a task description and comments could you figure out if they
+    want to show the rendered content or fields.
+
+    If its rendered content, we need to figure out if they want to use some
+    specific view mode. You will be given a list of all view modes available
+    in the system. Try to figure out which one they want to use. Otherwise
+    just set it to default.
+
+    If its fields, you will be given a list of all fields available in the system.
+    Try to figure out which fields they want to use. If they did not specify any
+    fields, be creative and try to figure out from the context what would make
+    sense.
+
+    You will also be given a list of all possible plugins that can be used in
+    fields. Try to figure out which plugin to use, based on the field type. Usually
+    the plugin name is prefixed or name similarly. If you do not find anything
+    that fits, assume that the plugin should be set to standard.
+
+    If context even is missing, just think of the most common fields that
+    would make sense.
+
+    If its listed as an administrative mode, assume that the view should be using
+    fields in a table settings and make sure that the view has common fields like
+    title, status, created and changed. Also include operations links if its a
+    content type. Also be creative and add all or some fields that are custom that
+    makes sense, custom fields usually have a field_ prefix on the data name. The
+    operations links always should come last.
+
+    Any long text fields should not be shown in tables, unless requested, these
+    are text_with_summary, text_long and string_long.
+
+    The task will be given as a task description and some comments. The task
+    description is what you need to solve, the comments are just to give context
+    if the task description happens to answer something that is not clear.
+
+    You can answer with multiple objects if its fields, if its rendered content
+    you can only answer with one object.
+  possible_actions:
+    rendered_content: They want to show the rendered content.
+    fields: They want to show fields.
+  formats:
+    - action: action id from list
+      view_mode: If its rendered content, they want to use a specific view mode. Only specify if action is rendered_content.
+      id: The field id to use.
+      label: The label of the field.
+      type: The field type of the field if known.
+      plugin_id: The plugin id of the field.
+      field: The data field name.
+  one_shot_learning_examples:
+    - action: rendered_content
+      view_mode: teaser
+    - action: fields
+      id: title
+      label: Title
+      type: string
+      plugin_id: default
+      field: title
+    - action: fields
+      id: body
+      label: Body
+      type: text
+      plugin_id: default
+      field: field_body
+    - action: status
+      id: status
+      label: Published
+      type: boolean
+      plugin_id: boolean
+      field: status
+    - action: fields
+      id: operations
+      label: Operations
+      plugin_id: entity_operations
+      field: operations

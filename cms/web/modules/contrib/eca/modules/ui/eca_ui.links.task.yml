@@ -1,0 +1,12 @@
+entity.eca.collection:
+  title: Models
+  route_name: entity.eca.collection
+  base_route: entity.eca.collection
+eca.import:
+  title: Import
+  route_name: eca.import
+  base_route: entity.eca.collection
+eca.settings:
+  title: Settings
+  route_name: eca.settings
+  base_route: entity.eca.collection

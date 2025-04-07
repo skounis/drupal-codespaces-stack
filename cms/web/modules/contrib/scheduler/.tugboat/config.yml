@@ -1,0 +1,214 @@
+# cspell:ignore q0rban tugboatqa bcmath updatedb
+services:
+  php:
+    image: q0rban/tugboat-drupal:10
+    default: true
+    http: false
+    depends: mysql
+    commands:
+      init: |
+        # Install the bcmath extension, required for commerce_product.
+        # Added > /dev/null because the commands print a huge amount to the log.
+        docker-php-ext-install bcmath > /dev/null
+        # JPEG support is not included by default, but it is needed when generating content.
+        docker-php-ext-configure gd --enable-gd --with-jpeg > /dev/null
+        docker-php-ext-install gd > /dev/null
+
+      update: |
+        set -eux
+
+        # Check out a branch using the unique Tugboat ID for this repository, to
+        # ensure we don't clobber an existing branch.
+        git checkout -b $TUGBOAT_REPO_ID
+
+        # Composer is hungry. You need a Tugboat project with a pretty sizeable
+        # chunk of memory.
+        export COMPOSER_MEMORY_LIMIT=-1
+
+        # This is an environment variable we added in the Dockerfile that
+        # provides the path to Drupal composer root (not the web root).
+        cd $DRUPAL_COMPOSER_ROOT
+
+        # We configure the Drupal project to use the checkout of the module as a
+        # Composer package repository.
+        composer config repositories.tugboat vcs $TUGBOAT_ROOT
+
+        # Now we can require this module, specifying the branch name we created
+        # above that uses the $TUGBOAT_REPO_ID environment variable.
+        composer require drupal/scheduler:dev-$TUGBOAT_REPO_ID
+
+        # Install Drupal on the site.
+        vendor/bin/drush \
+          --yes \
+          --db-url=mysql://tugboat:tugboat@mysql:3306/tugboat \
+          --site-name="Scheduler ${TUGBOAT_PREVIEW_NAME}" \
+          --account-pass=admin \
+          site:install standard
+
+        # Add the trusted host pattern for tugboat previews.
+        echo "\$settings['trusted_host_patterns'] = ['\.tugboatqa\.com\$'];" >> $DOCROOT/sites/default/settings.php
+
+        # Show site status and GD image support status.
+        vendor/bin/drush status-report
+        vendor/bin/drush php:eval 'phpinfo()' | grep GD
+        vendor/bin/drush php:eval 'print "imagepng() " . (function_exists("imagepng") ? "--yes\n" : "--no\n"); '
+        vendor/bin/drush php:eval 'print "imagejpeg() " . (function_exists("imagejpeg") ? "--yes\n" : "--no\n"); '
+        vendor/bin/drush php:eval 'print_r(gd_info());'
+
+        # Commerce 2.29 needs inline_entity_form which does not have a stable
+        # version as at March 2022. Therefore get that package here allowing RC
+        # to avoid the "does not match your minimum-stability" problem.
+        composer require drupal/inline_entity_form ^1.0@RC
+        composer require drupal/commerce
+
+        # Get config_update specifying 2 because the latest stable release is 1.7 which is only compatible up to D9.
+        composer require drupal/config_update:^2@alpha
+
+        # Get other useful modules.
+        composer require drupal/devel_generate drupal/module_filter drupal/admin_toolbar
+
+        # Set up the files directory permissions.
+        mkdir -p $DRUPAL_DOCROOT/sites/default/files
+        chgrp -R www-data $DRUPAL_DOCROOT/sites/default/files
+        chmod 2775 $DRUPAL_DOCROOT/sites/default/files
+        chmod -R g+w $DRUPAL_DOCROOT/sites/default/files
+
+        # Enable modules.
+        vendor/bin/drush --yes pm:enable scheduler devel devel_generate module_filter admin_toolbar media commerce_product taxonomy config_update_ui
+
+        # Show versions.
+        composer show drupal/scheduler | egrep 'name |vers'
+        vendor/bin/drush pml | grep scheduler
+        composer show drupal/devel | egrep 'name |vers'
+        vendor/bin/drush pml | grep devel
+
+        # Add some more items to the Devel toolbar. The default is 7 items, stored as 0 - 6, so new items start 7. These items
+        # are already available in the devel toolbar 'config' but adding them here is equivalent to ticking the checkbox.
+        vendor/bin/drush -y config-set devel.toolbar.settings toolbar_items.7 devel_generate.generate2
+        vendor/bin/drush -y config-set devel.toolbar.settings toolbar_items.8 devel.configs_list
+        vendor/bin/drush -y config-set devel.toolbar.settings toolbar_items.9 devel.switch_user
+        vendor/bin/drush config-get devel.toolbar.settings
+
+        # Site settings
+        vendor/bin/drush -y config-set system.date timezone.default Europe/London
+
+        # Scheduler general settings.
+        vendor/bin/drush -y config-set scheduler.settings allow_date_only 1
+        vendor/bin/drush -y config-set scheduler.settings default_time '22:06:00'
+        vendor/bin/drush config-get scheduler.settings
+
+        # Scheduler content settings.
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.unpublish_enable 1
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.expand_fieldset 'always'
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.fields_display_mode 'fieldset'
+        vendor/bin/drush -y config-set node.type.article third_party_settings.scheduler.publish_past_date 'schedule'
+        vendor/bin/drush config-get node.type.article third_party_settings
+
+        # Scheduler media settings.
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.unpublish_enable 1
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.expand_fieldset 'always'
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.fields_display_mode 'fieldset'
+        vendor/bin/drush -y config-set media.type.image third_party_settings.scheduler.publish_past_date 'schedule'
+        vendor/bin/drush config-get media.type.image third_party_settings
+
+        # Scheduler commerce product settings.
+        vendor/bin/drush -y config-set commerce_product.commerce_product_type.default third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush -y config-set commerce_product.commerce_product_type.default third_party_settings.scheduler.unpublish_enable 1
+        vendor/bin/drush -y config-set commerce_product.commerce_product_type.default third_party_settings.scheduler.publish_past_date 'schedule'
+        vendor/bin/drush -y config-set commerce_product.commerce_product_type.default third_party_settings.scheduler.expand_fieldset 'always'
+        vendor/bin/drush -y config-set commerce_product.commerce_product_type.default third_party_settings.scheduler.fields_display_mode 'fieldset'
+        vendor/bin/drush config-get commerce_product.commerce_product_type.default third_party_settings
+
+        # Scheduler taxonomy settings.
+        vendor/bin/drush -y config-set taxonomy.vocabulary.tags third_party_settings.scheduler.publish_enable 1
+        vendor/bin/drush -y config-set taxonomy.vocabulary.tags third_party_settings.scheduler.unpublish_enable 1
+        vendor/bin/drush -y config-set taxonomy.vocabulary.tags third_party_settings.scheduler.publish_past_date 'schedule'
+        vendor/bin/drush -y config-set taxonomy.vocabulary.tags third_party_settings.scheduler.expand_fieldset 'always'
+        vendor/bin/drush -y config-set taxonomy.vocabulary.tags third_party_settings.scheduler.fields_display_mode 'fieldset'
+        vendor/bin/drush config-get taxonomy.vocabulary.tags third_party_settings
+
+        # Media settings.
+        vendor/bin/drush -y config-set media.settings standalone_url 1
+        vendor/bin/drush config-get media.settings
+        vendor/bin/drush -y config-set field.field.media.image.field_media_image required 0
+        vendor/bin/drush config-get field.field.media.image.field_media_image
+
+        # Create and update roles for scheduler permissions. We can re-use the pre-existing content_editor role.
+        vendor/bin/drush role-add-perm 'content_editor' 'schedule publishing of nodes'
+        vendor/bin/drush role-create 'content_viewer' 'Content viewer'
+        vendor/bin/drush role-add-perm 'content_viewer' 'view scheduled content'
+        vendor/bin/drush role-create 'media_editor' 'Media editor'
+        vendor/bin/drush role-add-perm 'media_editor' 'schedule publishing of media'
+        vendor/bin/drush role-create 'media_viewer' 'Media viewer'
+        vendor/bin/drush role-add-perm 'media_viewer' 'view scheduled media'
+        vendor/bin/drush role-create 'product_editor' 'Product editor'
+        vendor/bin/drush role-add-perm 'product_editor' 'schedule publishing of commerce_product'
+        vendor/bin/drush role-create 'product_viewer' 'Product viewer'
+        vendor/bin/drush role-add-perm 'product_viewer' 'view scheduled commerce_product'
+        vendor/bin/drush role-create 'term_editor' 'Taxonomy editor'
+        vendor/bin/drush role-add-perm 'term_editor' 'schedule publishing of taxonomy_term'
+        vendor/bin/drush role-create 'term_viewer' 'Taxonomy viewer'
+        vendor/bin/drush role-add-perm 'term_viewer' 'view scheduled taxonomy_term'
+
+        # Add some permissions for all authenticated users.
+        vendor/bin/drush role-add-perm 'authenticated' \
+           "switch users, access toolbar, access administration pages, access devel information"
+        vendor/bin/drush role-add-perm 'authenticated' \
+          "create article content, edit any article content, delete any article content, view own unpublished content, access content overview"
+        vendor/bin/drush role-add-perm 'authenticated' \
+          "create media, update any media, delete any media, view own unpublished media, access media overview"
+        vendor/bin/drush role-add-perm 'authenticated' \
+          "create default commerce_product, update any default commerce_product, delete any default commerce_product, \
+           view own unpublished commerce_product, administer commerce_store, access commerce_product overview"
+        vendor/bin/drush role-add-perm 'authenticated' \
+          "create terms in tags, delete terms in tags, edit terms in tags, access taxonomy overview"
+
+        # Create users and give them roles.
+        vendor/bin/drush user-create 'Eddy content editor'
+        vendor/bin/drush user-add-role 'content_editor' 'Eddy content editor'
+        vendor/bin/drush user-create 'Vera content viewer'
+        vendor/bin/drush user-add-role 'content_viewer' 'Vera content viewer'
+        vendor/bin/drush user-create 'Madeline media editor'
+        vendor/bin/drush user-add-role 'media_editor' 'Madeline media editor'
+        vendor/bin/drush user-create 'Marvin media viewer'
+        vendor/bin/drush user-add-role 'media_viewer' 'Marvin media viewer'
+        vendor/bin/drush user-create 'Prodigy product editor'
+        vendor/bin/drush user-add-role 'product_editor' 'Prodigy product editor'
+        vendor/bin/drush user-create 'Proctor product viewer'
+        vendor/bin/drush user-add-role 'product_viewer' 'Proctor product viewer'
+        vendor/bin/drush user-create 'Terra term editor'
+        vendor/bin/drush user-add-role 'term_editor' 'Terra term editor'
+        vendor/bin/drush user-create 'Tevet term viewer'
+        vendor/bin/drush user-add-role 'term_viewer' 'Tevet term viewer'
+
+        # Generate content for bundles that have scheduling enabled.
+        vendor/bin/drush devel-generate-terms 3 --bundles=tags
+        vendor/bin/drush devel-generate-content 3 --bundles=article --authors=1,2,3
+        # Note: The --authors option does not exist in devel-generate-media
+        vendor/bin/drush devel-generate-media 3 --media-types=image
+
+        # Update form displays to match the entity type settings.
+        vendor/bin/drush ev "\Drupal::service('scheduler.manager')->resetFormDisplayFields()"
+
+        # @todo Place the 'Switch users' block in first sidebar.
+        # @todo Add 'content overview' and 'media overview' to tools menu.
+        # @todo Create a store for products. Then create some products.
+
+      build: |
+        set -eux
+
+        # Delete and re-check out this branch in case this is built from a Base Preview.
+        git branch -D $TUGBOAT_REPO_ID && git checkout -b $TUGBOAT_REPO_ID || true
+        export COMPOSER_MEMORY_LIMIT=-1
+        cd $DRUPAL_COMPOSER_ROOT
+        composer install --optimize-autoloader
+
+        # Update this module, including all dependencies.
+        composer update drupal/scheduler --with-all-dependencies
+        vendor/bin/drush --yes updatedb
+        vendor/bin/drush cache:rebuild
+
+  mysql:
+    image: tugboatqa/mariadb

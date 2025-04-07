@@ -1,0 +1,29 @@
+automatic_updates.settings:
+  type: config_object
+  label: 'Automatic Updates settings'
+  mapping:
+    unattended:
+      type: mapping
+      label: 'Settings for unattended update'
+      mapping:
+        method:
+          type: string
+          label: 'Method of running unattended updates'
+          constraints:
+            NotNull: []
+            Choice: [console, web]
+        level:
+          type: string
+          label: 'Which level of unattended updates to perform'
+          constraints:
+            NotNull: []
+            Choice: [disable, security, patch]
+    cron_port:
+      type: integer
+      label: 'Port to use for finalization sub-request'
+    allow_core_minor_updates:
+      type: boolean
+      label: 'Allow minor level Drupal core updates'
+    status_check_mail:
+      type: string
+      label: 'Whether to send status check failure email notifications during cron'

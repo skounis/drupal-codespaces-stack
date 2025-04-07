@@ -1,0 +1,8 @@
+services:
+  tagify.autocomplete_matcher:
+    class: Drupal\tagify\TagifyEntityAutocompleteMatcher
+    arguments:
+      - '@plugin.manager.entity_reference_selection'
+      - '@module_handler'
+      - '@entity_type.manager'
+      - '@token'

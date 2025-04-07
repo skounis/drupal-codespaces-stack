@@ -1,0 +1,83 @@
+Drupal advanced integration with the
+<a href="http://leafletjs.com/download.html" target="_blank">Leaflet JS mapping library.</a>
+
+<blockquote>A Modern, Lightweight Open-Source JavaScript Library for Interactive Web Mapping</blockquote>
+
+Drupal Leaflet module is dependant from the
+<a href="https://www.drupal.org/project/geofield" target="_blank">Geofield module</a>.
+<hr>
+<h2><a href="https://www.geodemocracy.com/drupal_geofield_stack_demo/web/geoplaces-map-leaflet" target="blank">>>>> Live Demo <<<<</a></h2>
+<br>
+<h3>LATEST NEWS</h3>
+<ul>
+  <li>February 2025: <strong>Leaflet 10.0.37</strong> adds <strong>Option to Leaflet Widget for Placing Markers on the Map via Geocoding</strong>. Refer to <a href="https://www.drupal.org/project/leaflet/issues/3505326">#3505326 Leaflet project issue</a> for more info.<br></li>
+</ul>
+<h2><strong>Leaflet Version 10</strong></h2>
+<h3><a href="https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/leaflet/" target="blank">Drupal Community documentation (WIP)</a> </h3>
+<h3 id="features-and-options">Features and Options</h3>
+<ul>
+  <li>Easy to use API for extended Leaflet Map definition &amp; customisation;</li>
+  <li>Leaflet Default Widget, with advanced integration with <a href="https://github.com/geoman-io/leaflet-geoman" target="_blank">Leaflet-Geoman plugin</a>
+    for creating and editing Points and Geometries (Linestring, Polygon) Layers;</li>
+  <li>Leaflet Tooltips and Popups;</li>
+  <li>Leaflet Multi Maps Base Layers Control;</li>
+  <li>Leaflet Overlays Control via Drupal Views Grouping;</li>
+  <li>Dynamic Markers Icons and Paths/Geometries Styling, with tokens and replacement patterns;</li>
+  <li>Markerclustering,via <a href="https://github.com/Leaflet/Leaflet.markercluster" target="_blank">Leaflet.markercluster plugin</a>;</li>
+  <li>Leaflet Gesture handling, via <a href="https://github.com/elmarquis/Leaflet.GestureHandling" target="_blank">Leaflet.GestureHandling plugin</a>;</li>
+  <li>Reset Map View Control via <a href="https://github.com/drustack/Leaflet.ResetView" target="_blank">Leaflet.ResetView plugin</a>;</li>
+  <li>Fullscreen Control, via <a href="https://github.com/brunob/leaflet.fullscreen" target="_blank">Leaflet.Control.FullScreen plugin</a>;</li>
+  <li>User Location Control, via <a href="https://github.com/domoritz/leaflet-locatecontrol" target="_blank">Leaflet.Locate plugin</a>;</li>
+  <li>Feature Additional Properties settings for advanced / dynamic customisation of
+    Leaflet Map and Features rendering logics;</li>
+  <li>Address Search Geocoding with Autocomplete integration (requires  Geocoder module);</li>
+  <li>Token and Replacement Patterns in Leaflet components settings;</li>
+  <li>Multiple Leaflet maps (mixed of Leaflet Formatters, Views and Widgets) on
+    the same page;</li>
+  <li>Drupal hooks for altering and interacting with its functionalities;</li>
+  <li>etc. ...</li>
+</ul>
+
+<h3 id="installation-and-use">Installation and Use</h3>
+<p>Require/Download the Leaflet module using Composer, which is simply running
+  the following command from your project package root   (where the main
+  composer.json file is sited):</p>
+<p><code>composer require drupal/leaflet</code></p>
+<p>which will also download the required <a href="https://www.drupal.org/project/geofield">Geofield Module</a>
+  dependency (and GeoPHP library).</p>
+
+Read the instructions in the Readme.md file for further details, on how to
+enable the Leaflet module and its submodules.
+
+<h3>Additional Drupal Integrations</h3>
+Leaflet module works well with the following modules;
+<ul>
+  <li><a href="http://drupal.org/project/geofield_map" target="_blank">Geofield Map</a></li>
+  <li><a href="http://drupal.org/project/leaflet_more_maps" target="_blank">Leaflet More Maps</a></li>
+  <li><a href="https://www.drupal.org/project/leaflet_more_markers" target="_blank">Leaflet More Markers</a></li>
+  <li><a href="http://drupal.org/project/leaflet_layers" target="_blank">Leaflet Layers</a></li>
+  <li><a href="http://drupal.org/project/views_geojson" target="_blank">Views GeoJSON</a></li>
+  <li><a href="http://drupal.org/project/leaflet_geojson" target="_blank">Leaflet GeoJSON</a></li>
+</ul>
+
+D8 version started by <a href="https://drupal.org/user/404007" target="_blank">RdeBoer</a> of <a href="http://flink.com.au/" target="_blank">flink</a>, and evolved to maturity by <a href="https://drupal.org/u/itamair" target="_blank">Itamair</a>.
+
+<hr>
+<h2>Leaflet Version 7</h2>
+The Leaflet module features:
+<ul>
+  <li>Field formatter that can show a map for fields that contain geospatial data.</li>
+  <li>Views integration that plots data on a map (using the sub module Leaflet Views).</li>
+  <li>Lightweight and easy to use API for defining maps and displaying data on a map.</li>
+</ul>
+Some modules that build on Leaflet, adding various features:
+<ul>
+  <li><a href="http://drupal.org/project/leaflet_more_maps">Leaflet More Maps</a>: adds over 20 map styles, selected at the flick of a drop-down</li>
+  <li><a href="http://drupal.org/project/leaflet_label">Leaflet Label</a>: alternative tool tip hovers for polygons and line strings</li>
+  <li><a href="http://drupal.org/project/leaflet_hash">Leaflet Hash</a>: bookmarking for maps, appends a hash of current map center and zoom to the URL, so you save and restore the "view port"</li>
+  <li><a href="http://drupal.org/project/leaflet_markercluster">Leaflet MarkerCluster</a>: makes large marker populations easier to navigate through animated clustering and drill-down capability</li>
+  <li><a href="http://drupal.org/project/ip_geoloc">IP Geolocation Views & Maps</a>: adds a swag of cool features such as centering options, markers colour-coded by any field in your View, cross-highlighting between content and map, geocoding and reverse geocoding options.</li>
+  <li><a href="https://www.drupal.org/node/1645460">Many more...</a></li>
+</ul>
+
+D7 version originally developed by <a href="http://thinkshout.com" target="_blank">ThinkShout</a> and <a href="http://drupal.org/user/108811" target="_blank">@pvhee</a> (from <a href="http://marzeelabs.org">Marzee Labs</a>) with lots of help from the <a href="http://drupal.org/node/1222714/committers">community</a>.

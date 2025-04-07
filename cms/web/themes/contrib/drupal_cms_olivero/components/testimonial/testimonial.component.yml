@@ -1,0 +1,51 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Testimonial
+status: experimental
+props:
+  type: object
+  required:
+    - content
+    - name
+  properties:
+    image:
+      $ref: json-schema-definitions://experience_builder.module/image
+      type: object
+      title: Image
+      examples:
+        - src: images/example-gizmo.jpg
+          alt: 'Gizmo (an ugly dog) smiling for the camera'
+          width: 400
+          height: 400
+    content:
+      $ref: json-schema-definitions://experience_builder.module/textarea
+      type: string
+      title: Content
+      description: The testimonial content
+      examples:
+        - "I don't always require pets. But when I do,  I insist they be bestowed upon my belly."
+    name:
+      type: string
+      title: Name
+      description: The name associated with the testimonial
+      examples:
+        - Gizmo Main
+    role:
+      type: string
+      title: Role
+      description: Role / Extra info
+      examples:
+        - "The most interesting dog in the world"
+    link_text:
+      type: string
+      title: Link text
+      description: "The optional link text, default: Learn more"
+      default: Learn more
+      examples:
+        - Learn more
+    link_url:
+      type: string
+      format: uri-reference
+      title: Link URL
+      description: The link URL for the link text
+      examples:
+        - https://example.com

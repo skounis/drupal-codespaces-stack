@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the Scheduler Extras test module.
+ *
+ * This module is used in SchedulerDefaultTimeTest to check that the default
+ * time is set correctly when the time element of the datetime input is hidden.
+ *
+ * It is also used in SchedulerQueryTagsTest to test hook_query_TAG_alter().
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function scheduler_extras_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Only continue if the form is for adding the standard test entity types.
+  if (!in_array($form_id, [
+    'node_testpage_form',
+    'media_test_video_add_form',
+    'commerce_product_test_product_add_form',
+    'taxonomy_term_test_vocab_form',
+  ])) {
+    return;
+  }
+  // Hide the time element when the scheduler field exists.
+  if (isset($form['publish_on'])) {
+    $form['publish_on']['widget'][0]['value']['#date_time_element'] = 'none';
+  }
+  if (isset($form['unpublish_on'])) {
+    $form['unpublish_on']['widget'][0]['value']['#date_time_element'] = 'none';
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler.
+ */
+function scheduler_extras_query_scheduler_alter($query) {
+  $entityTypeId = $query->getMetaData('entity_type');
+  // Prevent all processing if either of the dates are more than 12 months ago.
+  $query->condition($query->orConditionGroup()
+    ->condition("{$entityTypeId}_field_revision.publish_on", strtotime('- 12 months'), '>')
+    ->condition("{$entityTypeId}_field_revision.unpublish_on", strtotime('- 12 months'), '>')
+  );
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler_publish.
+ */
+function scheduler_extras_query_scheduler_publish_alter($query) {
+  $entityTypeId = $query->getMetaData('entity_type');
+  // Do not publish if the entity is in Spanish.
+  $query->condition("{$entityTypeId}_field_revision.langcode", 'es', '!=');
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler_node_publish.
+ */
+function scheduler_extras_query_scheduler_node_publish_alter($query) {
+  // Do not publish if the title is "Do not publish this $entityTypeId".
+  $query->condition('node_field_revision.title', "Do not publish this {$query->getMetaData('entity_type')}", '!=');
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler_media_publish.
+ */
+function scheduler_extras_query_scheduler_media_publish_alter($query) {
+  // Do not publish if the title is "Do not publish this $entityTypeId".
+  $query->condition('media_field_revision.name', "Do not publish this {$query->getMetaData('entity_type')}", '!=');
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler_unpublish.
+ */
+function scheduler_extras_query_scheduler_unpublish_alter($query) {
+  $entityTypeId = $query->getMetaData('entity_type');
+  // Do not unpublish if the entity is in Danish.
+  $query->condition("{$entityTypeId}_field_revision.langcode", 'dk', '!=');
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler_node_unpublish.
+ */
+function scheduler_extras_query_scheduler_node_unpublish_alter($query) {
+  // Do not unpublish if the title is "Do not unpublish this $entityTypeId".
+  $query->condition('node_field_revision.title', "Do not unpublish this {$query->getMetaData('entity_type')}", '!=');
+}
+
+/**
+ * Implements hook_query_TAG_alter() for TAG = scheduler_media_unpublish.
+ */
+function scheduler_extras_query_scheduler_media_unpublish_alter($query) {
+  // Do not unpublish if the title is "Do not unpublish this $entityTypeId".
+  $query->condition('media_field_revision.name', "Do not unpublish this {$query->getMetaData('entity_type')}", '!=');
+}

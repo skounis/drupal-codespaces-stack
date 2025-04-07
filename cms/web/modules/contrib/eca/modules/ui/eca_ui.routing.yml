@@ -1,0 +1,85 @@
+entity.eca.collection:
+  path: '/admin/config/workflow/eca'
+  defaults:
+    _entity_list: 'eca'
+    _title: 'Configure ECA - Events, Conditions, Actions'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.edit_form:
+  path: '/admin/config/workflow/eca/{eca}/edit'
+  defaults:
+    _controller: '\Drupal\eca_ui\Controller\EcaController::edit'
+  requirements:
+    _permission: 'administer eca'
+eca.save:
+  path: '/admin/config/workflow/eca/{modeller_id}/save'
+  defaults:
+    _controller: '\Drupal\eca_ui\Controller\EcaController::save'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.delete_form:
+  path: '/admin/config/workflow/eca/{eca}/delete'
+  defaults:
+    _entity_form: 'eca.delete'
+    _title: 'Delete'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.enable:
+  path: '/admin/config/workflow/eca/{eca}/enable'
+  defaults:
+    _controller: '\Drupal\eca_ui\Controller\EcaController::enable'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.disable:
+  path: '/admin/config/workflow/eca/{eca}/disable'
+  defaults:
+    _controller: '\Drupal\eca_ui\Controller\EcaController::disable'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.clone:
+  path: '/admin/config/workflow/eca/{eca}/clone'
+  defaults:
+    _controller: '\Drupal\eca_ui\Controller\EcaController::clone'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.export:
+  path: '/admin/config/workflow/eca/{eca}/export'
+  defaults:
+    _controller: '\Drupal\eca_ui\Controller\EcaController::export'
+  requirements:
+    _permission: 'administer eca'
+entity.eca.export_recipe:
+  path: '/admin/config/workflow/eca/{eca}/recipe'
+  defaults:
+    _title: 'Export as recipe'
+    _form: '\Drupal\eca_ui\Form\ExportRecipe'
+  options:
+    parameters:
+      eca:
+        type: 'entity:eca'
+  requirements:
+    _permission: 'administer eca'
+
+eca.settings:
+  path: '/admin/config/workflow/eca/settings'
+  defaults:
+    _title: 'Settings'
+    _form: '\Drupal\eca_ui\Form\Settings'
+  requirements:
+    _permission: 'administer eca'
+
+eca.import:
+  path: '/admin/config/workflow/eca/import'
+  defaults:
+    _title: 'Import'
+    _form: '\Drupal\eca_ui\Form\Import'
+  requirements:
+    _permission: 'administer eca'
+
+eca.add:
+  path: '/admin/config/workflow/eca/add'
+  defaults:
+    _title: 'Create new model'
+    _controller: '\Drupal\eca_ui\Controller\EcaController::add'
+  requirements:
+    _permission: 'administer eca'

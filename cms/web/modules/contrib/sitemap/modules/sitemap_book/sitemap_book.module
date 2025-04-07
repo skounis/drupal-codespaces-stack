@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Hooks and helper functions for the sitemap_book module.
+ */
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for node.
+ */
+function sitemap_book_node_delete(NodeInterface $node) {
+  // @todo Can we tell if the deleted node was a parent book node?
+  _sitemap_clear_plugin_cache();
+}

@@ -1,0 +1,12 @@
+name: 'ECA Development'
+type: module
+description: 'Internal development services only, not for production sites.'
+core_version_requirement: ^10.3 || ^11
+hidden: true
+dependencies:
+  - eca:eca
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * selective_better_exposed_filters.module
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function selective_better_exposed_filters_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.selective_better_exposed_filters':
+      $text = file_get_contents(__DIR__ . '/README.md');
+      return '<pre>' . Html::escape($text) . '</pre>';
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function selective_better_exposed_filters_config_schema_info_alter(&$definitions) {
+  $altered_widgets = ['default', 'bef_links', 'bef'];
+  foreach ($altered_widgets as $altered_widget) {
+    if (isset($definitions["better_exposed_filters.filter.$altered_widget"])) {
+      $definitions["better_exposed_filters.filter.$altered_widget"]['mapping']['options_show_only_used'] = [
+        'type' => 'boolean',
+        'label' => 'Show only used items',
+      ];
+      $definitions["better_exposed_filters.filter.$altered_widget"]['mapping']['options_show_only_used_filtered'] = [
+        'type' => 'boolean',
+        'label' => 'Filter items based on filtered result set',
+      ];
+      $definitions["better_exposed_filters.filter.$altered_widget"]['mapping']['options_hide_when_empty'] = [
+        'type' => 'boolean',
+        'label' => 'Hide filter, if no options',
+      ];
+    }
+  }
+}

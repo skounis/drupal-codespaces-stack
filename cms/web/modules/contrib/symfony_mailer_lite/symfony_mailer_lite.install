@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function symfony_mailer_lite_install($is_syncing) {
+  if ($is_syncing) {
+    return;
+  }
+  $settings = Drupal::configFactory()->getEditable('mailsystem.settings');
+  $settings->set('modules.symfony_mailer_lite.none', [
+    'formatter' => 'symfony_mailer_lite',
+    'sender' => 'symfony_mailer_lite',
+  ])->save();
+
+  if (\Drupal::moduleHandler()->moduleExists('swiftmailer')) {
+    // Upgrade Swiftmailer configuration to Drupal Symfony Mailer Lite.
+    $message_settings = Drupal::configFactory()->getEditable('symfony_mailer_lite.message');
+    $swiftmailer_message_settings = Drupal::configFactory()->getEditable('swiftmailer.message');
+    if (!empty($swiftmailer_message_settings->get('content_type'))) {
+      $message_settings->set('content_type', $swiftmailer_message_settings->get('content_type'));
+      $message_settings->set('override', TRUE);
+    }
+    else {
+      $message_settings->set('override', FALSE);
+    }
+    if (!empty($swiftmailer_message_settings->get('text_format'))) {
+      $message_settings->set('text_format', $swiftmailer_message_settings->get('text_format'));
+    }
+    $message_settings->set('generate_plain', (bool) $swiftmailer_message_settings->get('generate_plain'));
+    if (!empty($swiftmailer_message_settings->get('character_set'))) {
+      $message_settings->set('character_set', $swiftmailer_message_settings->get('character_set'));
+    }
+    $message_settings->save();
+
+    $symfony_mailer_lite_settings = Drupal::configFactory()->getEditable('symfony_mailer_lite.settings');
+    $transport_storage = \Drupal::entityTypeManager()->getStorage('symfony_mailer_lite_transport');
+    $swiftmailer_transport_settings = Drupal::configFactory()->getEditable('swiftmailer.transport');
+    if ($swiftmailer_transport_settings->get('transport') === 'sendmail') {
+      $transport_storage->create([
+        'id' => 'sendmail',
+        'label' => 'Sendmail',
+        'plugin' => 'sendmail',
+        'configuration' => [
+          'query' => [
+            'command' => $swiftmailer_transport_settings->get('sendmail_path') . ' -' . $swiftmailer_transport_settings->get('sendmail_mode'),
+          ],
+        ],
+      ])->save();
+      $symfony_mailer_lite_settings->set('default_transport', 'sendmail')
+        ->save();
+    }
+    elseif ($swiftmailer_transport_settings->get('transport') === 'smtp') {
+      $transport_storage->create([
+        'id' => 'smtp',
+        'label' => 'SMTP',
+        'plugin' => 'smtp',
+        'configuration' => [
+          'host' => $swiftmailer_transport_settings->get('smtp_host'),
+          'port' => $swiftmailer_transport_settings->get('smtp_port'),
+          'user' => $swiftmailer_transport_settings->get('smtp_credentials.swiftmailer.username'),
+          'pass' => $swiftmailer_transport_settings->get('smtp_credentials.swiftmailer.password'),
+          'query' => [
+            'verify_peer' => TRUE,
+            'local_domain' => '',
+            'restart_threshold' => NULL,
+            'restart_threshold_sleep' => NULL,
+            'ping_threshold' => NULL,
+          ],
+        ],
+      ])->save();
+      $symfony_mailer_lite_settings->set('default_transport', 'smtp')
+        ->save();
+    }
+  }
+}
+
+/**
+ * Add the default message settings.
+ */
+function symfony_mailer_lite_update_9001(&$sandbox) {
+  // Add the default message settings.
+  $message_settings = Drupal::configFactory()->getEditable('symfony_mailer_lite.message');
+  if (empty($message_settings->get('content_type'))) {
+    $message_settings->set('content_type', \Drupal\symfony_mailer_lite\Plugin\Mail\SymfonyMailer::FORMAT_PLAIN)
+      ->set('text_format', '')
+      ->set('generate_plain', TRUE)
+      ->set('character_set', 'UTF-8')
+      ->save();
+  }
+}

@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_content
+    - eca_log
+id: eca_test_0006
+modeller: bpmn_io
+label: 'Write Log Message'
+version: v1
+weight: null
+events:
+  Event_1eshshx:
+    plugin: 'content_entity:presave'
+    label: 'Presave node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_02f0tls
+        condition: ''
+conditions: {  }
+gateways: {  }
+actions:
+  Activity_02f0tls:
+    plugin: eca_write_log_message
+    label: Log
+    configuration:
+      channel: eca
+      severity: '6'
+      message: 'Node [entity:title] is about to be saved'
+    successors: {  }

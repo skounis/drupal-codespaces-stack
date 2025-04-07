@@ -1,0 +1,12 @@
+name: Drupal Symfony Mailer Lite
+type: module
+description: Send emails with Symfony Mailer library
+package: Mail
+core_version_requirement: ^10.1 || ^11
+dependencies:
+  - mailsystem:mailsystem
+
+# Information added by Drupal.org packaging script on 2024-11-27
+version: '2.0.2'
+project: 'symfony_mailer_lite'
+datestamp: 1732721049

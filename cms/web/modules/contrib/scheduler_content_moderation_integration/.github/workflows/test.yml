@@ -1,0 +1,72 @@
+name: Run module tests
+
+on:
+  push:
+
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+  schedule:
+    - cron:  '15 4 * * *'
+
+env:
+  DRUPAL_TESTING_TEST_CODING_STYLES: true
+  DRUPAL_TESTING_DATABASE_USER: root
+  DRUPAL_TESTING_DATABASE_PASSWORD: root
+  DRUPAL_TESTING_DATABASE_ENGINE: mysql
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - DRUPAL_TESTING_DRUPAL_VERSION: '~9.3'
+            PHP_VERSION: '7.4'
+          - DRUPAL_TESTING_DRUPAL_VERSION: '~9.5'
+            PHP_VERSION: '8.0'
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          php-version: ${{ matrix.PHP_VERSION }}
+
+      - name: Start MySql service
+        run: sudo /etc/init.d/mysql start
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-cache-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-cache-
+
+      - name: Get build environment
+        run: composer global require thunder/drupal-testing
+
+      - name: Prepare the build
+        run: test-drupal-project prepare_build
+        env:
+          DRUPAL_TESTING_DRUPAL_VERSION: ${{ matrix.DRUPAL_TESTING_DRUPAL_VERSION }}
+
+      - name: Build the docroot
+        run: test-drupal-project build
+
+      - name: Test for deprecations
+        run: test-drupal-project deprecation
+        if: ${{ matrix.DRUPAL_TESTING_DRUPAL_VERSION != '~9.0.0' }}
+
+      - name: Install drupal
+        run: test-drupal-project install
+        env:
+          DRUPAL_TESTING_TEST_DEPRECATION: false
+
+      - name: Start webserver and run the tests
+        run: test-drupal-project

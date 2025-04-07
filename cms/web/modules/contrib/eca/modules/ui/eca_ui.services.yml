@@ -1,0 +1,5 @@
+services:
+
+  eca_ui.service.token_browser:
+    class: Drupal\eca_ui\Service\TokenBrowserService
+    arguments: ['@module_handler']

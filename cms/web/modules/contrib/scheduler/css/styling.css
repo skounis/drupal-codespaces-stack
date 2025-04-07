@@ -1,0 +1,12 @@
+/* Without a width value, the button extends 100% of the form */
+.scheduler-admin-form > .dropbutton-wrapper {
+  width: 30%;
+}
+
+/* Add default background to dropbutton items in Claro theme. This should only
+   affect the non-link group title items, and avoid them being transparent.
+   See https://www.drupal.org/project/scheduler/issues/3316719
+   and https://www.drupal.org/project/drupal/issues/3317323 */
+.scheduler-admin-form .dropbutton__item:first-of-type ~ .dropbutton__item {
+  background-color: #f2f4f5;
+}

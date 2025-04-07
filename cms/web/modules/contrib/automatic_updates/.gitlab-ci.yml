@@ -1,0 +1,275 @@
+################
+# DrupalCI GitLabCI template
+#
+# Gitlab-ci.yml to replicate DrupalCI testing for Contrib
+#
+# With thanks to:
+#   * The GitLab Acceleration Initiative participants
+#   * DrupalSpoons
+################
+
+################
+# Guidelines
+#
+# This template is designed to give any Contrib maintainer everything they need to test, without requiring modification. It is also designed to keep up to date with Core Development automatically through the use of include files that can be centrally maintained.
+#
+# However, you can modify this template if you have additional needs for your project.
+################
+
+################
+# Includes
+#
+# Additional configuration can be provided through includes.
+# One advantage of include files is that if they are updated upstream, the changes affect all pipelines using that include.
+#
+# Includes can be overridden by re-declaring anything provided in an include, here in gitlab-ci.yml
+# https://docs.gitlab.com/ee/ci/yaml/includes.html#override-included-configuration-values
+################
+
+include:
+  ################
+  # DrupalCI includes:
+  # As long as you include this, any future includes added by the Drupal Association will be accessible to your pipelines automatically.
+  # View these include files at https://git.drupalcode.org/project/gitlab_templates/
+  ################
+  - project: $_GITLAB_TEMPLATES_REPO
+    # "ref" value can be:
+    # - Recommended (default) - `ref: $_GITLAB_TEMPLATES_REF` - The Drupal Association will update this value to the recommended tag for contrib.
+    # - Latest - `ref: main` - Get the latest additions and bug fixes as they are merged into the templates.
+    # - Minor or Major latests - `ref: 1.x-latest` or `ref: 1.0.x-latest` - Get the latest additions within a minor (mostly bugfixes) or major (bugs and new features).
+    # - Fixed tag - `ref: 1.0.1` - Set the value to a known tag. This will not get any updates.
+    # If you change the default value of ref, you should set the _CURL_TEMPLATES_REF variable in the variables section to be the same as set here.
+    ref: $_GITLAB_TEMPLATES_REF
+    file:
+      - '/includes/include.drupalci.main.yml'
+      # EXPERIMENTAL: For Drupal 7, remove the above line and uncomment the below.
+      # - '/includes/include.drupalci.main-d7.yml'
+      - '/includes/include.drupalci.variables.yml'
+      - '/includes/include.drupalci.workflows.yml'
+
+################
+# Pipeline configuration variables
+#
+# These are the variables provided to the Run Pipeline form that a user may want to override.
+#
+# Docs at https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.variables.yml
+################
+variables:
+  _PHPUNIT_CONCURRENT: '1'
+  _PHPUNIT_TESTGROUPS: ''
+  # Always test against the previous minor version of core.
+  OPT_IN_TEST_PREVIOUS_MINOR: '1'
+  OPT_IN_TEST_PREVIOUS_MAJOR: '1'
+  # Test against the next major version of core, with Automatic Updates and
+  # Package Manager included as core modules.
+  OPT_IN_TEST_NEXT_MAJOR: '1'
+  # @todo Remove this line when https://drupal.org/i/3414093 is fixed.
+  CI_DEBUG_SERVICES: "true"
+  _TARGET_DB_TYPE: "mariadb"
+  _TARGET_DB_VERSION: "10.6"
+  # Always show environment variables, to help in debugging CI problems.
+  _SHOW_ENVIRONMENT_VARIABLES: '1'
+
+
+###################################################################################
+#
+#                                        *
+#                                       /(
+#                                      ((((,
+#                                    /(((((((
+#                                   ((((((((((*
+#                                ,(((((((((((((((
+#                              ,(((((((((((((((((((
+#                            ((((((((((((((((((((((((*
+#                         *(((((((((((((((((((((((((((((
+#                       ((((((((((((((((((((((((((((((((((*
+#                    *((((((((((((((((((  .((((((((((((((((((
+#                  ((((((((((((((((((.       /(((((((((((((((((*
+#                /(((((((((((((((((            .(((((((((((((((((,
+#             ,((((((((((((((((((                 ((((((((((((((((((
+#           .((((((((((((((((((((                   .(((((((((((((((((
+#          (((((((((((((((((((((((                     ((((((((((((((((/
+#        (((((((((((((((((((((((((((/                    ,(((((((((((((((*
+#      .((((((((((((((/  /(((((((((((((.                   ,(((((((((((((((
+#     *((((((((((((((      ,(((((((((((((/                   *((((((((((((((.
+#    ((((((((((((((,          /(((((((((((((.                  ((((((((((((((,
+#   (((((((((((((/              ,(((((((((((((*                 ,(((((((((((((,
+#  *(((((((((((((                .(((((((((((((((                ,(((((((((((((
+#  ((((((((((((/                /((((((((((((((((((.              ,((((((((((((/
+# (((((((((((((              *(((((((((((((((((((((((*             *((((((((((((
+# (((((((((((((            ,(((((((((((((..(((((((((((((           *((((((((((((
+# ((((((((((((,          /((((((((((((*      /((((((((((((/         ((((((((((((
+# (((((((((((((        /((((((((((((/          (((((((((((((*       ((((((((((((
+# (((((((((((((/     /((((((((((((               ,((((((((((((,    *((((((((((((
+#  ((((((((((((((  *(((((((((((/                   *((((((((((((.  ((((((((((((/
+#  *((((((((((((((((((((((((((,                      /(((((((((((((((((((((((((
+#   (((((((((((((((((((((((((                         ((((((((((((((((((((((((,
+#   .(((((((((((((((((((((((/                         ,(((((((((((((((((((((((
+#     ((((((((((((((((((((((/                         ,(((((((((((((((((((((/
+#      *(((((((((((((((((((((                         (((((((((((((((((((((,
+#       ,(((((((((((((((((((((,                      ((((((((((((((((((((/
+#         ,(((((((((((((((((((((*                  /((((((((((((((((((((
+#            ((((((((((((((((((((((,           ,/((((((((((((((((((((,
+#              ,(((((((((((((((((((((((((((((((((((((((((((((((((((
+#                 .(((((((((((((((((((((((((((((((((((((((((((((
+#                     .((((((((((((((((((((((((((((((((((((,.
+#                          .,(((((((((((((((((((((((((.
+#
+###################################################################################
+
+.extra-variables: &extra-variables
+  - MODULE_DIR=$_WEB_ROOT/modules/custom/$CI_PROJECT_NAME
+  # Strip the `-dev` suffix out of $DRUPAL_CORE to reveal the name of the Drupal core branch or tag.
+  - CORE_REF=`echo $DRUPAL_CORE | sed -e "s/-dev$//"`
+
+# Work around an incorrect assumption in the GitLab CI templates, which assume
+# that the module directory will have a `composer.lock` file.
+# @see https://git.drupalcode.org/project/gitlab_templates/-/blob/main/includes/include.drupalci.main.yml?ref_type=heads#L444
+# @todo Remove this when https://drupal.org/i/3453001 is fixed.
+composer-lint:
+  before_script:
+    - *extra-variables
+    - cp composer.lock $MODULE_DIR
+
+composer:
+  extends: .composer-base
+  before_script:
+    # In this case, we want to archive everything.
+    - rm .gitattributes
+    - composer archive --file=module
+  after_script:
+    - *extra-variables
+    - rm -r -f $MODULE_DIR
+    - mkdir -p $MODULE_DIR
+    - tar -x -f module.tar -C $MODULE_DIR
+    - rm module.tar
+    - git clone https://git.drupalcode.org/project/drupal.git --depth 1 --branch $CORE_REF /tmp/drupal-core
+    - cp -R /tmp/drupal-core/composer .
+    # Copy to web as well as \Drupal\Composer\Composer will expect it be there.
+    - cp -R /tmp/drupal-core/composer web
+
+composer (previous minor):
+  before_script:
+    - !reference [composer, before_script]
+  after_script:
+    - !reference [composer, after_script]
+
+composer (previous major):
+  before_script:
+    - !reference [composer, before_script]
+  after_script:
+    - !reference [composer, after_script]
+
+#composer (next major):
+#  image:
+#    name: $_CONFIG_DOCKERHUB_ROOT/php-8.3-ubuntu-apache:production
+#  before_script:
+#    - !reference [composer, before_script]
+#  after_script:
+#    - !reference [composer, after_script]
+
+#core conversion:
+#  stage: build
+#  needs:
+#    - composer (next major)
+#  script:
+#    - *extra-variables
+#    # Remove the one core patch we currently apply. We can do this because it does
+#    # not affect Package Manager or Automatic Updates at all. We should remove this
+#    # line once we make the converter command's calls to `patch` work properly on
+#    # GitLab CI.
+#    - rm $MODULE_DIR/scripts/core-patches/3331078-allow-prerelease.patch
+#    # Convert Automatic Updates and Package Manager to core modules.
+#    - composer run core-convert --working-dir=$MODULE_DIR -- $CI_PROJECT_DIR/$_WEB_ROOT --gitlabci_path=$CI_PROJECT_DIR --core_target_branch=$CORE_REF
+#    # Confirm that both modules are now in core, then remove the contrib module.
+#    - test -d $_WEB_ROOT/core/modules/auto_updates
+#    - test -d $_WEB_ROOT/core/modules/package_manager
+#    - rm -r -f $MODULE_DIR
+#  artifacts: !reference [composer (next major), artifacts]
+
+phpcs:
+  before_script:
+    # Use core's PHPCS configuration.
+    - cp $_WEB_ROOT/core/phpcs.xml.dist .
+
+phpstan:
+  before_script:
+    - *extra-variables
+    # Ensure our PHPStan configuration has the correct include path to core's PHPStan configuration.
+    - sed -i "s#%rootDir%/../../../#%rootDir%/../../../$_WEB_ROOT/#" $MODULE_DIR/phpstan.neon
+
+# Disable this job entirely; the modules are moved to core.
+#phpstan (next major):
+#  rules:
+#    - when: never
+
+phpunit:
+  parallel:
+    matrix:
+      - MODULE:
+          - automatic_updates_extensions
+          - automatic_updates
+          - package_manager
+        TEST_TYPE:
+          - Unit
+          - Kernel
+          - Functional
+          - FunctionalJavascript
+          - Build
+  rules:
+    # Automatic Updates Extensions has no unit or functional JavaScript tests.
+    - if: $MODULE == "automatic_updates_extensions" && ($TEST_TYPE == "Unit" || $TEST_TYPE == "FunctionalJavascript")
+      when: never
+    # Package Manager has no functional JavaScript tests.
+    - if: $MODULE == "package_manager" && $TEST_TYPE == "FunctionalJavascript"
+      when: never
+    - when: on_success
+  variables:
+    _PHPUNIT_EXTRA: '--types PHPUnit-$TEST_TYPE --module $MODULE'
+
+phpunit (previous major):
+  rules:
+    - !reference [phpunit, rules]
+
+phpunit (previous minor):
+  rules:
+    - !reference [phpunit, rules]
+
+#phpunit (next major):
+#  allow_failure: false
+#  image:
+#    name: $_CONFIG_DOCKERHUB_ROOT/php-8.3-ubuntu-apache:production
+#  rules:
+#    - !reference [phpunit, rules]
+
+#phpunit (core):
+#  extends: .phpunit-base
+#  image:
+#    name: $_CONFIG_DOCKERHUB_ROOT/php-8.3-ubuntu-apache:production
+#  needs:
+#    - core conversion
+#  parallel:
+#    matrix:
+#      - MODULE:
+#          - auto_updates
+#          - package_manager
+#        TEST_TYPE:
+#          - Unit
+#          - Kernel
+#          - Functional
+#          - FunctionalJavascript
+#          - Build
+#  rules:
+#    - if: $OPT_IN_TEST_NEXT_MAJOR != "1" || $SKIP_PHPUNIT == "1"
+#      when: never
+#    # Package Manager has no functional JavaScript tests.
+#    - if: $MODULE == "package_manager" && $TEST_TYPE == "FunctionalJavascript"
+#      when: never
+#    - when: on_success
+#  variables:
+#    _PHPUNIT_EXTRA: '--types PHPUnit-$TEST_TYPE --module $MODULE'
+#    # This variable prevents a deprecation error; see https://www.drupal.org/node/3422624.
+#    MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless"]}}, "http://localhost:9515"]'
+#    # Ensure deprecations will cause tests to fail, except for deprecations that core
+#    # specifically ignores.
+#    SYMFONY_DEPRECATIONS_HELPER: 'ignoreFile=$CI_PROJECT_DIR/$_WEB_ROOT/core/.deprecation-ignore.txt'

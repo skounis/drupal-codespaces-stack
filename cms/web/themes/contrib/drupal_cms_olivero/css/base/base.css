@@ -1,0 +1,8 @@
+body {
+  hyphens: none;
+}
+
+:root {
+  /* Additional gray to ensure contrast on the light gray background */
+  --color--gray-40: hsl(var(--color--gray-hue), var(--color--gray-saturation), 40%);
+}

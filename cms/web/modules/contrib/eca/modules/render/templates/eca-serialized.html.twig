@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Default theme implementation for serialized data using ECA.
+ *
+ * Available variables:
+ * - serialized: The serialized data.
+ * - format: The used serialization format (e.g. "json").
+ * - method: The used method, either "serialize" or "unserialize".
+ * - data: The not-serialized data.
+ * - wrap: Boolean indicating whether the serialized string should be wrapped by
+ *         an HTML script tag.
+ *
+ * @see template_preprocess_eca_serialized()
+ *
+ * @ingroup themeable
+ */
+#}
+{% apply spaceless %}
+  {% if wrap %}
+    <script {{ attributes }}>{{ serialized|raw }}</script>
+  {% else %}
+    {{ serialized|raw }}
+  {% endif %}
+{% endapply %}

@@ -1,0 +1,68 @@
+project_browser.admin_settings:
+  type: config_object
+  label: "Project Browser admin settings"
+  mapping:
+    enabled_sources:
+      type: sequence
+      label: 'Enabled for project data'
+      sequence:
+        type: string
+        label: 'Source'
+    allow_ui_install:
+      type: boolean
+      label: 'Allow installing packages from within the UI'
+    allowed_projects:
+      type: sequence
+      label: 'Allow-lists of projects, keyed by source plugin ID'
+      sequence:
+        type: sequence
+        label: 'List of allowed projects'
+        sequence:
+          type: string
+          label: 'Project identifier'
+          constraints:
+            NotBlank: []
+    max_selections:
+      type: integer
+      nullable: true
+      label: 'The maximum number of projects that can be chosen for installation at once. Internal use only.'
+
+block.settings.project_browser_block:*:
+  type: block_settings
+  label: 'Project Browser block settings'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    paginate:
+      type: boolean
+      label: 'Enable pagination'
+    page_sizes:
+      type: string
+      label: 'Page sizes'
+      constraints:
+        # A comma-separated list of numbers with fuzzy spacing, e.g. `32, 64,88`.
+        Regex: '/^([0-9]+\s*,?\s*)+$/'
+    sort_options:
+      type: sequence
+      label: 'Sort options'
+      nullable: true
+      sequence:
+        type: string
+        label: 'Sort option ID'
+        constraints:
+          NotBlank: []
+    default_sort:
+      type: string
+      label: 'Default sort criterion'
+      nullable: true
+      constraints:
+        NotBlank: []
+    filters:
+      type: sequence
+      label: 'Enabled filters'
+      nullable: true
+      sequence:
+        type: string
+        label: 'Filter ID'
+        constraints:
+          NotBlank: []

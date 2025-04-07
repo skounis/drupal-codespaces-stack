@@ -1,0 +1,56 @@
+block.settings.simple_search_form_block:
+  type: block_settings
+  label: 'Simple search form block'
+  mapping:
+    action_path:
+      type: path
+      label: 'Path'
+    get_parameter:
+      type: string
+      label: 'GET parameter'
+    input_type:
+      type: string
+      label: 'Input element type'
+    search_api_autocomplete:
+      type: mapping
+      label: 'Search API views view to be used:'
+      mapping:
+        search_id:
+          type: string
+          label: 'View ID'
+        display:
+          type: string
+          label: 'View display ID'
+        arguments:
+          type: string
+          label: 'View arguments'
+        filter:
+          type: string
+          label: 'Fulltext search filter machine name'
+    input_label:
+      type: label
+      label: 'Search label'
+    input_label_display:
+      type: string
+      label: 'Label display mode'
+    input_placeholder:
+      type: label
+      label: 'Search placeholder'
+    input_css_classes:
+      type: string
+      label: 'Search CSS classes'
+    submit_display:
+      type: boolean
+      label: 'Display submit button'
+    submit_label:
+      type: label
+      label: 'Submit label'
+    input_keep_value:
+      type: boolean
+      label: 'Keep value in search input after form submit'
+    preserve_url_query_parameters:
+      type: sequence
+      label: 'Preserve query parameters from URL'
+      sequence:
+        type: string
+        label: 'URL query parameter to preserve'

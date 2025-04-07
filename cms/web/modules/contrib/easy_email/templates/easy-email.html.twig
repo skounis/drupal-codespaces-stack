@@ -1,0 +1,62 @@
+{#
+/**
+ * @file easy_email.html.twig
+ * Default theme implementation to present Email data.
+ *
+ * This template is used when viewing Email pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_easy_email()
+ *
+ * @ingroup themeable
+ */
+#}
+{{ attach_library('easy_email/preview') }}
+{% set status = is_sent ? ('Sent' | t) : ('Unsent' | t) %}
+<div{{ attributes.addClass('easy-email') }}>
+  <fieldset>
+    <legend>{{ 'Status' | t }}</legend>
+    <div>
+      <label>{{ 'Status' | t }}</label>: {{ status }}
+    </div>
+    {% if is_sent and sent_time %}
+      <div>
+        <label>{{ 'Sent time' | t }}</label>: {{ sent_time | format_date('short') }}
+      </div>
+    {% endif %}
+  </fieldset>
+  <fieldset data-drupal-selector="headers">
+    <legend>{{ 'Headers' | t }}</legend>
+    {% for header in headers %}
+      <div data-drupal-selector="header-{{ header.name }}"><label>{{ header.name }}:</label> <span class="value">{{ header.value }}</span></div>
+    {% endfor %}
+  </fieldset>
+  <fieldset data-drupal-selector="inbox-preview">
+    <legend>{{ 'Inbox preview' | t }}</legend>
+    <div class="easy-email-resizable inbox-preview-resizable">
+      {{ inbox_preview }}
+    </div>
+  </fieldset>
+  {% if preview_html_url %}
+    <fieldset data-drupal-selector="html-body" class="easy-email-resizable">
+      <legend>{{ 'HTML body' | t }}</legend>
+      <iframe frameBorder="0" width="100%" height="100%" src="{{ preview_html_url }}"></iframe>
+    </fieldset>
+  {% endif %}
+  {% if preview_plain_url %}
+    <fieldset data-drupal-selector="plain-body" class="easy-email-resizable">
+      <legend>{{ 'Plain text body' | t }}</legend>
+      <iframe frameBorder="0" width="100%" height="100%" src="{{ preview_plain_url }}"></iframe>
+    </fieldset>
+  {% endif %}
+  {% if attachments %}
+    <fieldset data-drupal-selector="attachments">
+      <legend>{{ 'Attachments' | t }}</legend>
+      {{ attachments }}
+    </fieldset>
+  {% endif %}
+</div>

@@ -1,0 +1,5 @@
+entity.ai_agent_decision.collection:
+  title: 'Agent Decisions'
+  route_name: entity.ai_agent_decision.collection
+  base_route: system.admin_content
+  weight: 10

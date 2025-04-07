@@ -1,0 +1,568 @@
+<?php
+
+/**
+ * @file
+ * Scheduler Content Moderation Integration.
+ *
+ * This submodule provides extended options widget populated with default
+ * revision states to allow publishing and un-publishing of entities which are
+ * moderated.
+ *
+ * @see https://www.drupal.org/project/scheduler/issues/2798689
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EditorialContentEntityBase;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\content_moderation\ContentModerationState;
+use Drupal\workflows\Transition;
+
+require_once dirname(__FILE__) . '/includes/scheduler_hooks.inc';
+
+/**
+ * Implements hook_entity_access().
+ *
+ * Deny access to users not having access to scheduled transitions, similar to
+ * what is done in content_moderation_entity_access() by checking for valid
+ * transitions.
+ */
+function scheduler_content_moderation_integration_entity_access(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
+  /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_info */
+  $moderation_info = Drupal::service('content_moderation.moderation_information');
+
+  if ($operation === 'update' && $moderation_info->isModeratedEntity($entity) && $entity->moderation_state) {
+    $states = [];
+    if (isset($entity->publish_state) && isset($entity->publish_on->value)) {
+      $states[] = $entity->publish_state;
+    }
+    if (isset($entity->unpublish_state) && isset($entity->unpublish_on->value)) {
+      $states[] = $entity->unpublish_state;
+    }
+
+    /** @var \Drupal\workflows\WorkflowInterface $workflow */
+    $workflow = $moderation_info->getWorkflowForEntity($entity);
+    $current_state = $workflow->getTypePlugin()->getState($entity->moderation_state->value);
+    /** @var \Drupal\content_moderation\StateTransitionValidation $transition_validation */
+    $transition_validation = \Drupal::service('content_moderation.state_transition_validation');
+    foreach ($states as $state) {
+      try {
+        $scheduled_state = $workflow->getTypePlugin()->getState($state->value);
+        if (!$transition_validation->isTransitionValid($workflow, $current_state, $scheduled_state, $account, $entity)) {
+
+          return AccessResult::forbidden('Scheduled transition is not valid for the given account.');
+        }
+      }
+      catch (\InvalidArgumentException) {
+        // Just move on when there is no valid state.
+      }
+    }
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function scheduler_content_moderation_integration_entity_base_field_info(EntityTypeInterface $entity_type): array {
+  $fields = [];
+  // Cater for all entity types supported by the Scheduler entity plugins.
+  $entity_types = &drupal_static(__FUNCTION__);
+  if (empty($entity_types)) {
+    $entity_types = \Drupal::service('scheduler.manager')->getPluginEntityTypes();
+  }
+  /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_information */
+  $moderation_information = \Drupal::service('content_moderation.moderation_information');
+
+  // Define the fields if the entity type is supported via a Scheduler plugin
+  // and the entity type is moderatable.
+  if (in_array($entity_type->id(), $entity_types) && $moderation_information->canModerateEntitiesOfEntityType($entity_type)) {
+    $fields['publish_state'] = BaseFieldDefinition::create('list_string')
+      ->setSetting('allowed_values_function', '_scheduler_content_moderation_integration_states_values')
+      ->setLabel(t('Publish state'))
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'region' => 'hidden',
+        'weight' => -5,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'scheduler_moderation',
+        'region' => 'hidden',
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', FALSE)
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->addConstraint('SchedulerPublishState')
+      ->addConstraint('SchedulerModerationTransitionAccess');
+
+    $fields['unpublish_state'] = BaseFieldDefinition::create('list_string')
+      ->setSetting('allowed_values_function', '_scheduler_content_moderation_integration_states_values')
+      ->setLabel(t('Unpublish state'))
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'region' => 'hidden',
+        'weight' => -5,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'scheduler_moderation',
+        'region' => 'hidden',
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', FALSE)
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->addConstraint('SchedulerUnPublishState')
+      ->addConstraint('SchedulerModerationTransitionAccess');
+  }
+
+  return $fields;
+}
+
+/**
+ * Add publish state and unpublish state fields to supported entity types.
+ *
+ * This is called from hook_update_9001 and hook_modules_installed().
+ */
+function _scheduler_content_moderation_integration_add_fields(): array {
+  $entityUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $list = $entityUpdateManager->getChangeList();
+  $output = [];
+  foreach ($list as $entity_type_id => $definitions) {
+    if (($definitions['field_storage_definitions']['publish_state'] ?? 0) || ($definitions['field_storage_definitions']['unpublish_state'] ?? 0)) {
+      $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+      $fields = scheduler_content_moderation_integration_entity_base_field_info($entity_type);
+      foreach ($fields as $field_name => $field_definition) {
+        $entityUpdateManager->installFieldStorageDefinition($field_name, $entity_type_id, $entity_type_id, $field_definition);
+      }
+      if (!empty($fields)) {
+        \Drupal::logger('SCMI')->notice('%entity entity type updated with %publish_state and %unpublish_state fields for Scheduler Content Moderation Integration.', [
+          '%entity' => $entity_type->getLabel(),
+          '%publish_state' => $fields['publish_state']->getLabel(),
+          '%unpublish_state' => $fields['unpublish_state']->getLabel(),
+        ]);
+        $output[] = (string) $entity_type->getLabel();
+      }
+    }
+  }
+  return $output;
+}
+
+/**
+ * Remove publish state and unpublish state fields to match base definition.
+ *
+ * The two state fields are now not defined for entity types that are not
+ * moderatable. This may leave db fields in the database for which there is no
+ * definition according to hook_entity_base_field_info. The status report may
+ * show "The publish state field needs to be uninstalled". This function fixes
+ * the problem. It is called from hook_update_9003 but can also be called via
+ * drush ev "_scheduler_content_moderation_integration_remove_fields()".
+ */
+function _scheduler_content_moderation_integration_remove_fields(): array {
+  // Find all changed entity definitions.
+  $entityUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $list = $entityUpdateManager->getChangeList();
+  $output = [];
+  foreach ($list as $entity_type_id => $definitions) {
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+    if (isset($definitions['field_storage_definitions'])) {
+      foreach (['publish_state', 'unpublish_state'] as $field_name) {
+        $change = ($definitions['field_storage_definitions'][$field_name] ?? NULL);
+        // If the field is marked as deleted then remove it.
+        if ($change == $entityUpdateManager::DEFINITION_DELETED && $field = $entityUpdateManager->getFieldStorageDefinition($field_name, $entity_type_id)) {
+          $entityUpdateManager->uninstallFieldStorageDefinition($field);
+          $output[$entity_type_id] = t('%publish_state and %unpublish_state fields removed from %entity entity type', [
+            '%publish_state' => t('Publish state'),
+            '%unpublish_state' => t('Unpublish state'),
+            '%entity' => $entity_type->getLabel(),
+          ]);
+          \Drupal::logger('SCMI')->info('%field field removed from %entity entity type', [
+            '%field' => $field->getLabel(),
+            '%entity' => $entity_type->getLabel(),
+          ]);
+        }
+      }
+    }
+  }
+  return $output;
+}
+
+/**
+ * Show or hide form fields to match the Scheduler enabled/disabled settings.
+ *
+ * This is called from hook_update_9002 and hook_install().
+ */
+function _scheduler_content_moderation_integration_reset_form_display(): array {
+  /** @var \Drupal\scheduler\SchedulerManager $scheduler_manager */
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+
+  /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_information */
+  $moderation_information = \Drupal::service('content_moderation.moderation_information');
+
+  /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+  $display_repository = \Drupal::service('entity_display.repository');
+
+  $fields_displayed = [];
+  $fields_hidden = [];
+  foreach ($scheduler_manager->getPlugins() as $entityTypeId => $plugin) {
+    /** @var Drupal\Core\Entity\ContentEntityTypeInterface $content_entity_type */
+    $content_entity_type = \Drupal::entityTypeManager()->getDefinition($entityTypeId);
+    $can_moderate = $moderation_information->canModerateEntitiesOfEntityType($content_entity_type);
+
+    $all_display_modes = array_keys($display_repository->getFormModes($entityTypeId));
+    $all_display_modes[] = $display_repository::DEFAULT_DISPLAY_MODE;
+    $supported_display_modes = $plugin->entityFormDisplayModes();
+
+    $bundles = $plugin->getTypes();
+    foreach ($bundles as $bundle_id => $bundle) {
+      foreach ($all_display_modes as $display_mode) {
+        $form_display = $display_repository->getFormDisplay($entityTypeId, $bundle_id, $display_mode);
+        // If the form display is new and not saved yet, do nothing with it.
+        // @see https://www.drupal.org/i/3359796
+        if ($form_display->isNew()) {
+          continue;
+        }
+        $third_party = $bundle->getThirdPartySettings('scheduler');
+
+        if (($third_party['publish_enable'] ?? 0) && in_array($display_mode, $supported_display_modes) && $can_moderate) {
+          $form_display->setComponent('publish_state', ['type' => 'scheduler_moderation', 'weight' => 53])->save();
+          $fields_displayed['publish_state']["{$bundle->getEntityType()->getCollectionLabel()}"][] = $bundle->label();
+        }
+        else {
+          $form_display->removeComponent('publish_state')->save();
+          $fields_hidden['publish_state']["{$bundle->getEntityType()->getCollectionLabel()}"][] = $bundle->label();
+        }
+
+        if (($third_party['unpublish_enable'] ?? 0) && in_array($display_mode, $supported_display_modes) && $can_moderate) {
+          $form_display->setComponent('unpublish_state', ['type' => 'scheduler_moderation', 'weight' => 55])->save();
+          $fields_displayed['unpublish_state']["{$bundle->getEntityType()->getCollectionLabel()}"][] = $bundle->label();
+        }
+        else {
+          $form_display->removeComponent('unpublish_state')->save();
+          $fields_hidden['unpublish_state']["{$bundle->getEntityType()->getCollectionLabel()}"][] = $bundle->label();
+        }
+      }
+    }
+  }
+
+  $output = [];
+  // Get fields info to use labels. Does not matter which entity type.
+  $fields = scheduler_content_moderation_integration_entity_base_field_info($content_entity_type);
+  foreach ($fields as $field_name => $field) {
+    if (isset($fields_displayed[$field_name])) {
+      $output[] = t('%field displayed for: @list', [
+        '%field' => $fields[$field_name]->getLabel(),
+        '@list' => _scheduler_content_moderation_integration_format_text($fields_displayed[$field_name]),
+      ]);
+    }
+    if (isset($fields_hidden[$field_name])) {
+      $output[] = t('%field hidden for: @list', [
+        '%field' => $fields[$field_name]->getLabel(),
+        '@list' => _scheduler_content_moderation_integration_format_text($fields_hidden[$field_name]),
+      ]);
+    }
+  }
+  foreach ($output as $message) {
+    \Drupal::logger('SCMI')->notice($message);
+  }
+  return $output;
+}
+
+/**
+ * Helper function to format the list of fields on bundles.
+ */
+function _scheduler_content_moderation_integration_format_text($fields): string {
+  return implode(', ', array_map(function ($name, $bundles) {
+    return "$name (" . implode(', ', $bundles) . ")";
+  }, array_keys($fields), $fields));
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function scheduler_content_moderation_integration_modules_installed($modules): void {
+  /** @var \Drupal\scheduler\SchedulerManager $scheduler_manager */
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+  $scheduler_manager->invalidatePluginCache();
+
+  // If there is a Scheduler plugin for a newly installed module then update
+  // the base tables adding publish_state and unpublish_state for that entity
+  // type. Third-party modules can provide Scheduler plugins for entity types
+  // that are not defined by that module, or that do not have the same id as the
+  // module name. Similarly, core modules define entity types for which
+  // Scheduler provides the plugin. Hence, we need to check both the plugin
+  // entity type and the provider and if either of these match a module that is
+  // being installed then run the update functions.
+  $matches = [];
+  $plugin_definitions = $scheduler_manager->getPluginDefinitions();
+  foreach ($plugin_definitions as $definition) {
+    // If the plugin entity type, provider or dependency match any of the
+    // modules being installed then add the entity type to the $matches list.
+    if (array_intersect([$definition['entityType'], $definition['provider'], $definition['dependency']], $modules)) {
+      $matches[] = $definition['entityType'];
+    }
+  }
+  if (!empty($matches)) {
+    // Add the database fields.
+    _scheduler_content_moderation_integration_add_fields();
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function scheduler_content_moderation_integration_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
+  // Get all 'add' and 'edit' form ids for all supported entity types.
+  $scheduler_manager = \Drupal::service('scheduler.manager');
+
+  if (!in_array($form_id, $scheduler_manager->getEntityFormIds())) {
+    // If the form is an entity type then we need to add a submit-handler
+    // for the publish_state/unpublish_state.
+    if (in_array($form_id, $scheduler_manager->getEntityTypeFormIds())) {
+      $form['actions']['submit']['#submit'][] = '_scheduler_content_moderation_integration_form_entity_type_submit';
+    }
+    return;
+  }
+
+  // Attach the publish/un-publish state form elements to the scheduler
+  // settings group.
+  $form['publish_state']['#group'] = 'scheduler_settings';
+  $form['unpublish_state']['#group'] = 'scheduler_settings';
+
+  $form['publish_state']['widget']['#after_build'][] = '_scheduler_content_moderation_integration_hide_empty_state_options';
+  $form['unpublish_state']['widget']['#after_build'][] = '_scheduler_content_moderation_integration_hide_empty_state_options';
+
+  // If scheduling for publish/unpublish is not enabled, then hide the
+  // corresponding state selection field. If #access is already set to false
+  // (for example by a third-party module) then do not override that setting.
+  $config = \Drupal::config('scheduler.settings');
+  /** @var \Drupal\Core\Entity\EntityInterface $entity */
+  $entity = $form_state->getFormObject()->getEntity();
+
+  // If scheduling for publish/unpublish is not enabled, then hide the state
+  // selection field.
+  $form['publish_state']['#access'] = ($form['publish_state']['#access'] ?? TRUE) && $scheduler_manager->getThirdPartySetting($entity, 'publish_enable', $config->get('default_publish_enable'));
+  $form['unpublish_state']['#access'] = ($form['unpublish_state']['#access'] ?? TRUE) && $scheduler_manager->getThirdPartySetting($entity, 'unpublish_enable', $config->get('default_unpublish_enable'));
+}
+
+/**
+ * Entity type form submit handler.
+ */
+function _scheduler_content_moderation_integration_form_entity_type_submit($form, FormStateInterface $form_state): void {
+  // Get the entity type id (node, media, taxonomy_term, etc.)
+  $entity_type_id = $form_state->getFormObject()->getEntity()->getEntityType()->getBundleOf();
+  // Get the entity bundle id (page, article, image, etc.)
+  $bundle_id = $form_state->getFormObject()->getEntity()->id();
+
+  /** @var Drupal\Core\Entity\ContentEntityTypeInterface $content_entity_type */
+  $content_entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+
+  /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_information */
+  $moderation_information = \Drupal::service('content_moderation.moderation_information');
+  $can_moderate = $moderation_information->canModerateEntitiesOfEntityType($content_entity_type);
+
+  /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+  $display_repository = \Drupal::service('entity_display.repository');
+
+  // Get all active display modes. getFormModes() returns the additional modes
+  // then add the default.
+  $all_display_modes = array_keys($display_repository->getFormModes($entity_type_id));
+  $all_display_modes[] = $display_repository::DEFAULT_DISPLAY_MODE;
+
+  $supported_display_modes = \Drupal::service('scheduler.manager')->getPlugin($entity_type_id)->entityFormDisplayModes();
+
+  // Each of the active form display modes may need to be adjusted to add or
+  // remove the scheduler fields depending on the 'enable' setting.
+  foreach ($all_display_modes as $display_mode) {
+    $form_display = $display_repository->getFormDisplay($entity_type_id, $bundle_id, $display_mode);
+
+    // If this bundle is not enabled for scheduled publishing or the form
+    // display mode is not supported or the entity type cannot be moderated then
+    // make sure the publish_state field is disabled in the form display.
+    if (!$form_state->getValue('scheduler_publish_enable') || !in_array($display_mode, $supported_display_modes) || !$can_moderate) {
+      $form_display->removeComponent('publish_state')->save();
+    }
+    elseif ($form_state->getValue('scheduler_publish_enable')) {
+      $form_display->setComponent('publish_state', ['type' => 'scheduler_moderation', 'weight' => 53])->save();
+    }
+
+    // Do the same for the unpublish_state field.
+    if (!$form_state->getValue('scheduler_unpublish_enable') || !in_array($display_mode, $supported_display_modes) || !$can_moderate) {
+      $form_display->removeComponent('unpublish_state')->save();
+    }
+    elseif ($form_state->getValue('scheduler_unpublish_enable')) {
+      $form_display->setComponent('unpublish_state', ['type' => 'scheduler_moderation', 'weight' => 55])->save();
+    }
+  }
+}
+
+/**
+ * Form API callback: Hide state element if there are no options to select.
+ */
+function _scheduler_content_moderation_integration_hide_empty_state_options(array $element, FormStateInterface $form_state): array {
+  foreach (Element::getVisibleChildren($element) as $key) {
+    // Hide the element if there are no options.
+    if (empty($element[$key]['#options'])) {
+      $element[$key]['#access'] = FALSE;
+    }
+    else {
+      // Hide the element if the only option is 'none'.
+      $options_without_none = array_diff_key($element[$key]['#options'], ['_none' => '']);
+      $element[$key]['#access'] = (bool) count($options_without_none);
+    }
+  }
+  return $element;
+}
+
+/**
+ * Helper function for the scheduler moderation widget.
+ *
+ * Helps on generating the options dynamically for the scheduler
+ * moderation widget.
+ *
+ * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+ *   The field storage definition.
+ * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
+ *   (optional) The entity context if known, or NULL if the allowed values are
+ *   being collected without the context of a specific entity.
+ * @param bool &$cacheable
+ *   (optional) If an $entity is provided, the $cacheable parameter should be
+ *   modified by reference and set to FALSE if the set of allowed values
+ *   returned was specifically adjusted for that entity and cannot not be reused
+ *   for other entities. Defaults to TRUE.
+ *
+ * @return array
+ *   The array of allowed values.
+ */
+function _scheduler_content_moderation_integration_states_values(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL, bool &$cacheable = FALSE): array {
+  $options = [];
+
+  // Fetch all possible states if no entity is given.
+  if (!$entity) {
+    $workflow_storage = \Drupal::entityTypeManager()->getStorage('workflow');
+
+    foreach ($workflow_storage->loadByProperties(['type' => 'content_moderation']) as $workflow) {
+      /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModerationInterface $workflow_type */
+      $workflow_type = $workflow->getTypePlugin();
+
+      foreach ($workflow_type->getStates() as $state_id => $state) {
+        $options[$workflow->id() . '_' . $state_id] = $state->label();
+      }
+    }
+
+    return $options;
+  }
+
+  /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_information */
+  $moderation_information = \Drupal::service('content_moderation.moderation_information');
+
+  // Only add options for moderated entities.
+  if (!$moderation_information->isModeratedEntity($entity)) {
+    return $options;
+  }
+
+  /** @var \Drupal\workflows\WorkflowInterface $workflow */
+  $workflow = $moderation_information->getWorkflowForEntity($entity);
+
+  /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModerationInterface $type_plugin */
+  $type_plugin = $workflow->getTypePlugin();
+
+  $user = \Drupal::currentUser();
+  $user_transitions = array_filter($type_plugin->getTransitions(), function (Transition $transition) use ($workflow, $user) {
+    return $user->hasPermission('use ' . $workflow->id() . ' transition ' . $transition->id());
+  });
+
+  // Grabs the entity moderation state if it has a value, otherwise it uses the
+  // default one.
+  $current_state = !empty($entity->moderation_state->value) ?
+    $type_plugin->getState($entity->moderation_state->value) :
+    $type_plugin->getState($type_plugin->getConfiguration()['default_moderation_state']);
+
+  // Record the possible new publish states for use when determining which of
+  // the unpublish states to add as valid options.
+  $new_publish_states = [];
+
+  // The option for '_none' must be included here, so that validation of the
+  // selected values via the 'allowed_values_function' setting will pass.
+  // However, there is no need to specify a label because this will be set
+  // automatically in OptionsWidgetBase::getOptions().
+  $publish_state_options['_none'] = '';
+  $unpublish_state_options['_none'] = '';
+
+  foreach ($user_transitions as $transition) {
+    /** @var \Drupal\content_moderation\ContentModerationState $state */
+    $state = $transition->to();
+    // Check that this transition is valid from the current state.
+    $ok_from_current = $current_state->canTransitionTo($state->id());
+
+    // Add this transition to the publish_state options if it is valid from the
+    // current state and the new state is defined as a 'published' state.
+    if ($ok_from_current && $state->isPublishedState() && $state->isDefaultRevisionState()) {
+      $publish_state_options[$state->id()] = $state->label();
+      // Save the state for use below when adding the unpublish_state options.
+      $new_publish_states[] = $state;
+    }
+
+    // For the unpublish_state options, there are two ways in which the
+    // transition can be a valid option (a) if it can be transitioned to from
+    // the entity's current state, or (b) if it can be transitioned to from any
+    // of the new possible published states.
+    if (!$state->isPublishedState() && $state->isDefaultRevisionState()) {
+      if ($ok_from_current) {
+        $unpublish_state_options[$state->id()] = $state->label();
+      }
+      foreach ($new_publish_states as $publish_state) {
+        if ($publish_state->canTransitionTo($state->id())) {
+          $unpublish_state_options[$state->id()] = $state->label();
+        }
+      }
+    }
+  }
+  // Finally return the options set for the field being processed.
+  return $definition->getName() === 'publish_state' ? $publish_state_options : $unpublish_state_options;
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function scheduler_content_moderation_integration_module_implements_alter(array &$implementations, string $hook): void {
+  // Scheduler module implements presave that sets entity status to 0 if
+  // the entity can't be published immediately.
+  // Scmi module has to make sure, moderation state is not set to published
+  // if entity status is set to 0.
+  if ($hook === 'entity_presave') {
+    $scmi_hook = $implementations['scheduler_content_moderation_integration'];
+    unset($implementations['scheduler_content_moderation_integration']);
+    $implementations['scheduler_content_moderation_integration'] = $scmi_hook;
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ *
+ * @see https://www.drupal.org/project/scheduler_content_moderation_integration/issues/3423224
+ */
+function scheduler_content_moderation_integration_entity_presave(EntityInterface $entity): void {
+  /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_information */
+  $moderation_information = \Drupal::service('content_moderation.moderation_information');
+  if (!$moderation_information->isModeratedEntity($entity)) {
+    return;
+  }
+  assert($entity instanceof EditorialContentEntityBase);
+  $new_state_value = $entity->get('moderation_state')->value;
+  $workflow = $moderation_information->getWorkflowForEntity($entity);
+  $new_state = $workflow?->getTypePlugin()->getState($new_state_value);
+  assert($new_state instanceof ContentModerationState);
+  if (!$entity->isPublished() && $new_state->isPublishedState()) {
+    $original_state = $moderation_information->getOriginalState($entity);
+    $entity->set('moderation_state', $original_state->id());
+  }
+}

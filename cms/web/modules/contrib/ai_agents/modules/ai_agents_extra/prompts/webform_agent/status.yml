@@ -1,0 +1,13 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following Prompt, give me back information if the form should be published or unpublished?
+  formats:
+    - status: open if the form is published, closed if its unpublished.
+      response: A one sentence response that the field(s) were moved
+  one_shot_learning_examples:
+    - status: open
+      response: The form is now live.
+    - status: closed
+      response: The form is now locked and not available.

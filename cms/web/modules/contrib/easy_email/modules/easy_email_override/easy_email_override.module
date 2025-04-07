@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Contains easy_email_override.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+
+/**
+ * Implements hook_help().
+ */
+function easy_email_override_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name === 'help.page.easy_email_override') {
+    $readme_file = file_exists(__DIR__ . '/README.md') ? __DIR__ . '/README.md' : __DIR__ . '/README.txt';
+    if (!file_exists($readme_file)) {
+      return NULL;
+    }
+    $text = file_get_contents($readme_file);
+    if ($text && !\Drupal::moduleHandler()->moduleExists('markdown')) {
+      return '<pre>' . $text . '</pre>';
+    }
+    else {
+      // Use the Markdown filter to render the README.
+      $filter_manager = \Drupal::service('plugin.manager.filter');
+      $settings = \Drupal::configFactory()->get('markdown.settings')->getRawData();
+      $config = ['settings' => $settings];
+      $filter = $filter_manager->createInstance('markdown', $config);
+      return $filter->process($text, 'en');
+    }
+  }
+  return NULL;
+}
+
+#[LegacyHook]
+function easy_email_override_easy_email_type_delete(\Drupal\easy_email\Entity\EasyEmailTypeInterface $easy_email_type) {
+  \Drupal::service(\Drupal\easy_email_override\Hook\EntityHooks::class)->easyEmailTypeDelete($easy_email_type);
+}
+
+#[LegacyHook]
+function easy_email_override_form_user_admin_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  \Drupal::service(\Drupal\easy_email_override\Hook\FormAlter::class)->userAdminSettings($form, $form_state, $form_id);
+}

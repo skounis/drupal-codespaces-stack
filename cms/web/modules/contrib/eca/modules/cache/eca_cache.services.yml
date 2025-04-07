@@ -1,0 +1,17 @@
+services:
+  cache.eca_memory:
+    class: Drupal\Core\Cache\MemoryCache\MemoryCache
+    arguments: ['@datetime.time']
+  cache.eca_default:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: ['@cache_factory', 'get']
+    arguments: [eca_default]
+  cache.eca_chained:
+    class: Drupal\Core\Cache\BackendChain
+    calls:
+      - [appendBackend, ['@cache.eca_memory']]
+      - [appendBackend, ['@cache.eca_default']]
+    tags:
+      - { name: cache.bin }

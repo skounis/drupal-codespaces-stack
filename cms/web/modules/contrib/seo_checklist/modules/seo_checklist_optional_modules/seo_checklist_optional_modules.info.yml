@@ -1,0 +1,38 @@
+name: SEO Checklist Optional Modules
+type: module
+description: Installs the optional modules recommended by the SEO Checklist.
+package: SEO
+core_version_requirement: ^8.8 || ^9 || ^10 || ^11
+dependencies:
+  - addtoany:addtoany
+  - admin_toolbar:admin_toolbar
+  - advagg:advagg
+  # Not currently installable due to Composer requirements conflicts.
+  # - amp:amp
+  - cloudflare:cloudflare
+  - coffee:coffee
+  - diff:diff
+  - easy_breadcrumb:easy_breadcrumb
+  - editor_advanced_link:editor_advanced_link
+  - filefield_paths:filefield_paths
+  - google_tag:google_tag
+  - honeypot:honeypot
+  - hreflang:hreflang
+  - metatag:metatag
+  - pathauto:pathauto
+  - redirect:redirect
+  - robotstxt:robotstxt
+  - scheduler:scheduler
+  - search404:search404
+  - security_review:security_review
+  - seo_checklist:seo_checklist
+  - sitemap:sitemap
+  - xmlsitemap:xmlsitemap
+  - yoast_seo:yoast_seo
+configure: checklistapi.checklists.seo_checklist
+lifecycle: deprecated 
+lifecycle_link: 'https://www.drupal.org/node/3475953'
+# Information added by Drupal.org packaging script on 2025-01-10
+version: '5.2.4'
+project: 'seo_checklist'
+datestamp: 1736549433

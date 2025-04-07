@@ -1,0 +1,33 @@
+# Configuration file for PHPStan static code checking, see https://phpstan.org .
+# PHPStan is triggered on Drupal CI in commit-code-check.sh.
+includes:
+  - phar://phpstan.phar/conf/bleedingEdge.neon
+
+parameters:
+  level: 1
+
+  paths:
+    - .
+
+  ignoreErrors:
+    # new static() is a best practice in Drupal, so we cannot fix that.
+    - "#^Unsafe usage of new static#"
+
+    # Ignore common errors for now.
+    - "#Drupal calls should be avoided in classes, use dependency injection instead#"
+
+    # Specific errors we don't want to or cannot fix.
+
+    - # Defined in the Search API Solr module, which we don't depend on.
+      message: "#^Access to undefined constant Drupal\\\\search_api_solr\\\\SolrBackendInterface::SEARCH_API_SOLR_SCHEMA_VERSION.$#"
+      paths:
+        - src/Form/IndexOverviewForm.php
+        - search_api_autocomplete.install
+      # For some reason, GitLab CI does seem to find that constant, so we don't
+      # want to report an error if this message was not matched.
+      reportUnmatched: false
+
+    - # Defined in the Search API Solr module, which we don't depend on.
+      message: "#^Return type of method Drupal\\\\search_api_autocomplete\\\\Plugin\\\\search_api_autocomplete\\\\suggester\\\\Server::getBackend\\(\\) has typehint with deprecated interface Drupal\\\\search_api_autocomplete\\\\AutocompleteBackendInterface:#"
+      count: 1
+      path: src/Plugin/search_api_autocomplete/suggester/Server.php

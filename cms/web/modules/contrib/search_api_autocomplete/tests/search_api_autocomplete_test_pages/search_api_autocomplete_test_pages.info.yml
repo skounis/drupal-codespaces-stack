@@ -1,0 +1,12 @@
+name: Search API Autocomplete Pages Test
+description: "Support module for testing integration of Search API Autocomplete with Search API Pages."
+dependencies:
+  - search_api_autocomplete:search_api_autocomplete_test
+  - search_api_page:search_api_page
+type: module
+package: Testing
+
+# Information added by Drupal.org packaging script on 2025-01-15
+version: '8.x-1.10'
+project: 'search_api_autocomplete'
+datestamp: 1736941749

@@ -1,0 +1,110 @@
+# Schema for the configuration files of the Drupal Symfony Mailer Lite module.
+
+symfony_mailer_lite.settings:
+  type: config_object
+  label: 'Drupal Symfony Mailer Lite settings'
+  mapping:
+    default_transport:
+      type: string
+      label: Default transport ID
+
+symfony_mailer_lite.message:
+  type: config_object
+  label: 'Drupal Symfony Mailer Lite message settings'
+  mapping:
+    content_type:
+      type: string
+      label: 'Content type'
+    override:
+      type: boolean
+      label: 'Override'
+    text_format:
+      type: string
+      label: 'Text format'
+    generate_plain:
+      type: boolean
+      label: 'Generate alternative plain text version'
+    character_set:
+      type: string
+      label: 'Character set'
+
+symfony_mailer_lite.symfony_mailer_lite_transport.*:
+  type: config_entity
+  label: 'Drupal Symfony Mailer Lite Transport'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: symfony_mailer_lite.transport_plugin.[%parent.plugin]
+
+symfony_mailer_lite.transport_plugin.dsn:
+  type: mapping
+  label: 'DSN transport'
+  mapping:
+    dsn:
+      type: string
+      label: 'DSN'
+
+symfony_mailer_lite.transport_plugin.native:
+  type: mapping
+  label: 'Native transport'
+
+symfony_mailer_lite.transport_plugin.null:
+  type: mapping
+  label: 'Null transport'
+
+symfony_mailer_lite.transport_plugin.sendmail:
+  type: mapping
+  label: 'Sendmail transport'
+  mapping:
+    query:
+      type: mapping
+      label: 'URL query parameters'
+      mapping:
+        command:
+          type: string
+          label: 'Sendmail command'
+
+
+symfony_mailer_lite.transport_plugin.smtp:
+  type: mapping
+  label: 'SMTP transport'
+  mapping:
+    user:
+      type: string
+      label: 'User name'
+    pass:
+      type: string
+      label: 'Password'
+    host:
+      type: string
+      label: 'Host name'
+    port:
+      type: integer
+      label: 'Port'
+    query:
+      type: mapping
+      label: 'URL query parameters'
+      mapping:
+        verify_peer:
+          type: boolean
+          label: 'Verify peer'
+        local_domain:
+          type: string
+          label: 'HELO command domain name'
+        restart_threshold:
+          type: integer
+          label: 'Restart threshold'
+        restart_threshold_sleep:
+          type: integer
+          label: 'Restart threshold sleep'
+        ping_threshold:
+          type: integer
+          label: 'Ping threshold'

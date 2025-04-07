@@ -1,0 +1,11 @@
+name: "Token Or Webform test"
+type: module
+description: "Support module for webform testing."
+package: Testing
+dependencies:
+  - "webform:webform"
+
+# Information added by Drupal.org packaging script on 2024-11-05
+version: '2.3.0'
+project: 'token_or'
+datestamp: 1730828438

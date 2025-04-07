@@ -1,0 +1,120 @@
+<?php
+
+/**
+ * @file
+ * ECA UI module file.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
+use Drupal\eca\Entity\Eca;
+use Drupal\eca\Event\Tag;
+use Drupal\eca_ui\Entity\AccessControlHandler;
+use Drupal\eca_ui\Entity\ListBuilder;
+use Drupal\eca_ui\Form\EcaDeleteForm;
+
+/**
+ * Implements hook_help().
+ */
+function eca_ui_help(string $route_name): string {
+  if ($route_name === 'help.page.eca') {
+    /** @var \Drupal\eca\PluginManager\Event $event_plugin_manager */
+    $event_plugin_manager = \Drupal::service('plugin.manager.eca.event');
+    $available_event_tags = Tag::getTags();
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The <a href=":project">ECA</a> module provides a processor that gets triggered for every Drupal event. It validates these events against the models (event - condition - action), which are stored in config, and processes them. ECA leverages existing components of Drupal core, i.e. events and actions. For more details and help, see the <a href=":online">online documentation</a>.', [
+      ':online' => 'https://www.drupal.org/docs/contributed-modules/eca-event-condition-action',
+      ':project' => 'https://www.drupal.org/project/eca',
+    ]) . '</p>';
+    $output .= '<p>' . t('ECA makes no decision about the user interface which may be required for building the (business process) models (a.k.a. rules). Instead, it provides a plugin manager with an interface to easily integrate existing tools, that already do that pretty well. Here is a list of integrated modellers:<ul><li><a href=":bpmn_io">BPMN.iO</a>: javascript based implementation, integrated into the Drupal admin UI</li><li><a href=":camunda">Camunda</a>: desktop client</li></ul>', [
+      ':bpmn_io' => 'https://www.drupal.org/project/bpmn_io',
+      ':camunda' => 'https://www.drupal.org/project/camunda',
+    ]) . '</p>';
+    $output .= '<h3>' . t('Available events') . '</h3>';
+    $output .= '<p>' . t('You can react on available events within an <a href=":config_ui">ECA configuration</a>.', [
+      ':config_ui' => '/admin/config/workflow/eca',
+    ]) . '</p>';
+    $output .= '<dl>';
+    $output .= '<dt>' . t('All available events to react on are shown below.') . '</dt>';
+    $output .= '<dd><ul>';
+
+    foreach ($event_plugin_manager->getDefinitions() as $definition) {
+      $tags_info = [];
+      $defined_tags = $definition['tags'] ?? 0;
+      foreach ($available_event_tags as $event_tag => $event_label) {
+        if ($event_tag & $defined_tags) {
+          $tags_info[] = $event_label;
+        }
+      }
+      $output .= '<li>';
+      $output .= '<strong>' . $definition['label'] . '</strong>';
+      if ($tags_info) {
+        $output .= ' <em>(' . t('Characteristics: @tags', ['@tags' => implode(', ', $tags_info)]) . ')</em>';
+      }
+      $output .= '</li>';
+    }
+
+    $output .= '</ul></dd>';
+    $output .= '</dl>';
+    return $output;
+  }
+  return '';
+}
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function eca_ui_entity_type_build(array &$entity_types): void {
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
+   */
+  $entity_types['eca']
+    ->setAccessClass(AccessControlHandler::class)
+    ->setListBuilderClass(ListBuilder::class)
+    ->setFormClass('delete', EcaDeleteForm::class)
+    ->setLinkTemplate('edit-form', '/admin/config//workflow/eca/{eca}/edit')
+    ->setLinkTemplate('delete-form', '/admin/config/workflow/eca/{eca}/delete')
+    ->setLinkTemplate('collection', '/admin/config/workflow/eca');
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function eca_ui_entity_operation(EntityInterface $entity): array {
+  $operations = [];
+  if ($entity instanceof Eca) {
+    if (!$entity->status()) {
+      $operations['enable'] = [
+        'title' => t('Enable'),
+        'url' => Url::fromRoute('entity.eca.enable', ['eca' => $entity->id()]),
+        'weight' => 50,
+      ];
+    }
+    else {
+      $operations['disable'] = [
+        'title' => t('Disable'),
+        'url' => Url::fromRoute('entity.eca.disable', ['eca' => $entity->id()]),
+        'weight' => 51,
+      ];
+    }
+    if ($entity->isEditable()) {
+      $operations['clone'] = [
+        'title' => t('Clone'),
+        'url' => Url::fromRoute('entity.eca.clone', ['eca' => $entity->id()]),
+        'weight' => 52,
+      ];
+    }
+    $operations['export'] = [
+      'title' => t('Export'),
+      'url' => Url::fromRoute('entity.eca.export', ['eca' => $entity->id()]),
+      'weight' => 52,
+    ];
+    $operations['export_recipe'] = [
+      'title' => t('Export as recipe'),
+      'url' => Url::fromRoute('entity.eca.export_recipe', ['eca' => $entity->id()]),
+      'weight' => 53,
+    ];
+  }
+  return $operations;
+}

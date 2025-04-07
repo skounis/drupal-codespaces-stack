@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * Add dashboards functionality to Drupal.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\dashboard\Hook\GinThemeIntegration;
+use Drupal\dashboard\Hook\MenuLocalTasks;
+use Drupal\dashboard\Hook\NavigationIntegration;
+use Drupal\dashboard\Hook\ToolbarIntegration;
+use Drupal\dashboard\Hook\UserLoginRedirect;
+
+/**
+ * Implements hook_user_login().
+ */
+#[LegacyHook]
+function dashboard_user_login(AccountInterface $account): void {
+  \Drupal::service(UserLoginRedirect::class)->__invoke($account);
+}
+
+/**
+ * Implements hook_toolbar_alter().
+ */
+#[LegacyHook]
+function dashboard_toolbar_alter(&$items): void {
+  \Drupal::service(ToolbarIntegration::class)->toolbarAlter($items);
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+#[LegacyHook]
+function dashboard_menu_local_tasks_alter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  \Drupal::service(MenuLocalTasks::class)->menuLocalTasksAlter($data, $route_name, $cacheability);
+}
+
+/**
+ * Implements hook_theme().
+ */
+#[LegacyHook]
+function dashboard_theme($existing, $type, $theme, $path): array {
+  return \Drupal::service(NavigationIntegration::class)->theme($existing, $type, $theme, $path);
+}
+
+/**
+ * Implements hook_menu_links_discovered_alter().
+ */
+#[LegacyHook]
+function dashboard_menu_links_discovered_alter(&$links): void {
+  \Drupal::service(NavigationIntegration::class)->menuLinksDiscoveredAlter($links);
+}
+
+/**
+ * Implements hook_block_alter().
+ */
+#[LegacyHook]
+function dashboard_block_alter(&$definitions): void {
+  \Drupal::service(NavigationIntegration::class)->blockAlter($definitions);
+}
+
+/**
+ * Implements hook_library_info_alter().
+ */
+#[LegacyHook]
+function dashboard_library_info_alter(&$libraries, $extension): array {
+  return \Drupal::service(GinThemeIntegration::class)->libraryInfoAlter($libraries, $extension);
+}

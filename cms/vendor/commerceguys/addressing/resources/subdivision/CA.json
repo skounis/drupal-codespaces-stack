@@ -1,0 +1,84 @@
+{
+	"country_code": "CA",
+	"locale": "fr",
+	"subdivisions": {
+		"AB": {
+			"code": "AB",
+			"local_code": "AB",
+			"name": "Alberta",
+			"local_name": "Alberta"
+		},
+		"BC": {
+			"code": "BC",
+			"local_code": "BC",
+			"name": "British Columbia",
+			"local_name": "Colombie-Britannique"
+		},
+		"MB": {
+			"code": "MB",
+			"local_code": "MB",
+			"name": "Manitoba",
+			"local_name": "Manitoba"
+		},
+		"NB": {
+			"code": "NB",
+			"local_code": "NB",
+			"name": "New Brunswick",
+			"local_name": "Nouveau-Brunswick"
+		},
+		"NL": {
+			"code": "NL",
+			"local_code": "NL",
+			"name": "Newfoundland and Labrador",
+			"local_name": "Terre-Neuve-et-Labrador"
+		},
+		"NT": {
+			"code": "NT",
+			"local_code": "NT",
+			"name": "Northwest Territories",
+			"local_name": "Territoires du Nord-Ouest"
+		},
+		"NS": {
+			"code": "NS",
+			"local_code": "NS",
+			"name": "Nova Scotia",
+			"local_name": "Nouvelle-Écosse"
+		},
+		"NU": {
+			"code": "NU",
+			"local_code": "NU",
+			"name": "Nunavut",
+			"local_name": "Nunavut"
+		},
+		"ON": {
+			"code": "ON",
+			"local_code": "ON",
+			"name": "Ontario",
+			"local_name": "Ontario"
+		},
+		"PE": {
+			"code": "PE",
+			"local_code": "PE",
+			"name": "Prince Edward Island",
+			"local_name": "Île-du-Prince-Édouard"
+		},
+		"QC": {
+			"code": "QC",
+			"local_code": "QC",
+			"name": "Quebec",
+			"local_name": "Québec"
+		},
+		"SK": {
+			"code": "SK",
+			"local_code": "SK",
+			"name": "Saskatchewan",
+			"local_name": "Saskatchewan"
+		},
+		"YT": {
+			"code": "YT",
+			"local_code": "YT",
+			"name": "Yukon",
+			"local_name": "Yukon"
+		}
+	}
+}

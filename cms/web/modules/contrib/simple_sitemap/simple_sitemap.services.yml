@@ -1,0 +1,75 @@
+services:
+  _defaults:
+    autowire: true
+
+  simple_sitemap.generator:
+    class: Drupal\simple_sitemap\Manager\Generator
+    arguments:
+      $lock: '@lock'
+  Drupal\simple_sitemap\Manager\Generator: '@simple_sitemap.generator'
+
+  simple_sitemap.entity_manager:
+    class: Drupal\simple_sitemap\Manager\EntityManager
+  Drupal\simple_sitemap\Manager\EntityManager: '@simple_sitemap.entity_manager'
+
+  simple_sitemap.custom_link_manager:
+    class: Drupal\simple_sitemap\Manager\CustomLinkManager
+  Drupal\simple_sitemap\Manager\CustomLinkManager: '@simple_sitemap.custom_link_manager'
+
+  simple_sitemap.settings:
+    class: Drupal\simple_sitemap\Settings
+  Drupal\simple_sitemap\Settings: '@simple_sitemap.settings'
+
+  simple_sitemap.queue_worker:
+    class: Drupal\simple_sitemap\Queue\QueueWorker
+    arguments:
+      $key_value: '@keyvalue'
+      $lock: '@lock'
+  Drupal\simple_sitemap\Queue\QueueWorker: '@simple_sitemap.queue_worker'
+
+  simple_sitemap.queue:
+    class: Drupal\simple_sitemap\Queue\SimpleSitemapQueue
+    arguments:
+      $name: 'simple_sitemap_elements'
+  Drupal\simple_sitemap\Queue\SimpleSitemapQueue: '@simple_sitemap.queue'
+
+  simple_sitemap.sitemap_writer:
+    class: Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\SitemapWriter
+  Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\SitemapWriter: '@simple_sitemap.sitemap_writer'
+
+  simple_sitemap.entity_helper:
+    class: Drupal\simple_sitemap\Entity\EntityHelper
+  Drupal\simple_sitemap\Entity\EntityHelper: '@simple_sitemap.entity_helper'
+
+  simple_sitemap.form_helper:
+    class: Drupal\simple_sitemap\Form\FormHelper
+  Drupal\simple_sitemap\Form\FormHelper: '@simple_sitemap.form_helper'
+
+  simple_sitemap.logger:
+    class: Drupal\simple_sitemap\Logger
+    arguments:
+      # @todo Can be removed.
+      # See https://www.drupal.org/node/3395436
+      $logger: '@logger.channel.simple_sitemap'
+  Drupal\simple_sitemap\Logger: '@simple_sitemap.logger'
+
+  simple_sitemap.path_processor:
+    class: Drupal\simple_sitemap\PathProcessor\SitemapPathProcessor
+    tags:
+      - { name: path_processor_inbound, priority: 300 }
+      - { name: path_processor_outbound, priority: 300 }
+
+  logger.channel.simple_sitemap:
+    parent: logger.channel_base
+    arguments:
+      - simple_sitemap
+
+  plugin.manager.simple_sitemap.url_generator:
+    class: Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\UrlGeneratorManager
+    parent: default_plugin_manager
+  Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\UrlGeneratorManager: '@plugin.manager.simple_sitemap.url_generator'
+
+  plugin.manager.simple_sitemap.sitemap_generator:
+    class: Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\SitemapGeneratorManager
+    parent: default_plugin_manager
+  Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\SitemapGeneratorManager: '@plugin.manager.simple_sitemap.sitemap_generator'

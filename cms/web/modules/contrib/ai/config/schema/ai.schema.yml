@@ -1,0 +1,55 @@
+ai.settings:
+  label: 'AI Settings'
+  type: config_object
+  mapping:
+    prompt_logging:
+      label: 'If the AI should log prompts'
+      type: boolean
+    prompt_logging_tags:
+      label: 'Tags to log prompts with'
+      type: string
+    default_providers:
+      label: 'Default providers'
+      type: mapping
+      mapping:
+        chat:
+          label: 'Default chat provider'
+          type: ai.default_operation_provider
+        chat_with_complex_json:
+          label: 'Default chat with complex JSON provider'
+          type: ai.default_operation_provider
+        chat_with_image_vision:
+          label: 'Default chat with image vision provider'
+          type: ai.default_operation_provider
+        embeddings:
+          label: 'Default embeddings provider'
+          type: ai.default_operation_provider
+        moderation:
+          label: 'Default moderation provider'
+          type: ai.default_operation_provider
+        speech_to_text:
+          label: 'Default speech to text provider'
+          type: ai.default_operation_provider
+        text_to_image:
+          label: 'Default text to image provider'
+          type: ai.default_operation_provider
+        text_to_speech:
+          label: 'Default text to speech provider'
+          type: ai.default_operation_provider
+    models:
+      type: sequence
+      label: The overriden/added models.
+      required: false
+      sequence:
+        type: ignore
+
+ai.default_operation_provider:
+  type: mapping
+  label: 'Default provider'
+  mapping:
+    provider_id:
+      label: 'Provider ID'
+      type: string
+    model_id:
+      label: 'Model ID'
+      type: string

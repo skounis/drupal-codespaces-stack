@@ -1,0 +1,16 @@
+name: LM Studio Provider
+description: This enables the use of LM Studio for the AI module.
+package: AI Providers
+type: module
+core_version_requirement: ^10.2 || ^11
+lifecycle: deprecated
+lifecycle_link: "https://www.drupal.org/project/ai/issues/3483356"
+hidden: true
+
+dependencies:
+  - ai:ai
+
+# Information added by Drupal.org packaging script on 2025-03-05
+version: '1.0.5'
+project: 'ai'
+datestamp: 1741174945

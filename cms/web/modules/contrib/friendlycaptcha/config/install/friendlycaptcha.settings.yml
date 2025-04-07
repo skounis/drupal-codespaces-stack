@@ -1,0 +1,4 @@
+site_key: ''
+api_key: ''
+api_endpoint: 'global'
+enable_validation_logging: false

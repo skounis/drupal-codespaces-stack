@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This fixture is used by \Drupal\Tests\automatic_updates_extensions\Functional\UpdaterFormTest.
+
+Contains metadata about the following (fake) releases of automatic_updates_extensions_test_theme, all of which are secure, in order:
+- 3.0.0
+- 8.x-2.1
+- 8.x-2.0
+-->
+<project xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title>Automatic Updates Extensions Test Theme</title>
+  <short_name>automatic_updates_extensions_test_theme</short_name>
+  <dc:creator>drupal</dc:creator>
+  <type>project_theme</type>
+  <supported_branches>8.x-2.,3.0.</supported_branches>
+  <project_status>published</project_status>
+  <link>http://example.com/project/automatic_updates_extensions_test_theme</link>
+  <terms>
+    <term>
+      <name>Projects</name>
+      <value>Themes</value>
+    </term>
+    <term>
+      <name>Maintenance status</name>
+      <value>Minimally maintained</value>
+    </term>
+    <term>
+      <name>Development status</name>
+      <value>Under active development</value>
+    </term>
+  </terms>
+  <releases>
+    <release>
+      <name>automatic_updates_extensions_test_theme 3.0.0</name>
+      <version>3.0.0</version>
+      <tag>3.0.0</tag>
+      <status>published</status>
+      <release_link>http://example.com/automatic_updates_extensions_test_theme-3-0-0-release</release_link>
+      <download_link>http://example.com/automatic_updates_extensions_test_theme-3.0.0.tar.gz</download_link>
+      <date>1597793786</date>
+      <files>
+        <file>
+          <url>http://example.com/automatic_updates_extensions_test_theme-3.0.0.tar.gz</url>
+          <archive_type>tar.gz</archive_type>
+          <md5>43956be126b27d718ecffd0b17244aa1</md5>
+          <size>196080</size>
+          <filedate>1597793786</filedate>
+        </file>
+        <file>
+          <url>http://example.com/automatic_updates_extensions_test_theme-3.0.0.zip</url>
+          <archive_type>zip</archive_type>
+          <md5>5d24ec88ac4755af6ccbe6ef5ff8b3c9</md5>
+          <size>200399</size>
+          <filedate>1597793786</filedate>
+        </file>
+      </files>
+      <security covered="1">Covered by Drupal's security advisory policy</security>
+      <core_compatibility>^8 || ^9</core_compatibility>
+    </release>
+    <release>
+      <name>automatic_updates_extensions_test_theme 8.x-2.1</name>
+      <version>8.x-2.1</version>
+      <tag>8.x-2.1</tag>
+      <status>published</status>
+      <release_link>http://example.com/automatic_updates_extensions_test_theme-8-x-2-1-release</release_link>
+      <download_link>http://example.com/automatic_updates_extensions_test_theme-8.x-2.1.tar.gz</download_link>
+      <date>1597793786</date>
+      <files>
+        <file>
+          <url>http://example.com/automatic_updates_extensions_test_theme-8.x-2.1.tar.gz</url>
+          <archive_type>tar.gz</archive_type>
+          <md5>43956be126b27d718ecffd0b17244aa1</md5>
+          <size>196080</size>
+          <filedate>1597793786</filedate>
+        </file>
+        <file>
+          <url>http://example.com/automatic_updates_extensions_test_theme-8.x-2.1.zip</url>
+          <archive_type>zip</archive_type>
+          <md5>5d24ec88ac4755af6ccbe6ef5ff8b3c9</md5>
+          <size>200399</size>
+          <filedate>1597793786</filedate>
+        </file>
+      </files>
+      <terms>
+        <term>
+          <name>Release type</name>
+          <value>Bug fixes</value>
+        </term>
+      </terms>
+      <security covered="1">Covered by Drupal's security advisory policy</security>
+      <core_compatibility>8.x</core_compatibility>
+    </release>
+    <release>
+      <name>automatic_updates_extensions_test_theme 8.x-2.0</name>
+      <version>8.x-2.0</version>
+      <tag>8.x-2.0</tag>
+      <status>published</status>
+      <release_link>http://example.com/automatic_updates_extensions_test_theme-8-x-2-0-release</release_link>
+      <download_link>http://example.com/automatic_updates_extensions_test_theme-8.x-2.0.tar.gz</download_link>
+      <date>1597793786</date>
+      <files>
+        <file>
+          <url>http://example.com/automatic_updates_extensions_test_theme-8.x-2.0.tar.gz</url>
+          <archive_type>tar.gz</archive_type>
+          <md5>43956be126b27d718ecffd0b17244aa1</md5>
+          <size>196080</size>
+          <filedate>1597793786</filedate>
+        </file>
+        <file>
+          <url>http://example.com/automatic_updates_extensions_test_theme-8.x-2.0.zip</url>
+          <archive_type>zip</archive_type>
+          <md5>5d24ec88ac4755af6ccbe6ef5ff8b3c9</md5>
+          <size>200399</size>
+          <filedate>1597793786</filedate>
+        </file>
+      </files>
+      <terms>
+        <term>
+          <name>Release type</name>
+          <value>Bug fixes</value>
+        </term>
+      </terms>
+      <security covered="1">Covered by Drupal's security advisory policy</security>
+      <core_compatibility>8.x</core_compatibility>
+    </release>
+  </releases>
+</project>

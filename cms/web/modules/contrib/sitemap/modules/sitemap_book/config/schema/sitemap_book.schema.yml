@@ -1,0 +1,8 @@
+# Schema for book plugin settings.
+sitemap_plugin_settings.book:
+  type: sitemap_plugin_settings_base
+  mapping:
+    show_expanded:
+      type: boolean
+      label: 'Show expanded'
+      nullable: true

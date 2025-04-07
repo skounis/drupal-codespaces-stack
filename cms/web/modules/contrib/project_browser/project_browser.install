@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Project Browser.
+ */
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function project_browser_update_last_removed(): int {
+  return 9017;
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Remove disable_add_new_module setting.
+ */
+function project_browser_update_9018(): void {
+  $config_factory = \Drupal::configFactory();
+  $config_factory->getEditable('project_browser.admin_settings')
+    ->clear('disable_add_new_module')
+    ->save(TRUE);
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Remove the Drupal.org(Mock API) setting and tables.
+ */
+function project_browser_update_9019(): void {
+  // Remove the mock from the enabled_sources, if present.
+  $config = \Drupal::configFactory()->getEditable('project_browser.admin_settings');
+  $enabled_sources = $config->get('enabled_sources');
+  if (($key = array_search('drupalorg_mockapi', $enabled_sources)) !== FALSE) {
+    unset($enabled_sources[$key]);
+    $enabled_sources = array_values($enabled_sources);
+    $config->set('enabled_sources', $enabled_sources)->save();
+  }
+
+  // And remove the tables.
+  $schema = \Drupal::database()->schema();
+  $tables_to_drop = ['project_browser_projects', 'project_browser_categories'];
+  foreach ($tables_to_drop as $table) {
+    if ($schema->tableExists($table)) {
+      $schema->dropTable($table);
+    }
+  }
+}

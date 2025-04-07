@@ -1,0 +1,15 @@
+name: Anthropic Provider
+description: This enables the use of Anthropic for the AI module.
+package: AI Providers
+type: module
+core_version_requirement: ^10.3 || ^11
+configure: ai_provider_anthropic.settings_form
+
+dependencies:
+  - ai:ai
+  - key:key
+
+# Information added by Drupal.org packaging script on 2025-01-09
+version: '1.0.0'
+project: 'ai_provider_anthropic'
+datestamp: 1736439796

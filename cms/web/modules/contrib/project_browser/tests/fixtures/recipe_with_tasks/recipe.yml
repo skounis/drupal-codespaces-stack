@@ -1,0 +1,19 @@
+name: Recipe with tasks
+type: Testing
+description: "A recipe that doesn't do anything, but exposes follow-up tasks."
+extra:
+  project_browser:
+    tasks:
+      -
+        text: Visit Drupal.org
+        uri: https://drupal.org
+        options:
+          fragment: hello
+      -
+        text: Administer site compactly
+        route_name: system.admin_compact_page
+        route_parameters:
+          mode: on
+        options:
+          query:
+            hi: there

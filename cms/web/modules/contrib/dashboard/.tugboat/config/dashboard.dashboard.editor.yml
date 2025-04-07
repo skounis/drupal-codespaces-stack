@@ -1,0 +1,62 @@
+uuid: a50bbae4-dd14-4e57-b738-3265ca347ab9
+langcode: en
+status: true
+dependencies: {  }
+id: editor
+label: Editor
+description: 'Dashboard for editor users.'
+layout:
+  -
+    layout_id: layout_onecol
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+    components:
+      f6549e56-d270-4088-a1d6-d458d2b133fe:
+        uuid: f6549e56-d270-4088-a1d6-d458d2b133fe
+        region: content
+        configuration:
+          id: dashboard_text_block
+          label: 'Dashboard Text'
+          label_display: '0'
+          provider: dashboard
+          context_mapping: {  }
+          text:
+            value: '<p><strong>Welcome to the Editor Dashboard!</strong></p>'
+            format: basic_html
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+  -
+    layout_id: layout_twocol_section
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+      column_widths: 50-50
+    components:
+      0519810e-e421-4b76-aa92-12f5b72a5830:
+        uuid: 0519810e-e421-4b76-aa92-12f5b72a5830
+        region: first
+        configuration:
+          id: 'views_block:content_recent-block_1'
+          label: ''
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: ''
+          items_per_page: none
+        weight: 0
+        additional: {  }
+      f8be9aec-7cdd-440e-9487-21db8d16e4b6:
+        uuid: f8be9aec-7cdd-440e-9487-21db8d16e4b6
+        region: second
+        configuration:
+          id: shortcuts
+          label: Shortcuts
+          label_display: visible
+          provider: shortcut
+          context_mapping: {  }
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+weight: -9

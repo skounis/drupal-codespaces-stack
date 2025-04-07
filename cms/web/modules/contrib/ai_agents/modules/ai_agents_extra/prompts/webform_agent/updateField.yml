@@ -1,0 +1,38 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following YAML of an already existing form field structure and the action prompt, return the field the person wants to change with the changes from the Prompt?
+  formats:
+    - id: unique id of element
+      title: human readable title
+      description: short description of the element
+      required: boolean if its required field
+      options: semi-colon separated list of options, if needed
+      prompt: the prompt to generate the field
+      response: one sentence human readable response on action taken
+  one_shot_learning_examples:
+    - id: last_name
+      title: Last Name
+      description: The last name of the person responding
+      required: true
+      options:
+      prompt: Generate a Last Name text field
+      response: We changed the last name to be require
+      markup:
+    - id: terms_and_conditions
+      title: Terms & Conditions
+      description: Read our <a href="http://localhost/toc">Terms & Conditions</a>
+      required: true
+      options:
+      prompt: Generate a checkbox with terms and conditions
+      response: We added the Terms and conditions.
+      markup:
+    - id: gender
+      title: Gender
+      description: The gender of the persons responding
+      required: true
+      options: Male;Female;Non-Binary
+      prompt: Generate a checkbox with Gender options
+      response: We added the Male option to the Gender
+      markup:

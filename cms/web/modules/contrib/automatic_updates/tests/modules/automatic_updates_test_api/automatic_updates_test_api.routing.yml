@@ -1,0 +1,23 @@
+automatic_updates_test_api.update:
+  path: '/automatic-updates-test-api'
+  defaults:
+    _controller: 'Drupal\automatic_updates_test_api\ApiController::run'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+automatic_updates_test_api.finish:
+  path: '/automatic-updates-test-api/finish/{id}'
+  defaults:
+    _controller: 'Drupal\automatic_updates_test_api\ApiController::finish'
+  requirements:
+    _access: 'TRUE'
+automatic_updates_test_api.reset_cron:
+  path: '/automatic-updates-test-api/reset-cron'
+  defaults:
+    _controller: 'Drupal\automatic_updates_test_api\ApiController::resetCron'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+    no_cache: TRUE

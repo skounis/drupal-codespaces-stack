@@ -1,0 +1,11 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following form title, id and description, choose one of the field types from the list of element types. Read through the whole list before choosing and try to choose one. If its a markup field choose webform_markup. Answer with the id only.
+  formats:
+    - field_type: the field type id
+  one_shot_learning_examples:
+    - field_type: textarea
+    - field_type: webform_markup
+    - field_type: textfield

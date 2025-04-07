@@ -1,0 +1,22 @@
+<?php
+
+namespace Drupal\Core\Plugin;
+
+use Drupal\Core\Cache\CacheBackendInterface;
+
+class DefaultPluginManager {
+
+  /**
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param string $cache_key
+   * @param string[] $cache_tags
+   */
+  public function setCacheBackend(CacheBackendInterface $cache_backend, string $cache_key, array $cache_tags = []): void {}
+
+  /**
+   * @param string[] $definition
+   * @param string $plugin_id
+   */
+  public function processDefinition(array &$definition, string $plugin_id): void {}
+
+}

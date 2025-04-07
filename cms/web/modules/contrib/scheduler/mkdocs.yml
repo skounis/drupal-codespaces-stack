@@ -1,0 +1,40 @@
+site_name: 'Scheduler'
+repo_url: https://git.drupalcode.org/project/scheduler
+repo_name: drupal/scheduler
+edit_uri: /-/edit/2.x/docs/
+theme:
+  name: material
+  logo: logo.png
+  favicon: logo.png
+  palette:
+    # Palette toggle for automatic mode
+    - media: '(prefers-color-scheme)'
+      primary: blue
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      primary: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      primary: blue
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+nav:
+  - Home: 'index.md'
+  - Set Up: 'setup.md'
+  - Extend with a new entity plugin:
+      - Introduction: 'plugin.md'
+      - Create a new entity plugin: 'plugin_create.md'
+      - Add test coverage: 'plugin_test.md'
+plugins:
+  - search
+  - privacy:
+      enabled: !ENV [CI, false]

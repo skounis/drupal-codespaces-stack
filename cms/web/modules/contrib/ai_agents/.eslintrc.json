@@ -1,0 +1,6 @@
+{
+  "rules": {
+    // We need to be able to create empty mappings, for json.
+    "yml/no-empty-mapping-value": "off"
+  }
+}

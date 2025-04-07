@@ -1,0 +1,14 @@
+name: AI Agents Extra
+type: module
+description: Extra Agents (Views, Webform, Module) that still are experimental.
+package: AI Tools
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+
+dependencies:
+  - ai_agents:ai_agents
+
+# Information added by Drupal.org packaging script on 2025-02-07
+version: '1.0.2'
+project: 'ai_agents'
+datestamp: 1738909481

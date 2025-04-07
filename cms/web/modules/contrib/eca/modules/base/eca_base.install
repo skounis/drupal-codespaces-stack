@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * ECA base install file.
+ */
+
+/**
+ * Update last cron run times for existing eca config entities.
+ */
+function eca_base_update_8001(): void {
+  $state = \Drupal::service('eca.state');
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /**
+   * @var \Drupal\eca\Entity\Eca $eca
+   */
+  foreach ($storage->loadMultiple() as $eca) {
+    foreach ($eca->getUsedEvents() as $event) {
+      if ($event->getPlugin()->getPluginId() === 'eca_base:eca_cron') {
+        $id = $event->getId();
+        $lastRun = $state->getTimestamp('cron-' . $id);
+        if (!$lastRun) {
+          $state->setTimestamp('cron-' . $id);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+# Drupal components, module names and programming terms
+commerceproduct
+commerceguys
+mediatype
+nodetype
+taxonomyterm
+ctools
+phplint
+csslint
+interdif
+nomsg
+nolog
+drupalspoons
+backported
+tnid
+randomstring
+logfile
+oneline
+mkdocs
+testgroup
+ksection
+
+# Scheduler words
+timecheck
+testpage
+unpublication
+
+# The following are the allowed text for date formatting in scheduler config.
+djmnFMyY
+hHgGisaA
+
+# Test user names
+Admolly
+Taximayne
+Vicenza
+Webisa
+Wenlock
+
+# Real words missing from dictionary
+unrequired
+
+# Other
+Rnnn

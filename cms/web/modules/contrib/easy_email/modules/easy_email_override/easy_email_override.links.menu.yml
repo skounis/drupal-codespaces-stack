@@ -1,0 +1,9 @@
+
+# Email Override menu items definition
+entity.easy_email_override.collection:
+  title: 'Email overrides'
+  route_name: entity.easy_email_override.collection
+  description: 'Manage email overrides'
+  parent: entity.easy_email_type.collection
+  weight: 99
+

@@ -1,0 +1,13 @@
+{
+  "name": "drupal/recipe_installer_kit",
+  "require": {
+    "drupal/core": ">=10.4",
+    "drush/drush": "^13"
+  },
+  "autoload": {
+    "psr-4": {
+      "Drupal\\RecipeKit\\Installer\\": "src"
+    }
+  },
+  "license": ["GPL-2.0-or-later"]
+}

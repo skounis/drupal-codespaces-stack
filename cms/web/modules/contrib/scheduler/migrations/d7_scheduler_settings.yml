@@ -1,0 +1,28 @@
+id: d7_scheduler_settings
+label: Scheduler configuration
+migration_tags:
+  - Drupal 7
+  - Configuration
+source:
+  plugin: variable
+  variables:
+    - scheduler_allow_date_only
+    - scheduler_default_time
+    - scheduler_date_format
+  source_module: scheduler
+process:
+  allow_date_only:
+    plugin: default_value
+    default_value: false
+    source: scheduler_allow_date_only
+  default_time:
+    plugin: default_value
+    default_value: '00:00:00'
+    source: scheduler_default_time
+  hide_seconds:
+    plugin: scheduler_hide_seconds
+    default_value: false
+    source: scheduler_date_format
+destination:
+  plugin: config
+  config_name: scheduler.settings

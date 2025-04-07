@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="simple_sitemap">
+  <description>Default PHP CodeSniffer configuration for the Simple XML Sitemap module.</description>
+  <arg name="extensions" value="php,module,inc,install,yml"/>
+  <config name="drupal_core_version" value="8"/>
+  <file>.</file>
+
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+  <!-- Update hooks may have long descriptions. -->
+  <rule ref="Drupal.Files.LineLength.TooLong">
+    <exclude-pattern>\.install</exclude-pattern>
+    <exclude-pattern>\.post_update\.php</exclude-pattern>
+  </rule>
+  <!-- Update hooks may have multiline descriptions. -->
+  <rule ref="Drupal.Commenting.DocComment.ShortSingleLine">
+    <exclude-pattern>\.install</exclude-pattern>
+    <exclude-pattern>\.post_update\.php</exclude-pattern>
+  </rule>
+</ruleset>

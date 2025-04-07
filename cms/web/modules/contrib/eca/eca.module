@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * @file
+ * ECA module file.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\eca\Event\TriggerEvent;
+use Drupal\eca\PluginManager\Action;
+use Drupal\eca\Service\ContentEntityTypes;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for action entities.
+ */
+function eca_action_insert(EntityInterface $entity): void {
+  Action::get()->clearCachedDefinitions();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for action entities.
+ */
+function eca_action_update(EntityInterface $entity): void {
+  Action::get()->clearCachedDefinitions();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for action entities.
+ */
+function eca_action_delete(EntityInterface $entity): void {
+  Action::get()->clearCachedDefinitions();
+}
+
+/**
+ * Provides the trigger event service.
+ *
+ * @return \Drupal\eca\Event\TriggerEvent
+ *   The trigger event service.
+ */
+function _eca_trigger_event(): TriggerEvent {
+  return \Drupal::service('eca.trigger_event');
+}
+
+/**
+ * Provides the content entity types service.
+ *
+ * @return \Drupal\eca\Service\ContentEntityTypes
+ *   The content entity types service.
+ */
+function _eca_content_entity_types(): ContentEntityTypes {
+  return \Drupal::service('eca.service.content_entity_types');
+}
+
+/**
+ * Helper function to rename tokens in existing ECA models.
+ *
+ * @param array $tokenNames
+ *   The list of token names.
+ */
+function _eca_post_update_token_rename(array $tokenNames): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /** @var \Drupal\eca\Entity\Eca $eca */
+  foreach ($storage->loadMultiple() as $eca) {
+    $changed = FALSE;
+    $modelData = $eca->getModel()->getModeldata();
+    foreach (['conditions', 'actions'] as $type) {
+      $items = $eca->get($type) ?? [];
+      foreach ($items as &$item) {
+        if (!empty($item['configuration'])) {
+          foreach ($item['configuration'] as $key => $value) {
+            foreach ($tokenNames as $oldTokenName => $newTokenName) {
+              $oldToken = '[' . $oldTokenName;
+              $newToken = '[' . $newTokenName;
+              $count = 0;
+              $modelData = str_replace($oldToken, $newToken, $modelData, $count);
+              if ($count > 0) {
+                $changed = TRUE;
+              }
+              if (is_array($value)) {
+                foreach ($value as $delta => $subValue) {
+                  $item['configuration'][$key][$delta] = str_replace($oldToken, $newToken, $subValue);
+                }
+              }
+              else {
+                $item['configuration'][$key] = str_replace($oldToken, $newToken, $value);
+              }
+            }
+          }
+        }
+      }
+      unset($item);
+      $eca->set($type, $items);
+    }
+    if ($changed) {
+      if ($modelData !== '') {
+        $eca->getModel()->setModeldata($modelData)->save();
+      }
+      $eca->save();
+    }
+  }
+}

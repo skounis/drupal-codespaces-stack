@@ -1,0 +1,151 @@
+<?php
+
+/**
+ * @file
+ * Contains yoast_seo.module.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityFormInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\yoast_seo\Form\AnalysisFormHandler;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function yoast_seo_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state) {
+  $form_object = $form_state->getFormObject();
+  assert($form_object instanceof EntityFormInterface);
+  $field_storage_config = $form_object->getEntity();
+  assert($field_storage_config instanceof FieldStorageConfigInterface);
+  if ($field_storage_config->getType() === 'yoast_seo') {
+    // Hide the cardinality field.
+    $form['cardinality_container']['#access'] = FALSE;
+    $form['cardinality_container']['#disabled'] = TRUE;
+  }
+}
+
+/**
+ * Implements hook_field_access().
+ */
+function yoast_seo_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  if ($field_definition->getType() == 'yoast_seo') {
+    return AccessResult::forbiddenIf(
+      !($account->hasPermission('use yoast seo') || $account->hasPermission('administer yoast seo'))
+      // Such edit meta tags permission doesn't exist anymore, and administer
+      // meta tags is too restrictive.
+      // Wait or changes.
+      // || ! ( $account->hasPermission('edit meta tags') ||
+      // $account->hasPermission('administer meta tags') )
+    )->cachePerPermissions();
+  }
+
+  // No opinion.
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_theme().
+ */
+function yoast_seo_theme() {
+  $theme['yoast_snippet'] = [
+    'variables' => [
+      'wrapper_target_id' => NULL,
+      'snippet_target_id' => NULL,
+      'output_target_id' => NULL,
+    ],
+  ];
+
+  $theme['overall_score'] = [
+    'variables' => [
+      'overall_score_target_id' => NULL,
+      'overall_score' => NULL,
+    ],
+    'template' => 'overall_score',
+  ];
+
+  $theme['view_overall_score'] = [
+    'variables' => [
+      'overall_score' => NULL,
+    ],
+    'template' => 'view_overall_score',
+  ];
+
+  $theme['content_score'] = [
+    'variables' => [],
+    'template' => 'content_score',
+  ];
+
+  return $theme;
+}
+
+/**
+ * Implements hook_entity_type_build().
+ *
+ * Sets the default yoast_seo_form form handler to all entity types.
+ *
+ * @see \Drupal\Core\Entity\Annotation\EntityType
+ */
+function yoast_seo_entity_type_build(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  foreach ($entity_types as &$entity_type) {
+    if (!$entity_type->hasHandlerClass('yoast_seo_preview_form')) {
+      $entity_type->setHandlerClass('yoast_seo_preview_form', AnalysisFormHandler::class);
+    }
+  }
+}
+
+/**
+ * Implements hook_metatags_alter().
+ *
+ * If an entity has values for the custom title or description fields then we
+ * use those values in place of the metatags defaults.
+ */
+function yoast_seo_metatags_alter(array &$metatags, array $context) {
+  // Without entity there is nothing for us to do.
+  if (empty($context['entity'])) {
+    return;
+  }
+
+  $entity = $context['entity'];
+
+  // Make sure we have a fieldable entity or our SeoManager will produce errors.
+  if (!$entity instanceof FieldableEntityInterface) {
+    return;
+  }
+
+  /** @var \Drupal\yoast_seo\SeoManager $seo_manager */
+  $seo_manager = \Drupal::service('yoast_seo.manager');
+
+  $seo_field = $seo_manager->getSeoField($entity);
+
+  // Abort early if we're not enabled for this entity type.
+  if (is_null($seo_field)) {
+    return;
+  }
+
+  $field_item = $seo_field->first();
+
+  // If the field has no value then we're done as well.
+  if (empty($field_item)) {
+    return;
+  }
+
+  $values = $field_item->getValue();
+
+  // If we have a custom title, use it instead of the default one.
+  if (!empty($values['title'])) {
+    $metatags['title'] = $values['title'];
+  }
+
+  // If we have a custom description, use it instead of the default one.
+  if (!empty($values['description'])) {
+    $metatags['description'] = $values['description'];
+  }
+
+}

@@ -1,0 +1,19 @@
+views.area.add_content_by_bundle:
+  type: views_area
+  label: 'Add Content by Bundle link'
+  mapping:
+    bundle:
+      type: string
+      label: 'The content type whose form will be linked to.'
+    label:
+      type: label
+      label: 'The label of the link.'
+    class:
+      type: string
+      label: 'A CSS class to use on the link.'
+    target:
+      type: string
+      label: 'Option to target a modal or off-screen dialog.'
+    width:
+      type: integer
+      label: 'Width to use for the dialog.'

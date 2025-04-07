@@ -1,0 +1,36 @@
+# This file contains patterns to be ignored while testing for use of
+# deprecated code.
+# See https://www.drupal.org/node/3285162 for more details.
+
+%The "Symfony\\Component\\Validator\\Context\\ExecutionContextInterface::.*\(\)" method is considered internal Used by the validator engine\. (Should not be called by user\W+code\. )?It may change without further notice\. You should not extend it from "[^"]+"\.%
+
+# Skip some dependencies' DebugClassLoader forward compatibility warnings.
+%Method "Behat\\[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Doctrine\\Common\\Annotations\\Reader::[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\Extension\\ExtensionInterface::[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\Loader\\FilesystemLoader::findTemplate\(\)" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\Loader\\LoaderInterface::exists\(\)" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\Node\\Node::compile\(\)" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\NodeVisitor\\AbstractNodeVisitor::[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\NodeVisitor\\NodeVisitorInterface::[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "Twig\\TokenParser\\TokenParserInterface::[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "WebDriver\\Service\\CurlServiceInterface::[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in implementation "[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+
+# Indirect deprecations. These are not in Drupal's remit to fix, but it is
+# worth keeping track of dependencies' issues.
+%Method "[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in implementation "org\\bovigo\\vfs\\[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+%Method "[^"]+" might add "[^"]+" as a native return type declaration in the future. Do the same in (child class|implementation) "OpenTelemetry\\[^"]+" now to avoid errors or add an explicit @return annotation to suppress this message%
+
+# The following deprecation is listed for Twig 2 compatibility when unit
+# testing using \Symfony\Component\ErrorHandler\DebugClassLoader.
+%The "Twig\\Template" class is considered internal\. It may change without further notice\. You should not use it from "Drupal\\Tests\\Core\\Template\\StubTwigTemplate"\.%
+%The "Twig\\Environment::getTemplateClass\(\)" method is considered internal\. It may change without further notice\. You should not extend it from "Drupal\\Core\\Template\\TwigEnvironment"\.%
+
+# PHPUnit 10.
+%The "PHPUnit\\Framework\\TestCase::__construct\(\)" method is considered internal.*You should not extend it from "Drupal\\[^"]+"%
+
+# Twig 3.
+%Since twig/twig 3.12: Twig Filter "spaceless" is deprecated%
+
+# Search API hooks
+%^The deprecated (alter )?hook hook_search_api_%

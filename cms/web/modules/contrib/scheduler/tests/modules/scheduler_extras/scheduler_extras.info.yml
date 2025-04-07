@@ -1,0 +1,11 @@
+name: 'Scheduler Extras'
+type: module
+description: 'Support module for general Scheduler testing.'
+package: Testing
+dependencies:
+  - scheduler:scheduler
+
+# Information added by Drupal.org packaging script on 2025-02-05
+version: '2.2.1'
+project: 'scheduler'
+datestamp: 1738771367

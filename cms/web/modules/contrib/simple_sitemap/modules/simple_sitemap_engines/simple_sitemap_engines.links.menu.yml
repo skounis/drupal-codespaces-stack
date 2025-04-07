@@ -1,0 +1,5 @@
+simple_sitemap.engines:
+  title: 'Search engines'
+  parent: simple_sitemap.sitemaps
+  route_name: simple_sitemap.engines.status
+  weight: 2

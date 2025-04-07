@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Theme implementation to display the sitemap page.
+ *
+ * Available variables:
+ * - message: A configurable introductory message.
+ * - sitemap_items: An array of renderable content items
+ *
+ * @see template_preprocess()
+ * @see template_preprocess_sitemap()
+ */
+#}
+<div class="sitemap">
+  {% if message %}
+    <div class="sitemap-message">
+      {{ message }}
+    </div>
+  {% endif %}
+  {% if sitemap_items %}
+    {% for item in sitemap_items %}
+      {{ item }}
+    {% endfor %}
+  {% endif %}
+</div>

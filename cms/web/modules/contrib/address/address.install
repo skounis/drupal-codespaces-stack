@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * @file
+ * Requirements and update functions for the address module.
+ */
+
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Utility\UpdateException;
+
+/**
+ * Implements hook_requirements().
+ */
+function address_requirements($phase) {
+  $requirements = [];
+  if ($phase == 'install') {
+    if (!class_exists('\CommerceGuys\Addressing\AddressFormat\AddressFormatRepository')) {
+      $requirements['addressing_library'] = [
+        'description' => t('Address requires the commerceguys/addressing library.'),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Add the address_line3 field.
+ */
+function address_update_9201() {
+  if (!class_exists('\CommerceGuys\Addressing\Subdivision\SubdivisionUpdater')) {
+    throw new UpdateException('The commerceguys/addressing library must be updated before running this update.');
+  }
+
+  $column_name = 'address_line3';
+  $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+  $address_definition = $field_type_manager->getDefinition('address');
+  /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address_item_class */
+  $address_item_class = $address_definition['class'];
+
+  $schema = \Drupal::database()->schema();
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  $entity_field_map = $entity_field_manager->getFieldMapByFieldType('address');
+  // The key-value collection for tracking installed storage schema.
+  $entity_storage_schema_sql = \Drupal::keyValue('entity.storage_schema.sql');
+  $entity_definitions_installed = \Drupal::keyValue('entity.definitions.installed');
+
+  foreach ($entity_field_map as $entity_type_id => $field_map) {
+    $entity_storage = $entity_type_manager->getStorage($entity_type_id);
+    // Only SQL storage based entities are supported / throw known exception.
+    if (!($entity_storage instanceof SqlContentEntityStorage)) {
+      continue;
+    }
+
+    $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+    $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions($entity_type_id);
+    /** @var Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+    $table_mapping = $entity_storage->getTableMapping($field_storage_definitions);
+    // Only need field storage definitions of address fields.
+    /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition */
+    foreach (array_intersect_key($field_storage_definitions, $field_map) as $field_storage_definition) {
+      $field_name = $field_storage_definition->getName();
+      $table = $table_mapping->getFieldTableName($field_name);
+      // See if the field has a revision table.
+      $revision_table = NULL;
+      if ($entity_type->isRevisionable() && $field_storage_definition->isRevisionable()) {
+        if ($table_mapping->requiresDedicatedTableStorage($field_storage_definition)) {
+          $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_definition);
+        }
+        elseif ($table_mapping->allowsSharedTableStorage($field_storage_definition)) {
+          $revision_table = $entity_type->getRevisionDataTable() ?: $entity_type->getRevisionTable();
+        }
+      }
+      // Load the installed field schema so that it can be updated.
+      $schema_key = "$entity_type_id.field_schema_data.$field_name";
+      $field_schema_data = $entity_storage_schema_sql->get($schema_key);
+
+      $column = $table_mapping->getFieldColumnName($field_storage_definition, $column_name);
+      $field_schema = $address_item_class::schema($field_storage_definition);
+      $spec = $field_schema['columns'][$column_name];
+      // Add the new column.
+      $schema->addField($table, $column, $spec);
+      if ($revision_table) {
+        $schema->addField($revision_table, $column, $spec);
+      }
+
+      // Add the new column to the installed field schema.
+      if ($field_schema_data) {
+        $field_schema_data[$table]['fields'][$column] = $field_schema['columns'][$column_name];
+        $field_schema_data[$table]['fields'][$column]['not null'] = FALSE;
+        if ($revision_table) {
+          $field_schema_data[$revision_table]['fields'][$column] = $field_schema['columns'][$column_name];
+          $field_schema_data[$revision_table]['fields'][$column]['not null'] = FALSE;
+        }
+      }
+
+      // Save changes to the installed field schema.
+      if ($field_schema_data) {
+        $recipient_column = $table_mapping->getFieldColumnName($field_storage_definition, 'recipient');
+        unset($field_schema_data[$table]['fields'][$recipient_column]);
+        if ($revision_table) {
+          unset($field_schema_data[$revision_table]['fields'][$recipient_column]);
+        }
+        $entity_storage_schema_sql->set($schema_key, $field_schema_data);
+      }
+      if ($table_mapping->allowsSharedTableStorage($field_storage_definition)) {
+        $key = "$entity_type_id.field_storage_definitions";
+        if ($definitions = $entity_definitions_installed->get($key)) {
+          $definitions[$field_name] = $field_storage_definition;
+          $entity_definitions_installed->set($key, $definitions);
+        }
+      }
+    }
+  }
+}

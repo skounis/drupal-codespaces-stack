@@ -1,0 +1,15 @@
+name: Easy Email Commerce
+type: module
+description: Integrate Easy Email with Drupal Commerce.
+package: Mail
+core_version_requirement: ^10.1 || ^11
+
+dependencies:
+  - easy_email:easy_email
+  - commerce:commerce_order
+  - commerce:commerce_price
+
+# Information added by Drupal.org packaging script on 2024-12-27
+version: '3.0.4'
+project: 'easy_email'
+datestamp: 1735316201

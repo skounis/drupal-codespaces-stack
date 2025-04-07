@@ -1,0 +1,7 @@
+views.field.eca_render:
+  type: views_field
+  label: 'ECA Views field'
+  mapping:
+    name:
+      type: string
+      label: 'Field name'

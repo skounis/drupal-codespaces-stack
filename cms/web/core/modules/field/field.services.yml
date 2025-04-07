@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autoconfigure: true
+
+  field.uninstall_validator:
+    class: Drupal\field\FieldUninstallValidator
+    arguments: ['@entity_type.manager', '@string_translation', '@plugin.manager.field.field_type']

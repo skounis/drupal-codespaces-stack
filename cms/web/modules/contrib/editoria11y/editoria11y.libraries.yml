@@ -1,0 +1,50 @@
+editoria11y-library:
+  js:
+    library/dist/editoria11y.min.js: { preprocess: false }
+  css:
+    theme:
+      library/dist/editoria11y.min.css: { preprocess: false }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+
+editoria11y-localization:
+  js:
+    js/editoria11y-localization.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+
+editoria11y-library-localized:
+  js:
+    library/dist/editoria11y.min.js: { preprocess: false }
+  css:
+    theme:
+      library/dist/editoria11y.min.css: { preprocess: false }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - editoria11y/editoria11y-localization
+
+editoria11y:
+  js:
+    js/editoria11y-drupal.js: {}
+  dependencies:
+    - editoria11y/editoria11y-library
+
+editoria11y-localized:
+  js:
+    js/editoria11y-drupal.js: {}
+  dependencies:
+    - editoria11y/editoria11y-library-localized
+
+editoria11y-admin:
+  js:
+    js/editoria11y-admin.js: {}
+  css:
+    layout:
+      css/editoria11y-admin.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.message

@@ -1,0 +1,47 @@
+{
+	"country_code": "NR",
+	"subdivisions": {
+		"01": {
+			"name": "Aiwo District"
+		},
+		"02": {
+			"name": "Anabar District"
+		},
+		"03": {
+			"name": "Anetan District"
+		},
+		"04": {
+			"name": "Anibare District"
+		},
+		"05": {
+			"name": "Baiti District"
+		},
+		"06": {
+			"name": "Boe District"
+		},
+		"07": {
+			"name": "Buada District"
+		},
+		"08": {
+			"name": "Denigomodu District"
+		},
+		"09": {
+			"name": "Ewa District"
+		},
+		"10": {
+			"name": "Ijuw District"
+		},
+		"11": {
+			"name": "Meneng District"
+		},
+		"12": {
+			"name": "Nibok District"
+		},
+		"13": {
+			"name": "Uaboe District"
+		},
+		"14": {
+			"name": "Yaren District"
+		}
+	}
+}

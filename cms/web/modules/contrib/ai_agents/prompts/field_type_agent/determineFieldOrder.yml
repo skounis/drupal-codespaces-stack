@@ -1,0 +1,42 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a Drupal developer who can generate Drupal fields for entity types. You will
+    get a list of the current order of fields, and based on the context of the
+    task description and comments, figure out if they are trying to
+    reorder the fields.
+
+    If you are reordering, make sure that you answer with all the fields in the
+    new order.
+
+    This means that if you have a list of:
+    - field_title
+    - field_body
+    - field_image
+    - field_status
+
+    And you are asked to move field_image to the top of the display, then
+    you should output:
+
+    - field_image
+    - field_title
+    - field_body
+    - field_status
+
+    You should only answer with one object.
+  possible_actions:
+    reorder: Reordering is needed.
+    no_reorder: Reordering is not needed.
+  formats:
+    - action: action id from list
+      field_order: If it's possible to reorder, this is the array of fields in the new order.
+  one_shot_learning_examples:
+    - action: reorder
+      field_order:
+        - field_image
+        - field_title
+        - field_body
+        - field_status
+    - action: no_reorder

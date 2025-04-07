@@ -1,0 +1,14 @@
+name: 'Webform Custom Form Example'
+type: module
+description: 'Provides an example of custom configuration form built using the Webform module.'
+package: 'Webform example'
+core_version_requirement: ^10.3 || ^11.0
+configure: webform_example_custom_form.settings
+dependencies:
+  - 'webform:webform'
+  - 'webform:webform_devel'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

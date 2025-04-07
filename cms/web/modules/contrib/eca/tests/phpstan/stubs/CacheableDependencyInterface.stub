@@ -1,0 +1,22 @@
+<?php
+
+namespace Drupal\Core\TypedData\Plugin\DataType;
+
+interface CacheableDependencyInterface {
+
+  /**
+   * @return string[]
+   */
+  public function getCacheContexts(): array;
+
+  /**
+   * @return string[]
+   */
+  public function getCacheTags(): array;
+
+  /**
+   * @return int
+   */
+  public function getCacheMaxAge(): int;
+
+}

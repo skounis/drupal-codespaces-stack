@@ -1,0 +1,11 @@
+name: Search API Autocomplete Test Hooks
+description: "Support module for testing Search API Autocomplete hooks."
+dependencies:
+  - search_api_autocomplete:search_api_autocomplete
+type: module
+package: Testing
+
+# Information added by Drupal.org packaging script on 2025-01-15
+version: '8.x-1.10'
+project: 'search_api_autocomplete'
+datestamp: 1736941749

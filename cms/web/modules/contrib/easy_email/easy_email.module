@@ -1,0 +1,339 @@
+<?php
+
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\easy_email\Entity\EasyEmailTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+/**
+ * @file
+ * Contains easy_email.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function easy_email_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name === 'help.page.easy_email') {
+    $readme_file = file_exists(__DIR__ . '/README.md') ? __DIR__ . '/README.md' : __DIR__ . '/README.txt';
+    if (!file_exists($readme_file)) {
+      return NULL;
+    }
+    $text = file_get_contents($readme_file);
+    if ($text && !\Drupal::moduleHandler()->moduleExists('markdown')) {
+      return '<pre>' . $text . '</pre>';
+    }
+    else {
+      // Use the Markdown filter to render the README.
+      $filter_manager = \Drupal::service('plugin.manager.filter');
+      $settings = \Drupal::configFactory()->get('markdown.settings')->getRawData();
+      $config = ['settings' => $settings];
+      $filter = $filter_manager->createInstance('markdown', $config);
+      return $filter->process($text, 'en');
+    }
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function easy_email_theme() {
+  return [
+    'easy_email' => [
+      'render element' => 'elements',
+      'file' => 'easy_email.page.inc',
+      'template' => 'easy-email',
+    ],
+    'easy_email_content_add_list' => [
+      'render element' => 'content',
+      'variables' => ['content' => NULL],
+      'file' => 'easy_email.page.inc',
+    ],
+    'easy_email_body_html' => [
+      'variables' => ['easy_email' => NULL],
+    ],
+    'easy_email_body_plain' => [
+      'variables' => ['easy_email' => NULL],
+    ],
+    'easy_email_body_inbox_preview' => [
+      'variables' => ['easy_email' => NULL],
+    ],
+    'easy_email_inbox_preview_view' => [
+      'variables' => ['easy_email' => NULL],
+    ],
+    'easy_email_type_preview' => [
+      'variables' => ['easy_email' => NULL],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function easy_email_theme_suggestions_easy_email(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#easy_email'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'easy_email__' . $sanitized_view_mode;
+  $suggestions[] = 'easy_email__' . $entity->bundle();
+  $suggestions[] = 'easy_email__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'easy_email__' . $entity->id();
+  $suggestions[] = 'easy_email__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function easy_email_theme_suggestions_easy_email_body_html(array $variables) {
+  $suggestions = [];
+  $entity = $variables['easy_email'];
+  $suggestions[] = 'easy_email_body_html__' . $entity->bundle();
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function easy_email_theme_suggestions_easy_email_body_plain(array $variables) {
+  $suggestions = [];
+  $entity = $variables['easy_email'];
+  $suggestions[] = 'easy_email_body_plain__' . $entity->bundle();
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function easy_email_theme_suggestions_easy_email_body_inbox_preview(array $variables) {
+  $suggestions = [];
+  $entity = $variables['easy_email'];
+  $suggestions[] = 'easy_email_body_inbox_preview__' . $entity->bundle();
+  return $suggestions;
+}
+
+/**
+ * Implements hook_mail().
+ */
+function easy_email_mail($key, &$message, $params) {
+  if (!empty($params['easy_email_preview'])) {
+    $message['send'] = FALSE;
+  }
+
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+  if (isset($params['headers'])) {
+    $message['headers'] = array_merge($message['headers'], $params['headers']);
+  }
+  if (!empty($params['from'])) {
+    $message['from'] = $params['from'];
+  }
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $renderer->render($params['body']);
+  if (!empty($params['plain'])) {
+    $message['plain'] = $renderer->render($params['plain']);
+  }
+}
+
+function template_preprocess_easy_email_body_html(array &$variables) {
+  /** @var \Drupal\easy_email\Entity\EasyEmailInterface $email */
+  $email = $variables['easy_email'];
+  $html_body = $email->getHtmlBody();
+  if (!empty($html_body)) {
+    $variables['body'] = [
+      '#type' => 'processed_text',
+      '#text' => $html_body['value'],
+      '#format' => $html_body['format'],
+    ];
+  }
+}
+
+
+function template_preprocess_easy_email_body_plain(array &$variables) {
+  /** @var \Drupal\easy_email\Entity\EasyEmailInterface $email */
+  $email = $variables['easy_email'];
+  $plain_body = $email->getPlainBody();
+  if (!empty($plain_body)) {
+    $variables['body'] = [
+      '#markup' => Xss::filter($plain_body, [])
+    ];
+  }
+}
+
+function template_preprocess_easy_email_body_inbox_preview(array &$variables) {
+  /** @var \Drupal\easy_email\Entity\EasyEmailInterface $email */
+  $email = $variables['easy_email'];
+  $inbox_preview = $email->getInboxPreview();
+  $variables['body'] = [
+    '#markup' => Xss::filter($inbox_preview, [])
+  ];
+}
+
+function template_preprocess_easy_email_inbox_preview_view(array &$variables) {
+  /** @var \Drupal\easy_email\Entity\EasyEmailInterface $easy_email */
+  $easy_email = $variables['easy_email'];
+  $inbox_preview = $easy_email->getInboxPreview();
+  if (!$easy_email->hasField('body_html') || empty($inbox_preview)) {
+    $inbox_preview = NULL;
+    $html_body = $easy_email->getHtmlBody();
+    if (!empty($html_body)) {
+      $body = [
+        '#type' => 'processed_text',
+        '#text' => $html_body['value'],
+        '#format' => $html_body['format'],
+      ];
+      $renderer = \Drupal::service('renderer');
+      $inbox_preview = $renderer->executeInRenderContext(new RenderContext(), function () use ($renderer, $body) {
+        return $renderer->render($body);
+      });
+    }
+    if (empty($inbox_preview)) {
+      $plain_body = $easy_email->getPlainBody();
+      if (!empty($plain_body)) {
+        $body = [
+          '#plain_text' => $plain_body,
+        ];
+        $renderer = \Drupal::service('renderer');
+        $inbox_preview = $renderer->executeInRenderContext(new RenderContext(), function () use ($renderer, $body) {
+          return $renderer->render($body);
+        });
+      }
+    }
+  }
+  $variables['inbox_preview'] = strip_tags(html_entity_decode($inbox_preview));
+  $variables['subject'] = $easy_email->getSubject();
+  $from = $easy_email->getFromName();
+  if (empty($from)) {
+    $from = $easy_email->getFromAddress();
+  }
+  if (empty($from)) {
+    /** @var \Drupal\Core\Config\ImmutableConfig $site_config */
+    $site_config = \Drupal::config('system.site');
+    $from = $site_config->get('name');
+  }
+  $variables['from_name'] = $from;
+}
+
+/**
+ * Prepares variables for Email entities.
+ *
+ * Default template: easy_email.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the user information and any
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_easy_email_type_preview(array &$variables) {
+  // Fetch EasyEmail Entity Object.
+  /** @var \Drupal\easy_email\Entity\EasyEmailInterface $easy_email */
+  $easy_email = $variables['easy_email'];
+
+  if ($easy_email->hasField('body_html') && !empty($easy_email->getHtmlBody())) {
+    $variables['preview_html_url'] = Url::fromRoute('entity.easy_email_type.preview_html',
+      [
+        'easy_email_type' => $easy_email->bundle(),
+      ],
+      [
+        'query' => [
+          'uuid' => $easy_email->uuid(),
+        ],
+      ]);
+  }
+
+  /** @var \Drupal\easy_email\Entity\EasyEmailTypeInterface $easy_email_type */
+  $easy_email_type = \Drupal::entityTypeManager()->getStorage('easy_email_type')->load($easy_email->bundle());
+
+  if ($easy_email->hasField('body_plain') && (!empty($easy_email_type->getGenerateBodyPlain()) || !empty($easy_email->getPlainBody()))) {
+    $variables['preview_plain_url'] = Url::fromRoute('entity.easy_email_type.preview_plain',
+      [
+        'easy_email_type' => $easy_email->bundle(),
+      ],
+      [
+        'query' => [
+          'uuid' => $easy_email->uuid(),
+        ],
+      ]);
+  }
+
+
+  $variables['headers'] = [];
+
+  /** @var \Drupal\easy_email\Service\EmailHandlerInterface $email_handler */
+  $email_handler = \Drupal::service('easy_email.handler');
+
+  $message = $email_handler->preview($easy_email);
+  if (!empty($message['headers'])) {
+    foreach ($message['headers'] as $header => $value) {
+      $variables['headers'][] = [
+        'name' => $header,
+        'value' => $value,
+      ];
+    }
+  }
+  $recipients = $easy_email->getCombinedRecipientAddresses() ?? [];
+  if (!is_array($recipients)) {
+    $recipients = [$recipients];
+  }
+  $variables['headers'][] = [
+    'name' => 'To',
+    'value' => implode(', ', $recipients),
+  ];
+  $variables['headers'][] = [
+    'name' => 'Subject',
+    'value' => $easy_email->getSubject(),
+  ];
+
+  $variables['inbox_preview'] = [
+    '#theme' => 'easy_email_inbox_preview_view',
+    '#easy_email' => $easy_email,
+  ];
+
+  $attachments = [];
+
+  /** @var \Drupal\easy_email\Service\EmailAttachmentEvaluatorInterface $attachment_evalutator */
+  $attachment_evalutator = \Drupal::service('easy_email.attachment_evaluator');
+  $attachment_evalutator->evaluateAttachments($easy_email, FALSE);
+  foreach ($easy_email->getEvaluatedAttachments() as $file) {
+    if (is_object($file)) {
+      $file = (array) $file;
+    }
+    if (empty($file) || (empty($file['uri']) && empty($file['filepath']))) {
+      continue;
+    }
+    $uri = !empty($file['uri']) ? $file['uri'] : $file['filepath'];
+    $attachments[] = Link::fromTextAndUrl($file['filename'], Url::fromUri(\Drupal::service('file_url_generator')->generateAbsoluteString($uri), ['attributes' => ['target' => '_blank']]));
+  }
+
+  if (!empty($attachments)) {
+    $variables['attachments'] = [
+      '#theme' => 'item_list',
+      '#items' => $attachments,
+    ];
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function easy_email_cron() {
+  $settings = \Drupal::config('easy_email.settings');
+  if ($settings->get('purge_on_cron')) {
+    $purger = \Drupal::service('easy_email.purger');
+    $purger->purgeEmails([], NULL, $settings->get('purge_cron_limit'));
+  }
+}
+
+
+
+

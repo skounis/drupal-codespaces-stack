@@ -1,0 +1,119 @@
+# Schema for Scheduler module configuration.
+
+scheduler.settings:
+  type: config_object
+  label: 'Scheduler settings'
+  mapping:
+    allow_date_only:
+      type: boolean
+      label: 'Allow date-only input with time taken from default time setting'
+    date_format:
+      type: string
+      label: 'Full date and time format'
+    date_letters:
+      type: string
+      label: 'The set of PHP date letters allowed in the Scheduler date format'
+    date_only_format:
+      type: string
+      label: 'Date part of the full format'
+    default_expand_fieldset:
+      type: string
+      label: 'Default value for entity type setting expand_fieldset'
+    default_fields_display_mode:
+      type: string
+      label: 'Default value for entity type setting fields_display_mode'
+    default_publish_enable:
+      type: boolean
+      label: 'Default value for entity type setting publish_enable'
+    default_publish_past_date:
+      type: string
+      label: 'Default value for entity type setting publish_past_date'
+    default_publish_past_date_created:
+      type: boolean
+      label: 'Default value for entity type setting publish_past_date_created'
+    default_publish_required:
+      type: boolean
+      label: 'Default value for entity type setting publish_required'
+    default_publish_revision:
+      type: boolean
+      label: 'Default value for entity type setting publish_revision'
+    default_publish_touch:
+      type: boolean
+      label: 'Default value for entity type setting publish_touch'
+    default_show_message_after_update:
+      type: boolean
+      label: 'Default value for entity type setting show_message_after_update'
+    default_time:
+      type: string
+      label: 'Default Scheduling Time. This is used with the option to allow date only'
+    default_unpublish_enable:
+      type: boolean
+      label: 'Default value for entity type setting unpublish_enable'
+    default_unpublish_required:
+      type: boolean
+      label: 'Default value for entity type setting unpublish_required'
+    default_unpublish_revision:
+      type: boolean
+      label: 'Default value for entity type setting unpublish_revision'
+    hide_seconds:
+      type: boolean
+      label: 'Hide the seconds on the input control when entering a time'
+    log:
+      type: boolean
+      label: 'Log every Scheduler lightweight cron activation and completion message'
+    time_letters:
+      type: string
+      label: 'The set of PHP time letters allowed in the Scheduler time format'
+    time_only_format:
+      type: string
+      label: 'Time part of the full format'
+
+node.type.*.third_party.scheduler: &third_party_settings_alias
+  type: mapping
+  label: 'Scheduler entity type settings'
+  mapping:
+    expand_fieldset:
+      type: string
+      label: 'Conditions under which to expand the date input fieldset or vertical tab ("when_required" or "always")'
+    fields_display_mode:
+      type: string
+      label: 'The way the scheduling fields are displayed in the edit form ("vertical_tab" or "fieldset")'
+    publish_enable:
+      type: boolean
+      label: 'Enable scheduled publishing'
+    publish_past_date:
+      type: string
+      label: 'Action to be taken for publication dates in the past ("error", "publish" or "schedule")'
+    publish_past_date_created:
+      type: boolean
+      label: 'Change entity creation date for past dates to avoid "changed" being earlier than "created"'
+    publish_required:
+      type: boolean
+      label: 'Require scheduled publishing'
+    publish_revision:
+      type: boolean
+      label: 'Create a new revision on publishing'
+    publish_touch:
+      type: boolean
+      label: 'Change entity creation time to match the scheduled publish time'
+    show_message_after_update:
+      type: boolean
+      label: 'Show a message after updating an entity which is scheduled'
+    unpublish_enable:
+      type: boolean
+      label: 'Enable scheduled unpublishing'
+    unpublish_required:
+      type: boolean
+      label: 'Require scheduled unpublishing'
+    unpublish_revision:
+      type: boolean
+      label: 'Create a new revision on unpublishing'
+
+# Use the saved alias to repeat the schema for Media entity type.
+media.type.*.third_party.scheduler: *third_party_settings_alias
+
+# Repeat the schema for Commerce Product entity type.
+commerce_product.commerce_product_type.*.third_party.scheduler: *third_party_settings_alias
+
+# Repeat the schema for Taxonomy Terms
+taxonomy.vocabulary.*.third_party.scheduler: *third_party_settings_alias

@@ -1,0 +1,37 @@
+id: focal_point_crop
+label: Focal Point Crop
+migration_tags:
+  - Drupal 7
+  - Content
+source:
+  plugin: focal_point
+  source_module: focal_point
+  constants:
+    entity_type: 'file'
+    type: 'focal_point'
+process:
+  entity_id:
+    plugin: migration_lookup
+    source: fid
+    migration:
+      - d7_file
+      - d7_file_private
+  crop_field_data:
+    plugin: focal_point_to_crop
+    source:
+      - '@entity_id'
+      - focal_point
+  type: 'constants/type'
+  entity_type: 'constants/entity_type'
+  uri: '@crop_field_data/uri'
+  x: '@crop_field_data/x'
+  y: '@crop_field_data/y'
+destination:
+  plugin: entity:crop
+  default_bundle: 'focal_point'
+migration_dependencies:
+  required:
+    - d7_file
+    - d7_file_private
+    - focal_point_crop_type
+    - focal_point_settings

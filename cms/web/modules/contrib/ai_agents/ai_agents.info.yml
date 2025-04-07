@@ -1,0 +1,13 @@
+name: AI Agents
+type: module
+description: The Agents module makes Drupal taskable by AI agents.
+package: AI Tools
+core_version_requirement: ^10.3 || ^11
+
+dependencies:
+  - ai:ai
+
+# Information added by Drupal.org packaging script on 2025-02-07
+version: '1.0.2'
+project: 'ai_agents'
+datestamp: 1738909481

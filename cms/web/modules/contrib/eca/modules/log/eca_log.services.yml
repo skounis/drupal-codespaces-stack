@@ -1,0 +1,6 @@
+services:
+  logger.eca_log:
+    class: Drupal\eca_log\Logger\EcaLog
+    arguments: ['@event_dispatcher']
+    tags:
+      - { name: logger }

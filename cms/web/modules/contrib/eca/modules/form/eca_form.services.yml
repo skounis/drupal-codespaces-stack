@@ -1,0 +1,10 @@
+services:
+
+  eca_form.hook_handler:
+    class: Drupal\eca_form\HookHandler
+    arguments: ['@eca.trigger_event']
+
+  eca.token_data.current_form:
+    class: Drupal\eca_form\Token\CurrentFormDataProvider
+    tags:
+      - { name: eca.token_data_provider }

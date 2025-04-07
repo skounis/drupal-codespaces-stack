@@ -1,0 +1,21 @@
+services:
+  logger.channel.search_api_autocomplete:
+    parent: logger.channel_base
+    arguments: ['search_api_autocomplete']
+
+  plugin.manager.search_api_autocomplete.suggester:
+    class: Drupal\search_api_autocomplete\Suggester\SuggesterManager
+    parent: default_plugin_manager
+
+  plugin.manager.search_api_autocomplete.search:
+    class: Drupal\search_api_autocomplete\Search\SearchPluginManager
+    parent: default_plugin_manager
+
+  search_api_autocomplete.helper:
+    class: Drupal\search_api_autocomplete\Utility\AutocompleteHelper
+    tags:
+      - { name: access_check, applies_to: _search_api_autocomplete }
+
+  search_api_autocomplete.plugin_helper:
+    class: Drupal\search_api_autocomplete\Utility\PluginHelper
+    arguments: ['@plugin.manager.search_api_autocomplete.suggester', '@plugin.manager.search_api_autocomplete.search']

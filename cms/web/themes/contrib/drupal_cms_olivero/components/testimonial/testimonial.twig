@@ -1,0 +1,39 @@
+{%
+  set classes = [
+    'testimonial',
+    not image ? 'testimonial--has-no-image',
+  ]
+%}
+
+<div{{attributes.addClass(classes)}}>
+  <div class="testimonial__top">
+    {% if image.src %}
+      <div>
+        <img class="testimonial__image" loading="lazy" src="{{ image.src }}" alt="{{ image.alt }}" width="{{ image.width }}" height="{{ image.height }}">
+      </div>
+    {% endif %}
+    <blockquote class="testimonial__content">
+      {{ content }}
+    </blockquote>
+  </div>
+
+  {% if name or source %}
+    <cite class="testimonial__source">
+      {%- if name -%}
+        <span class="testimonial__name">{{ name }}</span>
+      {%- endif -%}
+      {%- if role -%}
+        <span class="testimonial__role">{{ role }}</span>
+      {%- endif -%}
+    </cite>
+  {% endif %}
+
+  {% if link_url %}
+    <div class="testimonial__footer">
+      <a href="{{ link_url }}" class="testimonial__link button button--link">
+        {{ link_text|default('Learn more'|t) }}
+        {{ include (componentMetadata.path ~ '/images/arrow.svg') }}
+      </a>
+    </div>
+  {% endif %}
+</div>

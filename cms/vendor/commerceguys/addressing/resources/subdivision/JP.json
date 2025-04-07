@@ -1,0 +1,194 @@
+{
+	"country_code": "JP",
+	"locale": "ja",
+	"subdivisions": {
+		"01": {
+			"name": "Hokkaido",
+			"local_name": "北海道"
+		},
+		"02": {
+			"name": "Aomori",
+			"local_name": "青森県"
+		},
+		"03": {
+			"name": "Iwate",
+			"local_name": "岩手県"
+		},
+		"04": {
+			"name": "Miyagi",
+			"local_name": "宮城県"
+		},
+		"05": {
+			"name": "Akita",
+			"local_name": "秋田県"
+		},
+		"06": {
+			"name": "Yamagata",
+			"local_name": "山形県"
+		},
+		"07": {
+			"name": "Fukushima",
+			"local_name": "福島県"
+		},
+		"08": {
+			"name": "Ibaraki",
+			"local_name": "茨城県"
+		},
+		"09": {
+			"name": "Tochigi",
+			"local_name": "栃木県"
+		},
+		"10": {
+			"name": "Gunma",
+			"local_name": "群馬県"
+		},
+		"11": {
+			"name": "Saitama",
+			"local_name": "埼玉県"
+		},
+		"12": {
+			"name": "Chiba",
+			"local_name": "千葉県"
+		},
+		"13": {
+			"name": "Tokyo",
+			"local_name": "東京都"
+		},
+		"14": {
+			"name": "Kanagawa",
+			"local_name": "神奈川県"
+		},
+		"15": {
+			"name": "Niigata",
+			"local_name": "新潟県"
+		},
+		"16": {
+			"name": "Toyama",
+			"local_name": "富山県"
+		},
+		"17": {
+			"name": "Ishikawa",
+			"local_name": "石川県"
+		},
+		"18": {
+			"name": "Fukui",
+			"local_name": "福井県"
+		},
+		"19": {
+			"name": "Yamanashi",
+			"local_name": "山梨県"
+		},
+		"20": {
+			"name": "Nagano",
+			"local_name": "長野県"
+		},
+		"21": {
+			"name": "Gifu",
+			"local_name": "岐阜県"
+		},
+		"22": {
+			"name": "Shizuoka",
+			"local_name": "静岡県"
+		},
+		"23": {
+			"name": "Aichi",
+			"local_name": "愛知県"
+		},
+		"24": {
+			"name": "Mie",
+			"local_name": "三重県"
+		},
+		"25": {
+			"name": "Shiga",
+			"local_name": "滋賀県"
+		},
+		"26": {
+			"name": "Kyoto",
+			"local_name": "京都府"
+		},
+		"27": {
+			"name": "Osaka",
+			"local_name": "大阪府"
+		},
+		"28": {
+			"name": "Hyogo",
+			"local_name": "兵庫県"
+		},
+		"29": {
+			"name": "Nara",
+			"local_name": "奈良県"
+		},
+		"30": {
+			"name": "Wakayama",
+			"local_name": "和歌山県"
+		},
+		"31": {
+			"name": "Tottori",
+			"local_name": "鳥取県"
+		},
+		"32": {
+			"name": "Shimane",
+			"local_name": "島根県"
+		},
+		"33": {
+			"name": "Okayama",
+			"local_name": "岡山県"
+		},
+		"34": {
+			"name": "Hiroshima",
+			"local_name": "広島県"
+		},
+		"35": {
+			"name": "Yamaguchi",
+			"local_name": "山口県"
+		},
+		"36": {
+			"name": "Tokushima",
+			"local_name": "徳島県"
+		},
+		"37": {
+			"name": "Kagawa",
+			"local_name": "香川県"
+		},
+		"38": {
+			"name": "Ehime",
+			"local_name": "愛媛県"
+		},
+		"39": {
+			"name": "Kochi",
+			"local_name": "高知県"
+		},
+		"40": {
+			"name": "Fukuoka",
+			"local_name": "福岡県"
+		},
+		"41": {
+			"name": "Saga",
+			"local_name": "佐賀県"
+		},
+		"42": {
+			"name": "Nagasaki",
+			"local_name": "長崎県"
+		},
+		"43": {
+			"name": "Kumamoto",
+			"local_name": "熊本県"
+		},
+		"44": {
+			"name": "Oita",
+			"local_name": "大分県"
+		},
+		"45": {
+			"name": "Miyazaki",
+			"local_name": "宮崎県"
+		},
+		"46": {
+			"name": "Kagoshima",
+			"local_name": "鹿児島県"
+		},
+		"47": {
+			"name": "Okinawa",
+			"local_name": "沖縄県"
+		}
+	}
+}

@@ -1,0 +1,54 @@
+/**
+ * @file
+ * Styles for person content type.
+ */
+
+.page-node-type-person {
+  .wide-content.block-field-blocknodepersonfield-featured-image {
+    margin-inline: 0;
+    margin-block-end: 0;
+    max-width: 100%;
+  }
+
+  .field--name-field-person__phone-number,
+  .field--name-field-person__email {
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+    text-decoration: none;
+    font-size: 18px;
+
+    &:before {
+      display: block;
+      content: "";
+      width: 15px;
+      height: 15px;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-position: center;
+      mask-position: center;
+      background: var(--color--primary-50);
+    }
+  }
+
+  .field--name-field-person__phone-number:before {
+    -webkit-mask-image: url('../../images/phone.svg');
+    mask-image: url('../../images/phone.svg');
+  }
+
+  .field--name-field-person__email {
+    a {
+      text-decoration: none;
+      color: var(--color-text-neutral-medium)
+    }
+
+    &:before {
+      -webkit-mask-image: url('../../images/mail.svg');
+      mask-image: url('../../images/mail.svg');
+    }
+  }
+}

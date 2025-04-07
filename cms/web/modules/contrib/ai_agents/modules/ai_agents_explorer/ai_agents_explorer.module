@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Contains hooks for forms.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_form_alter().
+ */
+function ai_agents_explorer_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'ai_agents_settings') {
+    $form['agents']['#header']['explore'] = t('Explorer');
+    foreach ($form['agents']['#rows'] as $key => $values) {
+      $form['agents']['#rows'][$key]['explore'] = [
+        'data' => [
+          '#type' => 'link',
+          '#title' => t('Explore'),
+          '#url' => Url::fromRoute('ai_agents_explorer.explorer', [
+            'agent_id' => $form['agents']['#rows'][$key]['id'],
+          ]),
+        ],
+      ];
+    }
+  }
+}

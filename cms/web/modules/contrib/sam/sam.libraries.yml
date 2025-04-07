@@ -1,0 +1,8 @@
+simplify:
+  js:
+    js/sam_simplify.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal
+    - core/once

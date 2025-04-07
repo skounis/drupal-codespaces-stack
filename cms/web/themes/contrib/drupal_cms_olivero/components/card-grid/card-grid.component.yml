@@ -1,0 +1,18 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Card grid
+status: experimental
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: The title of the card grid
+      examples:
+        - Card grid title
+slots:
+  cards:
+    title: Cards
+    description: The cards for the card grid
+    examples:
+      - "<div class=\"card\">Card content</div>"

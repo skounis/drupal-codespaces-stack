@@ -1,0 +1,161 @@
+{
+	"country_code": "ES",
+	"subdivisions": {
+		"C": {
+			"name": "A Coruña"
+		},
+		"VI": {
+			"name": "Álava"
+		},
+		"AB": {
+			"name": "Albacete"
+		},
+		"A": {
+			"name": "Alicante"
+		},
+		"AL": {
+			"name": "Almería"
+		},
+		"O": {
+			"name": "Asturias"
+		},
+		"AV": {
+			"name": "Ávila"
+		},
+		"BA": {
+			"name": "Badajoz"
+		},
+		"PM": {
+			"name": "Balears"
+		},
+		"B": {
+			"name": "Barcelona"
+		},
+		"BU": {
+			"name": "Burgos"
+		},
+		"CC": {
+			"name": "Cáceres"
+		},
+		"CA": {
+			"name": "Cádiz"
+		},
+		"S": {
+			"name": "Cantabria"
+		},
+		"CS": {
+			"name": "Castellón"
+		},
+		"CE": {
+			"name": "Ceuta"
+		},
+		"CR": {
+			"name": "Ciudad Real"
+		},
+		"CO": {
+			"name": "Córdoba"
+		},
+		"CU": {
+			"name": "Cuenca"
+		},
+		"GI": {
+			"name": "Girona"
+		},
+		"GR": {
+			"name": "Granada"
+		},
+		"GU": {
+			"name": "Guadalajara"
+		},
+		"SS": {
+			"name": "Guipúzcoa"
+		},
+		"H": {
+			"name": "Huelva"
+		},
+		"HU": {
+			"name": "Huesca"
+		},
+		"J": {
+			"name": "Jaén"
+		},
+		"LO": {
+			"name": "La Rioja"
+		},
+		"GC": {
+			"name": "Las Palmas"
+		},
+		"LE": {
+			"name": "León"
+		},
+		"L": {
+			"name": "Lleida"
+		},
+		"LU": {
+			"name": "Lugo"
+		},
+		"M": {
+			"name": "Madrid"
+		},
+		"MA": {
+			"name": "Málaga"
+		},
+		"ML": {
+			"name": "Melilla"
+		},
+		"MU": {
+			"name": "Murcia"
+		},
+		"NA": {
+			"name": "Navarra"
+		},
+		"OR": {
+			"name": "Ourense"
+		},
+		"P": {
+			"name": "Palencia"
+		},
+		"PO": {
+			"name": "Pontevedra"
+		},
+		"SA": {
+			"name": "Salamanca"
+		},
+		"TF": {
+			"name": "Santa Cruz de Tenerife"
+		},
+		"SG": {
+			"name": "Segovia"
+		},
+		"SE": {
+			"name": "Sevilla"
+		},
+		"SO": {
+			"name": "Soria"
+		},
+		"T": {
+			"name": "Tarragona"
+		},
+		"TE": {
+			"name": "Teruel"
+		},
+		"TO": {
+			"name": "Toledo"
+		},
+		"V": {
+			"name": "Valencia"
+		},
+		"VA": {
+			"name": "Valladolid"
+		},
+		"BI": {
+			"name": "Vizcaya"
+		},
+		"ZA": {
+			"name": "Zamora"
+		},
+		"Z": {
+			"name": "Zaragoza"
+		}
+	}
+}

@@ -1,0 +1,38 @@
+.focal-point-indicator {
+  width: 1px;
+  height: 1px;
+  cursor: move;
+}
+.focal-point-indicator::after {
+  position: relative;
+  top: -.375em;
+  left: -.375em;
+  display: block;
+  width: .75em;
+  height: .75em;
+  content: "+";
+  cursor: move;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, -1px -1px 0 #000;
+  font-size: 1.5em;
+  line-height: .75em;
+}
+.focal-point-wrapper {
+  position: relative;
+  display: inline-block;
+  direction: ltr;
+}
+.focal-point-preview-link {
+  display: block;
+  text-align: center;
+  direction: initial;
+  line-height: initial;
+}
+.focal-point-preview-link::before {
+  content: "\1F50D";
+  vertical-align: middle;
+  font-size: x-large;
+}
+.focal-point-preview-link:hover {
+  text-decoration: none;
+}

@@ -1,0 +1,58 @@
+/**
+ * @file
+ * Styles for event content type.
+ */
+
+.field--name-field-event__location-address {
+  font-size: 18px;
+
+  .address {
+    margin-block: var(--sp0-5);
+  }
+}
+
+.field--name-field-event__location-name {
+  margin-bottom: var(--sp0-5);
+}
+
+.node--type-event:where(.node--view-mode-full) {
+  .field--name-field-geofield {
+    margin-block: var(--sp2);
+  }
+
+  .field--name-field-event__link {
+    margin-block: var(--sp2);
+  }
+
+  .field--name-field-event__file {
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 18px;
+
+      &:after {
+        display: block;
+        content: "";
+        width: 15px;
+        height: 15px;
+        -webkit-mask-image: url('../../images/download.svg');
+        mask-image: url('../../images/download.svg');
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background: currentColor;
+
+        @media (forced-colors: active) {
+          background: buttonText;
+        }
+      }
+    }
+  }
+}

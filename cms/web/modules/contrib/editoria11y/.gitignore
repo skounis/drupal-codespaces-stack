@@ -1,0 +1,19 @@
+*.DS_Store
+/composer.spoons.json
+/composer.spoons.lock
+/vendor/
+/web/
+/.env
+.envrc
+.envrc.local
+.composer-plugin.env
+.vscode/
+
+# Ignoring IDE and local development settings.
+/.editorconfig
+/.ddev
+/.idea
+
+# Ignore some gitlab stuff that may be installed by the drupal-spoons composer plugin
+.gitlab-ci.yml
+drupalspoons-*

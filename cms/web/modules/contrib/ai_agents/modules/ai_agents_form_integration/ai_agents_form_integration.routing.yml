@@ -1,0 +1,7 @@
+ai_agents_form_integration.ai_assisted_generation:
+  path: '/admin/structure/types/add-ai-assisted'
+  defaults:
+    _form: '\Drupal\ai_agents_form_integration\Form\ContentTypes'
+    _title: 'Generate Content Type with AI'
+  requirements:
+    _permission: 'create ai assisted content types'

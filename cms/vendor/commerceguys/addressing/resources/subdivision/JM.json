@@ -1,0 +1,47 @@
+{
+	"country_code": "JM",
+	"subdivisions": {
+		"13": {
+			"name": "Clarendon"
+		},
+		"09": {
+			"name": "Hanover"
+		},
+		"01": {
+			"name": "Kingston"
+		},
+		"12": {
+			"name": "Manchester"
+		},
+		"04": {
+			"name": "Portland"
+		},
+		"02": {
+			"name": "St. Andrew"
+		},
+		"06": {
+			"name": "St. Ann"
+		},
+		"14": {
+			"name": "St. Catherine"
+		},
+		"11": {
+			"name": "St. Elizabeth"
+		},
+		"08": {
+			"name": "St. James"
+		},
+		"05": {
+			"name": "St. Mary"
+		},
+		"03": {
+			"name": "St. Thomas"
+		},
+		"07": {
+			"name": "Trelawny"
+		},
+		"10": {
+			"name": "Westmoreland"
+		}
+	}
+}

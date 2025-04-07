@@ -1,0 +1,5 @@
+sam.configuration_form:
+  title: 'Simple Add More Settings'
+  parent: system.admin_config_content
+  description: 'Configure Simple Add More settings'
+  route_name: sam.admin_settings

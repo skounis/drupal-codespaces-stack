@@ -1,0 +1,7 @@
+use the agent explorer:
+  title: 'Use the Agent Explorer'
+  restrict access: true
+
+administer ai_agent_decision:
+  title: 'Administer agent decisions'
+  restrict access: true

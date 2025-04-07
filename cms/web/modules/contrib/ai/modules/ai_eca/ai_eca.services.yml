@@ -1,0 +1,4 @@
+services:
+  ai_eca.provider_validator:
+    class: Drupal\ai_eca\Service\AiProviderValidator
+    arguments: ['@validation.basic_recursive_validator_factory']

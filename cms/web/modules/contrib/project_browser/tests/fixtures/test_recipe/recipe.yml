@@ -1,0 +1,27 @@
+name: Test Recipe
+type: Testing
+description: A test recipe.
+
+# Ensure we can properly apply recipes that have dependencies.
+recipes:
+  - core/recipes/content_editor_role
+
+input:
+  new_name:
+    data_type: string
+    description: "This will update the site name."
+    constraints:
+      NotBlank: []
+    form:
+      '#type': 'textfield'
+      '#title': 'New site name'
+      '#default_value': ''
+    default:
+      source: value
+      value: 'Anything.'
+
+config:
+  actions:
+    system.site:
+      simpleConfigUpdate:
+        name: '${new_name}'

@@ -1,0 +1,947 @@
+<?php
+
+/**
+ * @file
+ * Module install and update procedures.
+ */
+
+use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\simple_sitemap\Entity\SimpleSitemap;
+
+/**
+ * Implements hook_requirements().
+ */
+function simple_sitemap_requirements($phase) {
+  $requirements = [];
+
+  if (!extension_loaded('xmlwriter')) {
+    $requirements['simple_sitemap_php_extensions'] = [
+      'title' => t('Simple XML Sitemap PHP extensions'),
+      'value' => t('Missing PHP xmlwriter extension'),
+      'description' => t('In order to be able to generate sitemaps, the Simple XML Sitemap module requires the <em>xmlwriter</em> PHP extension to be enabled.'),
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+
+  switch ($phase) {
+
+    case 'runtime':
+
+      // @todo Implement for 4.x
+      // phpcs:disable
+//      /** @var \Drupal\simple_sitemap\Simplesitemap $generator */
+//      $generator = \Drupal::service('simple_sitemap.generator');
+//      $generated_ago = $generator->getGeneratedAgo();
+//      $cron_generation = $generator->getSetting('cron_generate');
+//
+//      if (!$generated_ago) {
+//        $value = t('Not available');
+//        $description = t($cron_generation
+//          ? 'Run cron, or <a href="@generate">generate</a> the sitemap manually.'
+//          : 'Generation on cron run is disabled. <a href="@generate">Generate</a> the sitemap manually.', [
+//            '@generate' => $GLOBALS['base_url'] . '/admin/config/search/simplesitemap'
+//          ]
+//        );
+//        $severity = REQUIREMENT_WARNING;
+//      }
+//      else {
+//        $value = t('XML sitemaps are available');
+//        $description = t('The last generation finished @ago ago.'
+//          . ' ' . ($cron_generation
+//            ? 'Run cron, or <a href="@generate">regenerate</a> the sitemaps manually.'
+//            : 'Generation on cron run is disabled. <a href="@generate">Regenerate</a> the sitemaps manually.'), [
+//              '@ago' => $generated_ago,
+//              '@generate' => $GLOBALS['base_url'] . '/admin/config/search/simplesitemap'
+//            ]
+//          );
+//        $severity = REQUIREMENT_INFO;
+//      }
+//
+//      $requirements['simple_sitemap_generated'] = [
+//        'title' => 'Simple XML Sitemap',
+//        'value' => $value,
+//        'description' => $description,
+//        'severity' => $severity,
+//      ];
+      // phpcs:enable
+      break;
+  }
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simple_sitemap_uninstall() {
+  \Drupal::keyValue('simple_sitemap')->deleteAll();
+  \Drupal::state()->delete('simple_sitemap.last_cron_generate');
+
+  \Drupal::service('queue')
+    ->get('simple_sitemap_elements')
+    ->deleteQueue();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function simple_sitemap_schema() {
+  $schema['simple_sitemap'] = [
+    'description' => 'Holds XML sitemaps as strings for quick retrieval.',
+    'fields' => [
+      'id' => [
+        'description' => 'Sitemap chunk unique identifier.',
+        'type' => 'serial',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'type' => [
+        'description' => 'Type of sitemap this chunk belongs to.',
+        'type' => 'varchar',
+        'length' => EntityTypeInterface::ID_MAX_LENGTH,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'delta' => [
+        'description' => 'Delta of the chunk within the type scope.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'sitemap_string' => [
+        'description' => 'XML sitemap chunk string.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'sitemap_created' => [
+        'description' => 'Timestamp of sitemap chunk generation.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+      'status' => [
+        'description' => 'Flag indicating the publishing status of the chunk.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+      'link_count' => [
+        'description' => 'The number of links in the sitemap.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'type_status_delta' => ['type', 'status', 'delta'],
+    ],
+  ];
+
+  $schema['simple_sitemap_entity_overrides'] = [
+    'description' => 'Holds sitemap settings overridden by entities.',
+    'fields' => [
+      'id' => [
+        'description' => 'Override unique identifier.',
+        'type' => 'serial',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'type' => [
+        'description' => 'Type of sitemap this override belongs to.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ],
+      'entity_type' => [
+        'description' => 'Entity type of the overriding entity.',
+        'type' => 'varchar',
+        'length' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+        'not null' => TRUE,
+      ],
+      'entity_id' => [
+        'description' => 'ID of the overriding entity.',
+        'type' => 'varchar',
+        'length' => EntityTypeInterface::ID_MAX_LENGTH,
+        'not null' => TRUE,
+      ],
+      'inclusion_settings' => [
+        'description' => 'Setting for the overriding entity.',
+        'type' => 'blob',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'entity_key' => ['type', 'entity_type', 'entity_id'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Setting the default variant.
+ */
+function _simple_sitemap_update_8216_get_default_variant() {
+  $config_factory = \Drupal::service('config.factory');
+  $default_variant = $config_factory->get('simple_sitemap.settings')->get('default_variant');
+  if (empty($default_variant)) {
+    $default_variant = 'default';
+    $config_factory->getEditable('simple_sitemap.settings')
+      ->set('default_variant', $default_variant)
+      ->save();
+  }
+
+  return $default_variant;
+}
+
+/**
+ * Changing the data structure of the module's configuration.
+ */
+function simple_sitemap_update_8201() {
+  $entity_types = \Drupal::config('simple_sitemap.settings')->get('entity_types');
+  $entity_types = is_array($entity_types) ? $entity_types : [];
+  $naming_changes = [
+    'node_type' => 'node',
+    'taxonomy_vocabulary' => 'taxonomy_term',
+    'menu' => 'menu_link_content',
+    'commerce_product_type' => 'commerce_product',
+    'media_bundle' => 'media',
+  ];
+  foreach ($entity_types as $entity_type_name => $settings) {
+    if (isset($naming_changes[$entity_type_name])) {
+      $entity_types[$naming_changes[$entity_type_name]] = $settings;
+      unset($entity_types[$entity_type_name]);
+    }
+  }
+  \Drupal::service('config.factory')->getEditable('simple_sitemap.settings')
+    ->set('entity_types', $entity_types)->save();
+}
+
+/**
+ * Moving entity overrides from configuration to database table.
+ */
+function simple_sitemap_update_8202() {
+  $database = \Drupal::database();
+
+  // Create database table.
+  if (!$database->schema()->tableExists('simple_sitemap_entity_overrides')) {
+    $database->schema()->createTable('simple_sitemap_entity_overrides', [
+      'description' => 'Holds sitemap settings overridden by entities.',
+      'fields' => [
+        'id' => [
+          'description' => 'Override unique identifier.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'entity_type' => [
+          'description' => 'Entity type of the overriding entity.',
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+        ],
+        'entity_id' => [
+          'description' => 'ID of the overriding entity.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'inclusion_settings' => [
+          'description' => 'Setting for the overriding entity.',
+          'type' => 'blob',
+        ],
+      ],
+      'primary key' => ['id'],
+    ]);
+  }
+
+  // Populate database table with config values.
+  $entity_types = \Drupal::config('simple_sitemap.settings')->get('entity_types');
+  $entity_types = is_array($entity_types) ? $entity_types : [];
+
+  foreach ($entity_types as $entity_type_name => &$entity_type) {
+    if (is_array($entity_type)) {
+      foreach ($entity_type as &$bundle) {
+        if (isset($bundle['entities'])) {
+          foreach ($bundle['entities'] as $entity_id => $entity_settings) {
+            $database->insert('simple_sitemap_entity_overrides')
+              ->fields([
+                'entity_type' => $entity_type_name,
+                'entity_id' => $entity_id,
+                'inclusion_settings' => serialize($entity_settings),
+              ])
+              ->execute();
+          }
+          // Remove entity overrides from configuration.
+          unset($bundle['entities']);
+        }
+      }
+    }
+  }
+
+  \Drupal::service('config.factory')->getEditable('simple_sitemap.settings')
+    ->set('entity_types', $entity_types)->save();
+}
+
+/**
+ * Splitting simple_sitemap.settings configuration into simple_sitemap.settings,
+ * simple_sitemap.entity_types and simple_sitemap.custom.
+ */
+function simple_sitemap_update_8203() {
+  $old_config = \Drupal::config('simple_sitemap.settings');
+  foreach (['entity_types', 'custom'] as $config_name) {
+    if ($config = $old_config->get($config_name)) {
+      \Drupal::service('config.factory')->getEditable("simple_sitemap.$config_name")
+        ->setData($config)->save();
+    }
+  }
+  if (NULL !== ($settings = $old_config->get('settings'))) {
+    \Drupal::service('config.factory')->getEditable("simple_sitemap.settings")
+      ->setData($settings)->save();
+  }
+}
+
+/**
+ * Removing entity type settings for entity types which do not have the canonical
+ * link template.
+ */
+function simple_sitemap_update_8204() {
+  $sitemap_entity_types = \Drupal::service('entity_type.manager')->getDefinitions();
+  $entity_types = \Drupal::config('simple_sitemap.entity_types')->get();
+  unset($entity_types['_core']);
+  foreach ($entity_types as $entity_type_id => $entity_type) {
+    if (!isset($sitemap_entity_types[$entity_type_id])
+      || !$sitemap_entity_types[$entity_type_id]->hasLinkTemplate('canonical')) {
+
+      // Delete entity overrides.
+      \Drupal::database()->delete('simple_sitemap_entity_overrides')
+        ->condition('entity_type', $entity_type_id)
+        ->execute();
+
+      // Delete entity type settings.
+      unset($entity_types[$entity_type_id]);
+    }
+  }
+  \Drupal::service('config.factory')->getEditable("simple_sitemap.entity_types")
+    ->setData($entity_types)->save();
+}
+
+/**
+ * Splitting simple_sitemap.entity_types into individual configuration objects
+ * for each bundle.
+ */
+function simple_sitemap_update_8205() {
+  $entity_types = \Drupal::config('simple_sitemap.entity_types')->get();
+  unset($entity_types['_core']);
+  $enabled_entity_types = [];
+  foreach ($entity_types as $entity_type_id => $bundles) {
+    $enabled_entity_types[] = $entity_type_id;
+    foreach ($bundles as $bundle_name => $bundle_settings) {
+      \Drupal::service('config.factory')
+        ->getEditable("simple_sitemap.bundle_settings.$entity_type_id.$bundle_name")
+        ->setData($bundle_settings)->save();
+    }
+  }
+
+  // Add enabled entity type settings.
+  \Drupal::service('config.factory')
+    ->getEditable('simple_sitemap.settings')
+    ->set('enabled_entity_types', $enabled_entity_types)
+    ->save();
+
+  // Remove old configuration object.
+  \Drupal::service('config.factory')
+    ->getEditable('simple_sitemap.entity_types')
+    ->delete();
+}
+
+/**
+ * Placing custom links in a subkey of simple_sitemap.custom configuration.
+ */
+function simple_sitemap_update_8206() {
+  $custom_links = \Drupal::config('simple_sitemap.custom')->get();
+  foreach ($custom_links as $i => $custom_link) {
+    if (!isset($custom_link['path'])) {
+      unset($custom_links[$i]);
+    }
+  }
+  \Drupal::service('config.factory')->getEditable('simple_sitemap.custom')
+    ->setData(['links' => $custom_links])->save();
+}
+
+/**
+ * Updating entity_id field of simple_sitemap_entity_overrides table to varchar(32).
+ */
+function simple_sitemap_update_8207() {
+  \Drupal::database()->schema()->changeField(
+    'simple_sitemap_entity_overrides',
+    'entity_id',
+    'entity_id', [
+      'description' => 'ID of the overriding entity.',
+      'type' => 'varchar',
+      'length' => 32,
+      'not null' => TRUE,
+    ]
+  );
+}
+
+/**
+ * Adding changefreq setting to all existing bundle and entity instance settings.
+ */
+function simple_sitemap_update_8208() {
+
+  // Update existing bundle settings.
+  $config_factory = \Drupal::service('config.factory');
+  $entity_types = $config_factory->listAll('simple_sitemap.bundle_settings.');
+
+  foreach ($entity_types as $entity_type) {
+    $config = $config_factory->get($entity_type)->get();
+    if (!isset($config['changefreq'])) {
+      $config_factory->getEditable($entity_type)
+        ->setData($config + ['changefreq' => ''])
+        ->save();
+    }
+  }
+
+  // Update existing entity override data.
+  $results = \Drupal::database()->select('simple_sitemap_entity_overrides', 'o')
+    ->fields('o', ['id', 'inclusion_settings'])
+    ->execute()->fetchAll(\PDO::FETCH_OBJ);
+
+  foreach ($results as $row) {
+    $settings = unserialize($row->inclusion_settings, ['allowed_classes' => FALSE]);
+    if (!isset($settings['changefreq'])) {
+      \Drupal::database()->update('simple_sitemap_entity_overrides')
+        ->fields(['inclusion_settings' => serialize($settings + ['changefreq' => ''])])
+        ->condition('id', $row->id)
+        ->execute();
+    }
+  }
+
+  return t('You may now want to configure the new changefreq setting for the XML sitemap entities and custom links.');
+}
+
+/**
+ * Adding image inclusion setting to all existing bundle and entity instance settings.
+ */
+function simple_sitemap_update_8209() {
+
+  // Update existing bundle settings.
+  $config_factory = \Drupal::service('config.factory');
+  $all_bundle_settings = $config_factory->listAll('simple_sitemap.bundle_settings.');
+
+  foreach ($all_bundle_settings as $bundle_settings) {
+    $config = $config_factory->get($bundle_settings)->get();
+    if (!isset($config['include_images'])) {
+      $config_factory->getEditable($bundle_settings)
+        ->setData($config + ['include_images' => 0])
+        ->save();
+    }
+  }
+
+  // Update existing entity override data.
+  $results = \Drupal::database()->select('simple_sitemap_entity_overrides', 'o')
+    ->fields('o', ['id', 'inclusion_settings'])
+    ->execute()->fetchAll(\PDO::FETCH_OBJ);
+
+  foreach ($results as $row) {
+    $settings = unserialize($row->inclusion_settings, ['allowed_classes' => FALSE]);
+    if (!isset($settings['include_images'])) {
+      \Drupal::database()->update('simple_sitemap_entity_overrides')
+        ->fields(['inclusion_settings' => serialize($settings + ['include_images' => 0])])
+        ->condition('id', $row->id)
+        ->execute();
+    }
+  }
+
+  return t('You may now want to configure your XML sitemap entities to include images.');
+}
+
+/**
+ * Adding 'type' and 'delta' fields to simple_sitemap table.
+ */
+function simple_sitemap_update_8210() {
+
+  $database = \Drupal::database();
+  $database->truncate('simple_sitemap')->execute();
+
+  if (!$database->schema()->fieldExists('simple_sitemap', 'type')) {
+    $database->schema()->addField(
+      'simple_sitemap',
+      'type', [
+        'description' => 'Type of sitemap this chunk belongs to.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ]
+    );
+  }
+  if (!$database->schema()->fieldExists('simple_sitemap', 'delta')) {
+    $database->schema()->addField(
+      'simple_sitemap',
+      'delta', [
+        'description' => 'Delta of the chunk within the type scope.',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ]
+    );
+  }
+}
+
+/**
+ * Adding simple_sitemap.variants and simple_sitemap.types to configuration.
+ */
+function simple_sitemap_update_8211() {
+  $config_factory = \Drupal::service('config.factory');
+
+  // Add simple_sitemap.types.
+  $config_factory
+    ->getEditable('simple_sitemap.types.default_hreflang')
+    ->setData([
+      'label' => 'Default hreflang',
+      'description' => 'The default hreflang sitemap type.',
+      'sitemap_generator' => 'default',
+      'url_generators' => [
+        'custom',
+        'entity',
+        'entity_menu_link_content',
+        'arbitrary',
+      ],
+    ])->save();
+
+  // Add simple_sitemap.variants.
+  $config_factory
+    ->getEditable('simple_sitemap.variants')
+    ->set('variants', [
+      'default' => [
+        'label' => 'Default',
+        'type' => 'default_hreflang',
+      ],
+    ])->save();
+}
+
+/**
+ * Changing storage data type of 'index' and 'include_images' from integer to boolean.
+ */
+function simple_sitemap_update_8212() {
+
+  // Update existing bundle settings.
+  $config_factory = \Drupal::service('config.factory');
+  $all_bundle_settings = $config_factory->listAll('simple_sitemap.bundle_settings.');
+
+  foreach ($all_bundle_settings as $bundle_settings) {
+    $config = $config_factory->get($bundle_settings)->get();
+
+    $config['include_images'] = isset($config['include_images']) && $config['include_images'];
+
+    $config['index'] = isset($config['index']) && $config['index'];
+
+    $config_factory->getEditable($bundle_settings)->setData($config)->save();
+  }
+
+  // Update existing entity override data.
+  $results = \Drupal::database()->select('simple_sitemap_entity_overrides', 'o')
+    ->fields('o', ['id', 'inclusion_settings'])
+    ->execute()->fetchAll(\PDO::FETCH_OBJ);
+
+  foreach ($results as $row) {
+    $settings = unserialize($row->inclusion_settings, ['allowed_classes' => FALSE]);
+
+    if (isset($settings['index'])) {
+      $settings['index'] = (bool) $settings['index'];
+    }
+
+    if (isset($settings['include_images'])) {
+      $settings['include_images'] = (bool) $settings['include_images'];
+    }
+
+    \Drupal::database()->update('simple_sitemap_entity_overrides')
+      ->fields(['inclusion_settings' => serialize($settings)])
+      ->condition('id', $row->id)
+      ->execute();
+  }
+}
+
+/**
+ * Altering the configuration storage of variants.
+ */
+function simple_sitemap_update_8213() {
+  $config_factory = \Drupal::service('config.factory');
+  $new_variants = [];
+  foreach ($config_factory->get('simple_sitemap.variants')->get('variants') as $variant_name => $variant_definition) {
+    $new_variants[$variant_definition['type']][$variant_name] = ['label' => $variant_definition['label']];
+  }
+
+  // Create new configuration objects.
+  foreach ($new_variants as $type => $variants) {
+    $config_factory
+      ->getEditable('simple_sitemap.variants.' . $type)
+      ->set('variants', $variants)
+      ->save();
+  }
+
+  // Remove old configuration object.
+  $config_factory->getEditable('simple_sitemap.variants')->delete();
+}
+
+/**
+ * Removing sitemap types from configuration as they are to be stored as plugins in code.
+ */
+function simple_sitemap_update_8214() {
+  $config_factory = \Drupal::service('config.factory');
+  $sitemap_types = $config_factory->listAll('simple_sitemap.types.');
+
+  // Remove sitemap type configuration objects.
+  foreach ($sitemap_types as $type) {
+    $config_factory->getEditable($type)->delete();
+  }
+}
+
+/**
+ * Adding 'status' field to simple_sitemap table and weight to variants.
+ */
+function simple_sitemap_update_8215() {
+  $database = \Drupal::database();
+  $database->truncate('simple_sitemap')->execute();
+
+  if (!$database->schema()->fieldExists('simple_sitemap', 'status')) {
+    $database->schema()->addField(
+      'simple_sitemap',
+      'status', [
+        'description' => "Flag indicating the publishing status of the chunk.",
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ]
+    );
+  }
+
+  $config_factory = \Drupal::service('config.factory');
+  foreach ($config_factory->listAll('simple_sitemap.variants.') as $type) {
+    $type = $config_factory->getEditable($type);
+    $variants = $type->get('variants');
+    foreach ($variants as $i => $variant) {
+      $variants[$i]['weight'] = 0;
+    }
+    $type->set('variants', $variants)->save();
+  }
+}
+
+/**
+ * Adding per-variant bundle and entity override configuration.
+ */
+function simple_sitemap_update_8216() {
+  $config_factory = \Drupal::service('config.factory');
+  foreach ($config_factory->listAll('simple_sitemap.bundle_settings.') as $bundle_config_name) {
+    $config = $config_factory->getEditable($bundle_config_name);
+    $config_name_parts = explode('.', $bundle_config_name);
+    $config_factory->getEditable($config_name_parts[0] . '.' . $config_name_parts[1]
+      . '.' . _simple_sitemap_update_8216_get_default_variant() . '.' . $config_name_parts[2] . '.' . $config_name_parts[3])
+      ->setData($config->get())->save();
+
+    $config->delete();
+  }
+
+  $database = \Drupal::database();
+  if (!$database->schema()->fieldExists('simple_sitemap_entity_overrides', 'type')) {
+    $database->schema()->addField(
+      'simple_sitemap_entity_overrides',
+      'type', [
+        'description' => 'Type of sitemap this override belongs to.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'initial' => 'default',
+      ]
+    );
+  }
+}
+
+/**
+ * Adding per-variant custom link configuration.
+ */
+function simple_sitemap_update_8217() {
+  $config_factory = \Drupal::service('config.factory');
+  $old_config = $config_factory->getEditable('simple_sitemap.custom');
+  $config_factory->getEditable('simple_sitemap.custom_links.' . _simple_sitemap_update_8216_get_default_variant())
+    ->setData($old_config->get())->save();
+  $old_config->delete();
+
+  return t('The XML sitemaps need to be regenerated.');
+}
+
+/**
+ * Changing id and delta fields of simple_sitemap table from smallint to int.
+ */
+function simple_sitemap_update_8301() {
+  $schema = \Drupal::database()->schema();
+
+  $schema->changeField(
+    'simple_sitemap',
+    'id',
+    'id', [
+      'description' => 'Sitemap chunk unique identifier.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'unsigned' => TRUE,
+    ]
+  );
+
+  $schema->changeField(
+    'simple_sitemap',
+    'delta',
+    'delta', [
+      'description' => 'Delta of the chunk within the variant scope.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'unsigned' => TRUE,
+    ]
+  );
+}
+
+/**
+ * Removing unused batch_process_limit key from simple_sitemap.settings
+ * configuration.
+ */
+function simple_sitemap_update_8302() {
+  $settings = \Drupal::service('config.factory')
+    ->getEditable('simple_sitemap.settings');
+
+  if (NULL !== $settings->get('batch_process_limit')) {
+    $settings->clear('batch_process_limit');
+    $settings->save();
+  }
+}
+
+/**
+ * Add indexes to the simple_sitemap and simple_sitemap_entity_overrides tables.
+ */
+function simple_sitemap_update_8303() {
+  $schema = Database::getConnection()->schema();
+  $spec = [
+    'fields' => [
+      'type' => [
+        'description' => 'Type of sitemap this chunk belongs to.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'delta' => [
+        'description' => 'Delta of the chunk within the type scope.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'status' => [
+        'description' => 'Flag indicating the publishing status of the chunk.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+    ],
+  ];
+  $fields = ['type', 'status', 'delta'];
+  $schema->addIndex('simple_sitemap', 'type_status_delta', $fields, $spec);
+
+  $spec = [
+    'fields' => [
+      'type' => [
+        'description' => 'Type of sitemap this override belongs to.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ],
+      'entity_type' => [
+        'description' => 'Entity type of the overriding entity.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ],
+      'entity_id' => [
+        'description' => 'ID of the overriding entity.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ],
+    ],
+  ];
+  $fields = ['type', 'entity_type', 'entity_id'];
+  $schema->addIndex('simple_sitemap_entity_overrides', 'entity_key', $fields, $spec);
+}
+
+/**
+ * Add 'entities_per_queue_item' to configuration.
+ */
+function simple_sitemap_update_8304() {
+  \Drupal::service('config.factory')
+    ->getEditable('simple_sitemap.settings')
+    ->set('entities_per_queue_item', 50)
+    ->save();
+  return t("The new 'Entities per queue item' setting has been set to 50 to improve generation performance. This changes the memory footprint during generation, so please make sure to test and adjust performance settings to your needs on the module's settings page.");
+}
+
+/**
+ * Add the link_count field to simple_sitemap table.
+ */
+function simple_sitemap_update_8305() {
+  \Drupal::database()->schema()->addField(
+    'simple_sitemap',
+    'link_count', [
+      'description' => 'The number of links in the sitemap.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'unsigned' => TRUE,
+      'default' => 0,
+    ]
+  );
+}
+
+/**
+ * Change the simple_sitemap ID column to serial.
+ */
+function simple_sitemap_update_8401() {
+  \Drupal::database()->schema()->changeField(
+    'simple_sitemap',
+    'id',
+    'id', [
+      'description' => 'Sitemap chunk unique identifier.',
+      'type' => 'serial',
+      'not null' => TRUE,
+      'unsigned' => TRUE,
+    ]
+  );
+}
+
+/**
+ * Install new simple_sitemap_type and simple_sitemap configuration entities.
+ */
+function simple_sitemap_update_8402() {
+  foreach (['simple_sitemap_type', 'simple_sitemap'] as $entity_type) {
+    \Drupal::entityDefinitionUpdateManager()->installEntityType(\Drupal::entityTypeManager()->getDefinition($entity_type));
+  }
+}
+
+/**
+ * Migrate the default_hreflang sitemap type and its variants to new configuration entities.
+ */
+function simple_sitemap_update_8403() {
+
+  // Create the default_hreflang sitemap type.
+  $type_storage = \Drupal::entityTypeManager()->getStorage('simple_sitemap_type');
+  if ($type_storage->load('default_hreflang') === NULL) {
+    $type_storage->create([
+      'id' => 'default_hreflang',
+      'label' => 'Default hreflang',
+      'description' => 'The default hreflang sitemap type.',
+      'sitemap_generator' => 'default',
+      'url_generators' => [
+        'custom',
+        'entity',
+        'entity_menu_link_content',
+        'arbitrary',
+      ],
+    ])->save();
+  }
+
+  // Migrate variants of default_hreflang sitemap type.
+  $config_factory = \Drupal::configFactory();
+  $sitemap_storage = \Drupal::entityTypeManager()->getStorage('simple_sitemap');
+  $old_variants_config = $config_factory->get('simple_sitemap.variants.default_hreflang');
+  foreach ($old_variants_config->get('variants') as $variant_id => $variant_definition) {
+    if ($sitemap_storage->load(substr($variant_id, 0, 32)) === NULL) {
+      $sitemap_storage->create([
+        'id' => substr($variant_id, 0, 32),
+        'label' => $variant_definition['label'] ?? $variant_id,
+        'type' => 'default_hreflang',
+        'weight' => $variant_definition['weight'] ?? 0,
+      ])->save();
+    }
+  }
+  foreach ($config_factory->listAll('simple_sitemap.variants.') as $config) {
+    $config_factory->getEditable($config)->delete();
+  }
+  \Drupal::service('simple_sitemap.queue_worker')->deleteQueue();
+  SimpleSitemap::purgeContent();
+
+  return t('All variants belonging to the built-in "Default hreflang" sitemap type have been converted to entities. Custom sitemap types added via plugins will have to be recreated manually. See simple_sitemap.type.default_hreflang.yml. The sitemaps need to be regenerated now.');
+}
+
+/**
+ * Add dependencies to sitemap entities.
+ */
+function simple_sitemap_update_8404() {
+  foreach (SimpleSitemap::loadMultiple() as $sitemap) {
+    $sitemap->save();
+  }
+}
+
+/**
+ * Create the index sitemap type.
+ */
+function simple_sitemap_update_8405() {
+  $type_storage = \Drupal::entityTypeManager()->getStorage('simple_sitemap_type');
+  if ($type_storage->load('index') === NULL) {
+    $type_storage->create([
+      'id' => 'index',
+      'label' => 'Sitemap Index',
+      'description' => 'The sitemap index sitemap type. A sitemap of this type lists sitemaps of all other types.',
+      'sitemap_generator' => 'index',
+      'url_generators' => ['index'],
+    ])->save();
+  }
+}
+
+/**
+ * Create the index sitemap.
+ */
+function simple_sitemap_update_8406() {
+  $sitemap_storage = \Drupal::entityTypeManager()->getStorage('simple_sitemap');
+  if ($sitemap_storage->load('index') === NULL) {
+    $sitemap_storage->create([
+      'id' => 'index',
+      'label' => 'Sitemap Index',
+      'description' => 'The sitemap index listing all other sitemaps - useful if there are at least two other sitemaps. In most cases this sitemap should be last in the generation queue and set as the default sitemap.',
+      'type' => 'index',
+      'weight' => 1000,
+      'status' => FALSE,
+    ])->save();
+  }
+
+  return t('A sitemap index which lists all other sitemaps is now available and can be enabled.');
+}
+
+/**
+ * Delete the sitemap queue.
+ */
+function simple_sitemap_update_8407() {
+  \Drupal::service('simple_sitemap.queue_worker')->deleteQueue();
+
+  return t('The sitemaps need to be regenerated.');
+}
+
+/**
+ * Delete data from state now that it gets stored to the key/value store.
+ */
+function simple_sitemap_update_8408() {
+  \Drupal::service('simple_sitemap.queue_worker')->deleteQueue();
+  \Drupal::state()->deleteMultiple([
+    'simple_sitemap.queue_items_initial_amount',
+    'simple_sitemap.queue_stashed_results',
+  ]);
+
+  return t('The sitemaps need to be regenerated.');
+}

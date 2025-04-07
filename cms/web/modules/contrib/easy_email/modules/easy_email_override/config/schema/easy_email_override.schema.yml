@@ -1,0 +1,66 @@
+easy_email_override.easy_email_override.*:
+  type: config_entity
+  label: 'Email Override config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    module:
+      type: string
+      label: 'Module'
+    key:
+      type: string
+      label: 'Key'
+    easy_email_type:
+      type: string
+      label: 'Easy Email template'
+    param_map:
+      type: sequence
+      label: 'Parameter mapping'
+      orderby: key
+      sequence:
+        type: mapping
+        label: 'Parameter mapping'
+        mapping:
+          source:
+            type: string
+            label: 'Source field'
+          destination:
+            type: string
+            label: 'Destination field'
+    copied_fields:
+      type: mapping
+      label: 'Copied fields'
+      mapping:
+        from:
+          type: boolean
+          label: 'From'
+        reply_to:
+          type: boolean
+          label: 'Reply to'
+        to:
+          type: boolean
+          label: 'To'
+        cc:
+          type: boolean
+          label: 'CC'
+        bcc:
+          type: boolean
+          label: 'BCC'
+        subject:
+          type: boolean
+          label: 'Subject'
+        body_html:
+          type: boolean
+          label: 'HTML body'
+        body_plain:
+          type: boolean
+          label: 'Plain text body'
+        attachments:
+          type: boolean
+          label: 'Attachments'

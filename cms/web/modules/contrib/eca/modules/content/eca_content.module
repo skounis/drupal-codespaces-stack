@@ -1,0 +1,248 @@
+<?php
+
+/**
+ * @file
+ * ECA Content submodule.
+ */
+
+/* @noinspection ClassConstantCanBeUsedInspection */
+if (!class_exists('Drupal\Core\Field\FieldUpdateActionBase', FALSE)) {
+  /* @noinspection PhpIgnoredClassAliasDeclaration */
+  class_alias('Drupal\eca_content\Plugin\Action\FieldUpdateActionBase', 'Drupal\Core\Field\FieldUpdateActionBase');
+}
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\eca_content\HookHandler;
+
+/**
+ * Eca content hook handler.
+ *
+ * @return \Drupal\eca_content\HookHandler
+ *   The content hook handler.
+ */
+function _eca_content_hook_handler(): HookHandler {
+  return \Drupal::service('eca_content.hook_handler');
+}
+
+/**
+ * Implements hook_entity_bundle_create().
+ */
+function eca_content_entity_bundle_create(string $entity_type_id, string $bundle): void {
+  _eca_content_hook_handler()->bundleCreate($entity_type_id, $bundle);
+}
+
+/**
+ * Implements hook_entity_bundle_delete().
+ */
+function eca_content_entity_bundle_delete(string $entity_type_id, string $bundle): void {
+  _eca_content_hook_handler()->bundleDelete($entity_type_id, $bundle);
+}
+
+/**
+ * Implements hook_entity_create().
+ */
+function eca_content_entity_create(EntityInterface $entity): void {
+  _eca_content_hook_handler()->create($entity);
+}
+
+/**
+ * Implements hook_entity_revision_create().
+ */
+function eca_content_entity_revision_create(EntityInterface $new_revision, EntityInterface $entity, ?bool $keep_untranslatable_fields): void {
+  _eca_content_hook_handler()->revisionCreate($new_revision, $entity, $keep_untranslatable_fields);
+}
+
+/**
+ * Implements hook_entity_preload().
+ */
+function eca_content_entity_preload(array $ids, string $entity_type_id): void {
+  _eca_content_hook_handler()->preload($ids, $entity_type_id);
+}
+
+/**
+ * Implements hook_entity_load().
+ */
+function eca_content_entity_load(array $entities, string $entity_type_id): void {
+  _eca_content_hook_handler()->load($entities, $entity_type_id);
+}
+
+/**
+ * Implements hook_entity_storage_load().
+ */
+function eca_content_entity_storage_load(array $entities, string $entity_type): void {
+  _eca_content_hook_handler()->storageLoad($entities, $entity_type);
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function eca_content_entity_presave(EntityInterface $entity): void {
+  _eca_content_hook_handler()->presave($entity);
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function eca_content_entity_insert(EntityInterface $entity): void {
+  _eca_content_hook_handler()->insert($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function eca_content_entity_update(EntityInterface $entity): void {
+  _eca_content_hook_handler()->update($entity);
+}
+
+/**
+ * Implements hook_entity_translation_create().
+ */
+function eca_content_entity_translation_create(EntityInterface $translation): void {
+  _eca_content_hook_handler()->translationCreate($translation);
+}
+
+/**
+ * Implements hook_entity_translation_insert().
+ */
+function eca_content_entity_translation_insert(EntityInterface $translation): void {
+  _eca_content_hook_handler()->translationInsert($translation);
+}
+
+/**
+ * Implements hook_entity_translation_delete().
+ */
+function eca_content_entity_translation_delete(EntityInterface $translation): void {
+  _eca_content_hook_handler()->translationDelete($translation);
+}
+
+/**
+ * Implements hook_entity_predelete().
+ */
+function eca_content_entity_predelete(EntityInterface $entity): void {
+  _eca_content_hook_handler()->predelete($entity);
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function eca_content_entity_delete(EntityInterface $entity): void {
+  _eca_content_hook_handler()->delete($entity);
+}
+
+/**
+ * Implements hook_entity_revision_delete().
+ */
+function eca_content_entity_revision_delete(EntityInterface $entity): void {
+  _eca_content_hook_handler()->revisionDelete($entity);
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function eca_content_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, string $view_mode): void {
+  _eca_content_hook_handler()->view($build, $entity, $display, $view_mode);
+}
+
+/**
+ * Implements hook_entity_prepare_view().
+ */
+function eca_content_entity_prepare_view(string $entity_type_id, array $entities, array $displays, string $view_mode): void {
+  _eca_content_hook_handler()->prepareView($entity_type_id, $entities, $displays, $view_mode);
+}
+
+/**
+ * Implements hook_entity_prepare_form().
+ */
+function eca_content_entity_prepare_form(EntityInterface &$entity, ?string $operation, FormStateInterface $form_state): void {
+  _eca_content_hook_handler()->prepareForm($entity, $operation, $form_state);
+}
+
+/**
+ * Implements hook_entity_field_values_init().
+ */
+function eca_content_entity_field_values_init(FieldableEntityInterface $entity): void {
+  _eca_content_hook_handler()->fieldValuesInit($entity);
+}
+
+/**
+ * Implements hook_entity_view_mode_alter().
+ */
+function eca_content_entity_view_mode_alter(string &$view_mode, EntityInterface $entity): void {
+  _eca_content_hook_handler()->viewModeAlter($view_mode, $entity);
+}
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function eca_content_entity_type_build(array &$entity_types): void {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  foreach ($entity_types as $entity_type) {
+    if ($entity_type->entityClassImplements(ContentEntityInterface::class)) {
+      // Add ECA's chameleon validation constraint to the content entity.
+      $entity_type->addConstraint('EcaContent');
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for field_config entities.
+ *
+ * Updates existing ECA configuration dependencies that already refer to field
+ * configurations having the same field name.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function eca_content_field_config_insert(EntityInterface $entity): void {
+  if (!in_array('new_field_config', \Drupal::config('eca.settings')->get('dependency_calculation') ?? [], TRUE)) {
+    // Nothing to do.
+    return;
+  }
+
+  $eca_configs = \Drupal::entityTypeManager()->getStorage('eca')->loadMultiple();
+  if (empty($eca_configs)) {
+    // No ECA config present, thus nothing to do here.
+    return;
+  }
+
+  // List of updated ECA configs that need to be saved.
+  $to_save = [];
+
+  /**
+   * @var \Drupal\field\FieldConfigInterface $field_config
+   */
+  $field_config = $entity;
+  $field_name = $field_config->getName();
+  $entity_type_id = $field_config->getTargetEntityTypeId();
+  $field_storage_config_id = "field.storage.$entity_type_id.$field_name";
+  $field_field_config_id = 'field.field.' . $field_config->id();
+
+  /**
+   * @var \Drupal\eca\Entity\Eca $eca
+   */
+  foreach ($eca_configs as $eca) {
+    $eca_dependencies = $eca->getDependencies();
+    foreach ($eca_dependencies as $type => $dependencies) {
+      if (!in_array($type, ['config', 'module'])) {
+        continue;
+      }
+      $uses_field = in_array($field_storage_config_id, $dependencies, TRUE);
+      if ($uses_field && !in_array($field_field_config_id, $dependencies, TRUE)) {
+        $eca->addRuntimeDependency($field_config->getConfigDependencyKey(), $field_field_config_id);
+        $to_save[$eca->id()] = $eca;
+      }
+    }
+  }
+
+  /**
+   * @var \Drupal\eca\Entity\Eca $eca
+   */
+  foreach ($to_save as $eca) {
+    $eca->save();
+  }
+}

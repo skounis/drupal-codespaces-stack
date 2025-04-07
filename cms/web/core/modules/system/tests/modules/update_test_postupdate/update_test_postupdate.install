@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for test module.
+ */
+
+declare(strict_types=1);
+
+// cspell:ignore postupdate
+
+/**
+ * Normal update_N() function.
+ */
+function update_test_postupdate_update_8001(): void {
+}

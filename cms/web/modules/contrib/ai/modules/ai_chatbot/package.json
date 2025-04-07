@@ -1,0 +1,14 @@
+{
+  "name": "ai_chatbot",
+  "version": "1.0.0-dev",
+  "description": "A AI Chatbot for testing Assistant API AI",
+  "author": "",
+  "license": "GPL-2.0-only",
+  "dependencies": {
+    "showdown": "^2.1.0"
+  },
+  "scripts": {
+    "//": "Ugly solution for now, later webpack.",
+    "move-showdown": "cp node_modules/showdown/dist/showdown.min.js js/"
+  }
+}

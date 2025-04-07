@@ -1,0 +1,37 @@
+default:
+  suites:
+    default:
+      paths:
+        features: '%paths.base%/features'
+      contexts:
+        - Drupal\Tests\yoast_seo\Context\Setup
+        - Drupal\Tests\yoast_seo\Context\DrupalContext
+        - Drupal\Tests\yoast_seo\Context\DrushContext
+        - Drupal\Tests\yoast_seo\Context\MinkContext
+        - Drupal\Tests\yoast_seo\Context\Entity
+        - Drupal\Tests\yoast_seo\Context\Log
+        - Drupal\Tests\yoast_seo\Context\Node
+        - Drupal\Tests\yoast_seo\Context\Term
+        - Drupal\Tests\yoast_seo\Context\Widget
+  extensions:
+    DMore\ChromeExtension\Behat\ServiceContainer\ChromeExtension: ~
+    Drupal\MinkExtension:
+      base_url: 'http://web'
+      files_path: '%paths.base%/features'
+      browser_name: chrome_headless
+      javascript_session: chrome_headless
+      ajax_timeout: 30
+      sessions:
+        chrome_headless:
+          chrome:
+            api_url: "http://chrome:9222"
+            validate_certificate: false
+    Drupal\DrupalExtension:
+      api_driver: 'drupal'
+      drush:
+        root: '/var/www/html'
+      drupal:
+        drupal_root: '/var/www/html'
+    FriendsOfBehat\MinkDebugExtension:
+      directory: '%paths.base%/logs'
+      screenshot: true

@@ -1,0 +1,118 @@
+{#
+/**
+ * @file
+ * Template for the order receipt.
+ *
+ * Available variables:
+ * - commerce_order: The order entity.
+ * - billing_information: The billing information.
+ * - shipping_information: The shipping information.
+ * - payment_method: The payment method.
+ * - totals: An array of order totals values with the following keys:
+ *   - subtotal: The order subtotal price.
+ *   - adjustments: An array of adjustment totals:
+ *     - type: The adjustment type.
+ *     - label: The adjustment label.
+ *     - total: The adjustment total price.
+ *     - weight: The adjustment weight, taken from the adjustment type.
+ *   - total: The order total price.
+ *
+ * @ingroup themeable
+ */
+#}
+<table>
+  <tbody>
+  <tr>
+    <td style="font-weight: bold; padding-top:15px; padding-bottom: 15px; text-align: left; border-top: 1px solid #cccccc; border-bottom: 1px solid #cccccc">
+      {{ 'Order #@number'|t({'@number': commerce_order.getOrderNumber}) }}
+    </td>
+  </tr>
+  <tr>
+    <td>
+      {% if (billing_information or shipping_information) %}
+        <table style="width: 100%; padding-top:15px; padding-bottom: 15px; text-align: left; border-top: 1px solid #cccccc; border-bottom: 1px solid #cccccc">
+          <tbody>
+          <tr>
+            {% if shipping_information %}
+              <td style="padding-top: 5px; font-weight: bold;">{{ 'Shipping Information'|t }}</td>
+            {% endif %}
+            {% if billing_information %}
+              <td style="padding-top: 5px; font-weight: bold;">{{ 'Billing Information'|t }}</td>
+            {% endif %}
+          </tr>
+          <tr>
+            {% if shipping_information %}
+              <td>
+                {% block shipping_information %}
+                  {{ shipping_information }}
+                {% endblock %}
+              </td>
+            {% endif %}
+            {% if billing_information %}
+              <td>
+                {% block billing_information %}
+                  {{ billing_information }}
+                {% endblock %}
+              </td>
+            {% endif %}
+          </tr>
+          </tbody>
+        </table>
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+      {% block order_items %}
+        <table cellpadding=0 cellspacing=0 style="padding-top: 15px; padding-bottom:15px; width: 100%;">
+          <tbody style="text-align: left;">
+          {% for order_item in commerce_order.getItems %}
+            <tr>
+              <td>
+                {{ order_item.getQuantity|number_format }} x
+              </td>
+              <td>
+                {{ order_item.label }}
+              </td>
+              <td style="text-align: right;">
+                {{ order_item.getTotalPrice|commerce_price_format }}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% endblock %}
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <p style="margin-bottom: 0; text-align: right;">
+        {{ 'Subtotal: @subtotal'|t({'@subtotal': totals.subtotal|commerce_price_format}) }}
+      </p>
+    </td>
+  </tr>
+  {% for adjustment in totals.adjustments %}
+    <tr>
+      <td>
+        <p style="margin-bottom: 0; text-align: right;">
+          {{ adjustment.label }}: {{ adjustment.total|commerce_price_format }}
+        </p>
+      </td>
+    </tr>
+  {% endfor %}
+  <tr>
+    <td>
+      <p style="font-size: 130%; padding-top: 15px; padding-bottom: 5px; text-align: right;">
+        {{ 'Order Total: @total'|t({'@total': commerce_order.getTotalPrice|commerce_price_format}) }}
+      </p>
+    </td>
+  </tr>
+  {% if payment_method %}
+    {% block payment_method %}
+      <tr>
+        <td style="margin-top: 10px;">{{ 'Payment Method'|t }}: {{ payment_method }}</td>
+      </tr>
+    {% endblock %}
+  {% endif %}
+  </tbody>
+</table>

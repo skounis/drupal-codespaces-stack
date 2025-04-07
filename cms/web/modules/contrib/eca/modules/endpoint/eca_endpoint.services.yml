@@ -1,0 +1,3 @@
+parameters:
+  # The base path of all ECA endpoints. Must not start with a slash.
+  eca_endpoint.base_path: eca

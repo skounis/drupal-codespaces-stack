@@ -1,0 +1,28 @@
+---
+title: "{{ provider_name }}"
+tags:
+- module
+---
+# {{ provider_name }}
+
+{!include/modules/{{ provider }}.md!}
+
+{% if provider == 'core' %}
+No separate installation is required.
+{% else %}
+## Installation
+
+```shell
+{% if extension_info.standalone %}
+composer require drupal/{{ provider }}
+{% else %}
+{% if extension_info.module != 'core' %}
+composer require drupal/{{ extension_info.module }}
+{% endif %}
+{% endif %}
+drush pm:install {{ provider }}
+```
+
+Instead of using Drush to enable the module, you can also go to "Administration / Extend" (`/admin/modules`) and
+enable the module **{{ provider_name }}** from there.
+{% endif %}

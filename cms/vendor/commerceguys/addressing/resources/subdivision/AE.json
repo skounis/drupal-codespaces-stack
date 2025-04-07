@@ -1,0 +1,40 @@
+{
+	"country_code": "AE",
+	"locale": "ar",
+	"subdivisions": {
+		"AZ": {
+			"name": "Abu Dhabi",
+			"local_name": "أبو ظبي"
+		},
+		"SH": {
+			"code": "Sharjah",
+			"local_code": "إمارة الشارقةّ",
+			"name": "Sharjah",
+			"local_name": "الشارقة"
+		},
+		"FU": {
+			"name": "Fujairah",
+			"local_name": "الفجيرة"
+		},
+		"UQ": {
+			"name": "Umm Al Quwain",
+			"local_name": "ام القيوين"
+		},
+		"DU": {
+			"code": "Dubai",
+			"local_code": "إمارة دبيّ",
+			"name": "Dubai",
+			"local_name": "دبي"
+		},
+		"RK": {
+			"code": "Ras Al Khaimah",
+			"local_code": "إمارة رأس الخيمة",
+			"name": "Ras Al Khaimah",
+			"local_name": "رأس الخيمة"
+		},
+		"AJ": {
+			"name": "Ajman",
+			"local_name": "عجمان"
+		}
+	}
+}

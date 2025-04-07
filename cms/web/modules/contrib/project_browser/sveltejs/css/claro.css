@@ -1,0 +1,71 @@
+.messages__item a {
+  word-break: break-word;
+}
+.project-browser-popup textarea {
+  width: 90%;
+  color: #fff;
+  border: none;
+  background-color: #292b32;
+  resize: none;
+}
+.project-browser-popup .command-box img {
+  display: block;
+  width: 1.25em;
+  background: transparent;
+}
+.project-browser-popup .command-box button {
+  margin-inline-start: auto;
+  border: none;
+  background: transparent;
+}
+.project-browser-popup button:hover {
+  cursor: pointer;
+}
+.project-browser-popup .command-box {
+  position: relative;
+  display: flex;
+  margin: 0.85rem 0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 6px;
+  background-color: #282c34;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  padding-inline: 1rem 0.25rem;
+}
+.project-browser-popup .copied-action {
+  position: absolute;
+  z-index: 1;
+  right: -18px;
+  width: fit-content;
+  margin-top: 30px;
+  padding: 0 4px 0;
+  opacity: 0;
+  border: 0.5px solid black;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+}
+
+.project__action_button {
+  /* Steal Claro's button styles for the small variant. */
+  padding: calc(0.5rem - 1px) calc(1rem - 1px);
+  color: #fff;
+  border: 1px solid transparent !important;
+  border-radius: 2px;
+  background-color: #003ecc;
+  font-size: 0.79rem;
+  font-weight: bold;
+}
+.project__action_button:hover {
+  cursor: pointer;
+}
+.project__action_button:disabled {
+  cursor: not-allowed;
+}
+.project__action_button--fixed {
+  margin-inline-start: auto;
+  position: fixed;
+  bottom: 1px;
+  left: 120px;
+  z-index: 502;
+}

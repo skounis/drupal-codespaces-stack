@@ -1,0 +1,6 @@
+enabled_sources:
+  - drupalorg_jsonapi
+  - recipes
+allow_ui_install: false
+allowed_projects: {}
+max_selections: null

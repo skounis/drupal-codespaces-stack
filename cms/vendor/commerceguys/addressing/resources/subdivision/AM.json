@@ -1,0 +1,50 @@
+{
+	"country_code": "AM",
+	"locale": "hy",
+	"subdivisions": {
+		"AG": {
+			"name": "Aragatsotn",
+			"local_name": "Արագածոտն"
+		},
+		"AR": {
+			"name": "Ararat",
+			"local_name": "Արարատ"
+		},
+		"AV": {
+			"name": "Armavir",
+			"local_name": "Արմավիր"
+		},
+		"GR": {
+			"name": "Gegharkunik",
+			"local_name": "Գեղարքունիք"
+		},
+		"ER": {
+			"name": "Yerevan",
+			"local_name": "Երևան"
+		},
+		"LO": {
+			"name": "Lori",
+			"local_name": "Լոռի"
+		},
+		"KT": {
+			"name": "Kotayk",
+			"local_name": "Կոտայք"
+		},
+		"SH": {
+			"name": "Shirak",
+			"local_name": "Շիրակ"
+		},
+		"SU": {
+			"name": "Syunik",
+			"local_name": "Սյունիք"
+		},
+		"VD": {
+			"name": "Vayots Dzor",
+			"local_name": "Վայոց ձոր"
+		},
+		"TV": {
+			"name": "Tavush",
+			"local_name": "Տավուշ"
+		}
+	}
+}

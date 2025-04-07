@@ -1,0 +1,14 @@
+<?php
+
+namespace Drupal\Core\TypedData\Plugin\DataType;
+
+interface CachedDiscoveryInterface {
+
+  public function clearCachedDefinitions(): void;
+
+  /**
+   * @param bool $use_caches
+   */
+  public function useCaches(bool $use_caches = FALSE): void;
+
+}

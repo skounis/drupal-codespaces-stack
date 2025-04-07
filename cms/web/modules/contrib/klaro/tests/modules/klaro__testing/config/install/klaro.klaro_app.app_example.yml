@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies: {  }
+id: app_example
+label: Example
+description: 'Test example tests.'
+default: false
+purposes:
+  - external_content
+cookies: {  }
+required: false
+opt_out: false
+only_once: false
+info_url: ''
+privacy_policy_url: ''
+javascripts:
+  - example.org
+callback_code: ''
+wrapper_identifier: {  }
+attachments: {  }
+weight: 0

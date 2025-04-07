@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# colors
+RED='\e[31m'
+BOLDRED='\033[1m'
+NORMAL='\e[0m'
+
+cd sveltejs; yarn run rollup -c
+git diff --quiet; NOCHANGES=$?
+if [ "$NOCHANGES" -ne 0 ]; then
+echo "";
+echo "${RED}##################################${NORMAL}"
+echo "${RED}           PUSH ABORTED!!! ${NORMAL}"
+echo "${RED}Please, run ${BOLDRED}yarn build${NORMAL}${RED} before push ${NORMAL}"
+echo "${RED}################################## ${NORMAL}"
+echo "";
+exit 1;
+fi

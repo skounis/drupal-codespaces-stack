@@ -1,0 +1,14 @@
+{
+  "name": "drupal/scheduler_content_moderation_integration",
+  "type": "drupal-module",
+  "description": "Scheduler sub-module providing content moderation functionality for publishing/unpublishing",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^10.3 || ^11",
+    "drupal/scheduler": "^2.1"
+  },
+  "require-dev": {
+    "drupal/commerce": "^3.0"
+  }
+}

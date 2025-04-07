@@ -1,0 +1,11 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following YAML, which is the field key that person wants to remove based on the Prompt?
+  formats:
+    - keys: Comma separated list of element keys to remove
+      response: A one sentence response that the field(s) were removed
+  one_shot_learning_examples:
+    - keys: first_name,last_name
+      response: First Name and Last Name were removed successfully.

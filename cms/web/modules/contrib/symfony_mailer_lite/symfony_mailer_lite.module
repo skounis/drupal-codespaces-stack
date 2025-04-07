@@ -1,0 +1,137 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Drupal Symfony Mailer Lite module.
+ */
+
+
+/**
+ * Implements hook_theme().
+ */
+function symfony_mailer_lite_theme($existing, $type, $theme, $path) {
+  return [
+    'symfony_mailer_lite_email' => [
+      'variables' => [
+        'message' => [],
+        'is_html' => FALSE,
+      ],
+      'mail theme' => TRUE,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK() for symfony_mailer_lite_email.
+ */
+function symfony_mailer_lite_theme_suggestions_symfony_mailer_lite_email(array $variables) {
+  $suggestions = [];
+  $suggestions[] = 'symfony_mailer_lite_email__' . $variables['message']['module'];
+  $suggestions[] = 'symfony_mailer_lite_email__' . $variables['message']['module'] . '__' . strtr($variables['message']['key'], '-', '_');
+  return $suggestions;
+}
+
+/**
+ * Prepares variables for symfony_mailer_lite templates.
+ *
+ * Default template: symfony-mailer-lite-email.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - message: An associative array containing the message array.
+ *   - is_html: True if generating HTML output, false for plain text.
+ */
+function template_preprocess_symfony_mailer_lite_email(&$variables) {
+  $variables['base_url'] = $GLOBALS['base_url'];
+  $variables['subject'] = $variables['message']['subject'];
+  $variables['body'] = $variables['message']['body'];
+  $variables['attributes'] = new Attribute();
+}
+
+/**
+ * Implements hook_mail().
+ */
+function symfony_mailer_lite_mail($key, &$message) {
+  if ($key === 'test') {
+    $user = \Drupal::currentUser();
+    $message['headers']['Content-Type'] = \Drupal\symfony_mailer_lite\Plugin\Mail\SymfonyMailer::FORMAT_HTML;
+
+    $text[] = '<h3>' . t('Dear @user,', ['@user' => $user->getDisplayName()]) . '</h3>';
+    $text[] = '<p>' . t('This e-mail has been sent from @site by the Drupal Symfony Mailer Lite module. The module has been successfully configured.', ['@site' => \Drupal::config('system.site')->get('name')]) . '</p>';
+    $text[] = t('Kind regards') . '<br /><br />';
+    $text[] = t('The Drupal Symfony Mailer Lite module');
+
+    $message['subject'] = t('Drupal Symfony Mailer Lite has been successfully configured!');
+    $message['body'] = array_map(function ($text) {
+      return \Drupal\Core\Render\Markup::create($text);
+    }, $text);
+  }
+}
+
+/**
+ * Returns available character sets.
+ *
+ * @return array
+ *   A list of available character sets.
+ */
+function symfony_mailer_lite_get_character_set_options() {
+
+  return [
+    'UCS-4' => 'UCS-4',
+    'UCS-4BE' => 'UCS-4BE',
+    'UCS-4LE' => 'UCS-4LE',
+    'UCS-2' => 'UCS-2',
+    'UCS-2BE' => 'UCS-2BE',
+    'UCS-2LE' => 'UCS-2LE',
+    'UTF-32' => 'UTF-32',
+    'UTF-32BE' => 'UTF-32BE',
+    'UTF-32LE' => 'UTF-32LE',
+    'UTF-16' => 'UTF-16',
+    'UTF-16BE' => 'UTF-16BE',
+    'UTF-16LE' => 'UTF-16LE',
+    'UTF-7' => 'UTF-7',
+    'UTF7-IMAP' => 'UTF7-IMAP',
+    'UTF-8' => 'UTF-8',
+    'ASCII' => 'ASCII',
+    'EUC-JP' => 'EUC-JP',
+    'SJIS' => 'SJIS',
+    'eucJP-win' => 'eucJP-win',
+    'SJIS-win' => 'SJIS-win',
+    'ISO-2022-JP' => 'ISO-2022-JP',
+    'JIS' => 'JIS',
+    'ISO-8859-1' => 'ISO-8859-1',
+    'ISO-8859-2' => 'ISO-8859-2',
+    'ISO-8859-3' => 'ISO-8859-3',
+    'ISO-8859-4' => 'ISO-8859-4',
+    'ISO-8859-5' => 'ISO-8859-5',
+    'ISO-8859-6' => 'ISO-8859-6',
+    'ISO-8859-7' => 'ISO-8859-7',
+    'ISO-8859-8' => 'ISO-8859-8',
+    'ISO-8859-9' => 'ISO-8859-9',
+    'ISO-8859-10' => 'ISO-8859-10',
+    'ISO-8859-13' => 'ISO-8859-13',
+    'ISO-8859-14' => 'ISO-8859-14',
+    'ISO-8859-15' => 'ISO-8859-15',
+    'byte2be' => 'byte2be',
+    'byte2le' => 'byte2le',
+    'byte4be' => 'byte4be',
+    'byte4le' => 'byte4le',
+    'BASE64' => 'BASE64',
+    'HTML-ENTITIES' => 'HTML-ENTITIES',
+    '7bit' => '7bit',
+    '8bit' => '8bit',
+    'EUC-CN' => 'EUC-CN',
+    'CP936' => 'CP936',
+    'HZ' => 'HZ',
+    'EUC-TW' => 'EUC-TW',
+    'CP950' => 'CP950',
+    'BIG-5' => 'BIG-5',
+    'EUC-KR' => 'EUC-KR',
+    'UHC (CP949)' => 'UHC (CP949)',
+    'ISO-2022-KR' => 'ISO-2022-KR',
+    'Windows-1251 (CP1251)' => 'Windows-1251 (CP1251)',
+    'Windows-1252 (CP1252)' => 'Windows-1252 (CP1252)',
+    'CP866 (IBM866)' => 'CP866 (IBM866)',
+    'KOI8-R' => 'KOI8-R',
+  ];
+}

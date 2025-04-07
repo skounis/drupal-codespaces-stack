@@ -1,0 +1,38 @@
+klaro.admin:
+  title: 'Settings'
+  route_name: klaro.admin
+  base_route: klaro.admin
+  weight: 0
+
+klaro.admin.manage:
+  title: 'Manage'
+  route_name: entity.klaro_app.collection
+  base_route: klaro.admin
+  weight: 1
+  expanded: TRUE
+
+klaro.admin.manage.apps:
+  title: 'Services'
+  route_name: entity.klaro_app.collection
+  parent_id: klaro.admin.manage
+  weight: 0
+entity.klaro_app.edit_form:
+  title: 'Edit'
+  route_name: entity.klaro_app.edit_form
+  parent_id: klaro.admin.manage.apps
+
+klaro.admin.manage.purposes:
+  title: 'Purposes'
+  route_name: entity.klaro_purpose.collection
+  parent_id: klaro.admin.manage
+  weight: 1
+entity.klaro_purpose.edit_form:
+  title: 'Edit'
+  route_name: entity.klaro_purpose.edit_form
+  parent_id: klaro.admin.manage.purposes
+
+klaro.admin.texts:
+  title: 'Texts'
+  route_name: klaro.admin.texts
+  base_route: klaro.admin
+  weight: 2

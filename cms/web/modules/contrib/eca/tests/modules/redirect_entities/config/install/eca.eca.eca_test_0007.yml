@@ -1,0 +1,96 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_content
+    - redirect
+id: eca_test_0007
+modeller: bpmn_io
+label: 'Redirects for deleted entities'
+version: v1
+weight: null
+events:
+  Event_13udgh1:
+    plugin: 'content_entity:delete'
+    label: 'Delete node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_1fhsh60
+        condition: ''
+conditions: {  }
+gateways: {  }
+actions:
+  Activity_1fhsh60:
+    plugin: eca_new_entity
+    label: 'Create redirect'
+    configuration:
+      token_name: redirect
+      type: 'redirect redirect'
+      langcode: und
+      label: 'ECA created for node [entity:nid]'
+      published: true
+      owner: ''
+      object: ''
+    successors:
+      -
+        id: Activity_1l6xott
+        condition: ''
+  Activity_1l6xott:
+    plugin: eca_set_field_value
+    label: 'Set source path'
+    configuration:
+      field_name: redirect_source
+      field_value: 'node/[entity:nid]'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: redirect
+    successors:
+      -
+        id: Activity_1yzv4qk
+        condition: ''
+  Activity_1yzv4qk:
+    plugin: eca_set_field_value
+    label: 'Set destination'
+    configuration:
+      field_name: redirect_redirect.uri
+      field_value: 'internal:/contact'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: redirect
+    successors:
+      -
+        id: Activity_0yzp82f
+        condition: ''
+  Activity_0yzp82f:
+    plugin: eca_set_field_value
+    label: 'Set title'
+    configuration:
+      field_name: redirect_redirect.title
+      field_value: ''
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: redirect
+    successors:
+      -
+        id: Activity_0opq15l
+        condition: ''
+  Activity_0opq15l:
+    plugin: eca_set_field_value
+    label: 'Set status'
+    configuration:
+      field_name: status_code
+      field_value: '301'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: true
+      object: redirect
+    successors: {  }

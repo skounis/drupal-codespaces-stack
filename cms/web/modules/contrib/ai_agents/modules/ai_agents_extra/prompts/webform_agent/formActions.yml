@@ -1,0 +1,53 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    Based on the description and comments of a task, make a list of actions that the
+    person wants to take that have not been fulfilled yet with a web form. Read
+    through the full list before deciding and make sure that you only focus on
+    the tasks that has not yet been done as proven by comments.
+  possible_actions:
+    getInformation: They want to receive information about something from the form, including url and results
+    addField: They want to add a field to the form
+    updateField: They want to update a field in the form
+    moveField: They want to move a field in the form
+    removeField: They want to remove a field from the form
+    changeUrl: Only for the url, not for requested the current one
+    changeTitle: They want to change the title of the form
+    changeAccess: They want to change who can use the form
+    changeEmails: Only for changing who gets notified of the form
+    changeDescription: They want to change the description of the form
+    emailValidation: They want to change if email validation is required
+    getResults: They want to see the results of the form
+    status: For changing the publish status of the form
+    none: None of the above
+  formats:
+    - action: action id from list
+      value: possible data value
+      description: description of the intent of the action
+  one_shot_learning_examples:
+    - action: addField
+      value: First Name
+      description: Add a First Name field before the Last Name field
+    - action: updatefield
+      value: Dietary Restrictions
+      description: Add the option Fruitarianism to the list
+    - action: updateField
+      value: email
+      description: Make the field required
+    - action: removeField
+      value: First Name
+      description: Remove the field First Name
+    - action: getInformation
+      value: Authentication
+      description: Get information about who can answer this form
+    - action: changeEmails
+      value: something@example.com, responder
+      description: Change the e-ails to something@example.com and the responder
+    - action: emailValidation
+      value: General
+      description: Add a requirement that the user has to validate the email before it counts
+    - action: status
+      value: Published
+      description: Change the status of the form to published

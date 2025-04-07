@@ -1,0 +1,77 @@
+{
+	"country_code": "SO",
+	"subdivisions": {
+		"AW": {
+			"code": "AD",
+			"name": "Awdal"
+		},
+		"BK": {
+			"code": "BK",
+			"name": "Bakool"
+		},
+		"BN": {
+			"code": "BN",
+			"name": "Banaadir"
+		},
+		"BR": {
+			"code": "BR",
+			"name": "Bari"
+		},
+		"BY": {
+			"code": "BY",
+			"name": "Bay"
+		},
+		"GA": {
+			"code": "GG",
+			"name": "Galguduud"
+		},
+		"GE": {
+			"code": "GD",
+			"name": "Gedo"
+		},
+		"HI": {
+			"code": "HR",
+			"name": "Hiiraan"
+		},
+		"JD": {
+			"code": "JD",
+			"name": "Jubbada Dhexe"
+		},
+		"JH": {
+			"code": "JH",
+			"name": "Jubbada Hoose"
+		},
+		"MU": {
+			"code": "MD",
+			"name": "Mudug"
+		},
+		"NU": {
+			"code": "NG",
+			"name": "Nugaal"
+		},
+		"SA": {
+			"code": "SG",
+			"name": "Sanaag"
+		},
+		"SD": {
+			"code": "SD",
+			"name": "Shabeellaha Dhexe"
+		},
+		"SH": {
+			"code": "SH",
+			"name": "Shabeellaha Hoose"
+		},
+		"SO": {
+			"code": "SL",
+			"name": "Sool"
+		},
+		"TO": {
+			"code": "TG",
+			"name": "Togdheer"
+		},
+		"WO": {
+			"code": "WG",
+			"name": "Woqooyi Galbeed"
+		}
+	}
+}

@@ -1,0 +1,12 @@
+name: 'Scheduler API Test'
+type: module
+description: 'Support module for Scheduler API-related testing.'
+package: Testing
+dependencies:
+  - scheduler:scheduler
+  - drupal:media
+
+# Information added by Drupal.org packaging script on 2025-02-05
+version: '2.2.1'
+project: 'scheduler'
+datestamp: 1738771367

@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Automatic Updates.
+ */
+
+declare(strict_types=1);
+
+use Drupal\automatic_updates\CronUpdateRunner;
+use Drupal\automatic_updates\UpdateStage;
+use Drupal\automatic_updates\Validation\StatusCheckRequirements;
+use Drupal\system\SystemManager;
+
+/**
+ * Implements hook_uninstall().
+ */
+function automatic_updates_uninstall() {
+  \Drupal::service(UpdateStage::class)->destroy(TRUE);
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function automatic_updates_requirements($phase) {
+  if ($phase === 'runtime') {
+    // Check that site is ready to perform automatic updates.
+    /** @var \Drupal\automatic_updates\Validation\StatusCheckRequirements $status_check_requirement */
+    $status_check_requirement = \Drupal::classResolver(StatusCheckRequirements::class);
+    $requirements = $status_check_requirement->getRequirements();
+
+    // Check that site has cron updates enabled or not.
+    // @todo Remove in https://www.drupal.org/project/automatic_updates/issues/3284443
+    if (\Drupal::configFactory()->get('automatic_updates.settings')->get('unattended.level') !== CronUpdateRunner::DISABLED) {
+      $requirements['automatic_updates_cron'] = [
+        'title' => t('Cron installs updates automatically'),
+        'severity' => SystemManager::REQUIREMENT_WARNING,
+        'value' => t('Enabled. This is NOT an officially supported feature of the Automatic Updates module at this time. Use at your own risk.'),
+      ];
+    }
+    return $requirements;
+  }
+}
+
+// BEGIN: DELETE FROM CORE MERGE REQUEST
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function automatic_updates_update_last_removed(): int {
+  return 9002;
+}
+
+// END: DELETE FROM CORE MERGE REQUEST

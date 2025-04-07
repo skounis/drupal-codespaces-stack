@@ -1,0 +1,5 @@
+ai_api_explorer.main:
+  title: AI API Explorer
+  description: Development mode to test out different APIs.
+  parent: ai.admin_settings
+  route_name: ai_api_explorer.list_page

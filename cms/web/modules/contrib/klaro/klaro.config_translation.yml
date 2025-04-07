@@ -1,0 +1,6 @@
+klaro.admin:
+  title: 'Klaro!'
+  base_route_name: klaro.admin
+  names:
+    - klaro.settings
+    - klaro.texts

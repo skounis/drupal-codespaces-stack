@@ -1,0 +1,10 @@
+name: Project Browser
+type: module
+description: Provides a user interface for browsing available Drupal projects.
+core_version_requirement: ^10.4 || ^11
+configure: project_browser.settings
+
+# Information added by Drupal.org packaging script on 2025-03-18
+version: '2.0.0-beta1'
+project: 'project_browser'
+datestamp: 1742303544

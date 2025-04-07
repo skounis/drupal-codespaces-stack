@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * @file
+ * Contains install/update/delete functions and hooks.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function svg_image_uninstall() {
+  $moduleName = 'svg_image';
+  $configManager = \Drupal::getContainer()->get('config.manager');
+  $configFactory = $configManager->getConfigFactory();
+
+  // We need to clear only few config values.
+  $svgImageConfigs = ['svg_render_as_image', 'svg_attributes'];
+
+  $dependentConfigs = $configManager
+    ->findConfigEntityDependencies('module', ['svg_image']);
+
+  // Clear all dependent configs, set standard Image as a dependency and clear
+  // SVG Image related field properties.
+  foreach ($dependentConfigs as $config) {
+    $name = $config->getConfigDependencyName();
+    $editableConfig = $configFactory->getEditable($name);
+
+    $configData = $editableConfig->getRawData();
+
+    $dependencyKey = array_search($moduleName, $configData['dependencies']['module']);
+
+    $configData['dependencies']['module'][$dependencyKey] = 'image';
+
+    // Delete SVG Image dependent configs.
+    foreach ($svgImageConfigs as $svgImageConfig) {
+      if (!empty($configData['settings']) && array_key_exists($svgImageConfig, $configData['settings'])) {
+        unset($configData['settings'][$svgImageConfig]);
+      }
+    }
+
+    $editableConfig->setData($configData)->save(TRUE);
+  }
+
+  $allFieldsConfigs = $configFactory->listAll('field.field');
+
+  $changedFields = [];
+  foreach ($allFieldsConfigs as $fieldConfig) {
+    $editableConfig = $configFactory->getEditable($fieldConfig);
+
+    if ($editableConfig->get('field_type') === 'image') {
+      $availableExtensions = explode(' ', $editableConfig->get('settings.file_extensions'));
+      $svgExtensionPosition = array_search('svg', $availableExtensions, TRUE);
+
+      if ($svgExtensionPosition !== FALSE) {
+        unset($availableExtensions[$svgExtensionPosition]);
+        $editableConfig->set(
+          'settings.file_extensions',
+          implode(' ', $availableExtensions)
+        )->save();
+
+        $changedFields[] = $editableConfig->get('field_name');
+      }
+    }
+  }
+
+  // Notice user about the changes that we has done.
+  if (!empty($changedFields)) {
+    $message = t(
+      'SVG was removed from the allowed extensions list in fields: @field_list.',
+      ['@field_list' => implode(', ', $changedFields)]
+    );
+    \Drupal::messenger()->addWarning($message);
+  }
+}

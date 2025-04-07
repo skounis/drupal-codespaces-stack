@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * The default template file for the plain text body of an easy email.
+ *
+ * Available variables:
+ * - body: The plain text body content as a render array
+ * - easy_email: The easy email entity
+ *
+ * This template may be overriden by easy email type, using one of the
+ * following template names:
+ * - easy-email-body-plain.html.twig: global, used by default.
+ * - easy-email-body-plain--my-easy-email-type.html.twig: only for emails using the "my_easy_email_type" template.
+ *
+ * @see template_preprocess()
+ * @see template_preprocess_easy_email_body_plain()
+ *
+ * @ingroup themeable
+ */
+#}
+{{ body }}

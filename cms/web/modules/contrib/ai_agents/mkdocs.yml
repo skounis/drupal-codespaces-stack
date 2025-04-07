@@ -1,0 +1,21 @@
+site_name: Documentation for AI Agents module for Drupal
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Develop & Contribute:
+      - AI Agent plugins: developers/ai_agent_plugins.md
+      - Using AI Agents in Custom Code: developers/using_ai_agent_in_custom_code.md
+  - Modules:
+      - AI Agents Explorer: modules/ai_agents_explorer.md
+      - AI Agents Extra: modules/ai_agents_extra.md
+      - AI Agents Form Integration: modules/ai_agents_form_integration.md
+  - AI Agents:
+      - Field Type Agent: agents/field_type.md
+      - Module Agent: agents/module_enable.md
+      - Node Content Type Agent: agents/content_type.md
+      - Taxonomy Agent: agents/taxonomy_agent.md
+      - Views Agent: agents/views_agent.md
+      - Webform Agent: agents/webform.md
+docs_dir: docs
+site_dir: site

@@ -1,0 +1,126 @@
+This module is a Drupal wrapper/implementation for the <em><a href="https://geocoder-php.org" target="blank">Geocoder PHP library</a>: "The most featured Geocoder library written in PHP, which helps you build geo-aware applications by providing a powerful abstraction layer for geocoding manipulations".</em>
+
+It is commonly used to automatically Geocode string/text Point addresses and <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry" target="blank">WKT Geometries</a> into <a href="https://www.drupal.org/project/geofield">Geofield</a>, so as Reverse Geocode Geofield Points into String/Text Point addresses, and other Geocoder PHP library formats.
+In its Geocoder 1.x for Drupal 7 version, it also supports the <a href="http://www.drupal.org/project/geolocation" target="blank">Geolocation</a> and <a href="http://www.drupal.org/project/location" target="blank">Location</a> modules for converting Points.
+This module makes available an API to convert the information you already have into geographic information. It support a variety of input formats and runs them through pluggable backends to produce geographic information.
+In addition to Latitude / Longitude points, this API also supports more complex geographies such as lines and polygons.
+
+<h2>Compatible modules</h2>
+<ul>
+  <li><a href="https://www.drupal.org/project/geofield" target="blank">Geofield</a> (recommended location storage);</li>
+  <li>Core String and Text fields, <a href="https://www.drupal.org/project/addressfield" target="blank">Addressfield</a> and <a href="https://www.drupal.org/project/address" target="blank">Address for D8/D9</a> (recommended address storage);</li>
+  <li>Core Image and File modules (for Geo-Tagged and uploaded KML, Geojson, GPX files), into Drupal Geofield Format;</li>
+  <li><a href="https://www.drupal.org/project/location" target="blank">location</a> (alternative location or address storage, only for D7 version);</li>
+  <li><a href="https://www.drupal.org/project/geolocation" target="blank">geolocation</a> (alternative location storage, only for D7 version);</li>
+  <li><a href="https://www.drupal.org/project/geocoder_autocomplete" target="blank">geocoder-autocomplete</a> Provides a nice auto-complete text-widget. (Doesn't use geocoder api);</li>
+  <li><a href="https://www.drupal.org/project/computed_field" target="blank">Computed Field</a>;</li>
+</ul>
+
+<h2>Geocoder 1.x (Drupal 7)</h2>
+
+<h3>Features</h3>
+<ul>
+  <li>Geocode Address or location data from any text or <a href="https://www.drupal.org/project/project/addressfield" target="blank">Addressfield</a> value (using Google, Yahoo, Yandex, or MapQuest).</li>
+  <li>Read <a href="http://en.wikipedia.org/wiki/Geotagging#JPEG_photos" target="blank">Geotags from EXIF data</a> in your photos.</li>
+  <li>Convert any <a href="http://en.wikipedia.org/wiki/GPS_eXchange_Format" target="blank">GPX Tracklog</a> into a Linestring.</li>
+  <li>Convert uploaded <a href="http://en.wikipedia.org/wiki/KML" target="blank">KML files</a> into geometries.</li>
+  <li>Convert uploaded or typed <a href="http://en.wikipedia.org/wiki/GeoJSON" target="blank">GeoJSON</a> and <a href="http://en.wikipedia.org/wiki/Well-known_text">WKT</a> into geometries.</li>
+  <li><a href="https://www.drupal.org/project/services" target="blank">Services module</a> integration. You can easily transform Drupal into a general purpose geocoding server using REST, SOAP, XMLRPC etc.</li>
+</ul>
+
+<h3>Requirements for D7</h3>
+
+All you need to do is install the <a href="https://www.drupal.org/project/geophp" target="blank">geoPHP module</a>, which is required by geocoder.
+
+<h3>Tutorial</h3>
+
+There's a nice video tutorial on using geocoder, addressfield, and geofield <a href="http://vimeo.com/38558646" target="blank">here</a>
+
+<h3>APIs</h3>
+
+In addition to the GUI-based widget, geocoder also provides a nice general API for doing geocoding. Here's an example:
+
+<?php
+// Geocode an address
+$address = '4925 Gair Ave, Terrace, BC';
+$point = geocoder('google',$address);
+$geoJSON = $point->out('json');
+
+// List all available handlers
+$handlers = geocoder_handler_info();
+dpm($handlers);
+?>
+
+New geocoder handlers are easy to define. Simply create a new ctools plugin of the type "geocoder_handler".
+
+Find detailed documentation in the README.md file.
+
+<h2><del>Geocoder 2.x (Drupal 8 - deprecated)</del></h2>
+
+This is a complete rewrite of the Geocoder module, based on the <a href="http://geocoder-php.org/" target="blank">Geocoder PHP library</a> - <a href="https://github.com/geocoder-php/Geocoder/tree/3.x" target="blank">Version 3.x</a>.
+
+<h3>Features</h3>
+<ul>
+  <li>Solid API based on <a href="http://geocoder-php.org" target="blank">Geocoder PHP library</a></li>
+  <li>Geocode and Reverse Geocode using one or multiple Geocoder providers (ArcGISOnline, BingMaps, File, GoogleMaps,  Nominatim, OpeneStreetMap, etc);</li>
+  <li>Results can be dumped into multiple formats such as WKT, GeoJson, etc ...</li>
+  <li>The Geocoder Provider and Dumper plugins are extendable through a custom module;</li>
+  <li>Submodule Geocoder Field provides Drupal fields widgets and formatters, with even more options;</li>
+  <li><a href="https://www.drupal.org/project/geofield" target="blank">Geofield</a> and <a href="https://www.drupal.org/project/address" target="blank">Address</a> field integration;</li>
+  <li>Caching results capabilities, enabled by default;</li>
+</ul>
+
+<h2>Geocoder 3.x (Drupal 8/9)</h2>
+
+This is an evolution of the Geocoder 2.x module (deprecated), based on the <a href="https://github.com/geocoder-php/Geocoder" target="blank">Geocoder PHP library - Version 4.x</a>.
+Starting with this version the Geocoder providers are config entities, whereas in earlier versions the provider settings were stored in simple configuration. An upgrade path is provided but any code that was relying on the old simple config will need to be updated to use the config entities instead.
+An upgrade path is provided but any code that was relying on the 2.x simple config will need to be updated to use the config entities instead.
+
+<h3>Features</h3>
+<ul>
+  <li>See Geocoder 2.x Features (above)</a></li>
+</ul>
+
+<h3>Installation the Geocoder 8.x-3.x version for D8/D9</h3>
+
+<ol>
+  <li>Download the module running requiring it via composer. This will also download the Geocoder PHP library as willdurand/geocoder library</li>
+  <li>Enable the module (and its sub-modules) via Drush</li>
+  <li>Choose the <a href="https://packagist.org/providers/geocoder-php/provider-implementation" target="blank">Geocoder Provider</a> you want to use and also add it as a required dependency to your project. For
+    example if you want to use Google Maps as your provider:
+    <b>$ composer require geocoder-php/google-maps-provider</b>
+    (you will find that as a possible geocoder provider choice in the "add provider"
+    options of the Geocoder module settings page ('/admin/config/system/geocoder')</li>
+</ol>
+
+<h3>Upgrading from Geocoder 2.x to 3.x</h3>
+
+When upgrading to the new Geocoder 8.x-3.x branch you would need to:
+<ul>
+  <li>remove the Geocoder 8.x-2.x branch before ($ composer remove drupal/geocoder), and make sure also its dependency willdurand/geocoder": "^3.0" library is removed.</li>
+  <li>require the new default Geocoder 3.x version ($ composer require drupal/geocoder)</li>
+  <li>choose the <a href="https://packagist.org/providers/geocoder-php/provider-implementation" target="blank">Geocoder Provider</a> you want to use and also add it as a required dependency to your project;</li>
+  <li>run the database updates, either by visiting 'update.php' or running the '$ drush updb' command;</li>
+  <li>set back (update) the Geocoding & Reverse Geocoding settings for each field you previously applied them;</li>
+</ul>
+
+Further Detailed Documentation and APIs provided in the Geocoder 3.x Readme.md file.
+
+<h2>Geocoder 4.x (Drupal 9/10)</h2>
+This branch is a parallel copy of the Geocoder 3.x branch requiring the php-http/guzzle7-adapter, thus compatible with Guzzle 7 (that is a possible dependency since Drupal 9.4 and a requirement for Drupal 10).
+At the moment this branch still have incompatibilities with packages locked to php-http/guzzle6-adapter dependency (see issue #3283651).
+
+<h3>How to seamlessly upgrade to Drupal 10 & Geocoder 4.x ...</h3>
+When preparing for an upgrade to Drupal 10 we recommend that you widen your composer version constraints to allow either 3.x or 4.x.
+Edit composer.json the following way:
+
+<code>
+  "require": {
+  ...
+  "drupal/geocoder": "^3.20 || ^4.0",
+  ...
+  }
+</code>
+
+This will allow the module to be automatically upgraded when you upgrade Drupal core.
+(For more info refer to <a href="https://www.drupal.org/project/geocoder/issues/3283651#comment-15050664">this Issue Comment</a>.

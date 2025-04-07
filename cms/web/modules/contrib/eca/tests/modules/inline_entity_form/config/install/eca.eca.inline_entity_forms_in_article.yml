@@ -1,0 +1,65 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.article.field_pages
+    - field.field.node.article.field_paragraphs
+    - field.field.paragraph.text.field_text
+    - field.storage.node.field_pages
+    - field.storage.node.field_paragraphs
+    - field.storage.paragraph.field_text
+  module:
+    - eca_form
+id: inline_entity_forms_in_article
+modeller: core
+label: 'Inline Entity Forms in Article'
+version: ''
+weight: null
+events:
+  form_ief_build:
+    plugin: 'form:ief_build'
+    label: 'Build inline entity form'
+    configuration:
+      form_id: ''
+      entity_type_id: node
+      bundle: page
+      operation: 'edit, default'
+      parent_type_id: node
+      parent_bundle: article
+      field_name: field_pages
+    successors:
+      -
+        id: eca_form_field_disable
+        condition: null
+  form_ief_build_1:
+    plugin: 'form:ief_build'
+    label: 'Build inline entity form'
+    configuration:
+      form_id: ''
+      entity_type_id: paragraph
+      bundle: text
+      operation: 'edit, default'
+      parent_type_id: node
+      parent_bundle: article
+      field_name: field_paragraphs
+    successors:
+      -
+        id: eca_form_field_disable_1
+        condition: null
+conditions: {  }
+gateways: {  }
+actions:
+  eca_form_field_disable:
+    plugin: eca_form_field_disable
+    label: 'Form field: set as disabled'
+    configuration:
+      flag: true
+      field_name: title
+    successors: {  }
+  eca_form_field_disable_1:
+    plugin: eca_form_field_disable
+    label: 'Form field: set as disabled'
+    configuration:
+      flag: true
+      field_name: field_text
+    successors: {  }

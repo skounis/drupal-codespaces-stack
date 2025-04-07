@@ -1,0 +1,13 @@
+services:
+  plugin.manager.ai_agents:
+    class: Drupal\ai_agents\PluginManager\AiAgentManager
+    parent: default_plugin_manager
+  ai_agents.agent_helper:
+    class: Drupal\ai_agents\Service\AgentHelper
+    arguments: ['@extension.path.resolver', '@module_handler', '@ai.prompt_json_decode', '@ai.prompt_code_block_extractor', '@config.factory', '@plugin.manager.ai_agent_validation']
+  ai_agents.field_agent_helper:
+    class: Drupal\ai_agents\Service\FieldAgent\FieldAgentHelper
+    arguments: ['@current_user', '@plugin.manager.field.field_type', '@entity_type.manager', '@entity_display.repository', '@plugin.manager.field.widget', '@plugin.manager.field.formatter', '@entity_field.manager', '@entity_type.bundle.info', '@router.route_provider']
+  plugin.manager.ai_agent_validation:
+    class: Drupal\ai_agents\PluginManager\AiAgentValidationPluginManager
+    parent: default_plugin_manager

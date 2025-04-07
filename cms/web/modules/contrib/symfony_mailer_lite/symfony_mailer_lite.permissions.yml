@@ -1,0 +1,4 @@
+administer symfony_mailer_lite configuration:
+  title: 'Administer Drupal Symfony Mailer Lite configuration'
+  description: 'Administer Drupal Symfony Mailer Lite configuration'
+  restrict access: true

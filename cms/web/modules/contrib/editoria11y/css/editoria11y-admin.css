@@ -1,0 +1,30 @@
+.ed11y-reset-page {
+  float: right;
+  font-size: 0.9em;
+  font-weight: 400;
+}
+@media (min-width: 60rem) {
+  #editoria11y-form-dashboard .form-item,
+  #editoria11y-form-dismissal-filters .form-item {
+    display: inline-block;
+    max-width: 48%;
+    margin: 0 1% 1rem 0;
+  }
+  #editoria11y-form-dashboard .edit-actions,
+  #editoria11y-form-dismissal-filters .edit-actions {
+    display: inline-block;
+    max-width: 18%;
+  }
+}
+
+#recent_dismissals ~ table {
+  width: 100%;
+}
+.clear-both {
+  clear: both;
+}
+.views-field-page-title,
+.views-field-page-path {
+  max-width: 20em;
+  overflow-wrap: break-word;
+}

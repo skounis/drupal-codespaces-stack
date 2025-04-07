@@ -1,0 +1,6 @@
+services:
+  plugin.manager.dateaugmenter:
+    class: Drupal\date_augmenter\Plugin\DateAugmenterManager
+    parent: default_plugin_manager
+    arguments:
+      - '@string_translation'

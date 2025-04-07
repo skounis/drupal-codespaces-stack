@@ -1,0 +1,6 @@
+
+entity.easy_email_override.add_form:
+  route_name: entity.easy_email_override.add_form
+  title: 'Add email override'
+  appears_on:
+    - entity.easy_email_override.collection

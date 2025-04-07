@@ -1,0 +1,16 @@
+name: 'ECA model test: Logging'
+type: module
+description: 'Support module for the ECA model tests.'
+package: Testing
+dependencies:
+  - eca:eca_content
+  - eca:eca_log
+
+config_devel:
+  - eca.eca.eca_test_0006
+  - eca.model.eca_test_0006
+
+# Information added by Drupal.org packaging script on 2025-03-14
+version: '2.1.6'
+project: 'eca'
+datestamp: 1741965583

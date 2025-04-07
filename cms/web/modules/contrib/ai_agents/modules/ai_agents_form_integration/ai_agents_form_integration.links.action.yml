@@ -1,0 +1,8 @@
+ai_agents_form_integration.node_type_add:
+  route_name: ai_agents_form_integration.ai_assisted_generation
+  title: 'Generate with AI'
+  appears_on:
+    - entity.node_type.collection
+  weight: 100
+ai_agents_form_integration.field_type_deriver:
+  deriver: '\Drupal\ai_agents_form_integration\Plugin\Derivative\FieldType'

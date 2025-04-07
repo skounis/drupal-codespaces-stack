@@ -1,0 +1,14 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the following YAML, give me back an array of the keys order and the response?
+  formats:
+    - order: The form keys but in the new order
+      response: A one sentence response that the field(s) were moved
+  one_shot_learning_examples:
+    - order:
+        - last_name
+        - first_name
+        - email
+      response: We moved Last Name in front of First Name as requested.

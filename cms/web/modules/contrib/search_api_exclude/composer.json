@@ -1,0 +1,13 @@
+{
+    "name": "drupal/search_api_exclude",
+    "description": "The Search API Exclude module allows users to prevent certain nodes from being indexed.",
+    "type": "drupal-module",
+    "homepage": "https://www.drupal.org/project/search_api_exclude",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/search_api_exclude"
+    },
+    "license": "GPL-2.0+",
+    "require": {
+        "drupal/search_api": "^1.3"
+    }
+}

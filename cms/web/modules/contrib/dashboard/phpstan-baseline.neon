@@ -1,0 +1,8 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+		-
+			message: "#^Class Drupal\\\\dashboard\\\\Form\\\\DashboardPermissionsForm extends @internal class Drupal\\\\user\\\\Form\\\\EntityPermissionsForm\\.$#"
+			count: 1
+			path: src/Form/DashboardPermissionsForm.php

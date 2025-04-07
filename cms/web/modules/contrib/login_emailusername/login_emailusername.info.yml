@@ -1,0 +1,11 @@
+name: Login with Email or Username
+type: module
+description: 'Allow users to log in with either their username OR email address using the same input box on the login form.'
+core_version_requirement: ^10.3 || ^11.0
+dependencies:
+  - drupal:user
+
+# Information added by Drupal.org packaging script on 2025-02-03
+version: '3.0.1'
+project: 'login_emailusername'
+datestamp: 1738619524

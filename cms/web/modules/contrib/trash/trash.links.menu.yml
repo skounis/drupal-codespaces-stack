@@ -1,0 +1,9 @@
+trash.settings:
+  title: 'Trash'
+  route_name: trash.settings.form
+  parent: system.admin_config_content
+  description: 'Configure Trash settings.'
+trash.admin_content_trash:
+  title: 'Trash'
+  route_name: trash.admin_content_trash
+  parent: system.admin_content

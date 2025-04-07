@@ -1,0 +1,46 @@
+services:
+  ai.provider:
+    class: Drupal\ai\AiProviderPluginManager
+    parent: default_plugin_manager
+    arguments: ['@service_container', '@messenger', '@uuid']
+  ai.form_helper:
+    class: Drupal\ai\Service\AiProviderFormHelper
+    arguments: ['@ai.provider', '@path.current']
+  ai.prompt_json_decode:
+    class: Drupal\ai\Service\PromptJsonDecoder\PromptJsonDecoder
+  ai.prompt_code_block_extractor:
+    class: Drupal\ai\Service\PromptCodeBlockExtractor\PromptCodeBlockExtractor
+  ai.vdb_provider:
+    class: Drupal\ai\AiVdbProviderPluginManager
+    parent: default_plugin_manager
+  ai.tokenizer:
+    class: Drupal\ai\Utility\Tokenizer
+    arguments: ['@ai.provider']
+  ai.text_chunker:
+    class: Drupal\ai\Utility\TextChunker
+    arguments: ['@ai.tokenizer']
+  ai.breadcrumb.ai_model_settings_breadcrumbs:
+    class: Drupal\ai\Breadcrumb\AiModelSettingsBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 100 }
+  cache.ai:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    arguments: ['ai']
+    factory: cache_factory:get
+    tags:
+      - { name: cache.bin }
+  access_check.ai.providers:
+    class: Drupal\ai\Access\ProvidersAccessChecker
+    arguments: ['@ai.provider']
+    tags:
+      - { name: access_check, applies_to: _providers }
+  access_check.ai.vdb_providers:
+    class: Drupal\ai\Access\VdbProvidersAccessChecker
+    arguments: ['@ai.vdb_provider']
+    tags:
+      - { name: access_check, applies_to: _vdb_providers }
+  cache_context.ai_providers:
+    class: Drupal\ai\Cache\Context\AIProvidersCacheContext
+    arguments: ['@ai.provider', '@ai.vdb_provider']
+    tags:
+      - { name: cache.context }

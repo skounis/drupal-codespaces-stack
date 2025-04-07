@@ -1,0 +1,12 @@
+name: 'Webform Test Editorial'
+type: module
+description: 'Provides editorial management tools for the Webform module.'
+package: Testing
+configure: webform_test_editorial.index
+dependencies:
+  - 'webform:webform'
+
+# Information added by Drupal.org packaging script on 2025-03-21
+version: '6.3.0-beta2'
+project: 'webform'
+datestamp: 1742581873

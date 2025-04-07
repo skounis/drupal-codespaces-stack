@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Contains simple_sitemap_views.module.
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function simple_sitemap_views_cron() {
+  // Create tasks in the garbage collection queue.
+  /** @var \Drupal\simple_sitemap_views\SimpleSitemapViews $simple_sitemap_views */
+  $simple_sitemap_views = \Drupal::service('simple_sitemap.views');
+  $simple_sitemap_views->executeGarbageCollection();
+}

@@ -1,0 +1,7 @@
+ai_image_bulk_alt_text.fix_alt_text:
+  path: '/admin/config/media/ai_image_bulk_alt_text'
+  defaults:
+    _title: 'Bulk Generate Alt Text'
+    _form: 'Drupal\ai_image_bulk_alt_text\Form\AltTextFixer'
+  requirements:
+    _permission: 'batch fix ai images alt text'

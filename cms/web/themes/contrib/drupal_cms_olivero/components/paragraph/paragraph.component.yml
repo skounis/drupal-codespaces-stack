@@ -1,0 +1,27 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Paragraph
+
+status: experimental
+
+props:
+  type: object
+  required:
+    - text
+    - style
+  properties:
+    text:
+      type: string
+      $ref: json-schema-definitions://experience_builder.module/textarea
+      title: Text
+      examples: ['A paragraph element for text content.']
+    style:
+      type: string
+      title: Style
+      default: standard
+      enum:
+        - 'standard'
+        - 'large'
+        - 'bold'
+        - 'small'
+      examples: ['standard', 'large', 'bold', 'small']

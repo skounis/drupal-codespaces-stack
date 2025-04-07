@@ -1,0 +1,23 @@
+id: umami
+label: Umami
+description: 'Tracks online visits of the website.'
+langcode: en
+status: false
+default: false
+purposes:
+  - analytics
+cookies: {  }
+required: false
+opt_out: false
+only_once: false
+contextual_consent_only: false
+contextual_consent_text: ''
+info_url: 'https://umami.is'
+privacy_policy_url: 'https://umami.is/privacy'
+javascripts:
+  - umami.js
+callback_code: ''
+wrapper_identifier: {  }
+attachments:
+  - umami_analytics_tracking_script
+weight: 4

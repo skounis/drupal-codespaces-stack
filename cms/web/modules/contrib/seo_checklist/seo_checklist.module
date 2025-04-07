@@ -1,0 +1,451 @@
+<?php
+
+/**
+ * @file
+ * Uses best practices to check for proper search engine optimization.
+ */
+
+use Drupal\Core\Url;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
+/**
+ * Implements hook_checklistapi_checklist_info().
+ *
+ * @see _seo_checklist_preprocess_checklist_items()
+ */
+function seo_checklist_checklistapi_checklist_info(): array {
+  $definitions = [];
+  $definitions['seo_checklist'] = [
+    '#title' => t('SEO checklist'),
+    '#description' => t('Keep track of your Drupal Search Engine Optimization tasks.'),
+    '#path' => '/admin/config/search/seo-checklist',
+    '#callback' => 'seo_checklist_checklistapi_checklist_items',
+    '#help' => t("<p>Check off each SEO-related task as you complete it. Don't forget to click the <em>Save</em> button!</p>"),
+  ];
+  return $definitions;
+}
+
+/**
+ * Implements callback_checklistapi_checklist_items() for seo_checklist.
+ */
+function seo_checklist_checklistapi_checklist_items(): array {
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+
+  $items = [
+
+    // Basic SEO part 1 - Clean URLs.
+    'basic_seo_part_1' => [
+      '#title' => t('Clean URLs'),
+      '#description' => t('Clean, well-formed URLs are the foundation of search engine optimization.'),
+      'install_and_enable_redirect_module' => [
+        '#title' => t('Install and Enable Redirect module'),
+        '#description' => t('Redirects visitors from old URLs to new URLs.'),
+        '#module' => 'redirect',
+      ],
+      'configure_the_redirect_module' => [
+        '#title' => t('Configure the Redirect module'),
+        '#description' => t('Review the module settings. (The defaults are fine for most sites.)'),
+        '#configure' => 'redirect.settings',
+      ],
+      'configure_the_redirect_404_module' => [
+        '#title' => t('Configure the Redirect 404 module'),
+        '#description' => t('Review the module settings. (The defaults are fine for most sites.)'),
+        '#configure' => 'redirect_404.ignore_404',
+      ],
+      'install_and_enable_pathauto_module' => [
+        '#title' => t('Install and Enable Pathauto module'),
+        '#description' => t('Automatically generates URL/path aliases for various kinds of content without requiring the user to manually specify the path alias.'),
+        '#module' => 'pathauto',
+      ],
+      'configure_pathauto_module' => [
+        '#title' => t('Configure the Pathauto module'),
+        '#description' => t('Review the module settings. (The defaults are fine for most sites.)'),
+        '#configure' => 'pathauto.settings.form',
+      ],
+      'create_pathauto_patterns' => [
+        '#title' => t('Create Pathauto patterns'),
+        '#description' => t('Specify a pattern that Drupal will use to create the path name for new pieces of content.'),
+        '#configure' => 'entity.pathauto_pattern.collection',
+      ],
+      'install_and_enable_file_field_paths_module' => [
+        '#title' => t('Install and Enable File (Field) Paths module'),
+        '#description' => t('The File (Field) Paths module allows you to set paths for uploaded files.'),
+        '#module' => 'filefield_paths',
+      ],
+      'configure_file_field_paths_module' => [
+        '#title' => t('Configure File (Field) Paths module'),
+        '#description' => t('Configure the File (Field) Paths module.'),
+        '#configure' => 'entity.node_type.collection',
+      ],
+    ],
+
+    // Basic SEO part 2 - Meta tags.
+    'basic_seo_part_2' => [
+      '#title' => t('Meta tags and Schema.org Vocabularies'),
+      '#description' => t('Search engines look at your <code>TITLE</code> tags and certain meta data to determine what your site is about. These modules give you control over this important information.'),
+      'install_and_enable_metatag_module' => [
+        '#title' => t('Install and Enable Metatag module'),
+        '#description' => t('Provides structured metadata, aka "meta tags", about a website.'),
+        '#module' => 'metatag',
+      ],
+      'install_and_enable_schema_metatag' => [
+        '#title' => t('Install and Enable Schema Metatag module'),
+        '#description' => t('Extends the Metatag module to display structured data as JSON LD in the head of web pages. Install the appropriate sub-modules to add corresponding functionality for configuration in the next step.'),
+        '#module' => 'schema_metatag',
+      ],
+      'set_metatags_for_your_site' => [
+        '#title' => t('Set Metatags for your site'),
+        '#description' => t('Set up the metatags for your content.'),
+        '#configure' => 'entity.metatag_defaults.collection',
+      ],
+      'install_and_enable_alternate_hreflang_module' => [
+        '#title' => t('Install and Enable Alternate hreflang module'),
+        '#description' => t('Automatically adds hreflang tags to your pages.'),
+        '#module' => 'hreflang',
+        '#seo_training_camp' => Url::fromUri('https://support.google.com/webmasters/answer/189077'),
+      ],
+    ],
+
+    // Search engines.
+    'search_engines' => [
+      '#title' => t('Search engines'),
+      '#description' => t('Set your site up with the search engines and submit your XML sitemap.'),
+      'install_and_enable_xml_sitemap_module' => [
+        '#title' => t('Install and Enable an XML Sitemap module'),
+        '#description' => t(
+          'The Simple XML Sitemap module creates an XML Sitemap of your content that you can submit to search engines. (For an alternative to the Simple XML Sitemap module, an additional option is the <a href=":url">XML sitemap</a> module.)',
+          [':url' => 'https://www.drupal.org/project/xmlsitemap']
+
+        ),
+        '#module' => 'simple_sitemap',
+      ],
+      'configure_xml_sitemap_module' => [
+        '#title' => t('Configure XML Sitemap module'),
+        '#description' => t('Set up the entities that will appear in the XML Sitemap.'),
+        '#configure' => 'simple_sitemap.settings',
+      ],
+      'install_and_enable_robotstxt_module' => [
+        '#title' => t('Install and Enable RobotsTxt module'),
+        '#description' => t('Gives you the ability to edit your robots.txt file within the Drupal interface and manage multi-site sitemaps.'),
+        '#module' => 'robotstxt',
+      ],
+      'add_xml_sitemap_to_your_robotstxt_file' => [
+        '#title' => t('Verify your XML Sitemap is in your robots.txt file'),
+        '#description' => t('Makes your XML sitemap findable by other search engines.'),
+      ],
+      'set_up_cron' => [
+        '#title' => t('Set up Cron'),
+        '#description' => t('Set up cron to run periodically so that your XML sitemap will be updated. Learn more about cron at the <a href=":url">Cron automated tasks</a> documentation page.',
+          [':url' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks']
+        ),
+      ],
+      'google_accounts_sign_ups' => [
+        '#title' => t('Google Accounts Sign Ups'),
+        '#description' => t('Sign up for all the necessary Google accounts that will allow the most accurate analytics tracking for your website.'),
+      ],
+      'install_and_enable_google_tag_manager_module' => [
+        '#title' => t('Install and Enable Google Tag Manager Module'),
+        '#description' => t(
+          'Makes setting up your Google Analytics easy and provides the ability to install additional 3rd party scripts and to track visitor activity that is not included with a base Google Analytics installation. (For an alternative to Google Analytics, consider <a href=":url">Matomo Analytics</a>.)',
+          [':url' => 'https://www.drupal.org/project/matomo']
+        ),
+        '#module' => 'google_tag',
+      ],
+      'configure_google_tag_manager_module' => [
+        '#title' => t('Configure Google Tag Manager Module'),
+        '#description' => t('Use the Google Tag Manager module to install Google Analytics on your website.'),
+        '#configure' => 'entity.google_tag_container.collection',
+      ],
+      'submit_xml_sitemap_to_google' => [
+        '#title' => t('Submit XML sitemap to Google'),
+        '#description' => t('Gives Google a list of all the content on your website.'),
+        '#configure' => 'entity.google_tag_container.collection',
+        'submit_xml_sitemap' => [
+          '#text' => t('Submit XML sitemap'),
+          '#url' => Url::fromUri('https://www.google.com/webmasters/tools/sitemap-list'),
+        ],
+      ],
+      'get_a_microsoft_account' => [
+        '#title' => t('Get a Microsoft account'),
+        '#description' => t('A Microsoft account gives you access to Bing Webmaster Tools.'),
+        'create_microsoft_account' => [
+          '#text' => t('Create Microsoft account'),
+          '#url' => Url::fromUri('https://signup.live.com/'),
+        ],
+      ],
+      'authenticate_with_bing' => [
+        '#title' => t('Authenticate with Bing'),
+        '#description' => t('Authenticate your ownership of your website with Bing.'),
+        'bing_webmaster_tools' => [
+          '#text' => t('Bing Webmaster Tools'),
+          '#url' => Url::fromUri('https://www.bing.com/webmaster/home/'),
+        ],
+      ],
+      'submit_xml_sitemap_to_bing' => [
+        '#title' => t('Submit XML sitemap to Bing'),
+        '#description' => t('Gives Bing a list of all the content on your website.'),
+        'bing_webmaster_tools' => [
+          '#text' => t('Bing Webmaster Tools'),
+          '#url' => Url::fromUri('https://www.bing.com/webmaster/home/'),
+        ],
+      ],
+    ],
+
+    // Optimizing content.
+    'optimizing_content' => [
+      '#title' => t('Optimizing content'),
+      '#description' => t('Well-written and optimized content is important to the search engines and your visitors.'),
+      'install_and_enable_easy_breadcrumbs_module' => [
+        '#title' => t('Install and Enable Easy Breadcrumbs module'),
+        '#description' => t('Easy Breadcrumb uses the current URL (path alias) and the current page title to automatically create breadcrumbs.'),
+        '#module' => 'easy_breadcrumb',
+      ],
+      'configure_easy_breadcrumbs_module' => [
+        '#title' => t('Configure Easy Breadcrumbs module'),
+        '#description' => t('Verify the breadcrumb settings.'),
+        '#configure' => 'easy_breadcrumb.general_settings_form',
+      ],
+      'install_and_enable_d8_editor_advanced_link_module' => [
+        '#title' => t('Install and Enable Editor Advanced link module'),
+        '#description' => t('Allows you to define title, class, id, target, and rel for links in CKEditor.'),
+        '#module' => 'editor_advanced_link',
+      ],
+      'configure_text_formats_to_use_d8_editor_advanced_link_module' => [
+        '#title' => t('Configure Text formats to use D8 Editor Advanced link module'),
+        '#description' => t('Set up CKEditor to use the D8 Editor Advanced link module'),
+        '#configure' => 'filter.admin_overview',
+      ],
+      'install_and_enable_sitemap_module' => [
+        '#title' => t('Install and Enable the HTML Sitemap module'),
+        '#description' => t('This module provides a site map that gives visitors an overview of your site. It can also display the RSS feeds for all blogs and categories.'),
+        '#module' => 'sitemap',
+      ],
+      'configure_sitemap_module' => [
+        '#title' => t('Configure Sitemap module'),
+        '#description' => t('Name and enable content of your sitemap.'),
+        '#module' => 'sitemap',
+        '#configure' => 'sitemap.settings',
+      ],
+      'install_and_enable_search_404_module' => [
+        '#title' => t('Install and Enable Search 404 module'),
+        '#description' => t('Performs a search on the keywords in the URL instead of showing a standard "404 Page not found".'),
+        '#module' => 'search404',
+      ],
+      'configure_search_404_module' => [
+        '#title' => t('Configure Search 404 module'),
+        '#description' => t('Set up how Search 404 responds to visitors.'),
+        '#configure' => 'search404.settings',
+      ],
+    ],
+
+    // Page optimization.
+    'page_optimization' => [
+      '#title' => t('On-page optimization'),
+      '#description' => t('Optimize each page of your website for optimal results.'),
+      'install_and_enable_yoast_seo_module' => [
+        '#title' => t('Install and Enable Real-time SEO for Drupal module'),
+        '#description' => t('Helps you optimize content around keywords in a natural, non-spam way.'),
+        '#module' => 'yoast_seo',
+      ],
+      'configure_yoast_seo_module' => [
+        '#title' => t('Configure Real-time SEO for Drupal Module'),
+        '#description' => t('Set up which content types the Real-time SEO for Drupal module will evaluate.'),
+        '#configure' => 'yoast_seo.settings',
+      ],
+      'turn_on_create_new_revisions_for_all_content' => [
+        '#title' => t('Verify Create New Revisions is turned on for all content types'),
+        '#description' => t('Helps you figure out what changes increased or decreased rankings.'),
+        '#configure' => 'entity.node_type.collection',
+      ],
+      'install_and_enable_diff_module' => [
+        '#title' => t('Install and Enable Diff module'),
+        '#description' => t('Shows you differences between revisions to nodes.'),
+        '#module' => 'diff',
+      ],
+      'configure_the_diff_module' => [
+        '#title' => t('Configure the Diff module'),
+        '#description' => t('Configure how the diff module displays differences in your content.'),
+        '#module' => 'diff',
+        '#configure' => 'diff.general_settings',
+      ],
+    ],
+
+    // Security and performance.
+    'security_and_performance' => [
+      '#title' => t('Security and performance'),
+      '#description' => t("The best SEO'd website will not perform well if it is slow, gets hacked, or is spammed. Take these steps to lock things down and speed them up."),
+      'install_and_enable_security_review_module' => [
+        '#title' => t('Install and Enable Security Review module'),
+        '#description' => t('The Security Review module automates testing for many of the easy-to-make mistakes that render your site insecure.'),
+        '#module' => 'security_review',
+      ],
+      'configure_security_review_module' => [
+        '#title' => t('Configure Security Review module'),
+        '#description' => t('Select the checks that the Security Review module makes on your site.'),
+        '#configure' => 'security_review',
+      ],
+      'run_a_speed_test_for_your_site' => [
+        '#title' => t('Run a Speed Test for Your Site'),
+        '#description' => t("Before moving on, make sure to test your website's speed. These tools can provide benchmarks before moving forward to help you determine if more aggressive caching will improve your site's speed."),
+        'googles_page_speed_insights_tool' => [
+          '#text' => t("Google PageSpeed Insights"),
+          '#url' => Url::fromUri('https://pagespeed.web.dev/'),
+        ],
+        'web_page_testorg' => [
+          '#text' => t('WebPageTest.org'),
+          '#url' => Url::fromUri('http://www.webpagetest.org/'),
+        ],
+      ],
+      'secure_your_website_with_https' => [
+        '#title' => t('Secure Your Website with HTTPS'),
+        '#description' => t('Verify your website is secured by HTTPS.'),
+      ],
+      'adjust_performance_admin_settings' => [
+        '#title' => t('Adjust Performance Admin Settings'),
+        '#description' => t('Verify your site aggregates CSS and JavaScript, and is cached for at least 15 minutes.'),
+        '#configure' => 'system.performance_settings',
+      ],
+      'set_up_a_cdn_cloudflare_etc' => [
+        '#title' => t('Set up a CDN (Cloudflare, etc.)'),
+        '#description' => t('CloudFlare is a free reverse proxy, firewall, and global content delivery network and can be implemented without installing any server software or hardware.'),
+        '#module' => 'cloudflare',
+      ],
+      'move_to_fast_hosting' => [
+        '#title' => t('Move to Fast Hosting'),
+        '#description' => t('Faster hosting increases website response times which increase search rankings.'),
+      ],
+    ],
+
+    // Mobile and social.
+    'mobile_and_social' => [
+      '#title' => t('Mobile'),
+      '#description' => t('A mobile-friendly website ranks better in many search engines including Google.'),
+      'make_sure_website_is_responsive' => [
+        '#title' => t('Verify your website is responsive.'),
+        '#description' => t('Google recommends responsive websites for non-desktop devices. Verify by running a test at https://pagespeed.web.dev/'),
+      ],
+    ],
+
+  ];
+
+  return _seo_checklist_preprocess_checklist_items($items);
+}
+
+/**
+ * Adds support for SEO Checklist's augmented checklist definitions schema.
+ *
+ * @param array $items
+ *   An array of checklist definitions as defined by
+ *   callback_checklistapi_checklist_items(), optionally with any of the
+ *   following key-pair additions to the checklist items:
+ *   - #module: (optional) The project-and-machine name of a module. The item's
+ *     checkbox will be pre-checked if the module is installed, and relevant
+ *     links will be conditionally added to the item.
+ *   - #seo_training_camp: (optional) A URL to an additional training resource
+ *     to be displayed as a link.
+ *   - #configure: (optional) The route name to a configuration page to be
+ *     displayed as a link.
+ *
+ * @return array
+ *   The preprocessed checklist definitions.
+ *
+ * @see hook_checklistapi_checklist_info()
+ *
+ * @internal
+ */
+function _seo_checklist_preprocess_checklist_items(array $items): array {
+  $module_handler = \Drupal::moduleHandler();
+  $module_directories = $module_handler->getModuleDirectories();
+  $access_manager = \Drupal::accessManager();
+  $current_user = \Drupal::currentUser();
+  /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */
+  $route_provider = \Drupal::service('router.route_provider');
+
+  foreach ($items as &$group) {
+    if (is_array($group)) {
+      foreach ($group as &$item) {
+        if (is_array($item)) {
+
+          $see_also = FALSE;
+
+          $description = isset($item['#description']) ? "{$item['#description']} " : '';
+          if ($see_also) {
+            $item['#description'] = $description . $see_also;
+          }
+
+          // Make module-related additions.
+          if (isset($item['#module'])) {
+            $module_name = $item['#module'];
+            $module_url_fragment_safe_name = str_replace('_', '-', $module_name);
+            $enabled = $module_handler->moduleExists($module_name);
+
+            // Pre-check installed modules.
+            $item['#default_value'] = $enabled;
+
+            // Add CLI commands to description.
+            $item['#description'] .= '</p><p class="cli-commands">'
+              . "Composer: <code>composer require drupal/{$module_name}</code><br />";
+
+            // Add module links.
+            $item['project_page'] = [
+              '#text' => t('Download'),
+              '#url' => Url::fromUri("https://www.drupal.org/project/{$module_name}"),
+            ];
+            if ($access_manager->checkNamedRoute('system.modules_list', [], $current_user)) {
+              $item['modules_page'] = [
+                '#text' => t('Install'),
+                '#url' => Url::fromRoute('system.modules_list', [], [
+                  'fragment' => "module-{$module_url_fragment_safe_name}",
+                ]),
+              ];
+            }
+            if ($enabled && $access_manager->checkNamedRoute('user.admin_permissions', [], $current_user)) {
+              // The permissions handler blows up in this context, so see if the
+              // module has a permission.yml file as a cheap alternative.
+              $has_permissions = file_exists("{$module_directories[$module_name]}/{$module_name}.permissions.yml");
+              if ($has_permissions) {
+                $item['permissions_page'] = [
+                  '#text' => t('Configure permissions'),
+                  '#url' => Url::fromRoute('user.admin_permissions', [], [
+                    'fragment' => "module-{$module_name}",
+                  ]),
+                ];
+              }
+            }
+
+            unset($item['#module']);
+          }
+
+          // Add SEO training camp links.
+          if (isset($item['#seo_training_camp'])) {
+            $item['seo_training_camp'] = [
+              '#text' => t('SEO training camp'),
+              '#url' => $item['#seo_training_camp'],
+            ];
+            unset($item['#seo_training_camp']);
+          }
+
+          // Add Configure link.
+          if (isset($item['#configure'])) {
+            $route_name = $item['#configure'];
+            try {
+              $route_exists = (bool) $route_provider->getRouteByName($route_name);
+            }
+            catch (RouteNotFoundException $e) {
+              $route_exists = FALSE;
+            }
+            if ($route_exists && $access_manager->checkNamedRoute($route_name, [], $current_user)) {
+              $item['configure'] = [
+                '#text' => t('Configure'),
+                '#url' => Url::fromRoute($route_name),
+              ];
+            }
+            unset($item['#configure']);
+          }
+        }
+      }
+    }
+  }
+  return $items;
+}

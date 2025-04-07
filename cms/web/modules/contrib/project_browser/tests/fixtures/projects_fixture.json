@@ -1,0 +1,983 @@
+[
+  {
+    "title": "1 Starts With a Number",
+    "author": "Elle Woods",
+    "created": "609",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 0,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "1_starts_with_a_number",
+      "project_usage": {
+        "7.x-1.x": 103,
+        "8.x-2.x": 10
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13028",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "9 Starts With a Higher Number",
+    "author": "Tony the Tiger",
+    "created": "10647",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 1,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "9_starts_with_a_higher_number",
+      "project_usage": {
+        "7.x-1.x": 200,
+        "8.x-2.x": 105
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13028",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Astronaut Simulator",
+    "author": "David Bowie",
+    "created": "3333",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 2,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "astronaut_simulator",
+      "project_usage": {
+        "8.x-2.x": 0
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13028",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Become a Banana",
+    "author": "Ban Ana",
+    "created": "6777",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 3,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "banana",
+      "project_usage": {
+        "7.x-1.x": 10,
+        "8.x-2.x": 17
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "19370",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Cream cheese on a bagel",
+    "author": "Ba Gel",
+    "created": "1443",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 4,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "cream_cheese",
+      "project_usage": {
+        "7.x-1.x": 100,
+        "8.x-2.x": 814
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "19370",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Dancing Queen",
+    "author": "ABBA",
+    "created": "654",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 5,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "dancing_queen",
+      "project_usage": {
+        "7.x-1.x": 200,
+        "8.x-2.x": 219
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "19370",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Doomer",
+    "author": "Wojack",
+    "created": "10",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 6,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "doomer",
+      "project_usage": {
+        "7.x-1.x": 1,
+        "8.x-2.x": 20
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9992",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Eggman",
+    "author": "Sonic the Hedgehog",
+    "created": "75",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 7,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "eggman",
+      "project_usage": {
+        "7.x-1.x": 2000,
+        "8.x-2.x": 517
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9992",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Fire",
+    "author": "Earth Wind And",
+    "created": "1998",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 8,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "fire",
+      "project_usage": {
+        "7.x-1.x": 10,
+        "8.x-2.x": 53
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13032",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Grapefruit",
+    "author": "Grape Fruit",
+    "created": "2223",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 9,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "grapefruit",
+      "project_usage": {
+        "7.x-1.x": 0,
+        "8.x-2.x": 1
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9990",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Helvetica",
+    "author": "Hel Vetica",
+    "created": "6885",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 10,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content. <a href=\"http://example.com\">Example</a></p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "helvetica",
+      "project_usage": {
+        "7.x-1.x": 110,
+        "8.x-2.x": 95
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9990",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Ice Ice",
+    "author": "Baby",
+    "created": "4408",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 11,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "iceice",
+      "project_usage": {
+        "7.x-1.x": 23,
+        "8.x-2.x": 700
+      },
+      "taxonomy_vocabulary_3": [],
+      "taxonomy_vocabulary_44": {
+        "id": "9990",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Jazz",
+    "author": "Louis Armstrong",
+    "created": "23",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 12,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "jazz",
+      "project_usage": {
+        "7.x-1.x": 9000,
+        "8.x-2.x": 325
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13028",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Kangaroo",
+    "author": "Kanga Roo",
+    "created": "808",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 13,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "kangaroo",
+      "project_usage": {
+        "7.x-1.x": 42,
+        "8.x-2.x": 300
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13028",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Looper",
+    "author": "Joseph Gordon-Levitt",
+    "created": "777",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 14,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "looper",
+      "project_usage": {
+        "7.x-1.x": 4,
+        "8.x-2.x": 30
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9992",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Mad About You",
+    "author": "Helen Hunt",
+    "created": "673",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 15,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "madaboutyou",
+      "project_usage": {
+        "7.x-1.x": 400,
+        "8.x-2.x": 36
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13032",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "No Scrubs",
+    "author": "TLC",
+    "created": "1140",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 16,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "no_scrubs",
+      "project_usage": {
+        "7.x-1.x": 67,
+        "8.x-2.x": 500
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9990",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Octopus",
+    "author": "Oct Opus",
+    "created": "999",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 17,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "octopus",
+      "project_usage": {
+        "7.x-1.x": 200,
+        "8.x-2.x": 35
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "9990",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9988",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Pinky and the Brain",
+    "author": "Pinky Brain",
+    "created": "140",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 18,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "pinky_brain",
+      "project_usage": {
+        "7.x-1.x": 90,
+        "8.x-2.x": 800
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "52",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "74",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "122",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13028",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "16538",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Quiznos",
+    "author": "Sand Wich",
+    "created": "21",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 19,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "quiznos",
+      "project_usage": {
+        "7.x-1.x": 200,
+        "8.x-2.x": 101
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "19370",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "16538",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Ruh roh",
+    "author": "Scooby Doo",
+    "created": "440",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 20,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "ruhroh",
+      "project_usage": {
+        "7.x-1.x": 50,
+        "8.x-2.x": 15
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13032",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "16538",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Soup",
+    "author": "Camp Bell",
+    "created": "1064",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 21,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "soup",
+      "project_usage": {
+        "7.x-1.x": 46,
+        "8.x-2.x": 400
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13032",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "16538",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Tooth Fairy",
+    "author": "Dwayne Johnson",
+    "created": "987",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 22,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "toothfairy",
+      "project_usage": {
+        "7.x-1.x": 900,
+        "8.x-2.x": 80
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "13032",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9994",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Unwritten&:/",
+    "author": "Natasha Bedingfield",
+    "created": "5",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "covered",
+    "nid": 23,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "unwritten",
+      "project_usage": {
+        "7.x-1.x": 10,
+        "8.x-2.x": 15
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "55",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "19370",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9994",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  },
+  {
+    "title": "Vitamin&C;$?",
+    "author": "Orange Juice",
+    "created": "201",
+    "field_project_type": "full",
+    "field_security_advisory_coverage": "not-covered",
+    "nid": 24,
+    "status": "1",
+    "project_data": {
+      "body": {
+        "summary": "<p>Text here for fake summary content.</p>"
+      },
+      "field_project_images": [],
+      "field_project_machine_name": "vitaminc",
+      "project_usage": {
+        "7.x-1.x": 800,
+        "8.x-2.x": 132
+      },
+      "taxonomy_vocabulary_3": [
+        {
+          "id": "104",
+          "resource": "taxonomy_term"
+        },
+        {
+          "id": "67",
+          "resource": "taxonomy_term"
+        }
+      ],
+      "taxonomy_vocabulary_44": {
+        "id": "19370",
+        "resource": "taxonomy_term"
+      },
+      "taxonomy_vocabulary_46": {
+        "id": "9994",
+        "resource": "taxonomy_term"
+      },
+      "type": "project_module"
+    }
+  }
+]

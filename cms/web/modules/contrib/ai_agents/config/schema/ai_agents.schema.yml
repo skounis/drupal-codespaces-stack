@@ -1,0 +1,11 @@
+ai_agents.settings:
+  type: config_entity
+  label: AI Assistant
+  mapping:
+    # We have to decide if we want config entities later.
+    agent_settings:
+      type: sequence
+      label: Agent Settings
+      required: false
+      sequence:
+        type: ignore

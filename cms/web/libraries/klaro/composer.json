@@ -1,0 +1,11 @@
+{
+  "name": "drupal/klaro_js",
+  "description": "Mirror of the Klaro consent manager javascript library tagged as a Drupal library.",
+  "type": "drupal-library",
+  "homepage": "https://github.com/klaro-org/klaro-js/",
+  "license": "BSD-3-Clause",
+  "extra": {
+    "installer-name": "klaro",
+    "upstream-version": "v0.7.22"
+  }
+}

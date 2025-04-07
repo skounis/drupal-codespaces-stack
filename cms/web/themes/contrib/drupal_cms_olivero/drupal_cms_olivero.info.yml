@@ -1,0 +1,42 @@
+# This theme is marked as @internal. It is intended to evolve and change over
+# minor releases.
+# Although we are sub-theming Olivero within Drupal CMS, sub-theming Olivero is
+# explicitly not supported by Drupal core. This is intended as a stop-gap
+# measure to provide great looking content types and components before a more
+# robust design system can be implemented.
+name: 'Olivero for Drupal CMS'
+description: 'A variant of the Olivero front-end theme, optimized for Drupal CMS.'
+type: theme
+base theme: olivero
+core_version_requirement: ^11
+libraries:
+  - drupal_cms_olivero/global-styling
+regions:
+  header: Header
+  primary_menu: Primary menu
+  secondary_menu: Secondary menu
+  hero: Hero (full width)
+  highlighted: Highlighted
+  breadcrumb: Breadcrumb
+  social: Social Bar
+  content_above: Content Above
+  content: Content
+  sidebar: Sidebar
+  content_below: Content Below
+  footer_top: Footer Top
+  footer_bottom: Footer Bottom
+libraries-extend:
+  views/views.module:
+    - drupal_cms_olivero/views
+  search_api_autocomplete/search_api_autocomplete:
+    - drupal_cms_olivero/search-api-autocomplete
+libraries-override:
+  olivero/global-styling:
+    css:
+      component:
+        css/components/layout-field.css: false
+
+# Information added by Drupal.org packaging script on 2025-03-19
+version: '1.1.0'
+project: 'drupal_cms_olivero'
+datestamp: 1742408995

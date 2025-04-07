@@ -1,0 +1,20 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: Based on the context of the prompt, make a list of information actions the user wants to have.
+  possible_actions:
+    title: They want to know the title of the form
+    url: They want the link of the form
+    publish_status: They want to know the publish status of the form
+    emails: They want to know who gets sent emails of new responses to the form
+    access: They want to know who can respond to the form
+    email_validation: The want to know if email validation is enabled
+  formats:
+    - action: action id from list
+      value: extra information, just empty if not needed
+  one_shot_learning_examples:
+    - action: title
+      value:
+    - action: emails
+      value:

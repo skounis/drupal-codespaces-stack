@@ -1,0 +1,49 @@
+site_name: Documentation for AI (Artificial Intelligence) module for Drupal
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Develop & Contribute:
+    - Getting Started: developers/developer_information.md
+    - Why base on the AI module?: developers/why_ai.md
+    - Making AI Calls:
+      - The Idea: developers/base_calls.md
+      - Chat Call: developers/call_chat.md
+      - Text-To-Image Call: developers/call_text_to_image.md
+      - Text-To-Speech Call: developers/call_text_to_speech.md
+      - Speech-To-Text Call: developers/call_speech_to_text.md
+      - Embeddings Call: developers/call_embeddings.md
+      - Moderation Call: developers/call_moderation.md
+      - Audio-To-Audio Call: developers/call_audio_to_audio.md
+      - Speech-To-Speech Call: developers/call_speech_to_speech.md
+      - Image Classification Call: developers/call_image_classification.md
+      - Translate Text Call: developers/call_translate_text.md
+    - Develop a third-party module: developers/develop_third_party_module.md
+    - Contribute to the AI module: developers/contribute.md
+    - Events: developers/events.md
+    - DDEV: developers/ddev.md
+    - Develop for submodules:
+        - AI Assistant API Action: developers/develop_api_assistant_action.md
+        - Develop an AI API Explorer plugin: developers/ai_api_explorer.md
+        - Develop an AI Automators plugin: developers/writing_an_ai_automators_plugin.md
+        - AI CKEditor: developers/ck_editor_plugin.md
+        - Develop an AI Provider: developers/writing_an_ai_provider.md
+  - Modules:
+    - AI API Explorer: modules/ai_api_explorer/index.md
+    - AI Assistant API: modules/ai_assistant_api/index.md
+    - AI Automators: modules/ai_automators/index.md
+    - AI Chatbot: modules/ai_assistant_api/#ai-chatbot-module
+    - AI Ckeditor: modules/ai_ckeditor/index.md
+    - AI Content Suggestions: modules/ai_content_suggestions/index.md
+    - AI ECA: modules/ai_eca/index.md
+    - AI Logging: modules/ai_logging/index.md
+    - AI Search: modules/ai_search/index.md
+    - AI Translate: modules/ai_translate/index.md
+    - AI Validations: modules/ai_validations/index.md
+    - Providers:
+      - Ollama: modules/providers/provider_ollama/index.md
+    - VDB Providers:
+      - Milvus: modules/vdb_providers/vdb_provider_milvus/index.md
+  - Providers: providers/matris.md
+docs_dir: docs
+site_dir: site

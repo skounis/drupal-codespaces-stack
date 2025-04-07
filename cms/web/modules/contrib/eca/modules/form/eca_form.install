@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * Install file for the ECA Form submodule.
+ */
+
+use Drupal\eca_modeller_bpmn\ModellerBpmnBase;
+
+/**
+ * Implements hook_install().
+ */
+function eca_form_install(): void {
+  module_set_weight('eca_form', 1);
+}
+
+/**
+ * Update token "current-form" to "current_form".
+ */
+function eca_form_update_8001(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /**
+   * @var \Drupal\eca\Entity\Eca $eca
+   */
+  foreach ($storage->loadMultiple() as $eca) {
+    $model = $eca->getModel();
+    if ($eca->getModeller() instanceof ModellerBpmnBase) {
+      $xml = $model->getModeldata();
+      $xml = str_replace('[current-form', '[current_form', $xml);
+      $model
+        ->setModeldata($xml)
+        ->save();
+    }
+    else {
+      foreach (['event', 'condition', 'action'] as $type) {
+        $items = $eca->get($type . 's') ?? [];
+        foreach ($items as &$item) {
+          foreach ($item['configuration'] as $key => $value) {
+            $item[$key] = str_replace('[current-form', '[current_form', $value);
+          }
+        }
+        $eca->set($type . 's', $items);
+      }
+      $eca->save();
+    }
+  }
+}
+
+/**
+ * Increases the module weight.
+ *
+ * This action is necessary to improve compatibility with other projects.
+ * Please synchronize your configuration after applying this update.
+ */
+function eca_form_update_8002(): void {
+  module_set_weight('eca_form', 1);
+}
+
+/**
+ * Create default value for "group" configuration in form fieldsets.
+ */
+function eca_form_update_8003(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('eca');
+  /** @var \Drupal\eca\Entity\Eca $eca */
+  foreach ($storage->loadMultiple() as $eca) {
+    $save_eca = FALSE;
+    $items = $eca->get('actions') ?? [];
+    foreach ($items as &$item) {
+      if ($item['plugin'] !== 'eca_form_add_group_element') {
+        continue;
+      }
+      if (!isset($item['configuration']['group'])) {
+        $item['configuration']['group'] = '';
+        $save_eca = TRUE;
+      }
+    }
+    if ($save_eca) {
+      $eca->set('actions', $items);
+      $eca->save();
+    }
+  }
+}

@@ -1,0 +1,58 @@
+drupal.user:
+  version: VERSION
+  js:
+    js/user.js: {}
+    js/user.theme.js: {}
+  css:
+    component:
+      css/user.module.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+  moved_files:
+    user/user.js:
+      deprecation_version: drupal:11.1.0
+      removed_version: drupal:12.0.0
+      deprecation_link: https://www.drupal.org/node/3471539
+      js:
+        user.js: 'js/user.js'
+    user/user.theme.js:
+      deprecation_version: drupal:11.1.0
+      removed_version: drupal:12.0.0
+      deprecation_link: https://www.drupal.org/node/3471539
+      js:
+        user.theme.js: 'js/user.theme.js'
+
+drupal.user.admin:
+  version: VERSION
+  css:
+    theme:
+      css/user.admin.css: {}
+
+drupal.user.permissions:
+  version: VERSION
+  js:
+    js/user.permissions.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+    - user/drupal.user.admin
+    - core/drupal.checkbox
+    - core/drupal.debounce
+    - core/drupal.announce
+  moved_files:
+    user/user.permissions.js:
+      deprecation_version: drupal:11.1.0
+      removed_version: drupal:12.0.0
+      deprecation_link: https://www.drupal.org/node/3471539
+      js:
+        user.permissions.js: 'js/user.permissions.js'
+
+drupal.user.icons:
+  version: VERSION
+  css:
+    theme:
+      css/user.icons.admin.css: {}

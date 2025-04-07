@@ -1,0 +1,12 @@
+preview:
+  version: 1.x
+  css:
+    theme:
+      css/easy-email-preview.css: {}
+  js:
+    js/easy-email-preview.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once
+    - jquery_ui_resizable/resizable

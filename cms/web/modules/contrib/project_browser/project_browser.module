@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ * Provides hook implementations for the Project Browser module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function project_browser_help(string $route_name, RouteMatchInterface $route_match): string {
+  $output = '';
+  switch ($route_name) {
+    case 'help.page.project_browser':
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t("The Project Browser module allows users to easily search for available Drupal modules from your site. Enhanced filtering is provided so you can find what you need.") . '</p>';
+      $output .= '<p>' . t('For more information, see the <a href=":project_browser">online documentation for the Project Browser module</a>.', [':project_browser' => 'https://www.drupal.org/docs/contributed-modules/project-browser']) . '</p>';
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Browsing modules') . '</dt>';
+      $output .= '<dd>' . t('Users who have the <em>Administer modules</em> can browse modules from the <a href=":project_browser_admin">Browse projects page</a>.', [':project_browser_admin' => Url::fromRoute('project_browser.browse')->toString()]) . '</dd>';
+      $output .= '<dt>' . t('Accessing more modules') . '</dt>';
+      $output .= '<dd>' . t('Users who have the <em>Administer site configuration</em> permission can select where to search for modules from the <a href=":project_browser_settings">Project Browser settings page</a>. This can include the modules already on your site as well as contributed modules on Drupal.org', [':project_browser_settings' => Url::fromRoute('project_browser.settings')->toString()]) . '</dd>';
+      $output .= '</dl>';
+
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function project_browser_theme(): array {
+  return [
+    'project_browser_main_app' => [
+      'render element' => 'element',
+    ],
+  ];
+}
+
+/**
+ * Preprocess function for the project_browser_main_app theme hook.
+ *
+ * @param array $variables
+ *   The variables to pass to the template.
+ */
+function template_preprocess_project_browser_main_app(array &$variables): void {
+  $variables['id'] = $variables['element']['#id'];
+
+  if (\Drupal::theme()->getActiveTheme()->getName() === 'gin') {
+    $variables['#attached']['library'] = 'project_browser/internal.gin-styles';
+  }
+}

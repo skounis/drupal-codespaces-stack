@@ -1,0 +1,78 @@
+include:
+  - project: $_GITLAB_TEMPLATES_REPO
+    ref: $_GITLAB_TEMPLATES_REF
+    file:
+      - '/includes/include.drupalci.main.yml'
+      - '/includes/include.drupalci.variables.yml'
+      - '/includes/include.drupalci.workflows.yml'
+
+variables:
+  _TARGET_DRUPAL: 11.0
+  _TARGET_PHP: 8.3
+  _PHPUNIT_EXTRA: --verbose
+  OPT_IN_TEST_PREVIOUS_MAJOR: 1
+  OPT_IN_TEST_PREVIOUS_MINOR: 0
+  OPT_IN_TEST_NEXT_MINOR: 1
+  #OPT_IN_TEST_NEXT_MAJOR: 1
+  OPT_IN_TEST_MAX_PHP: 1
+  _PHPUNIT_CONCURRENT: 1
+  SKIP_ESLINT: 1
+  # Until fixed in gitlab templates.
+  SKIP_STYLELINT: 1
+  # showdown.js is full of emoji words.
+  _CSPELL_IGNORE_PATHS: "'modules/ai_chatbot/js', 'modules/ai_chatbot/deepchat', 'modules/ai_chatbot/css', '.cspell-project-words.txt'"
+  COMPOSER_IGNORE_PLATFORM_REQS: 'ext-ffi'
+
+pages:
+  stage: .post
+
+cspell:
+  allow_failure: false
+phpcs:
+  allow_failure: false
+phpstan:
+  allow_failure: false
+  before_script:
+    - composer require --dev drush/drush
+
+# Add in the FFI extension for the AI Search end-to-end test.
+# See /docs/modules/ai_search/index.md for more details.
+phpunit:
+  extends: .phpunit-base
+  before_script:
+    # Update and install build tools.
+    - apt-get update && apt-get install -y --no-install-recommends $PHPIZE_DEPS libffi-dev wget
+    # Download and extract PHP source code.
+    - wget -qO /usr/src/php.tar.xz https://www.php.net/distributions/php-8.3.0.tar.xz
+    - mkdir -p /usr/src/php
+    - tar -xf /usr/src/php.tar.xz -C /usr/src/php --strip-components=1
+    # Build and enable FFI extension.
+    - docker-php-ext-configure ffi
+    - docker-php-ext-install ffi
+    - echo "ffi.enable=true" >> /usr/local/etc/php/conf.d/docker-php-ext-ffi.ini
+    # Output whether FFI is successfully enabled into the pipeline log.
+    - php -i | grep ffi
+
+# Do the same with FFI for PHP 8.4.
+phpunit (max PHP version):
+  extends: .phpunit-base
+  before_script:
+    # Update and install build tools.
+    - apt-get update && apt-get install -y --no-install-recommends $PHPIZE_DEPS libffi-dev wget
+    # Download and extract PHP source code.
+    - wget -qO /usr/src/php.tar.xz https://www.php.net/distributions/php-8.4.0.tar.xz
+    - mkdir -p /usr/src/php
+    - tar -xf /usr/src/php.tar.xz -C /usr/src/php --strip-components=1
+    # Build and enable FFI extension.
+    - docker-php-ext-configure ffi
+    - docker-php-ext-install ffi
+    - echo "ffi.enable=true" >> /usr/local/etc/php/conf.d/docker-php-ext-ffi.ini
+    # Output whether FFI is successfully enabled into the pipeline log.
+    - php -i | grep ffi
+    # Update to dev version of Key module until a new release contains
+    # https://www.drupal.org/project/key/issues/3489100.
+    - composer require drupal/key:dev-1.x
+
+# Revert to Drupal Gitlab CI default template.
+phpunit (previous major):
+  extends: .phpunit-base

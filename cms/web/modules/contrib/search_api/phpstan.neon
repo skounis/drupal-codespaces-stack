@@ -1,0 +1,124 @@
+# Configuration file for PHPStan static code checking, see https://phpstan.org .
+# PHPStan is triggered on Drupal CI in commit-code-check.sh.
+includes:
+  - phar://phpstan.phar/conf/bleedingEdge.neon
+
+parameters:
+  level: 1
+
+  fileExtensions:
+    - sh
+
+  paths:
+    - .
+
+  excludePaths:
+    - search_api.behat.inc
+
+  ignoreErrors:
+    # new static() is a best practice in Drupal, so we cannot fix that.
+    - "#^Unsafe usage of new static#"
+
+    # Ignore common errors for now.
+    - "#Drupal calls should be avoided in classes, use dependency injection instead#"
+
+    # Specific errors we don't want to or cannot fix.
+
+    - # Since we don't depend on the VBO module, it isn't available for PhpStan.
+      message: "#^\\QParameter $event of method Drupal\\search_api\\Contrib\\ViewsBulkOperationsEventSubscriber::provideViewData() has invalid type Drupal\\views_bulk_operations\\ViewsBulkOperationsEvent.\\E#"
+      count: 1
+      path: src/Contrib/ViewsBulkOperationsEventSubscriber.php
+
+    - # Since we don't depend on the VBO module, it isn't available for PhpStan.
+      message: "#^Access to an undefined property Drupal\\\\search_api\\\\Entity\\\\Index::\\$original\\.#"
+      count: 1
+      path: src/Entity/Index.php
+
+    - # Checking for a class from a contrib module we don't depend on. As this
+      # is just used in an "instanceof" check, there is no actual danger here.
+      message: "#^Class Drupal\\\\external_entities\\\\Entity\\\\Query\\\\External\\\\Query not found.#"
+      count: 1
+      path: src/Plugin/search_api/datasource/ContentEntity.php
+
+    - # Method will never be called in the context of that class.
+      message: "#^Call to an undefined method Drupal\\\\search_api\\\\Plugin\\\\views\\\\filter\\\\SearchApiBoolean::operatorValues\\(\\).$#"
+      path: src/Plugin/views/filter/SearchApiFilterTrait.php
+      reportUnmatched: false
+
+    - # Method will never be called in the context of that class.
+      message: "#^Call to an undefined static method Drupal\\\\views\\\\Plugin\\\\views\\\\filter\\\\BooleanOperator::opSimple\\(\\).$#"
+      count: 1
+      path: src/Plugin/views/filter/SearchApiFilterTrait.php
+
+    - # Method will never be called in the context of that class.
+      message: "#^Call to an undefined static method Drupal\\\\views\\\\Plugin\\\\views\\\\filter\\\\FilterPluginBase::opSimple\\(\\).$#"
+      count: 1
+      path: src/Plugin/views/filter/SearchApiFilterTrait.php
+
+    - # Method has different number of parameters depending on class, but
+      # passing $field unnecessarily is harmless.
+      message: "#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\filter\\\\InOperator::opSimple\\(\\) invoked with 1 parameter, 0 required.$#"
+      path: src/Plugin/views/filter/SearchApiFilterTrait.php
+
+    - # Method doesn't exist on all classes that use the trait. But since this
+      # just calls the parent method, the method itself won't be called for
+      # those classes.
+      message: "#^Call to an undefined static method Drupal\\\\rest\\\\Plugin\\\\views\\\\row\\\\DataEntityRow::getEntityType\\(\\).$#"
+      count: 1
+      path: src/Plugin/views/SearchApiHandlerTrait.php
+
+    - # Unfortunately, PhpStan is not good enough to correctly deduce the type
+      # of variable. (If we change to an array, it then fails on validating the
+      # individual array elements, so nothing gained there.)
+      message: "/^The \"#pre_render\" render array value expects an array of callbacks/"
+      count: 1
+      path: src/Processor/FieldsProcessorPluginBase.php
+
+    - # This is the base class for other plugin managers, so not really possible
+      # (nor reasonable) to add the cache backend information there.
+      message: "#^Missing cache backend declaration for performance.$#"
+      count: 1
+      path: src/SearchApiPluginManager.php
+
+    - # The class was newly introduced in Drupal 11.2.
+      # @todo Remove once default pipelines run against Drupal 11.2+.
+      message: "#^Call to static method createBundle\\(\\) on an unknown class Drupal\\\\entity_test\\\\EntityTestHelper\\.#"
+      paths:
+        - tests/src/Functional/ExampleContentTrait.php
+        - tests/src/Kernel/Index/IndexChangesTest.php
+      reportUnmatched: false
+
+    - # The class was renamed (with alias, but seems PHPStan cannot find that)
+      # but we cannot use the new name until we depend on Drupal 10.3.
+      message: "#^Call to static method decode\\(\\) on an unknown class Drupal\\\\Core\\\\Serialization\\\\Yaml\\.#"
+      paths:
+        - tests/src/Functional/FieldIntegrationTest.php
+        - tests/src/Kernel/ConfigEntity/DefaultConfigEntityInstallationTest.php
+        - tests/src/Kernel/Views/ViewsQueryTypeTest.php
+        - tests/src/Kernel/Views/ViewsQueryTypeUpdateTest.php
+
+    - # The parent method was deprecated in Drupal 10.3 and removed in 11.0.
+      message: "/^Call to an undefined static method Drupal\\\\Core\\\\Cache\\\\MemoryBackend::getRequestTime\\(\\)\\./"
+      path: tests/src/Kernel/Views/TestMemoryBackend.php
+
+    - # No idea what's happening there, why it can't find the trait it is
+      # currently checking?
+      message: "#^Access to property \\$container on an unknown class#"
+      path: tests/src/Unit/Processor/TestItemsTrait.php
+
+    - # No idea what's happening there, why it can't find the trait it is
+      # currently checking?
+      message: "#^Call to method \\w+\\(\\) on an unknown class#"
+      path: tests/src/Unit/Processor/TestItemsTrait.php
+
+    - # This undefined method is part of the backwardsCompatibleCall.
+      message: "#^Call to an undefined method Drupal\\\\search_api\\\\Entity\\\\Index\\:\\:getOriginal\\(\\)\\.$#"
+      count: 1
+      path: src/Entity/Index.php
+      reportUnmatched: false
+
+    - # This undefined method is part of the backwardsCompatibleCall.
+      message: "#^Call to an undefined method Drupal\\\\search_api\\\\Entity\\\\Server\\:\\:getOriginal\\(\\)\\.$#"
+      count: 1
+      path: src/Entity/Server.php
+      reportUnmatched: false

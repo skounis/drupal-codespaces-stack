@@ -1,0 +1,136 @@
+search_api_autocomplete.settings:
+  type: config_object
+  label: 'Search API Autocomplete settings'
+  mapping:
+    enable_custom_scripts:
+      type: boolean
+      label: 'Enable the use of custom scripts as autocomplete callbacks'
+
+search_api_autocomplete.search.*:
+  type: config_entity
+  label: 'Autocomplete search'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: string
+      label: 'Label'
+    index_id:
+      type: string
+      label: 'Index ID'
+    suggester_settings:
+      type: sequence
+      label: 'Suggester settings'
+      sequence:
+        type: plugin.plugin_configuration.search_api_autocomplete_suggester.[%key]
+        label: 'The configuration for a single suggester'
+    suggester_weights:
+      type: sequence
+      label: 'Suggester weights'
+      sequence:
+        type: integer
+        label: 'The weight for a single suggester'
+    suggester_limits:
+      type: sequence
+      label: 'Suggester limits'
+      sequence:
+        type: integer
+        label: 'The limit for a single suggester'
+    search_settings:
+      type: sequence
+      label: 'Search plugin settings'
+      sequence:
+        type: plugin.plugin_configuration.search_api_autocomplete_search.[%key]
+        label: 'The configuration for the search entity''s search plugin'
+    options:
+      type: mapping
+      label: 'Options'
+      mapping:
+        limit:
+          type: integer
+          label: 'Maximum number of suggestions'
+        min_length:
+          type: integer
+          label: 'The minimum length of user input to trigger autocomplete'
+        show_count:
+          type: boolean
+          label: 'Whether to show a predicted result count for suggestions'
+        delay:
+          type: integer
+          label: 'The delay for triggering autocomplete after the user stopped typing'
+        submit_button_selector:
+          type: string
+          label: 'A jQuery selector for finding the submit button in the search form'
+        autosubmit:
+          type: boolean
+          label: 'Whether to automatically submit the search form when a suggestion is selected'
+
+plugin.plugin_configuration.search_api_autocomplete_suggester.*:
+  type: mapping
+
+plugin.plugin_configuration.search_api_autocomplete_suggester.custom_script:
+  type: mapping
+  mapping:
+    path:
+      type: string
+      label: 'The path or URI of the custom autocomplete script'
+
+plugin.plugin_configuration.search_api_autocomplete_suggester.server:
+  type: mapping
+  mapping:
+    fields:
+      type: sequence
+      label: 'The fields to use for autocompletion'
+      sequence:
+        type: string
+
+plugin.plugin_configuration.search_api_autocomplete_suggester.live_results:
+  type: mapping
+  mapping:
+    fields:
+      type: sequence
+      label: 'The fields to use for searching'
+      sequence:
+        type: string
+    highlight:
+      type: mapping
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Whether to replace live results with a highlighted field'
+        field:
+          type: string
+          label: 'The field to replace the live result'
+    suggest_keys:
+      type: boolean
+      label: 'Whether to suggest keywords instead of result links'
+    view_modes:
+      type: sequence
+      label: 'The view modes to use for displaying results'
+      sequence:
+        type: sequence
+        label: 'The view modes to use for displaying results of a certain type'
+        sequence:
+          type: string
+          label: 'The view mode to use for displaying results of a certain bundle'
+
+plugin.plugin_configuration.search_api_autocomplete_search.*:
+  type: mapping
+
+plugin.plugin_configuration.search_api_autocomplete_search.views:*:
+  type: mapping
+  mapping:
+    displays:
+      type: mapping
+      label: 'Displays'
+      mapping:
+        default:
+          type: boolean
+          label: 'Whether to exclude (TRUE) or include (FALSE) the selected Views displays.'
+        selected:
+          type: sequence
+          label: 'The selected Views displays'
+          sequence:
+            type: string
+            label: 'A Views display machine name'

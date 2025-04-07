@@ -1,0 +1,116 @@
+{
+	"country_code": "IN",
+	"subdivisions": {
+		"AN": {
+			"code": "Andaman and Nicobar Islands",
+			"name": "Andaman & Nicobar"
+		},
+		"AP": {
+			"name": "Andhra Pradesh"
+		},
+		"AR": {
+			"name": "Arunachal Pradesh"
+		},
+		"AS": {
+			"name": "Assam"
+		},
+		"BR": {
+			"name": "Bihar"
+		},
+		"CH": {
+			"name": "Chandigarh"
+		},
+		"CG": {
+			"name": "Chhattisgarh"
+		},
+		"DH": {
+			"code": "Dadra and Nagar Haveli and Daman and Diu",
+			"name": "Dadra & Nagar Haveli & Daman & Diu"
+		},
+		"DL": {
+			"name": "Delhi"
+		},
+		"GA": {
+			"name": "Goa"
+		},
+		"GJ": {
+			"name": "Gujarat"
+		},
+		"HR": {
+			"name": "Haryana"
+		},
+		"HP": {
+			"name": "Himachal Pradesh"
+		},
+		"JK": {
+			"code": "Jammu and Kashmir",
+			"name": "Jammu & Kashmir"
+		},
+		"JH": {
+			"name": "Jharkhand"
+		},
+		"KA": {
+			"name": "Karnataka"
+		},
+		"KL": {
+			"name": "Kerala"
+		},
+		"LA": {
+			"name": "Ladakh"
+		},
+		"LD": {
+			"name": "Lakshadweep"
+		},
+		"MP": {
+			"name": "Madhya Pradesh"
+		},
+		"MH": {
+			"name": "Maharashtra"
+		},
+		"MN": {
+			"name": "Manipur"
+		},
+		"ML": {
+			"name": "Meghalaya"
+		},
+		"MZ": {
+			"name": "Mizoram"
+		},
+		"NL": {
+			"name": "Nagaland"
+		},
+		"OD": {
+			"name": "Odisha"
+		},
+		"PY": {
+			"name": "Puducherry"
+		},
+		"PB": {
+			"name": "Punjab"
+		},
+		"RJ": {
+			"name": "Rajasthan"
+		},
+		"SK": {
+			"name": "Sikkim"
+		},
+		"TN": {
+			"name": "Tamil Nadu"
+		},
+		"TS": {
+			"name": "Telangana"
+		},
+		"TR": {
+			"name": "Tripura"
+		},
+		"UP": {
+			"name": "Uttar Pradesh"
+		},
+		"UK": {
+			"name": "Uttarakhand"
+		},
+		"WB": {
+			"name": "West Bengal"
+		}
+	}
+}

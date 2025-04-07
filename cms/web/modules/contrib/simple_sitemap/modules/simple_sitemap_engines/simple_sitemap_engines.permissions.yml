@@ -1,0 +1,4 @@
+index entity on save:
+  title: 'Index entity on save'
+  description: 'Allows optionally sending a change notice to IndexNow compatible search engines on entity form save.'
+  restrict access: false

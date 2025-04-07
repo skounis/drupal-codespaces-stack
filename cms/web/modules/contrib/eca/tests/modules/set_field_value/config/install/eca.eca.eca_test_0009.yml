@@ -1,0 +1,236 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.type_set_field_value.field_text_line
+    - field.field.node.type_set_field_value.field_text_lines
+    - field.storage.node.field_text_line
+    - field.storage.node.field_text_lines
+    - node.type.type_set_field_value
+  module:
+    - eca_content
+id: eca_test_0009
+modeller: bpmn_io
+label: 'Set field values'
+version: v1
+weight: null
+events:
+  Event_056l2f4:
+    plugin: 'content_entity:presave'
+    label: 'Presave Node'
+    configuration:
+      type: 'node type_set_field_value'
+    successors:
+      -
+        id: Gateway_113xj72
+        condition: Flow_0j7r2le
+      -
+        id: Gateway_0nagg07
+        condition: Flow_1eoahw0
+      -
+        id: Gateway_1tbbhie
+        condition: Flow_0e3yjwm
+      -
+        id: Gateway_1byzhmc
+        condition: Flow_0wind58
+      -
+        id: Gateway_0aowp4i
+        condition: Flow_0iwzr0t
+conditions:
+  Flow_0j7r2le:
+    plugin: eca_entity_field_value
+    configuration:
+      negate: false
+      case: false
+      expected_value: Append
+      field_name: title
+      operator: contains
+      type: value
+      entity: ''
+  Flow_1eoahw0:
+    plugin: eca_entity_is_new
+    configuration:
+      negate: false
+      entity: ''
+  Flow_0e3yjwm:
+    plugin: eca_entity_field_value
+    configuration:
+      negate: false
+      case: false
+      expected_value: 'Drop First'
+      field_name: title
+      operator: contains
+      type: value
+      entity: ''
+  Flow_0wind58:
+    plugin: eca_entity_field_value
+    configuration:
+      negate: false
+      case: false
+      expected_value: Reset
+      field_name: title
+      operator: contains
+      type: value
+      entity: ''
+  Flow_0iwzr0t:
+    plugin: eca_entity_field_value
+    configuration:
+      negate: false
+      case: false
+      expected_value: 'Drop last'
+      field_name: title
+      operator: contains
+      type: value
+      entity: ''
+gateways:
+  Gateway_113xj72:
+    type: 0
+    successors:
+      -
+        id: Activity_0na1ecf
+        condition: ''
+      -
+        id: Activity_1on1kw2
+        condition: ''
+  Gateway_1tbbhie:
+    type: 0
+    successors:
+      -
+        id: Activity_03beihz
+        condition: ''
+  Gateway_0nagg07:
+    type: 0
+    successors:
+      -
+        id: Activity_1agtxee
+        condition: ''
+      -
+        id: Activity_13qlvkq
+        condition: ''
+  Gateway_1byzhmc:
+    type: 0
+    successors:
+      -
+        id: Activity_0yt6yuv
+        condition: ''
+  Gateway_0aowp4i:
+    type: 0
+    successors:
+      -
+        id: Activity_036vgtd
+        condition: ''
+actions:
+  Activity_1agtxee:
+    plugin: eca_set_field_value
+    label: 'Set text line'
+    configuration:
+      field_name: field_text_line
+      field_value: 'Title is [entity:title].'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }
+  Activity_13qlvkq:
+    plugin: eca_set_field_value
+    label: 'Set lines 1'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'Line 1'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }
+  Activity_0na1ecf:
+    plugin: eca_set_field_value
+    label: 'Overwrite text line'
+    configuration:
+      field_name: field_text_line
+      field_value: 'The updated text line content.'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }
+  Activity_1on1kw2:
+    plugin: eca_set_field_value
+    label: 'Append line'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'Second line'
+      method: 'append:not_full'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors:
+      -
+        id: Activity_0aa91q1
+        condition: ''
+  Activity_0aa91q1:
+    plugin: eca_set_field_value
+    label: 'Append another line'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'Line 3'
+      method: 'append:not_full'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors:
+      -
+        id: Activity_0zcaglk
+        condition: ''
+  Activity_0zcaglk:
+    plugin: eca_set_field_value
+    label: 'Append another line'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'Line 4'
+      method: 'append:not_full'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }
+  Activity_03beihz:
+    plugin: eca_set_field_value
+    label: 'Append line'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'Line 4'
+      method: 'append:drop_first'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }
+  Activity_0yt6yuv:
+    plugin: eca_set_field_value
+    label: 'Reset lines'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'This is one line.'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }
+  Activity_036vgtd:
+    plugin: eca_set_field_value
+    label: 'Prepend line'
+    configuration:
+      field_name: field_text_lines
+      field_value: 'Inserted line'
+      method: 'prepend:drop_last'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors: {  }

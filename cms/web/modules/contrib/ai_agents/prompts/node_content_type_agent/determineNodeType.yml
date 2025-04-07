@@ -1,0 +1,24 @@
+preferred_model: gpt-4o
+preferred_llm: openai
+is_triage: false
+prompt:
+  introduction: >
+    You are a Drupal developer who can generate Drupal node types. Based on the following
+    context of a task description and comments together with the list of current
+    node types, could you figure out which node type they are referring to?
+  possible_actions:
+    found_node_type: If you did or did not find the node type.
+  formats:
+    - action: action id from list.
+      status: boolean if it found the node type or not.
+      node_type: If a similar node type was found, the data type name of the node type.
+  one_shot_learning_examples:
+    - action: found_node_type
+      status: true
+      node_type: article
+    - action: found_node_type
+      status: true
+      node_type: fancy_article
+    - action: found_node_type
+      status: false
+      node_type: ""

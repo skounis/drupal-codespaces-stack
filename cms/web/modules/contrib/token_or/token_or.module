@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Use case: Open Graph image with default fallback.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function token_or_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the token_or module.
+    case 'help.page.token_or':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module simply extends the token module to use "OR" logic within a single token. It returns the first token or string that is not empty.') . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_tokens_pre_alter().
+ */
+function token_or_tokens_pre_alter(&$text, $data, $options) {
+  \Drupal::service('token_or.tokens_pre_alter')->tokensPreAlter($text, $data, $options);
+}

@@ -1,0 +1,310 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.internal
+    - views.view.user_admin_people
+  module:
+    - eca_base
+    - eca_content
+    - eca_user
+    - eca_views
+    - user
+id: eca_bpmn_io
+modeller: bpmn_io
+label: 'ECA Feature Demo - BPMN.io'
+version: v2
+weight: 0
+events:
+  Event_0erz1e4:
+    plugin: 'user:login'
+    label: 'User Login'
+    configuration: {  }
+    successors:
+      -
+        id: Gateway_0hd8858
+        condition: Flow_1o433l9
+  Event_00dfxlw:
+    plugin: 'content_entity:insert'
+    label: 'User Register'
+    configuration:
+      type: 'user user'
+    successors:
+      -
+        id: Activity_0nr4ng5
+        condition: Flow_182dlgt
+      -
+        id: Activity_0tlx3ln
+        condition: ''
+  Event_04tl9lk:
+    plugin: 'content_entity:update'
+    label: 'Update User'
+    configuration:
+      type: 'user user'
+    successors:
+      -
+        id: Activity_0bk309u
+        condition: ''
+conditions:
+  Flow_1hqinah:
+    plugin: eca_current_user_role
+    configuration:
+      negate: false
+      role: content_editor
+  Flow_0047zve:
+    plugin: eca_current_user_role
+    configuration:
+      negate: false
+      role: administrator
+  Flow_0a1zeo8:
+    plugin: eca_count
+    configuration:
+      negate: false
+      case: false
+      left: admins
+      right: '0'
+      operator: greaterthan
+      type: numeric
+  Flow_182dlgt:
+    plugin: eca_current_user_role
+    configuration:
+      negate: false
+      role: administrator
+  Flow_0ijt8mj:
+    plugin: eca_current_user_role
+    configuration:
+      role: administrator
+      negate: true
+  Flow_1j2h2dk:
+    plugin: eca_current_user_role
+    configuration:
+      role: content_editor
+      negate: true
+  Flow_1vczt3y:
+    plugin: eca_scalar
+    configuration:
+      negate: false
+      case: false
+      left: '[actuser:mail]'
+      right: '@example.com'
+      operator: contains
+      type: value
+  Flow_0xavi4t:
+    plugin: eca_scalar
+    configuration:
+      case: false
+      left: '[actuser:mail]'
+      right: '@example.com'
+      operator: contains
+      type: value
+      negate: true
+  Flow_10zxcgn:
+    plugin: eca_user_role
+    configuration:
+      account: '[actuser]'
+      role: internal
+      negate: true
+  Flow_0c7hrjx:
+    plugin: eca_user_role
+    configuration:
+      negate: false
+      account: '[actuser]'
+      role: internal
+  Flow_1o433l9:
+    plugin: eca_scalar
+    configuration:
+      case: false
+      left: '[current-page:url:path]'
+      right: /user/reset
+      operator: beginswith
+      type: value
+      negate: true
+gateways:
+  Gateway_1rthid4:
+    type: 0
+    successors:
+      -
+        id: Activity_0atqgae
+        condition: Flow_0a1zeo8
+  Gateway_14hq8dd:
+    type: 0
+    successors:
+      -
+        id: Activity_1tfgvxt
+        condition: Flow_1j2h2dk
+      -
+        id: Activity_0bk309u
+        condition: ''
+  Gateway_1lz4l89:
+    type: 0
+    successors:
+      -
+        id: Activity_19q8z5c
+        condition: Flow_10zxcgn
+  Gateway_1o87unm:
+    type: 0
+    successors:
+      -
+        id: Activity_18vsxl7
+        condition: Flow_0c7hrjx
+  Gateway_0hd8858:
+    type: 0
+    successors:
+      -
+        id: Activity_0l4w3fc
+        condition: Flow_1hqinah
+      -
+        id: Activity_182vndw
+        condition: Flow_0047zve
+      -
+        id: Gateway_14hq8dd
+        condition: Flow_0ijt8mj
+actions:
+  Activity_0l4w3fc:
+    plugin: action_goto_action
+    label: 'Redirect to content overview'
+    configuration:
+      replace_tokens: false
+      url: /admin/content
+    successors: {  }
+  Activity_182vndw:
+    plugin: action_goto_action
+    label: 'Redirect to admin overview'
+    configuration:
+      replace_tokens: false
+      url: /admin
+    successors: {  }
+  Activity_1tfgvxt:
+    plugin: action_goto_action
+    label: |-
+      Redirect to
+      user profile
+    configuration:
+      replace_tokens: false
+      url: /user
+    successors: {  }
+  Activity_07ksdyx:
+    plugin: action_send_email_action
+    label: 'Inform admins by email'
+    configuration:
+      recipient: '[admin:mail]'
+      subject: '[site:name] New user registered: [newuser:name]'
+      message: 'Please review here: [newuser:url]'
+      replace_tokens: true
+    successors:
+      -
+        id: Gateway_1rthid4
+        condition: ''
+  Activity_1w9sk6r:
+    plugin: eca_views_query
+    label: |-
+      Load all
+      admin users
+    configuration:
+      token_name: admins
+      view_id: user_admin_people
+      display_id: attachment_1
+      arguments: administrator
+    successors:
+      -
+        id: Gateway_1rthid4
+        condition: ''
+  Activity_0atqgae:
+    plugin: eca_list_remove
+    label: 'Pop an admin from the list'
+    configuration:
+      value: ''
+      token_name: admin
+      method: first
+      index: ''
+      list_token: admins
+    successors:
+      -
+        id: Activity_07ksdyx
+        condition: ''
+  Activity_0tlx3ln:
+    plugin: eca_token_set_value
+    label: 'Save new user as token'
+    configuration:
+      token_name: newuser
+      token_value: '[entity]'
+      use_yaml: false
+    successors:
+      -
+        id: Activity_0xd3fam
+        condition: ''
+  Activity_0xd3fam:
+    plugin: eca_switch_account
+    label: 'Switch user'
+    configuration:
+      user_id: '1'
+    successors:
+      -
+        id: Activity_1w9sk6r
+        condition: ''
+  Activity_0nr4ng5:
+    plugin: eca_warning_message
+    label: 'Display link to Mailhog'
+    configuration:
+      message: 'Check emails in <a href="https://mailhog-[site:url-brief]" target="_blank">Mailhog</a>'
+      replace_tokens: true
+    successors: {  }
+  Activity_19q8z5c:
+    plugin: user_add_role_action
+    label: 'Add internal role'
+    configuration:
+      replace_tokens: false
+      rid: internal
+      object: actuser
+    successors:
+      -
+        id: Activity_1vtj47i
+        condition: ''
+  Activity_18vsxl7:
+    plugin: user_remove_role_action
+    label: 'Remove internal role'
+    configuration:
+      replace_tokens: false
+      rid: internal
+      object: actuser
+    successors:
+      -
+        id: Activity_0qzx0pp
+        condition: ''
+  Activity_1gige0f:
+    plugin: eca_switch_account
+    label: 'Switch user'
+    configuration:
+      user_id: '1'
+    successors:
+      -
+        id: Gateway_1lz4l89
+        condition: Flow_1vczt3y
+      -
+        id: Gateway_1o87unm
+        condition: Flow_0xavi4t
+  Activity_1vtj47i:
+    plugin: action_message_action
+    label: Message
+    configuration:
+      replace_tokens: false
+      message: 'You have been added to the internal group. Welcome!'
+    successors: {  }
+  Activity_0qzx0pp:
+    plugin: eca_warning_message
+    label: Warning
+    configuration:
+      replace_tokens: false
+      message: 'You are no longer part of the internal group.'
+    successors: {  }
+  Activity_0bk309u:
+    plugin: eca_token_set_value
+    label: 'Save user as token'
+    configuration:
+      token_name: actuser
+      token_value: '[entity]'
+      use_yaml: false
+    successors:
+      -
+        id: Activity_1gige0f
+        condition: ''

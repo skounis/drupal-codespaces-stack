@@ -1,0 +1,5 @@
+ai_translate.settings:
+  title: 'AI Translate settings'
+  description: 'AI Translate settings'
+  parent: ai.admin_settings
+  route_name: ai_translate.settings_form

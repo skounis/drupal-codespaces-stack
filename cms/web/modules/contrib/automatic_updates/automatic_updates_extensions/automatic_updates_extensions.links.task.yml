@@ -1,0 +1,17 @@
+automatic_updates_extensions.report_update:
+  route_name: automatic_updates_extensions.report_update
+  base_route: system.admin_reports
+  title: Update Extensions
+  weight: 20
+
+automatic_updates_extensions.module_update:
+  route_name: automatic_updates_extensions.module_update
+  base_route: system.modules_list
+  title: Update Extensions
+  weight: 20
+
+automatic_updates_extensions.theme_update:
+  route_name: automatic_updates_extension.theme_update
+  base_route: system.themes_page
+  title: Update Extensions
+  weight: 20

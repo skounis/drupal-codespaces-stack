@@ -1,0 +1,34 @@
+services:
+  plugin.manager.symfony_mailer_lite_transport:
+    class: Drupal\symfony_mailer_lite\TransportManager
+    parent: default_plugin_manager
+
+  symfony_mailer_lite.embedded_image_validator:
+    class: Drupal\symfony_mailer_lite\EmbeddedImageValidator
+    arguments: ['@file_system', '@file.mime_type.guesser']
+
+  # Mailer.
+  symfony_mailer_lite.transports_factory:
+    class: Drupal\symfony_mailer_lite\TransportsFactory
+    arguments: [ '@config.factory', '@entity_type.manager', '@event_dispatcher' ]
+    tags:
+      - { name: service_collector, tag: symfony_mailer_lite.transport_factory, call: addTransportFactory }
+    public: false
+
+  symfony_mailer_lite.transports:
+    class: Symfony\Component\Mailer\Transport\Transports
+    factory: [ '@symfony_mailer_lite.transports_factory', 'create' ]
+    public: false
+
+  symfony_mailer_lite.mailer:
+    class: Symfony\Component\Mailer\Mailer
+    arguments: [ '@symfony_mailer_lite.transports', '@?messenger.default_bus', '@event_dispatcher' ]
+  Symfony\Component\Mailer\MailerInterface: '@symfony_mailer_lite.mailer'
+
+  # Optional messenger integration.
+  mailer.messenger.message_handler:
+    class: Symfony\Component\Mailer\Messenger\MessageHandler
+    arguments: ['@symfony_mailer_lite.transports']
+    tags:
+      - { name: messenger.message_handler }
+    public: false

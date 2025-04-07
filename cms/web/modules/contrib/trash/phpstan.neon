@@ -1,0 +1,20 @@
+includes:
+  - phar://phpstan.phar/conf/bleedingEdge.neon
+
+parameters:
+  level: 2
+  paths:
+    - .
+  excludePaths:
+    - src/EntityQuery/Workspaces/QueryFactory.php
+    - src/Plugin/search_api/processor/TrashStatus.php
+    - src/TrashWorkspaceInformation.php
+  ignoreErrors:
+    # new static() is a best practice in Drupal, so we cannot fix that.
+    - "#^Unsafe usage of new static#"
+    # Ignore a missing event class until we can require Drupal 11.1.
+    -
+      message: '#^Parameter \$event of method Drupal\\trash\\EventSubscriber\\TrashIgnoreSubscriber\:\:onDefaultContentPreImport\(\) has invalid type Drupal\\Core\\DefaultContent\\PreImportEvent\.$#'
+      reportUnmatched: false
+  scanDirectories:
+    - ../../../../vendor/drush/drush/src-symfony-compatibility

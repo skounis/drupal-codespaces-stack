@@ -1,0 +1,11 @@
+name: 'Automatic Updates Test Status Checker Provider'
+type: module
+description: 'Test module to provide an additional status checker.'
+package: Testing
+dependencies:
+  - drupal:automatic_updates_test
+
+# Information added by Drupal.org packaging script on 2025-01-13
+version: '3.1.7'
+project: 'automatic_updates'
+datestamp: 1736800616

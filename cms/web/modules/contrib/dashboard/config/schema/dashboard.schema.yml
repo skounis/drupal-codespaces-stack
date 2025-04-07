@@ -1,0 +1,41 @@
+dashboard.dashboard.*:
+  type: config_entity
+  label: Dashboard
+  mapping:
+    id:
+      type: string
+      label: ID
+    label:
+      type: label
+      label: Label
+    uuid:
+      type: string
+    description:
+      type: string
+    layout:
+      label: 'Layout'
+      type: sequence
+      sequence:
+        type: layout_builder.section
+    weight:
+      type: integer
+      label: 'Dashboard weight'
+
+block.settings.dashboard_text_block:
+  type: block_settings
+  label: 'DashboardTextBlock block'
+  mapping:
+    text:
+      type: mapping
+      label: Text
+      mapping:
+        value:
+          type: string
+          label: Value
+        format:
+          type: string
+          label: Format
+
+block.settings.navigation_dashboard:
+  type: block_settings
+  label: 'Navigation Dashboard block'

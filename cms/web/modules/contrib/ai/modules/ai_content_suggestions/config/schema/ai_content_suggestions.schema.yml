@@ -1,0 +1,27 @@
+ai_content_suggestions.settings:
+  type: config_object
+  label: 'AI Content Suggestions settings'
+  mapping:
+    plugins:
+      type: sequence
+      label: Plugins
+      orderby: key
+      model:
+        type: string
+        label: Model
+    tone:
+      type: map
+      label: Tone
+      description: 'Dynamic tone analysis settings.'
+      mapping:
+        '*':
+          type: string
+          label: 'Tone Vocabulary ID'
+    prompts:
+      type: map
+      label: Prompts
+      description: 'Dynamic prompts settings.'
+      mapping:
+        '*':
+          type: string
+          label: 'Prompt'

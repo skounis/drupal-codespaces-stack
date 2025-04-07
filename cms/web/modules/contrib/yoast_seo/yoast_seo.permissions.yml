@@ -1,0 +1,8 @@
+administer yoast seo:
+  title: 'Administer Real-time SEO for Drupal'
+  description: 'Control the main settings pages and configure the settings per content types.'
+  restrict access: TRUE
+
+use yoast seo:
+  title: 'Use Real-time SEO for Drupal'
+  description: 'Modify Realtime SEO for Drupal configuration per individual entities.'

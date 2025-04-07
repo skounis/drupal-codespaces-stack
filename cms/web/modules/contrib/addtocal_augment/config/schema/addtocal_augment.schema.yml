@@ -1,0 +1,38 @@
+# Schema for the addtocal date_augmenter plugin
+date_augmenter.plugin.addtocal:
+  type: date_augmenter.plugin_settings
+  label: 'Settings of addtocal'
+  mapping:
+    label:
+      label: 'Links label'
+      type: label
+    event_title:
+      label: 'Event title'
+      type: label
+    location:
+      label: Location
+      type: string
+    description:
+      label: 'Event description'
+      type: string
+    retain_spacing:
+      label: 'Retain spacing'
+      type: boolean
+    icons:
+      label: 'Use icons'
+      type: boolean
+    max_desc:
+      label: 'Maximum description length'
+      type: integer
+    ellipsis:
+      label: 'Add ellipsis to trimmed descriptions'
+      type: boolean
+    past_events:
+      label: 'Show Add to Cal widget for past events?'
+      type: boolean
+    target:
+      label: 'Links display'
+      type: string
+    ignore_timezone_if_UTC:
+      label: 'Ignore the timezone if it is set to UTC?'
+      type: boolean

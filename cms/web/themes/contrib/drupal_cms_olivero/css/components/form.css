@@ -1,0 +1,4 @@
+/* Very specific selector to align search result page form. */
+[data-drupal-selector*="views-exposed-form-search-page"] .form-item__label {
+  margin-top: 10px;
+}

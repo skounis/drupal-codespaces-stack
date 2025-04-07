@@ -1,0 +1,16 @@
+{
+  "name": "drupal/addtocal_augment",
+  "type": "drupal-module",
+  "description": "Provides a plugin to inject add to calendar links into date displays.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://www.drupal.org/project/addtocal_augment",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/addtocal_augment",
+    "source": "https://git.drupalcode.org/project/addtocal_augment"
+  },
+  "require": {
+    "drupal/date_augmenter": "^1.1"
+  }
+}

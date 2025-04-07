@@ -1,0 +1,18 @@
+id: klaro
+label: 'Consent manager'
+description: 'Klaro! Cookie & Consent manager saves your consent status in the browser.'
+langcode: en
+status: true
+default: true
+purposes:
+  - cms
+cookies:
+  - { regex: 'klaro', path: '', domain: ''}
+required: true
+opt_out: false
+only_once: false
+weight: 0
+info_url: 'https://github.com/klaro-org/klaro-js/blob/master/README.md'
+privacy_policy_url: ''
+javascripts: { }
+attachments: { }

@@ -1,0 +1,20 @@
+langcode: en
+status: false
+dependencies: {  }
+id: leaflet
+label: 'External Map (Leaflet)'
+description: 'This service loads external maps via Leaflet. See privacy policy for more information about the chosen map provider.'
+default: false
+purposes:
+  - external_content
+cookies: {  }
+required: false
+opt_out: false
+only_once: false
+info_url: ''
+privacy_policy_url: ''
+javascripts: {  }
+callback_code: ''
+wrapper_identifier: {  }
+attachments: {  }
+weight: 0

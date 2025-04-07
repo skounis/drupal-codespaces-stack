@@ -1,0 +1,28 @@
+{
+    "name": "drupal/checklistapi",
+    "description": "Provides an API for creating fillable, persistent checklists.",
+    "license": "GPL-2.0-or-later",
+    "type": "drupal-module",
+    "authors": [
+        {
+            "name": "Travis Carden",
+            "email": "travis.carden@gmail.com"
+        }
+    ],
+    "homepage": "http://drupal.org/project/checklistapi",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/checklistapi",
+        "source": "https://git.drupalcode.org/project/checklistapi"
+    },
+    "require": {
+        "php": ">=7.3.0"
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^10"
+            }
+        }
+    }
+}

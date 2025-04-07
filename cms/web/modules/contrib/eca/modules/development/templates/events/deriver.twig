@@ -1,0 +1,19 @@
+{{ php_prefix|raw }}
+
+namespace Drupal\{{ machine_name }}\Plugin\ECA\Event;
+
+use Drupal\eca\Plugin\ECA\Event\EventDeriverBase;
+
+/**
+ * Deriver for {{ machine_name }} event plugins.
+ */
+class EcaEventDeriver extends EventDeriverBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function definitions(): array {
+    return EcaEvent::definitions();
+  }
+
+}

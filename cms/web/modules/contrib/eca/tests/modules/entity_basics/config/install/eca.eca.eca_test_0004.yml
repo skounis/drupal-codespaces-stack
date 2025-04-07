@@ -1,0 +1,116 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_content
+    - eca_user
+    - node
+id: eca_test_0004
+modeller: bpmn_io
+label: 'Basic entity tests'
+version: v1
+weight: null
+events:
+  Event_0033g46:
+    plugin: 'content_entity:update'
+    label: 'Update node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_00b702g
+        condition: ''
+  Event_0vwr0rl:
+    plugin: 'content_entity:presave'
+    label: 'Pre-save node'
+    configuration:
+      type: 'node _all'
+    successors:
+      -
+        id: Activity_1a19oxh
+        condition: ''
+      -
+        id: Activity_0w47i6f
+        condition: Flow_0rnawfp
+conditions:
+  Flow_0rnawfp:
+    plugin: eca_entity_type_bundle
+    configuration:
+      negate: false
+      type: 'node article'
+      entity: ''
+gateways: {  }
+actions:
+  Activity_00b702g:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Node [node:nid] ([entity:title]) was updated and ECA recognized this.'
+    successors: {  }
+  Activity_1a19oxh:
+    plugin: node_make_sticky_action
+    label: 'Make stícky'
+    configuration:
+      object: ''
+    successors:
+      -
+        id: Activity_0u9ayn3
+        condition: ''
+  Activity_0w47i6f:
+    plugin: node_promote_action
+    label: 'Promote to front page'
+    configuration:
+      object: ''
+    successors:
+      -
+        id: Activity_10999pm
+        condition: ''
+      -
+        id: Activity_1fmd24b
+        condition: ''
+  Activity_0u9ayn3:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Made node [entity:title] sticky'
+    successors: {  }
+  Activity_10999pm:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Promoted article [entity:title] to front page'
+    successors: {  }
+  Activity_0t82j94:
+    plugin: eca_set_field_value
+    label: 'Set title'
+    configuration:
+      field_name: title
+      field_value: 'Article from [user:account-name]'
+      method: 'set:clear'
+      strip_tags: false
+      trim: false
+      save_entity: false
+      object: ''
+    successors:
+      -
+        id: Activity_15kgp0b
+        condition: ''
+  Activity_15kgp0b:
+    plugin: action_message_action
+    label: Msg
+    configuration:
+      replace_tokens: false
+      message: 'Updated title of article'
+    successors: {  }
+  Activity_1fmd24b:
+    plugin: eca_token_load_user_current
+    label: 'Load user'
+    configuration:
+      token_name: user
+    successors:
+      -
+        id: Activity_0t82j94
+        condition: ''

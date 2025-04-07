@@ -1,0 +1,32 @@
+behat:
+  stage: test
+  image: drupal:10
+  services:
+    - name: mariadb:10.7
+      alias: db
+      command: ["mysqld", "--max_allowed_packet=16M"]
+      variables:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: rtseo
+    - name: zenika/alpine-chrome
+      alias: chrome
+      command:
+        - "--headless" # Run in headless mode, i.e., without a UI or display server dependencies.
+        - "--disable-gpu" # Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch.
+        - "--no-sandbox" # Disables the sandbox for all process types that are normally sandboxed. Meant to be used as a browser-level switch for testing purposes only.
+        - "--remote-debugging-address=0.0.0.0" # Enables remote debug over HTTP on the specified port.
+        - "--remote-debugging-port=9222" # Enables remote debug over HTTP on the specified port.
+
+  before_script:
+    - apt-get update && apt-get install -y jq unzip mariadb-client && apt-get clean
+    - cd /opt/drupal
+    - composer config minimum-stability dev
+    - composer config repositories.${CI_PROJECT_NAME} path $CI_PROJECT_DIR
+    - 'tmp=$(mktemp) && jq ".\"autoload-dev\" = { \"psr-4\": { \"Drupal\\\\Tests\\\\${CI_PROJECT_NAME}\\\\\": \"web/modules/contrib/${CI_PROJECT_NAME}/tests/src\" }}" composer.json > "$tmp" && mv "$tmp" composer.json'
+    - cat composer.json
+    - composer require drupal/${CI_PROJECT_NAME}
+    - jq -r '."require-dev" | to_entries | map(.key + ":\"" + .value + "\"")[]' ${CI_PROJECT_DIR}/composer.json | xargs composer require --dev --no-interaction --prefer-stable
+    - cp ${CI_PROJECT_DIR}/tests/settings.php /opt/drupal/web/sites/default/settings.php
+  script:
+    -  vendor/bin/behat -vvv --config web/modules/contrib/${CI_PROJECT_NAME}/tests/behat.yml web/modules/contrib/${CI_PROJECT_NAME}/tests/features
+

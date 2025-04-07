@@ -1,0 +1,51 @@
+.email-body-wrapper {
+  background-color: #eeeeee;
+  padding: 20px 0;
+  font-family: Arial, sans-serif;
+}
+.email-body {
+  background-color: #ffffff;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.email-body > .header {
+  text-align: center;
+  padding: 30px 40px;
+}
+.email-body > .header .site-name {
+  font-size: 24px;
+  font-weight: bold;
+}
+.email-body > .header .site-logo img {
+  margin: 0 auto;
+  display: block;
+  max-width: 100%;
+  max-height: 100px;
+  width: auto;
+  height: auto;
+
+}
+.email-body > .content {
+  padding: 10px 40px;
+  line-height: 1.5;
+  text-wrap: wrap;
+}
+.email-body > .content p {
+  margin-bottom: 1.5em;
+  text-wrap: wrap;
+}
+.button {
+  display: inline-block;
+  background-color: rgb(27, 154, 228);
+  color: #ffffff;
+  font-weight: bold;
+  padding: 12px 24px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+.button.danger {
+  background-color: rgb(204, 0, 0);
+}

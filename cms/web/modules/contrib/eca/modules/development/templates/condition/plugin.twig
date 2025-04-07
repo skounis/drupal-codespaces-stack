@@ -1,0 +1,67 @@
+{{ php_prefix|raw }}
+
+namespace Drupal\{{ machine_name }}\Plugin\ECA\Condition;
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\eca\Plugin\ECA\Condition\ConditionBase;
+
+/**
+ * Plugin implementation of the ECA condition "{{ purpose }}".
+ *
+ * @EcaCondition(
+ *   id = "{{ machine_name }}_{{ id }}",
+ *   label = @Translation("{{ purpose }}"),
+ *   description = @Translation("{{ description }}"),
+ *   eca_version_introduced = "{{ module_version }}",
+{% if context %}
+ *   context_definitions = {
+{% for i,item in context %}
+ *   {% if i > 0 %}, {% else %}  {% endif %}"{{ item|trim }}" = @ContextDefinition("{{ item|trim }}", label = @Translation("{{ item|trim|camelize }}"))
+{% endfor %}
+ *   }
+{% endif %}
+ * )
+ */
+class {{ class }} extends ConditionBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function evaluate(): bool {
+{% if context %}
+    ${{ context[0] }} = $this->getValueFromContext('{{ context[0] }}');
+{% endif %}
+    $result = TRUE;
+    return $this->negationCheck($result);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration(): array {
+    return [
+      'field1' => '',
+    ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
+    $form['field1'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Label of field 1'),
+      '#default_value' => $this->configuration['field1'],
+    ];
+    return parent::buildConfigurationForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
+    $this->configuration['field1'] = $form_state->getValue('field1');
+    parent::submitConfigurationForm($form, $form_state);
+  }
+
+}

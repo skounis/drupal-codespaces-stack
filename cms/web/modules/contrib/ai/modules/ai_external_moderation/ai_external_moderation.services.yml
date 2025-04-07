@@ -1,0 +1,6 @@
+services:
+  ai_external_moderation.pre_request_subscriber:
+    class: '\Drupal\ai_external_moderation\EventSubscriber\ModeratePreRequestEventSubscriber'
+    arguments: ['@ai.provider', '@config.factory']
+    tags:
+      - { name: 'event_subscriber' }

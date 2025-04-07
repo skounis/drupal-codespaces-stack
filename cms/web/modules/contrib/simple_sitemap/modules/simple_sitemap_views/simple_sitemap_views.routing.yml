@@ -1,0 +1,7 @@
+simple_sitemap.views:
+  path: '/admin/config/search/simplesitemap/views'
+  defaults:
+    _controller: '\Drupal\simple_sitemap_views\Controller\SimpleSitemapViewsController::content'
+    _title: 'Simple XML Sitemap'
+  requirements:
+    _permission: 'administer sitemap settings'

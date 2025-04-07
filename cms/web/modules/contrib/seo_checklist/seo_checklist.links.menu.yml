@@ -1,0 +1,5 @@
+seo_checklist.admin:
+  title: SEO Checklist
+  description: The SEO Checklist uses best practices to check your website for proper search engine optimization.
+  route_name: checklistapi.checklists.seo_checklist
+  parent: system.admin_config_search
