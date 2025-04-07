@@ -17,9 +17,11 @@
     },
     "require": {
         "composer/installers": "^2.3",
+        "drupal/basecore": "^1.0@beta",
         "drupal/core-composer-scaffold": "^11.1.4",
         "drupal/core-project-message": "^11.1.4",
         "drupal/core-recommended": "^11.1.4",
+        "drupal/corporateclean": "^1.0@beta",
         "drupal/drupal_cms_accessibility_tools": "~1.1.0",
         "drupal/drupal_cms_ai": "~1.1.0",
         "drupal/drupal_cms_analytics": "~1.1.0",
@@ -89,7 +91,7 @@
         "post-install-cmd": [
             "wget https://git.drupalcode.org/project/cms/-/archive/1.1.x/cms-1.1.x.zip -O cms-1.1.x.zip",
             "unzip -o cms-1.1.x.zip",
-            "mkdir -p cms/web/profiles",
+            "mkdir -p web/profiles",
             "cp -r cms-1.1.x/web/profiles/drupal_cms_installer web/profiles/",
             "rm -rf cms-1.1.x cms-1.1.x.zip"
         ]
