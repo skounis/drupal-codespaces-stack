@@ -10,7 +10,7 @@ all: clean start instructions
 # Clean the cms/ folder but keep composer.json
 clean:
 	@echo "Cleaning the $(CMS_DIR) folder but keeping $(COMPOSER_FILE)..."
-	@find $(CMS_DIR) -mindepth 1 ! -name $(notdir $(COMPOSER_FILE)) -exec rm -rf {} +
+	@find $(CMS_DIR) -mindepth 1 -depth -ignore_readdir_race ! -name $(notdir $(COMPOSER_FILE)) -exec rm -rf {} +
 
 # Start or restart ddev
 ddev:
