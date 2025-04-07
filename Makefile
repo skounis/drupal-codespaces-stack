@@ -2,10 +2,10 @@
 CMS_DIR := cms
 COMPOSER_FILE := $(CMS_DIR)/composer.json
 
-.PHONY: clean start restart instructions
+.PHONY: clean ddev setup
 
 # Default target to run all steps
-all: clean start instructions
+all: clean ddev setup
 
 # Clean the cms/ folder but keep composer.json
 clean:
@@ -31,10 +31,11 @@ restart:
 	@echo "Restarting ddev..."
 	@ddev restart
 
-# Display instructions
-instructions:
-	@echo "Run the following commands to complete the setup:"
-	@echo "1. ddev ssh"
-	@echo "2. cd $(CMS_DIR)"
-	@echo "3. composer install"
-	@echo "4. composer run-script post-install-cmd"
+# Run setup commands inside the ddev container
+setup:
+	@echo "Running setup commands inside the ddev container..."
+	@echo "Commands to be executed:"
+	@echo "1. cd $(CMS_DIR)"
+	@echo "2. composer install"
+	@echo "3. composer run-script post-install-cmd"
+	@ddev exec "cd $(CMS_DIR) && composer install && composer run-script post-install-cmd"
