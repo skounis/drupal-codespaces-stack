@@ -2,8 +2,9 @@
 
 This repository is a **ready-to-fork and run example** that sets up [Drupal CMS](https://www.drupal.org/project/cms) inside a [GitHub Codespace](https://github.com/features/codespaces) using [DDEV](https://ddev.com/). It provides a fully orchestrated developer environment for rapid prototyping and testing of Drupal projects in the cloud — no local setup required.
 
-![DrupalCMSDDEVinGitHub-teaser](https://github.com/user-attachments/assets/89d598fa-dfd3-4316-aa61-3340db01b712)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/89d598fa-dfd3-4316-aa61-3340db01b712" alt="Drupal CMS Codespaces demo" />
+</p>
 
 ## Purpose
 
