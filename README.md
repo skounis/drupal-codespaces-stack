@@ -17,11 +17,11 @@ The goal of this project is not just to install Drupal CMS, but to **demonstrate
 
 ## What’s Included
 
-- **Drupal CMS 1.1.x**: A curated Drupal distribution with smart defaults
-- **DDEV**: Local dev tooling inside the Codespace container
-- **Makefile**: Automates setup (cleaning, starting DDEV, Composer install)
-- **Devcontainer config**: VS Code & Codespaces setup with useful PHP extensions
-- **Post-install hooks**: Automatically fetch and copy the Drupal CMS profile
+- **Drupal CMS 1.1.x**: A curated Drupal distribution with smart defaults  
+- **DDEV**: Local dev tooling inside the Codespace container  
+- **Makefile**: Automates setup (cleaning, starting DDEV, Composer install)  
+- **Devcontainer config**: VS Code & Codespaces setup with useful PHP extensions  
+- **Post-install hooks**: Automatically fetch and copy the Drupal CMS profile  
 - **Contrib themes & modules** like `corporateclean`, `webform`, `project_browser`, etc.
 
 ## Quick Start
@@ -38,21 +38,29 @@ From your forked repository:
 Code → Open with Codespaces → Create new Codespace
 ```
 
-### 3. Wait for setup to complete
+### 3. Run `make` in the terminal
 
-The `postCreateCommand` in `.devcontainer/devcontainer.json` will automatically:
+Once the Codespace has been created, open a terminal in the Codespace and run:
 
-- Run `ddev config` to initialize DDEV
-- Run `make` to:
-  - Clean the Drupal CMS directory
-  - Start/restart DDEV
-  - Run Composer install
-  - Run post-install hooks
-  - Launch Drupal in a browser tab
+```bash
+make
+```
+
+This will:
+
+- Clean the Drupal CMS directory
+- Start or restart DDEV
+- Run Composer install
+- Run post-install hooks
+- Launch the Drupal CMS site in a browser
+
+> **Note:** While the `devcontainer.json` includes a `postCreateCommand` intended to automate this step, it currently does **not work reliably in Codespaces**. Manual execution of `make` is required for now.
+
+> *This is tracked as a future improvement.*
 
 ### 4. View the site
 
-Once setup completes, a browser window will open pointing to your running **Drupal CMS** site inside the Codespace container.
+After `make` finishes, your default browser will open and point to the running **Drupal CMS** site inside the container.
 
 ## Included Commands
 
@@ -85,3 +93,4 @@ This is a great starting point for your own Drupal projects using Codespaces. Yo
 ## License
 
 [MIT License](LICENSE)
+
