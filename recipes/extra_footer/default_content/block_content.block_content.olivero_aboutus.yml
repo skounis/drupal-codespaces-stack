@@ -1,0 +1,24 @@
+_meta:
+  version: '1.0'
+  entity_type: block_content
+  uuid: 80d78f8d-b367-45e6-afa8-fc8b40a5aecc
+  bundle: basic
+  default_langcode: en
+default:
+  status:
+    -
+      value: true
+  info:
+    -
+      value: 'About Us'
+  reusable:
+    -
+      value: true
+  revision_translation_affected:
+    -
+      value: true
+  body:
+    -
+      value: '<p>Nordic Design Co. combines Scandinavian design principles with cutting-edge technology to create meaningful digital experiences. We believe in simplicity, functionality, and sustainable digital solutions.</p>'
+      format: basic_html
+      summary: ''

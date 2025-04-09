@@ -58,6 +58,7 @@ launch:
 #
 # Work with recipes
 #
+# make export-block BLOCK_ID=2 BLOCK_NAME=olivero_aboutus RECIPE=extra_footer
 export-block:
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 

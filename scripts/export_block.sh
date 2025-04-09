@@ -6,32 +6,36 @@
 BLOCK_ID="$1"
 BLOCK_NAME="$2"
 RECIPE="${3:-extra_footer}"
-CONTENT_DIR="recipes/${RECIPE}/default_content"
+
+CONFIG_EXPORT_DIR="cms/web/sites/default/files/sync"
 CONFIG_DIR="recipes/${RECIPE}/config"
-CONTENT_FILENAME="block_content.block_content.${BLOCK_NAME}.yml"
+CONTENT_DIR="recipes/${RECIPE}/default_content"
 CONFIG_FILENAME="block.block.${BLOCK_NAME}.yml"
-EXPORT_DIR="cms/sites/default/files/sync"
+CONTENT_FILENAME="block_content.block_content.${BLOCK_NAME}.yml"
 
-mkdir -p "$CONTENT_DIR"
 mkdir -p "$CONFIG_DIR"
+mkdir -p "$CONTENT_DIR"
 
-echo "Exporting block content via DDEV exec..."
+echo "=== Step 1: Copying block placement config ==="
+if [ -f "${CONFIG_EXPORT_DIR}/${CONFIG_FILENAME}" ]; then
+  cp "${CONFIG_EXPORT_DIR}/${CONFIG_FILENAME}" "${CONFIG_DIR}/${CONFIG_FILENAME}"
+  echo "✅ Copied config to ${CONFIG_DIR}/${CONFIG_FILENAME}"
+else
+  echo "⚠️  Config file not found: ${CONFIG_EXPORT_DIR}/${CONFIG_FILENAME}"
+  echo "➡️  Make sure you've run 'ddev drush cex' inside the container after placing the block."
+fi
+
+echo "=== Step 2: Exporting block content via DDEV ==="
 ddev exec "cd cms && ./vendor/bin/drush default-content:export block_content $BLOCK_ID" > "${CONTENT_DIR}/${CONTENT_FILENAME}"
 
 if [ $? -eq 0 ]; then
-  echo "✅ Block content exported to ${CONTENT_DIR}/${CONTENT_FILENAME}"
+  echo "✅ Exported block content to ${CONTENT_DIR}/${CONTENT_FILENAME}"
 else
-  echo "❌ Failed to export block content"
+  echo "❌ Failed to export block content for block_content ID ${BLOCK_ID}"
   exit 1
 fi
 
-# Copy block config file (from host filesystem)
-if [ -f "${EXPORT_DIR}/${CONFIG_FILENAME}" ]; then
-  cp "${EXPORT_DIR}/${CONFIG_FILENAME}" "${CONFIG_DIR}/${CONFIG_FILENAME}"
-  echo "✅ Block placement config copied to ${CONFIG_DIR}/${CONFIG_FILENAME}"
-else
-  echo "⚠️  Config file not found: ${EXPORT_DIR}/${CONFIG_FILENAME}"
-fi
+echo "✅ All done: block config + content exported for '${BLOCK_NAME}' into recipe '${RECIPE}'"
 
 
 
