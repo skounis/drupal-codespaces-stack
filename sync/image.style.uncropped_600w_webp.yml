@@ -1,0 +1,23 @@
+uuid: 7df9191b-127a-4e52-89e9-1c46f434d02a
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: A2gGIDp7Jjh5fOtgqNWOUh7WIEGIPBwCDT0hL5TKGjs
+name: uncropped_600w_webp
+label: 'Uncropped | 600w | WebP'
+effects:
+  e5267027-b558-48af-abe1-3edd8aa95234:
+    uuid: e5267027-b558-48af-abe1-3edd8aa95234
+    id: image_scale
+    weight: 1
+    data:
+      width: 600
+      height: null
+      upscale: false
+  cd39cbc2-25c5-4d42-baf1-bc5d375a440f:
+    uuid: cd39cbc2-25c5-4d42-baf1-bc5d375a440f
+    id: image_convert
+    weight: 2
+    data:
+      extension: webp

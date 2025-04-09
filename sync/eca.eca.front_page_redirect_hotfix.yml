@@ -1,0 +1,49 @@
+uuid: b6e25f0f-54b2-42b6-b2fb-023b483776d4
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.page
+  module:
+    - eca_config
+    - eca_content
+_core:
+  default_config_hash: yRQr7EQ16Aj_JbeoRPwBGjAbXgdGfaFUA9ubP9Ka6K4
+id: front_page_redirect_hotfix
+modeller: bpmn_io
+label: 'Front page redirect hotfix'
+version: 1.0.0
+weight: 0
+events:
+  Event_insert_basic_page:
+    plugin: 'content_entity:insert'
+    label: 'Insert basic page'
+    configuration:
+      type: 'node page'
+    successors:
+      -
+        id: Activity_set_home_path
+        condition: Flow_is_home
+conditions:
+  Flow_is_home:
+    plugin: eca_entity_field_value
+    configuration:
+      negate: false
+      case: false
+      expected_value: e939b485-ca10-4061-9036-3d6d394d7214
+      field_name: uuid
+      operator: equal
+      type: value
+      entity: node
+gateways: {  }
+actions:
+  Activity_set_home_path:
+    plugin: eca_config_write
+    label: 'Set home path'
+    configuration:
+      config_value: '/node/[node:nid]'
+      use_yaml: false
+      save_config: true
+      config_name: system.site
+      config_key: page.front
+    successors: {  }

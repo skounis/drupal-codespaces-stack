@@ -1,0 +1,27 @@
+uuid: 5a2feabb-ff43-4977-96dc-150434dfb87b
+langcode: en
+status: false
+dependencies: {  }
+_core:
+  default_config_hash: 6qjt1wfIOxzlhFeLbPaV9cdeo9ec-Y-QLM1alxsTGAA
+id: mastodon
+label: 'Mastodon social.bund.de (Example)'
+description: 'Mastodon for social.bund.de - you must adapt the URL for your preferred Mastodon server.'
+default: false
+required: false
+opt_out: false
+only_once: false
+contextual_consent_only: null
+contextual_consent_text: null
+info_url: 'https://joinmastodon.org/'
+privacy_policy_url: ''
+purposes:
+  - external_content
+cookies: {  }
+callback_code: ''
+javascripts:
+  - social.bund.de
+wrapper_identifier:
+  - .mastodon-embed
+attachments: {  }
+weight: 0

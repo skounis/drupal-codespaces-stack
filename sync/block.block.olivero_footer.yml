@@ -1,0 +1,27 @@
+uuid: 78413b75-8b36-4af9-8275-c6ab6251e68a
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.footer
+  module:
+    - system
+  theme:
+    - olivero
+_core:
+  default_config_hash: pN0rgJ1tymD37RfWB_QXnWm8z1By8V14tbm3JurDU9E
+id: olivero_footer
+theme: olivero
+region: footer_top
+weight: 0
+provider: null
+plugin: 'system_menu_block:footer'
+settings:
+  id: 'system_menu_block:footer'
+  label: Footer
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: false
+visibility: {  }

@@ -1,0 +1,23 @@
+uuid: 0af27472-d72d-455c-9568-270f3d2d05f0
+langcode: en
+status: true
+dependencies:
+  theme:
+    - drupal_cms_olivero
+_core:
+  default_config_hash: 51yljBMyDahnXF7rZ8SIdLm6gXMmHwPeZX4nGROTGmo
+id: drupal_cms_olivero_about
+theme: drupal_cms_olivero
+region: footer_top
+weight: 0
+provider: null
+plugin: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+settings:
+  id: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+  label: About
+  label_display: visible
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }

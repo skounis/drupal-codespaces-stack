@@ -1,0 +1,26 @@
+uuid: 35ba021c-aee5-40e5-9839-ac13e6965548
+langcode: en
+status: false
+dependencies: {  }
+_core:
+  default_config_hash: fBAyZTIZVpIJVNbRqVfsPO67ZB4JOqq1ocvlR_rf0qA
+id: facebook
+label: Facebook
+description: 'Facebook is a social media platform by Meta Platforms, Inc (USA).'
+default: false
+required: false
+opt_out: false
+only_once: false
+contextual_consent_only: null
+contextual_consent_text: null
+info_url: 'https://about.meta.com/company-info'
+privacy_policy_url: 'https://www.facebook.com/privacy/policy/'
+purposes:
+  - external_content
+cookies: {  }
+callback_code: ''
+javascripts:
+  - www.facebook.com
+wrapper_identifier: {  }
+attachments: {  }
+weight: 0

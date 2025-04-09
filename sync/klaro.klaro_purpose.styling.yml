@@ -1,0 +1,10 @@
+uuid: 8053e180-376b-46ab-9709-d68d87ff75fa
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: zb5fw3XvVMA3iaOX1CO7qm1YLv0IzThvz3HQvDcsLA8
+id: styling
+label: Styling
+description: ''
+weight: 5

@@ -1,0 +1,27 @@
+uuid: e1653fff-0c9f-4331-b0d0-bba3cfc61558
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: pojsLtV41YIYgWaeuqfl6yG8fsVXhC1iVB7XwKG0nMc
+id: user.user.default
+targetEntityType: user
+bundle: user
+mode: default
+content:
+  account:
+    weight: -10
+    region: content
+  contact:
+    weight: 5
+    region: content
+  language:
+    weight: 0
+    region: content
+  timezone:
+    weight: 6
+    region: content
+hidden:
+  path: true

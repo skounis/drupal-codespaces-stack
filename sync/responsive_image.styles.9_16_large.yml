@@ -1,0 +1,25 @@
+uuid: 25cabaea-9c9d-4c2d-91bf-50afeecbfdf0
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.9_16_504x896_focal_point_webp
+    - image.style.9_16_540x960_focal_point_webp
+  theme:
+    - olivero
+_core:
+  default_config_hash: 8WoAxMBkx3T9rD8M4YoQf9L-dImlodOa4_DSe6XnNDU
+id: 9_16_large
+label: '9:16 Large'
+image_style_mappings:
+  -
+    image_mapping_type: sizes
+    image_mapping:
+      sizes: 100vw
+      sizes_image_styles:
+        - 9_16_504x896_focal_point_webp
+        - 9_16_540x960_focal_point_webp
+    breakpoint_id: olivero.sm
+    multiplier: 1x
+breakpoint_group: olivero
+fallback_image_style: 9_16_504x896_focal_point_webp

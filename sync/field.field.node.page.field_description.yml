@@ -1,0 +1,21 @@
+uuid: 776b6edb-7d33-47e7-b299-be717b4204f6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.page
+_core:
+  default_config_hash: cNlFl-oRIOsqwCDvw0RGnOEdWtwcp0WgKTsZXtuZ63E
+id: node.page.field_description
+field_name: field_description
+entity_type: node
+bundle: page
+label: Description
+description: 'Describe the page content. This appears as the description in search engine results.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

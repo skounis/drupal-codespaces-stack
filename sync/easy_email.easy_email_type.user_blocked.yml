@@ -1,0 +1,31 @@
+uuid: 91a60c50-82e1-42b8-b5ae-bf3fd9259173
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: R9i03-dkbYVX5YpNxrXZ4YuXSFE8SQPqsK2KPK3iYIg
+label: 'User: Account Blocked'
+id: user_blocked
+key: ''
+recipient: {  }
+cc: {  }
+bcc: {  }
+fromName: ''
+fromAddress: ''
+replyToAddress: ''
+subject: 'Account details for [easy_email:recipient_uid:0:entity:display-name] at [site:name] (blocked)'
+inboxPreview: ''
+bodyHtml:
+  value: '<p>[easy_email:recipient_uid:0:entity:display-name],</p><p>Your account on [site:name] has been blocked.</p><p>-- &nbsp;[site:name] team</p>'
+  format: easy_email
+bodyPlain: "[easy_email:recipient_uid:0:entity:display-name],\r\n\r\nYour account on [site:name] has been blocked.\r\n\r\n--  [site:name] team"
+generateBodyPlain: false
+attachment: {  }
+saveAttachment: false
+attachmentScheme: public
+attachmentDirectory: ''
+saveEmail: true
+allowSavingEmail: true
+purgeEmails: true
+purgeInterval: 30
+purgePeriod: days

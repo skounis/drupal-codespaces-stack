@@ -1,0 +1,22 @@
+uuid: 28e0da3a-65dc-4edc-aef9-11787ba823af
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+    - node
+_core:
+  default_config_hash: ij5NA5OrfuoaOPfx4KE3NT0oi0EnokhZweXx3iDOI4w
+id: node.field_featured_image
+field_name: field_featured_image
+entity_type: node
+type: entity_reference
+settings:
+  target_type: media
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
