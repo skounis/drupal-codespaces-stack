@@ -54,12 +54,20 @@ launch:
 	@echo "Launching the browser with ddev..."
 	@ddev launch
 
+# Prepare the CMS for development
+devenv: 
+	@ddev exec "cd $(CMS_DIR) && composer require 'drupal/default_content:^2.0@alpha'"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en block_content -y"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en default_content -y"
 
 #
 # Work with recipes
 #
-# make export-block BLOCK_ID=2 BLOCK_NAME=olivero_aboutus RECIPE=extra_footer
+# make export-block BLOCK_ID=1 BLOCK_NAME=drupal_cms_olivero_about RECIPE=extra_footer
 export-block:
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 
-
+# List all custom blocks
+list-block:
+	@ddev exec "cd cms && ./vendor/bin/drush php:script ../../scripts/list_blocks.php"

@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'block_content:basic_block:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+  module:
+    - block_content
+  theme:
+    - drupal_cms_olivero
+id: drupal_cms_olivero_about
+theme: drupal_cms_olivero
+region: footer_top
+weight: 0
+provider: null
+plugin: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+settings:
+  id: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+  label: About
+  label_display: visible
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }
