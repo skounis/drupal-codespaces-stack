@@ -31,6 +31,14 @@ restart:
 	@echo "Restarting ddev..."
 	@ddev restart
 
+# Restart ddev and purge all saved data
+purge:
+	@echo "Purging ddev project and all associated data..."
+	@ddev delete -Oy
+	@echo "Starting ddev after purge..."
+	@ddev start
+
+
 # Run setup commands inside the ddev container
 setup:
 	@echo "Running setup commands inside the ddev container..."
@@ -45,3 +53,12 @@ setup:
 launch:
 	@echo "Launching the browser with ddev..."
 	@ddev launch
+
+
+#
+# Work with recipes
+#
+export-block:
+	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
+
+
