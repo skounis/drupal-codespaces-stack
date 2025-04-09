@@ -22,6 +22,7 @@
         "drupal/core-project-message": "^11.1.4",
         "drupal/core-recommended": "^11.1.4",
         "drupal/corporateclean": "^1.0@beta",
+        "drupal/default_content": "^2.0@alpha",
         "drupal/drupal_cms_accessibility_tools": "~1.1.0",
         "drupal/drupal_cms_ai": "~1.1.0",
         "drupal/drupal_cms_analytics": "~1.1.0",
