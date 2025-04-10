@@ -1,0 +1,10 @@
+{
+    "name": "drupal/extra_form",
+    "description": "Creates more webforms.",
+    "type": "drupal-recipe",
+    "require": {
+      "drupal/core": "^9.3"
+    },
+    "license": "GPL-2.0-or-later"
+  }
+  
