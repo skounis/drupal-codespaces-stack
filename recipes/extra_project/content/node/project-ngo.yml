@@ -1,0 +1,37 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 2b2b2222-bbbb-4bbb-bbbb-222222222222
+  bundle: project
+  default_langcode: en
+  depends:
+    930856d3-0fff-455c-819d-2c74e01cff3d: media
+    c3093e43-6af7-47e6-91da-cd733fdfc5c7: media
+    d48adeba-e388-4e82-820b-98bbd2f35a46: taxonomy_term
+default:
+  revision_uid: [{ target_id: 1 }]
+  status: [{ value: true }]
+  uid: [{ target_id: 1 }]
+  title: [{ value: 'Launching a Global NGO’s New Digital Identity' }]
+  created: [{ value: 1734364093 }]
+  promote: [{ value: true }]
+  sticky: [{ value: false }]
+  revision_translation_affected: [{ value: true }]
+  moderation_state: [{ value: published }]
+  path: [{ alias: /projects/global-ngo-digital-identity, langcode: en }]
+  field_project__client_link:
+    - uri: 'https://www.drupal.org'
+      title: 'Visit website'
+      options: {}
+  field_project__client_logo:
+    - entity: 930856d3-0fff-455c-819d-2c74e01cff3d
+  field_project__client_name: [{ value: 'Global Aid' }]
+  field_content:
+    - value: "<h3>Challenge</h3><p>An NGO with a global reach needed a unified, accessible platform to amplify its mission across continents.</p><h3>Solution</h3><p>Drupal enabled content governance, translations, and API integrations across all regional sites.</p>"
+      format: content_format
+  field_description:
+    - value: 'See how Drupal empowered a humanitarian organization with a cohesive, global digital presence.'
+  field_featured_image:
+    - entity: c3093e43-6af7-47e6-91da-cd733fdfc5c7
+  field_tags:
+    - entity: d48adeba-e388-4e82-820b-98bbd2f35a46

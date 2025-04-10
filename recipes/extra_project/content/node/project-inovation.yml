@@ -1,0 +1,37 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 4d4d4444-dddd-4ddd-dddd-444444444444
+  bundle: project
+  default_langcode: en
+  depends:
+    930856d3-0fff-455c-819d-2c74e01cff3d: media
+    c3093e43-6af7-47e6-91da-cd733fdfc5c7: media
+    d48adeba-e388-4e82-820b-98bbd2f35a46: taxonomy_term
+default:
+  revision_uid: [{ target_id: 1 }]
+  status: [{ value: true }]
+  uid: [{ target_id: 1 }]
+  title: [{ value: 'Driving Automotive Innovation Through Digital' }]
+  created: [{ value: 1734364095 }]
+  promote: [{ value: true }]
+  sticky: [{ value: false }]
+  revision_translation_affected: [{ value: true }]
+  moderation_state: [{ value: published }]
+  path: [{ alias: /projects/automotive-digital-transformation, langcode: en }]
+  field_project__client_link:
+    - uri: 'https://www.drupal.org'
+      title: 'Visit website'
+      options: {}
+  field_project__client_logo:
+    - entity: 930856d3-0fff-455c-819d-2c74e01cff3d
+  field_project__client_name: [{ value: 'AutoTech Group' }]
+  field_content:
+    - value: "<h3>Digital Acceleration</h3><p>To stay competitive, a major car brand reimagined its product marketing websites using Drupal and headless architecture.</p>"
+      format: content_format
+  field_description:
+    - value: 'Explore how an automotive giant uses Drupal to power global product sites and interactive marketing.'
+  field_featured_image:
+    - entity: c3093e43-6af7-47e6-91da-cd733fdfc5c7
+  field_tags:
+    - entity: d48adeba-e388-4e82-820b-98bbd2f35a46

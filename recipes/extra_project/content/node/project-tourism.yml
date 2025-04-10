@@ -1,0 +1,37 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 1a1a1111-aaaa-4aaa-aaaa-111111111111
+  bundle: project
+  default_langcode: en
+  depends:
+    930856d3-0fff-455c-819d-2c74e01cff3d: media
+    c3093e43-6af7-47e6-91da-cd733fdfc5c7: media
+    d48adeba-e388-4e82-820b-98bbd2f35a46: taxonomy_term
+default:
+  revision_uid: [{ target_id: 1 }]
+  status: [{ value: true }]
+  uid: [{ target_id: 1 }]
+  title: [{ value: 'Reimagining City Tourism with Drupal' }]
+  created: [{ value: 1734364092 }]
+  promote: [{ value: true }]
+  sticky: [{ value: false }]
+  revision_translation_affected: [{ value: true }]
+  moderation_state: [{ value: published }]
+  path: [{ alias: /projects/city-tourism-drupal, langcode: en }]
+  field_project__client_link:
+    - uri: 'https://www.drupal.org'
+      title: 'Visit website'
+      options: {}
+  field_project__client_logo:
+    - entity: 930856d3-0fff-455c-819d-2c74e01cff3d
+  field_project__client_name: [{ value: 'City Council' }]
+  field_content:
+    - value: "<h3>Project Overview</h3><p>A major European city needed a digital tourism portal to showcase attractions, events, and cultural content.</p><h3>Drupal’s Role</h3><p>Using Drupal, we delivered a scalable, multilingual platform integrated with real-time events and mapping APIs.</p>"
+      format: content_format
+  field_description:
+    - value: 'Discover how a city revolutionized its tourism platform with Drupal’s flexibility and multilingual support.'
+  field_featured_image:
+    - entity: c3093e43-6af7-47e6-91da-cd733fdfc5c7
+  field_tags:
+    - entity: d48adeba-e388-4e82-820b-98bbd2f35a46
