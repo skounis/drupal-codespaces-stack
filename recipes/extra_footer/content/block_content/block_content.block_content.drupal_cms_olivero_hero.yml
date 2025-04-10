@@ -1,0 +1,24 @@
+_meta:
+  version: '1.0'
+  entity_type: block_content
+  uuid: 423454ca-9ec2-491f-90c7-5baa6405cc7c
+  bundle: basic_block
+  default_langcode: en
+default:
+  status:
+    -
+      value: true
+  info:
+    -
+      value: Hero
+  reusable:
+    -
+      value: true
+  revision_translation_affected:
+    -
+      value: true
+  body:
+    -
+      value: '<section class="hero d-flex align-items-center"><div class="container"><div class="row"><div class="col-lg-8"><h1 class="mb-4">We create digital experiences that matter</h1><p class="mb-5">Combining Scandinavian simplicity with innovative technology to deliver exceptional results for forward-thinking businesses.</p><p><a class="btn btn-primary" href="#contact">Let''s work together</a></p></div></div></div></section>'
+      format: full_html
+      summary: ''

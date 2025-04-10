@@ -46,6 +46,28 @@ default:
         layout_id: layout_onecol
         layout_settings:
           label: ''
+          context_mapping: {  }
+        components:
+          e18813f4-3c80-4d40-b1e9-9b0360eeee4d:
+            uuid: e18813f4-3c80-4d40-b1e9-9b0360eeee4d
+            region: content
+            configuration:
+              id: 'block_content:423454ca-9ec2-491f-90c7-5baa6405cc7c'
+              label: Hero
+              label_display: visible
+              provider: block_content
+              status: true
+              info: ''
+              view_mode: full
+              context_mapping: {  }
+            weight: 0
+            additional: {  }
+        third_party_settings: {  }
+    -
+      section:
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
         components:
           541922dc-a8c8-4b74-9cdd-88a1f5d053dd:
             uuid: 541922dc-a8c8-4b74-9cdd-88a1f5d053dd
