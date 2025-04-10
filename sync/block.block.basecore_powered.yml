@@ -1,0 +1,22 @@
+uuid: 8dea902f-0518-4bf0-b08c-b1f6165cc4df
+langcode: en
+status: false
+dependencies:
+  module:
+    - system
+  theme:
+    - basecore
+_core:
+  default_config_hash: q96HyfyfzvZ_cyXVHqD1i1uBl7N1roNKCol5ESkx6yI
+id: basecore_powered
+theme: basecore
+region: footer_bottom_fourth
+weight: -8
+provider: null
+plugin: system_powered_by_block
+settings:
+  id: system_powered_by_block
+  label: 'Powered by Drupal'
+  label_display: '0'
+  provider: system
+visibility: {  }

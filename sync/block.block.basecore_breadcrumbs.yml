@@ -1,0 +1,27 @@
+uuid: 3ce7d302-3239-4a5b-bee4-210ccbef533c
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - basecore
+_core:
+  default_config_hash: Y0huM98egSdMelu19IFFFJ9XGnJZam3C7qQMhDhKNr4
+id: basecore_breadcrumbs
+theme: basecore
+region: hero_top
+weight: -14
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility:
+  request_path:
+    id: request_path
+    pages: "/hero-1\r\n/blocks\r\n/slideshow-fullscreen\r\n/slideshow-boxedwidth\r\n/slideshow-fullwidth\r\n/hero-2\r\n/hero-3\r\n/hero-form\r\n/hero-4\r\n/hero-5\r\n/hero-6\r\n/hero-7\r\n/landing-page-10\r\n/news-default\r\n/news-focus\r\n/news-card"
+    negate: true
+    context_mapping: {  }

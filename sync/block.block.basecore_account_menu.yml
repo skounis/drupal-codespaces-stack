@@ -1,0 +1,32 @@
+uuid: 0a99cd62-5f2a-400a-9aba-0bda5c3aa1d8
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.account
+  module:
+    - system
+  theme:
+    - basecore
+_core:
+  default_config_hash: KbZgFU8-_2MJXIrL9xne8erqBlgQCGVhC74js67tGlY
+id: basecore_account_menu
+theme: basecore
+region: header_top_highlighted_second
+weight: -41
+provider: null
+plugin: 'system_menu_block:account'
+settings:
+  id: 'system_menu_block:account'
+  label: 'User account menu'
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 1
+  expand_all_items: false
+visibility:
+  request_path:
+    id: request_path
+    pages: "/landing-page-10\r\n/home-pages"
+    negate: true
+    context_mapping: {  }

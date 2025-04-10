@@ -1,0 +1,22 @@
+uuid: c0fa7da6-670a-47ed-9478-ebc2412ac921
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - basecore
+_core:
+  default_config_hash: frgm6qm3aa3b6qh2QqeXw7UmgbxtMDbBlxtot45jWpo
+id: basecore_messages
+theme: basecore
+region: system_messages
+weight: -16
+provider: null
+plugin: system_messages_block
+settings:
+  id: system_messages_block
+  label: 'Status messages'
+  label_display: '0'
+  provider: system
+visibility: {  }

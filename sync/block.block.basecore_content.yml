@@ -1,0 +1,27 @@
+uuid: aadf0291-db11-4249-ba3a-f99758220e0c
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - basecore
+_core:
+  default_config_hash: _FALXDAuzPVe9ZIs9HITWlqHJFpgdrsJpZHuXI4VCeY
+id: basecore_content
+theme: basecore
+region: content
+weight: -15
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: true
+    context_mapping: {  }
