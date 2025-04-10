@@ -9,7 +9,7 @@ RECIPE="${3:-extra_footer}"
 
 CONFIG_EXPORT_DIR="cms/web/sites/default/files/sync"
 CONFIG_DIR="recipes/${RECIPE}/config"
-CONTENT_DIR="recipes/${RECIPE}/default_content"
+CONTENT_DIR="recipes/${RECIPE}/content/block_content"
 CONFIG_FILENAME="block.block.${BLOCK_NAME}.yml"
 CONTENT_FILENAME="block_content.block_content.${BLOCK_NAME}.yml"
 

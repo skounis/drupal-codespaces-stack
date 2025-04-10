@@ -1,0 +1,127 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 6d47cce9-eb5c-4625-84bf-29249e4db2de
+  bundle: page
+  default_langcode: en
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: false
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Extra Home'
+  created:
+    -
+      value: 1744269161
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: draft
+  path:
+    -
+      alias: /extra-home
+      langcode: en
+      pathauto: 1
+  field_description:
+    -
+      value: 'Extra home page for the convincing demo'
+  layout_builder__layout:
+    -
+      section:
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          541922dc-a8c8-4b74-9cdd-88a1f5d053dd:
+            uuid: 541922dc-a8c8-4b74-9cdd-88a1f5d053dd
+            region: content
+            configuration:
+              id: 'field_block:node:page:field_content'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: text_default
+                label: hidden
+                settings: {  }
+                third_party_settings: {  }
+            weight: 2
+            additional: {  }
+          b09072a1-7bd8-49c5-ac58-2da953562e12:
+            uuid: b09072a1-7bd8-49c5-ac58-2da953562e12
+            region: content
+            configuration:
+              id: 'extra_field_block:node:page:content_moderation_control'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+            weight: 1
+            additional: {  }
+          bfcb27c2-a42f-4e71-bf84-1841a548d5a6:
+            uuid: bfcb27c2-a42f-4e71-bf84-1841a548d5a6
+            region: content
+            configuration:
+              id: 'field_block:node:page:field_featured_image'
+              label: 'Featured image'
+              label_display: '0'
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+              formatter:
+                type: entity_reference_entity_view
+                label: hidden
+                settings:
+                  view_mode: hero
+                third_party_settings: {  }
+            weight: 0
+            additional: {  }
+          6976105a-c13d-457c-a8ae-0dfd6f9a7903:
+            uuid: 6976105a-c13d-457c-a8ae-0dfd6f9a7903
+            region: content
+            configuration:
+              id: 'field_block:node:page:field_tags'
+              label: Tags
+              label_display: '0'
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+              formatter:
+                type: entity_reference_label
+                label: inline
+                settings:
+                  link: true
+                third_party_settings: {  }
+            weight: 4
+            additional: {  }
+          adfb4d92-3840-4210-9d7d-fab8a7190551:
+            uuid: adfb4d92-3840-4210-9d7d-fab8a7190551
+            region: content
+            configuration:
+              id: 'block_content:8e0351eb-0fdc-4ad5-8fb6-b3bdfc00135a'
+              label: Services
+              label_display: 0
+              provider: block_content
+              status: true
+              info: ''
+              view_mode: full
+              context_mapping: {  }
+            weight: 5
+            additional: {  }
+        third_party_settings: {  }

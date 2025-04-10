@@ -68,9 +68,18 @@ export-block:
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 
+export-node:
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 5 > test.yml -y"
 
 dcex:
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
+
+
+# How to capture a block
+# 1. Find the block ID using the following command: 
+#    make list-block`
+# 2. Use the block ID and name to run the export command: 
+#    make export-block BLOCK_ID=1 BLOCK_NAME=drupal_cms_olivero_about RECIPE=extra_footer
 
 # List all custom blocks
 list-block:
@@ -79,17 +88,22 @@ list-block:
 # List and capture all custom blocks configuration files
 # Usage:
 # make export-block-type TYPE=basic_block RECIPE=extra_footer
-export-block-type:
-	@echo "Listing config files for block_content type: $(TYPE)"
-	@find cms/web/sites/default/files/sync -name "*$(TYPE)*.yml"
-	@echo "Copying to recipes/$(RECIPE)/config"
-	@mkdir -p recipes/$(RECIPE)/config
-	@find cms/web/sites/default/files/sync -name "*$(TYPE)*.yml" -exec cp {} recipes/$(RECIPE)/config/ \;
-	@echo "✅ Done: all config files for '$(TYPE)' copied to recipes/$(RECIPE)/config"
+# export-block-type:
+# 	@echo "Listing config files for block_content type: $(TYPE)"
+# 	@find cms/web/sites/default/files/sync -name "*$(TYPE)*.yml"
+# 	@echo "Copying to recipes/$(RECIPE)/config"
+# 	@mkdir -p recipes/$(RECIPE)/config
+# 	@find cms/web/sites/default/files/sync -name "*$(TYPE)*.yml" -exec cp {} recipes/$(RECIPE)/config/ \;
+# 	@echo "✅ Done: all config files for '$(TYPE)' copied to recipes/$(RECIPE)/config"
 
 
 # Apply a recipe by name (default: extra_footer)
 # Usage: make apply-recipe RECIPE=extra_footer
 apply-recipe:
 	@echo "Applying recipe: $(RECIPE)"
-	@ddev exec "cd cms && ./vendor/bin/drush recipe ../recipes/$(RECIPE)"
+	# Path to recipes is relative to the `web` folder
+	@ddev exec "cd cms && ./vendor/bin/drush recipe ../../recipes/$(RECIPE)"
+
+# Shortcut for the default recipe
+apply-recipes:
+	@$(MAKE) apply-recipe RECIPE=extra_footer

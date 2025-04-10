@@ -17,6 +17,7 @@
     },
     "require": {
         "composer/installers": "^2.3",
+        "cweagans/composer-patches": "^1.6.5",
         "drupal/basecore": "^1.0@beta",
         "drupal/core-composer-scaffold": "^11.1.4",
         "drupal/core-project-message": "^11.1.4",
@@ -49,6 +50,7 @@
     "config": {
         "allow-plugins": {
             "composer/installers": true,
+            "cweagans/composer-patches": true,
             "drupal/core-composer-scaffold": true,
             "drupal/core-project-message": true,
             "php-http/discovery": true
@@ -73,6 +75,12 @@
             "web/profiles/custom/{$name}": ["type:drupal-custom-profile"],
             "recipes/{$name}": ["type:drupal-recipe"],
             "web/themes/custom/{$name}": ["type:drupal-custom-theme"]
+        },
+        "patches": {
+            "enable-patching" : true,
+            "drupal/default_content": {
+                "Add a Normalizer and Denormalizer to support Layout Builder": "https://www.drupal.org/files/issues/2022-12-06/default_content-3160146-53.patch"
+            }
         },
         "drupal-core-project-message": {
             "include-keys": ["homepage", "support"],
