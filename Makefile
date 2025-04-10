@@ -69,7 +69,7 @@ export-block:
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 
 export-node:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 5 > test.yml -y"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 15 > 15.yml -y"
 
 dcex:
 	@rm -rf ./sync
@@ -114,5 +114,6 @@ apply-recipe:
 # Shortcut for the default recipe
 apply-recipes:
 	@$(MAKE) devenv
+	@$(MAKE) apply-recipe RECIPE=extra_form
 	@$(MAKE) apply-recipe RECIPE=extra_footer
 	@$(MAKE) apply-recipe RECIPE=extra_project
