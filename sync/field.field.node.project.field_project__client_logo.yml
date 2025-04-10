@@ -1,0 +1,31 @@
+uuid: be8b87bf-39fe-4900-8230-678162ae8141
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project__client_logo
+    - media.type.image
+    - node.type.project
+_core:
+  default_config_hash: 7iddmmMgzCXZBJPaa6G0VNHPSKm7hmS_8NIhEnwhQZ4
+id: node.project.field_project__client_logo
+field_name: field_project__client_logo
+entity_type: node
+bundle: project
+label: 'Client logo'
+description: 'Include the logo of the client or organization.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,103 @@
+uuid: 31b1cb00-1a83-42e6-b5b6-ec8897f3054c
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.content_format
+    - media.type.document
+    - media.type.image
+    - media.type.remote_video
+    - media.type.svg_image
+    - node.type.blog
+    - node.type.case_study
+    - node.type.event
+    - node.type.news
+    - node.type.page
+    - node.type.person
+    - node.type.project
+    - workflows.workflow.basic_editorial
+  module:
+    - content_moderation
+    - contextual
+    - file
+    - filter
+    - media
+    - navigation
+    - node
+    - path
+    - redirect
+    - scheduler
+    - system
+    - toolbar
+    - trash
+_core:
+  default_config_hash: g-zSnaBXJnH7VoimReFb6KcLjIgHCU-hisiShtZ9hjQ
+id: content_editor
+label: 'Content editor'
+weight: 2
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access media overview'
+  - 'access navigation'
+  - 'access toolbar'
+  - 'access trash'
+  - 'administer menu'
+  - 'administer redirects'
+  - 'administer url aliases'
+  - 'create blog content'
+  - 'create case_study content'
+  - 'create document media'
+  - 'create event content'
+  - 'create image media'
+  - 'create news content'
+  - 'create page content'
+  - 'create person content'
+  - 'create project content'
+  - 'create remote_video media'
+  - 'create svg_image media'
+  - 'create url aliases'
+  - 'delete any blog content'
+  - 'delete any case_study content'
+  - 'delete any document media'
+  - 'delete any event content'
+  - 'delete any image media'
+  - 'delete any news content'
+  - 'delete any page content'
+  - 'delete any person content'
+  - 'delete any project content'
+  - 'delete any remote_video media'
+  - 'delete any svg_image media'
+  - 'delete blog revisions'
+  - 'delete case_study revisions'
+  - 'delete event revisions'
+  - 'delete news revisions'
+  - 'delete own files'
+  - 'delete page revisions'
+  - 'delete person revisions'
+  - 'delete project revisions'
+  - 'edit any blog content'
+  - 'edit any case_study content'
+  - 'edit any document media'
+  - 'edit any event content'
+  - 'edit any image media'
+  - 'edit any news content'
+  - 'edit any page content'
+  - 'edit any person content'
+  - 'edit any project content'
+  - 'edit any remote_video media'
+  - 'edit any svg_image media'
+  - 'revert all revisions'
+  - 'schedule publishing of nodes'
+  - 'use basic_editorial transition create_new_draft'
+  - 'use basic_editorial transition publish'
+  - 'use basic_editorial transition unpublish'
+  - 'use text format content_format'
+  - 'view all revisions'
+  - 'view any unpublished content'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view scheduled content'
+  - 'view the administration theme'

@@ -1,0 +1,69 @@
+uuid: b2a1fae3-9c77-430e-90e7-f4e00c54d8b8
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.blog
+    - node.type.case_study
+    - node.type.event
+    - node.type.news
+    - node.type.page
+    - node.type.person
+    - node.type.project
+  module:
+    - content_moderation
+_core:
+  default_config_hash: cTcLoeCkGY_boimnlZKzLdtKZmR7FXc6AirGUwq_Lts
+id: basic_editorial
+label: Basic
+type: content_moderation
+type_settings:
+  states:
+    draft:
+      label: Draft
+      weight: -1
+      published: false
+      default_revision: false
+    published:
+      label: Published
+      weight: 0
+      published: true
+      default_revision: true
+    unpublished:
+      label: Unpublished
+      weight: 1
+      published: false
+      default_revision: true
+  transitions:
+    create_new_draft:
+      label: 'Create new draft'
+      from:
+        - unpublished
+        - draft
+        - published
+      to: draft
+      weight: -1
+    publish:
+      label: Publish
+      from:
+        - draft
+        - published
+        - unpublished
+      to: published
+      weight: 0
+    unpublish:
+      label: Unpublish
+      from:
+        - published
+      to: unpublished
+      weight: 1
+  entity_types:
+    node:
+      - blog
+      - case_study
+      - event
+      - news
+      - page
+      - person
+      - project
+  default_moderation_state: draft

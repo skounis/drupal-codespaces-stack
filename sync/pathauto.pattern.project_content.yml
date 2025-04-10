@@ -1,0 +1,27 @@
+uuid: df721a87-f3d3-47b6-807f-c007169e47e5
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+  enforced:
+    config:
+      - node.type.project
+_core:
+  default_config_hash: Y-No-ky7M0tkNdYIhbwGeaTV_TsELgwv2GV6Gr4NVQc
+id: project_content
+label: 'Project content'
+type: 'canonical_entities:node'
+pattern: '/projects/[node:title]'
+selection_criteria:
+  0655a022-fa1f-4809-9843-756babf82da4:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 0655a022-fa1f-4809-9843-756babf82da4
+    context_mapping:
+      node: node
+    bundles:
+      project: project
+selection_logic: and
+weight: -5
+relationships: {  }

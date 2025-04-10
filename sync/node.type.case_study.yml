@@ -1,0 +1,33 @@
+uuid: 3ba1c7fd-bb6e-4e5a-a0aa-d15be7ee62c2
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+    - scheduler
+third_party_settings:
+  scheduler:
+    expand_fieldset: when_required
+    fields_display_mode: vertical_tab
+    publish_enable: true
+    publish_past_date: error
+    publish_past_date_created: false
+    publish_required: false
+    publish_revision: true
+    publish_touch: true
+    show_message_after_update: true
+    unpublish_enable: true
+    unpublish_required: false
+    unpublish_revision: true
+  menu_ui:
+    available_menus: {  }
+    parent: ''
+_core:
+  default_config_hash: Uzwwm2rDwDtv8ol5Qeotei4WuDch8vEqKBWrib7kfQY
+name: 'Case study'
+type: case_study
+description: 'Case study content provides detailed information about a subject to the intended audience.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

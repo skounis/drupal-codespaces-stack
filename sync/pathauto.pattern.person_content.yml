@@ -1,0 +1,27 @@
+uuid: 25f6e7fa-ad16-4356-98fd-207813603306
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+  enforced:
+    config:
+      - node.type.person
+_core:
+  default_config_hash: 7k66XB0oEosm6AhpPSyHzhXO1_4XKFS3QWO-As6p8bs
+id: person_content
+label: 'Person content'
+type: 'canonical_entities:node'
+pattern: '/people/[node:title]'
+selection_criteria:
+  38ac2720-ec8c-4121-bd3a-07d2259343b4:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 38ac2720-ec8c-4121-bd3a-07d2259343b4
+    context_mapping:
+      node: node
+    bundles:
+      person: person
+selection_logic: and
+weight: -5
+relationships: {  }

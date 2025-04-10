@@ -1,0 +1,21 @@
+uuid: 539f7bdc-3472-420e-b54f-7b63db35ac63
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: zMdXa6Eyzz-I2U5Qe0F_bLu775LrZDcpHxBIucxHZBM
+id: node.field_person__role_job_title
+field_name: field_person__role_job_title
+entity_type: node
+type: string_long
+settings:
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

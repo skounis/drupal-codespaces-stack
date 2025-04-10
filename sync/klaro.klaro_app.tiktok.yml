@@ -1,0 +1,27 @@
+uuid: abe0ff5c-9622-4104-a44d-62fd6f2e9629
+langcode: en
+status: false
+dependencies: {  }
+_core:
+  default_config_hash: VANMO9bKFMpdZ3Tz-c21Ejv8U78LRuGUs0nplDDJ4e0
+id: tiktok
+label: TikTok
+description: 'TikTok is a social media platform by Bytedance Ltd. (China/Cayman Islands).'
+default: false
+required: false
+opt_out: false
+only_once: false
+contextual_consent_only: null
+contextual_consent_text: null
+info_url: 'https://www.tiktok.com/about'
+privacy_policy_url: 'https://www.tiktok.com/legal/privacy-policy-row'
+purposes:
+  - external_content
+cookies: {  }
+callback_code: ''
+javascripts:
+  - www.tiktok.com
+wrapper_identifier:
+  - .tiktok-embed
+attachments: {  }
+weight: 0

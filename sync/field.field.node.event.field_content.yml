@@ -1,0 +1,26 @@
+uuid: b810142a-4341-4a51-a36d-793884c014a9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_content
+    - filter.format.content_format
+    - node.type.event
+  module:
+    - text
+_core:
+  default_config_hash: j6bxGvw2BLn0UT83kDhgVC4Z0i19W277pSREwUc_YqA
+id: node.event.field_content
+field_name: field_content
+entity_type: node
+bundle: event
+label: Content
+description: 'The content of this page.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - content_format
+field_type: text_long

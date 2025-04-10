@@ -1,0 +1,27 @@
+uuid: 88b505d3-91ee-4eca-9724-f817b6b0eb70
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.uncropped_500w_webp
+    - image.style.uncropped_700w_webp
+    - image.style.uncropped_960w_webp
+  theme:
+    - olivero
+_core:
+  default_config_hash: PLvQsmjLw9rloVdsiDRY9SHjtCNLLzMK3sjgjNQzi-I
+id: uncropped_large
+label: 'Uncropped Large'
+image_style_mappings:
+  -
+    image_mapping_type: sizes
+    image_mapping:
+      sizes: 100vw
+      sizes_image_styles:
+        - uncropped_500w_webp
+        - uncropped_700w_webp
+        - uncropped_960w_webp
+    breakpoint_id: olivero.sm
+    multiplier: 1x
+breakpoint_group: olivero
+fallback_image_style: uncropped_500w_webp

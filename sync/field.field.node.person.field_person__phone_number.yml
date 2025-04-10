@@ -1,0 +1,23 @@
+uuid: edd05864-2fdb-4948-a914-78a071519ff5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_person__phone_number
+    - node.type.person
+  module:
+    - telephone
+_core:
+  default_config_hash: PAqI__SG1CwPuPf2aBSkbfZsaZlL2TPw-ltAcPd9-Ts
+id: node.person.field_person__phone_number
+field_name: field_person__phone_number
+entity_type: node
+bundle: person
+label: 'Phone number'
+description: 'Include up to 5 phone numbers.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

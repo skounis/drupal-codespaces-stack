@@ -1,0 +1,27 @@
+uuid: 805ce3d4-e513-4112-97ea-3cb519a69182
+langcode: en
+status: false
+dependencies: {  }
+_core:
+  default_config_hash: vN8TfPdEQ-WQeGejDogrVhptSSDdSy2U4jHZ80cmM7s
+id: umami
+label: Umami
+description: 'Tracks online visits of the website.'
+default: false
+required: false
+opt_out: false
+only_once: false
+contextual_consent_only: false
+contextual_consent_text: ''
+info_url: 'https://umami.is'
+privacy_policy_url: 'https://umami.is/privacy'
+purposes:
+  - analytics
+cookies: {  }
+callback_code: ''
+javascripts:
+  - umami.js
+wrapper_identifier: {  }
+attachments:
+  - umami_analytics_tracking_script
+weight: 4

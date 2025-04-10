@@ -1,0 +1,19 @@
+enabled_sources:
+  - drupalorg_jsonapi
+  - recipes
+allow_ui_install: true
+allowed_projects:
+  recipes:
+    - drupal_cms_accessibility_tools
+    - drupal_cms_ai
+    - drupal_cms_blog
+    - drupal_cms_case_study
+    - drupal_cms_events
+    - drupal_cms_forms
+    - drupal_cms_google_analytics
+    - drupal_cms_news
+    - drupal_cms_person
+    - drupal_cms_project
+    - drupal_cms_search
+    - drupal_cms_seo_tools
+max_selections: 1

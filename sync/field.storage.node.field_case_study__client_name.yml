@@ -1,0 +1,23 @@
+uuid: 36ffe70c-5181-463f-a314-ea6269e1aee0
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: vMQmBnT7tvAHb5jcoAw918D8rBP99zuK9lnCdNgAafg
+id: node.field_case_study__client_name
+field_name: field_case_study__client_name
+entity_type: node
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

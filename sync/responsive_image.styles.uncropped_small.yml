@@ -1,0 +1,20 @@
+uuid: 2f90657f-1ad5-43a7-9ad7-64eb407c8c4c
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.uncropped_300w_webp
+  theme:
+    - olivero
+_core:
+  default_config_hash: U13C9GPgeAZyWtnEn7aWWR48yP3-4mAndLliGh_VoSw
+id: uncropped_small
+label: 'Uncropped Small'
+image_style_mappings:
+  -
+    image_mapping_type: image_style
+    image_mapping: uncropped_300w_webp
+    breakpoint_id: olivero.sm
+    multiplier: 1x
+breakpoint_group: olivero
+fallback_image_style: uncropped_300w_webp

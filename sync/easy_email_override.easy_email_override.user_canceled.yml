@@ -1,0 +1,25 @@
+uuid: 98603cdb-faf5-4927-8ad6-f2b5a47d60c9
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: XNp7gpuE22WlY7lXjMrgVyzgw0wXjS3OHTg6HXb0rD8
+label: 'User: Account Canceled'
+id: user_canceled
+param_map:
+  -
+    source: account
+    destination: recipient_uid
+copied_fields:
+  from: false
+  reply_to: false
+  to: false
+  cc: false
+  bcc: false
+  subject: false
+  body_html: false
+  body_plain: false
+  attachments: false
+module: user
+key: status_canceled
+easy_email_type: user_canceled

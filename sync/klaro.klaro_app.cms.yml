@@ -1,0 +1,29 @@
+uuid: 87da515c-bd2d-414b-90f6-b4c2fbed9dd8
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: HBeBrdoMQ8HHvIcge46zv21fgnD6c8V6FjQ_h1eiQkY
+id: cms
+label: 'Drupal CMS'
+description: 'Store data (e.g. cookie for user session) in your browser (required to use this website).'
+default: true
+purposes:
+  - cms
+cookies:
+  -
+    regex: '^[SESS|SSESS]'
+    path: ''
+    domain: ''
+required: true
+opt_out: false
+only_once: false
+contextual_consent_only: null
+contextual_consent_text: null
+info_url: 'https://www.drupal.org'
+privacy_policy_url: ''
+javascripts: {  }
+callback_code: ''
+wrapper_identifier: {  }
+attachments: {  }
+weight: -1

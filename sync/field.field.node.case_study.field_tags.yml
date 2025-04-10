@@ -1,0 +1,29 @@
+uuid: 4e649b3a-2517-4ae3-8a75-edfcbb86a04c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_tags
+    - node.type.case_study
+    - taxonomy.vocabulary.tags
+_core:
+  default_config_hash: lhmzM2Tr3jOudqZ1Ar08c7vuHadwvf899nU8fsdj-jg
+id: node.case_study.field_tags
+field_name: field_tags
+entity_type: node
+bundle: case_study
+label: Tags
+description: 'Include tags for relevant topics.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      tags: tags
+    sort:
+      field: _none
+    auto_create: true
+field_type: entity_reference

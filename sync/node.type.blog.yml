@@ -1,0 +1,33 @@
+uuid: 4d65de22-ae08-40e4-8e45-3f073a4a0a68
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+    - scheduler
+third_party_settings:
+  scheduler:
+    expand_fieldset: when_required
+    fields_display_mode: vertical_tab
+    publish_enable: true
+    publish_past_date: error
+    publish_past_date_created: false
+    publish_required: false
+    publish_revision: true
+    publish_touch: true
+    show_message_after_update: true
+    unpublish_enable: true
+    unpublish_required: false
+    unpublish_revision: true
+  menu_ui:
+    available_menus: {  }
+    parent: ''
+_core:
+  default_config_hash: ezQvjZFx2H7Jg_2xa4MM58xr_K-8Hky-KyTrmt8C_GE
+name: 'Blog post'
+type: blog
+description: 'A simple blog entry, categorized by tags.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true
