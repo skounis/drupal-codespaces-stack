@@ -107,3 +107,4 @@ apply-recipe:
 # Shortcut for the default recipe
 apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_footer
+	@$(MAKE) apply-recipe RECIPE=extra_project
