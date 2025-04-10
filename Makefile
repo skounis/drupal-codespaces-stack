@@ -72,7 +72,14 @@ export-node:
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 5 > test.yml -y"
 
 dcex:
+	@rm -rf ./sync
+	@mkdir -p ./sync
+	@echo "Exporting configuration from Drupal..."
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
+	@echo "Copying sync directory to ./sync..."
+	@cp cms/web/sites/default/files/sync . -R
+	@cp -R cms/web/sites/default/files/sync/* ./sync || echo "Sync directory does not exist, skipping copy."
+
 
 
 # How to capture a block
@@ -106,5 +113,6 @@ apply-recipe:
 
 # Shortcut for the default recipe
 apply-recipes:
+	@$(MAKE) devenv
 	@$(MAKE) apply-recipe RECIPE=extra_footer
 	@$(MAKE) apply-recipe RECIPE=extra_project
