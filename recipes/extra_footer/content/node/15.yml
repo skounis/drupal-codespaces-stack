@@ -10,7 +10,7 @@ default:
       target_id: 1
   status:
     -
-      value: false
+      value: true
   uid:
     -
       target_id: 1
@@ -31,7 +31,7 @@ default:
       value: true
   moderation_state:
     -
-      value: draft
+      value: published
   path:
     -
       alias: /extra-home
@@ -123,5 +123,49 @@ default:
               view_mode: full
               context_mapping: {  }
             weight: 5
+            additional: {  }
+        third_party_settings: {  }
+    -
+      section:
+        layout_id: layout_onecol
+        layout_settings:
+          label: 'Promoted projects'
+          context_mapping: {  }
+        components:
+          e792c3d7-4b50-4b44-bf20-1b9d6a97e1c6:
+            uuid: e792c3d7-4b50-4b44-bf20-1b9d6a97e1c6
+            region: content
+            configuration:
+              id: 'views_block:projects-latest'
+              label: ''
+              label_display: visible
+              provider: views
+              views_label: ''
+              items_per_page: none
+              context_mapping: {  }
+            weight: 0
+            additional: {  }
+        third_party_settings: {  }
+    -
+      section:
+        layout_id: layout_onecol
+        layout_settings:
+          label: 'Stay Updated'
+          context_mapping: {  }
+        components:
+          656ffead-8bda-4a50-9f1a-7f5105ea3137:
+            uuid: 656ffead-8bda-4a50-9f1a-7f5105ea3137
+            region: content
+            configuration:
+              id: webform_block
+              label: 'Stay Updated'
+              label_display: visible
+              provider: webform
+              webform_id: subscribe
+              default_data: ''
+              redirect: 0
+              lazy: 0
+              context_mapping: {  }
+            weight: 0
             additional: {  }
         third_party_settings: {  }
