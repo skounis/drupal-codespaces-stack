@@ -103,6 +103,8 @@ module:
   update: 0
   user: 0
   views_ui: 0
+  webform: 0
+  webform_ui: 0
   workflows: 0
   eca_form: 1
   pathauto: 1

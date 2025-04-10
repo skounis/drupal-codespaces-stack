@@ -5,6 +5,7 @@ dependencies:
   config:
     - system.menu.admin
   module:
+    - smart_date
     - taxonomy
     - user
   enforced:
