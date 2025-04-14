@@ -69,7 +69,7 @@ export-block:
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 
 export-node:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 16 > 16.yml -y"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 15 > 15.yml -y"
 
 dcex:
 	@rm -rf ./sync
