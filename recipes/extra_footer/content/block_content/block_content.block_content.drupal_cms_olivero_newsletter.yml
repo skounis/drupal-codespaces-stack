@@ -1,0 +1,24 @@
+_meta:
+  version: '1.0'
+  entity_type: block_content
+  uuid: 1ee8c136-50f6-497d-b4fe-9d771f69fc32
+  bundle: basic_block
+  default_langcode: en
+default:
+  status:
+    -
+      value: true
+  info:
+    -
+      value: 'Newsletter '
+  reusable:
+    -
+      value: true
+  revision_translation_affected:
+    -
+      value: true
+  body:
+    -
+      value: '<section class="section text-center"><div class="container"><h2 class="mb-4">Stay Updated</h2><p class="mb-5">Subscribe to our newsletter for insights on design, technology, and business.</p><form class="newsletter-form" id="newsletter-form"><div class="input-group mb-3"><input class="form-control" type="email" placeholder="Your email address" required=""> <button class="btn btn-primary" type="submit">Subscribe</button></div></form></div></section>'
+      format: full_html
+      summary: ''
