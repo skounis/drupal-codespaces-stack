@@ -1,0 +1,6 @@
+name: Extra Form
+type: Drupal CMS
+description: 'Creates a content type with the machine name mt-landing-page.'
+
+config:
+  strict: false

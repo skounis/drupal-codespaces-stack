@@ -1,0 +1,10 @@
+{
+    "name": "drupal/extra_landing_page",
+    "description": "Creates a content type with the machine name mt-landing-page.",
+    "type": "drupal-recipe",
+    "require": {
+      "drupal/core": "^9.3"
+    },
+    "license": "GPL-2.0-or-later"
+  }
+  

@@ -117,3 +117,4 @@ apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_form
 	@$(MAKE) apply-recipe RECIPE=extra_footer
 	@$(MAKE) apply-recipe RECIPE=extra_project
+	@$(MAKE) apply-recipe RECIPE=extra_landing_page
