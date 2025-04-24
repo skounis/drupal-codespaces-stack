@@ -1,0 +1,27 @@
+uuid: 851ea7fa-5a6c-47af-9972-c6a48fd25ace
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.main
+  module:
+    - system
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: zWC_s29Mvbz0PE7AsprkZ2DC5a0VV32ishCZ5Ex-tUQ
+id: corporateclean_main_menu
+theme: corporateclean
+region: header
+weight: -22
+provider: null
+plugin: 'system_menu_block:main'
+settings:
+  id: 'system_menu_block:main'
+  label: 'Main navigation'
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 1
+  expand_all_items: false
+visibility: {  }

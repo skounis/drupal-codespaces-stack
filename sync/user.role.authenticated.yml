@@ -1,16 +1,14 @@
-uuid: 9f50af6c-e9a4-415b-b849-59e7622225db
+uuid: 85cc2ff8-69a9-4236-92d9-c47233ae6cd7
 langcode: en
 status: true
 dependencies:
   config:
     - dashboard.dashboard.welcome
-    - filter.format.webform_default
   module:
     - captcha
     - coffee
     - dashboard
     - file
-    - filter
     - honeypot
     - klaro
     - media
@@ -29,7 +27,6 @@ permissions:
   - 'delete own files'
   - 'skip CAPTCHA'
   - 'use klaro'
-  - 'use text format webform_default'
   - 'view media'
   - 'view own unpublished content'
   - 'view welcome dashboard'

@@ -1,0 +1,20 @@
+uuid: 89282546-7414-4979-8ab4-022837874084
+langcode: en
+status: true
+dependencies:
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: dGeqMRVUfkvKWISQ3lcDjf_ESrQWCI0rKqb88JZtu_0
+id: corporateclean_page_title
+theme: corporateclean
+region: hero_top
+weight: -7
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Page title'
+  label_display: '0'
+  provider: core
+visibility: {  }

@@ -1,0 +1,25 @@
+uuid: ec7d61c4-8b36-402a-ba34-fefa303386aa
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'block_content:basic_block:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+  module:
+    - block_content
+  theme:
+    - corporateclean
+id: corporateclean_about
+theme: corporateclean
+region: footer_top_first
+weight: 0
+provider: null
+plugin: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+settings:
+  id: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
+  label: 'About Us'
+  label_display: visible
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }

@@ -1,0 +1,20 @@
+uuid: 022d4f20-37c4-4a01-a28f-d84afa524fbb
+langcode: en
+status: true
+dependencies:
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: w6coiw26aFAdq3B3I37TrW_vF0Mzv-kPBfY1JZlI4BE
+id: corporateclean_local_actions
+theme: corporateclean
+region: content
+weight: -17
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Primary admin actions'
+  label_display: '0'
+  provider: core
+visibility: {  }

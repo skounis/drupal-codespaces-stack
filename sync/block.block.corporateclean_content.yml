@@ -1,0 +1,22 @@
+uuid: 85900f4d-8876-46b6-bddb-16397fc062f1
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: sZaq5OOund0FZ27hFgVin0QYoFejHmFtkpJ6VXsOwRE
+id: corporateclean_content
+theme: corporateclean
+region: content
+weight: -15
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility: {  }

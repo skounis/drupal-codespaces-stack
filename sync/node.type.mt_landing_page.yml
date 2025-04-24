@@ -1,0 +1,13 @@
+uuid: 96447249-74ee-43f7-9753-ec3ecae7abd3
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: ijdqpvePkNGBDUwZqUooA5DwKwQY9suyUEDvzXfitEY
+name: 'Landing Page'
+type: mt_landing_page
+description: ''
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,22 @@
+uuid: cb6fbe50-3929-403b-900d-638251184ba8
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: xB-zkrZTVIyNV-6-yADyxyGk6mZW38BnCrh2Lf_jW5U
+id: corporateclean_messages
+theme: corporateclean
+region: system_messages
+weight: -16
+provider: null
+plugin: system_messages_block
+settings:
+  id: system_messages_block
+  label: 'Status messages'
+  label_display: '0'
+  provider: system
+visibility: {  }

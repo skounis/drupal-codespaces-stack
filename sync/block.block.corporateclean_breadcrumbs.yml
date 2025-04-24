@@ -1,0 +1,22 @@
+uuid: 8e86f5d1-64d3-4120-92ea-5ac01632a6b9
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: sALo3rwa_9CE-WdVjjnnghLhmz3NgO_EqBgSh19mXOo
+id: corporateclean_breadcrumbs
+theme: corporateclean
+region: hero_top
+weight: -14
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility: {  }

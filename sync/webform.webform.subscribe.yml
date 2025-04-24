@@ -1,12 +1,12 @@
+_core:
+  default_config_hash: hTdPjd1hss4PVlUdTcpjTnI8QXRq683Dlf5TpIk8jIo
 uuid: b7d3e4e7-98b7-45e1-b078-ac5d884d59fd
 langcode: en
 status: open
 dependencies: {  }
-_core:
-  default_config_hash: hTdPjd1hss4PVlUdTcpjTnI8QXRq683Dlf5TpIk8jIo
+weight: 0
 open: null
 close: null
-weight: 0
 uid: 1
 template: false
 archive: false
