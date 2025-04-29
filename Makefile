@@ -129,6 +129,16 @@ launch:
 
 # Install the CMS using the `drupal_cms_installer`
 install:
+ifeq ($(USE_DDEV),false)
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush site:install \
+		drupal_cms_installer \
+		--db-url='mysql://db_user:db_pass@127.0.0.1/db_name' \
+		--account-mail=admin@example.com \
+		--account-name=admin \
+		--account-pass=admin \
+		--site-name='My Site' \
+		--yes"
+else
 	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush site:install \
 		drupal_cms_installer \
 		--account-mail=admin@example.com \
@@ -136,6 +146,7 @@ install:
 		--account-pass=admin \
 		--site-name='My Site' \
 		--yes"
+endif
 
 # Apply stock recipes
 stock-recipes:
