@@ -12,14 +12,14 @@ _core:
   default_config_hash: 53IzIEBQiPcHVQvnEhoP49auDf2zbyI2tbaR2wGX2n8
 id: corporateclean_footer
 theme: corporateclean
-region: footer
-weight: -8
+region: footer_third
+weight: -5
 provider: null
 plugin: 'system_menu_block:footer'
 settings:
   id: 'system_menu_block:footer'
   label: 'Footer menu'
-  label_display: '0'
+  label_display: visible
   provider: system
   level: 1
   depth: 0

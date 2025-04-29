@@ -1,0 +1,25 @@
+uuid: fbd991db-4133-4d55-b431-ffaea5a1bdc0
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'block_content:basic_block:bead9350-a093-4655-b613-2b9c2a2b253b'
+  module:
+    - block_content
+  theme:
+    - corporateclean
+id: corporateclean_copyright
+theme: corporateclean
+region: sub_footer_first
+weight: -6
+provider: null
+plugin: 'block_content:bead9350-a093-4655-b613-2b9c2a2b253b'
+settings:
+  id: 'block_content:bead9350-a093-4655-b613-2b9c2a2b253b'
+  label: Copyright
+  label_display: '0'
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }
