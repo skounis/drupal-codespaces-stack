@@ -1,3 +1,7 @@
+# ENV Variables
+include .env
+export
+
 # Variables
 CMS_DIR := cms
 COMPOSER_FILE := $(CMS_DIR)/composer.json
@@ -132,7 +136,7 @@ install:
 ifeq ($(USE_DDEV),false)
 	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush site:install \
 		drupal_cms_installer \
-		--db-url='mysql://db_user:db_pass@127.0.0.1/db_name' \
+		--db-url='$(DB_URL)' \
 		--account-mail=admin@example.com \
 		--account-name=admin \
 		--account-pass=admin \
