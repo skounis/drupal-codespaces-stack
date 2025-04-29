@@ -1,4 +1,4 @@
-uuid: ec7d61c4-8b36-402a-ba34-fefa303386aa
+uuid: 6356d184-dee1-450d-bce0-498600b74855
 langcode: en
 status: true
 dependencies:
@@ -7,16 +7,18 @@ dependencies:
   module:
     - block_content
   theme:
-    - corporateclean
-id: corporateclean_about
-theme: corporateclean
-region: footer_top_first
+    - stark
+_core:
+  default_config_hash: 51yljBMyDahnXF7rZ8SIdLm6gXMmHwPeZX4nGROTGmo
+id: stark_about
+theme: stark
+region: sidebar_first
 weight: 0
 provider: null
 plugin: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
 settings:
   id: 'block_content:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
-  label: 'About Us'
+  label: About
   label_display: visible
   provider: block_content
   status: true
