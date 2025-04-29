@@ -1,0 +1,27 @@
+uuid: c72f157d-7e83-4415-be25-0684aa10d19e
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.footer
+  module:
+    - system
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: 53IzIEBQiPcHVQvnEhoP49auDf2zbyI2tbaR2wGX2n8
+id: corporateclean_footer
+theme: corporateclean
+region: footer_third
+weight: -5
+provider: null
+plugin: 'system_menu_block:footer'
+settings:
+  id: 'system_menu_block:footer'
+  label: 'Footer menu'
+  label_display: visible
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: false
+visibility: {  }
