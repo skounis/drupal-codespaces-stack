@@ -54,11 +54,22 @@ launch:
 	@echo "Launching the browser with ddev..."
 	@ddev launch
 
+# Prepare dev environment and enable themes
+prepare:
+	@$(MAKE) devenv
+	@$(MAKE) themes
+
 # Prepare the CMS for development
 devenv: 
 	@ddev exec "cd $(CMS_DIR) && composer require 'drupal/default_content:^2.0@alpha'"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en block_content -y"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en default_content -y"
+
+# Enable contrib themes and sets default
+themes:
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush then basecore -y"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush then corporateclean -y"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush config:set system.theme default corporateclean -y"
 
 #
 # Work with recipes
