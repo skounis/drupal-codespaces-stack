@@ -17,6 +17,69 @@ endif
 # Default target to run all steps
 all: clean ddev full-install launch
 
+
+help:
+	@echo ""
+	@echo "=== Drupal CMS Makefile Help ==="
+	@echo ""
+	@echo "Quick Start:"
+	@echo "  make full-install             # Install everything using DDEV (default)"
+	@echo "  make full-install USE_DDEV=false   # Install on local Apache/PHP/Composer stack"
+	@echo ""
+	@echo "Main targets:"
+	@echo "  all                  Run clean, setup, full-install and launch"
+	@echo "  full-install         Purge and fully install Drupal CMS with recipes and themes"
+	@echo "  full-stock-install   Install Drupal with stock recipes"
+	@echo "  full-extra-install   Apply extra UX recipes and enhancements"
+	@echo "  setup                Install PHP dependencies and run post-install scripts"
+	@echo "  launch               Open the site in your browser (DDEV only)"
+	@echo "  login                Get one-time login link via drush"
+	@echo ""
+	@echo "Development & Config:"
+	@echo "  prepare              Enable dev modules and themes"
+	@echo "  devenv               Enable default_content and block_content"
+	@echo "  themes               Enable basecore and corporateclean themes"
+	@echo "  install              Run drush site:install with default parameters"
+	@echo "  stock-recipes        Apply default content recipes (blog, news, etc.)"
+	@echo ""
+	@echo "System Management:"
+	@echo "  clean                Remove all files from CMS_DIR except composer.json"
+	@echo "  ddev                 Start or restart DDEV environment"
+	@echo "  purge                Delete DDEV environment and restart"
+	@echo "  start, restart       Manage DDEV instance manually"
+	@echo "  doctor               Check if required tools are installed (based on USE_DDEV)"
+	@echo ""
+	@echo "Content Export:"
+	@echo "  dcex                 Export full config and copy to ./sync"
+	@echo "  export-block         Export a single block (requires BLOCK_ID, BLOCK_NAME, RECIPE)"
+	@echo "  export-node          Export a specific node to YAML"
+	@echo ""
+	@echo "Recipes:"
+	@echo "  apply-recipe         Apply a recipe (RECIPE=name required)"
+	@echo "  apply-recipes        Apply all default extra UX recipes"
+	@echo ""
+	@echo "Options:"
+	@echo "  USE_DDEV=true|false  Use DDEV or run locally (default is true)"
+	@echo ""
+
+doctor:
+	@echo "Running environment checks..."
+ifeq ($(USE_DDEV),false)
+	@echo "USE_DDEV=false — Checking for local tools..."
+	@command -v php >/dev/null 2>&1 || { echo >&2 "❌ PHP is not installed."; exit 1; }
+	@command -v composer >/dev/null 2>&1 || { echo >&2 "❌ Composer is not installed."; exit 1; }
+	@command -v drush >/dev/null 2>&1 || { echo >&2 "❌ Drush is not installed."; exit 1; }
+	@echo "✅ All required local tools are installed."
+else
+	@echo "USE_DDEV=true — Checking for DDEV..."
+	@command -v ddev >/dev/null 2>&1 || { echo >&2 "❌ DDEV is not installed."; exit 1; }
+	@ddev version >/dev/null 2>&1 || { echo >&2 "❌ DDEV is not configured properly."; exit 1; }
+	@echo "✅ DDEV is installed and working."
+endif
+
+
+
+
 # Clean the cms/ folder but keep composer.json
 clean:
 	@echo "Cleaning the $(CMS_DIR) folder but keeping $(COMPOSER_FILE)..."
