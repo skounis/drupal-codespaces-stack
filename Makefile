@@ -5,7 +5,7 @@ COMPOSER_FILE := $(CMS_DIR)/composer.json
 .PHONY: clean ddev setup launch
 
 # Default target to run all steps
-all: clean ddev setup launch
+all: clean ddev full-install launch
 
 # Clean the cms/ folder but keep composer.json
 clean:
@@ -38,7 +38,6 @@ purge:
 	@echo "Starting ddev after purge..."
 	@ddev start
 
-
 # Run setup commands inside the ddev container
 setup:
 	@echo "Running setup commands inside the ddev container..."
@@ -47,7 +46,6 @@ setup:
 	@echo "2. composer install"
 	@echo "3. composer run-script post-install-cmd"
 	@ddev exec "cd $(CMS_DIR) && composer install && composer run-script post-install-cmd"
-
 
 # Launch the browser using ddev
 launch:
@@ -65,13 +63,14 @@ install:
 		--yes"
 
 # Apply stock recipes
-post-install:
+stock-recipes:
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_blog"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_events"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_news"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_case_study"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_person"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_project"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cr"
 
 # Prepare dev environment and enable themes
 prepare:
@@ -81,18 +80,18 @@ prepare:
 # Install the stock Drupal CMS
 full-stock-install: 
 	@$(MAKE) install
-	@$(MAKE) post-install
+	@$(MAKE) stock-recipes
 
 # Improve the CMS with Extra UX
 full-extra-install:
-	@$(MAKE) devenv
 	@$(MAKE) themes
+	@$(MAKE) devenv
 	@$(MAKE) apply-recipes
-
 
 # Install stock Drupal CMS with all the Extra UX
 full-install:
 	@$(MAKE) purge
+	@$(MAKE) setup
 	@$(MAKE) full-stock-install
 	@$(MAKE) full-extra-install
 
@@ -102,11 +101,16 @@ devenv:
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en block_content -y"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en default_content -y"
 
-# Enable contrib themes and sets default
+# Enable contrib themes and set default
 themes:
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush then basecore -y"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush then corporateclean -y"
 	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush config:set system.theme default corporateclean -y"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cr"
+
+# Shortcut: log into the site
+login:
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush uli"
 
 #
 # Work with recipes
@@ -158,6 +162,7 @@ apply-recipe:
 	@echo "Applying recipe: $(RECIPE)"
 	# Path to recipes is relative to the `web` folder
 	@ddev exec "cd cms && ./vendor/bin/drush recipe ../../recipes/$(RECIPE)"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cr"
 
 # Shortcut for the default recipe
 apply-recipes:
