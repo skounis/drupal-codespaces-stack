@@ -145,7 +145,7 @@ default:
             configuration:
               id: 'block_content:1ee8c136-50f6-497d-b4fe-9d771f69fc32'
               label: 'Stay Updated'
-              label_display: visible
+              label_display: 0
               provider: block_content
               status: true
               info: ''
