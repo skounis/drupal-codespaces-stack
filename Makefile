@@ -54,10 +54,47 @@ launch:
 	@echo "Launching the browser with ddev..."
 	@ddev launch
 
+# Install the CMS using the `drupal_cms_installer`
+install:
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush site:install \
+		drupal_cms_installer \
+		--account-mail=admin@example.com \
+		--account-name=admin \
+		--account-pass=admin \
+		--site-name='My Site' \
+		--yes"
+
+# Apply stock recipes
+post-install:
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_blog"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_events"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_news"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_case_study"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_person"
+	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_project"
+
 # Prepare dev environment and enable themes
 prepare:
 	@$(MAKE) devenv
 	@$(MAKE) themes
+
+# Install the stock Drupal CMS
+full-stock-install: 
+	@$(MAKE) install
+	@$(MAKE) post-install
+
+# Improve the CMS with Extra UX
+full-extra-install:
+	@$(MAKE) devenv
+	@$(MAKE) themes
+	@$(MAKE) apply-recipes
+
+
+# Install stock Drupal CMS with all the Extra UX
+full-install:
+	@$(MAKE) purge
+	@$(MAKE) full-stock-install
+	@$(MAKE) full-extra-install
 
 # Prepare the CMS for development
 devenv: 
@@ -124,8 +161,7 @@ apply-recipe:
 
 # Shortcut for the default recipe
 apply-recipes:
-	@$(MAKE) devenv
-	@$(MAKE) apply-recipe RECIPE=extra_form
+#	@$(MAKE) apply-recipe RECIPE=extra_form
 	@$(MAKE) apply-recipe RECIPE=extra_footer
 	@$(MAKE) apply-recipe RECIPE=extra_project
 	@$(MAKE) apply-recipe RECIPE=extra_landing_page
