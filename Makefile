@@ -1,8 +1,18 @@
 # Variables
 CMS_DIR := cms
 COMPOSER_FILE := $(CMS_DIR)/composer.json
+USE_DDEV ?= true
 
-.PHONY: clean ddev setup launch
+ifeq ($(USE_DDEV),false)
+	EXEC := sh -c
+else
+	EXEC := ddev exec
+endif
+
+.PHONY: clean ddev start restart purge setup launch \
+	install stock-recipes prepare full-stock-install full-extra-install full-install \
+	devenv themes login \
+	export-block export-node dcex list-block apply-recipe apply-recipes
 
 # Default target to run all steps
 all: clean ddev full-install launch
@@ -15,46 +25,48 @@ clean:
 # Start or restart ddev
 ddev:
 	@echo "Checking ddev status..."
-	@if ddev describe >/dev/null 2>&1; then \
-		echo "ddev is already running. Restarting..."; \
-		ddev restart; \
+	@if [ "$(USE_DDEV)" = "true" ]; then \
+		if ddev describe >/dev/null 2>&1; then \
+			echo "ddev is already running. Restarting..."; \
+			ddev restart; \
+		else \
+			echo "ddev is not running. Starting..."; \
+			ddev start; \
+		fi; \
 	else \
-		echo "ddev is not running. Starting..."; \
-		ddev start; \
+		echo "Skipping ddev start (USE_DDEV=false)"; \
 	fi
 
 start:
 	@echo "Starting ddev..."
-	@ddev start
+	@if [ "$(USE_DDEV)" = "true" ]; then ddev start; else echo "Skipping start (USE_DDEV=false)"; fi
 
 restart:
 	@echo "Restarting ddev..."
-	@ddev restart
+	@if [ "$(USE_DDEV)" = "true" ]; then ddev restart; else echo "Skipping restart (USE_DDEV=false)"; fi
 
 # Restart ddev and purge all saved data
 purge:
 	@echo "Purging ddev project and all associated data..."
-	@ddev delete -Oy
-	@echo "Starting ddev after purge..."
-	@ddev start
+	@if [ "$(USE_DDEV)" = "true" ]; then ddev delete -Oy && ddev start; else echo "Skipping purge (USE_DDEV=false)"; fi
 
-# Run setup commands inside the ddev container
+# Run setup commands inside the container or local
 setup:
-	@echo "Running setup commands inside the ddev container..."
+	@echo "Running setup commands in $(CMS_DIR)..."
 	@echo "Commands to be executed:"
 	@echo "1. cd $(CMS_DIR)"
 	@echo "2. composer install"
 	@echo "3. composer run-script post-install-cmd"
-	@ddev exec "cd $(CMS_DIR) && composer install && composer run-script post-install-cmd"
+	@$(EXEC) "cd $(CMS_DIR) && composer install && composer run-script post-install-cmd"
 
 # Launch the browser using ddev
 launch:
 	@echo "Launching the browser with ddev..."
-	@ddev launch
+	@if [ "$(USE_DDEV)" = "true" ]; then ddev launch; else echo "Open your browser to http://localhost manually."; fi
 
 # Install the CMS using the `drupal_cms_installer`
 install:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush site:install \
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush site:install \
 		drupal_cms_installer \
 		--account-mail=admin@example.com \
 		--account-name=admin \
@@ -64,109 +76,86 @@ install:
 
 # Apply stock recipes
 stock-recipes:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_blog"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_events"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_news"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_case_study"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_person"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_project"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cr"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_blog"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_events"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_news"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_case_study"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_person"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush recipe ../recipes/drupal_cms_project"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush cr"
 
 # Prepare dev environment and enable themes
 prepare:
-	@$(MAKE) devenv
-	@$(MAKE) themes
+	@$(MAKE) devenv USE_DDEV=$(USE_DDEV)
+	@$(MAKE) themes USE_DDEV=$(USE_DDEV)
 
 # Install the stock Drupal CMS
 full-stock-install: 
-	@$(MAKE) install
-	@$(MAKE) stock-recipes
+	@$(MAKE) install USE_DDEV=$(USE_DDEV)
+	@$(MAKE) stock-recipes USE_DDEV=$(USE_DDEV)
 
 # Improve the CMS with Extra UX
 full-extra-install:
-	@$(MAKE) themes
-	@$(MAKE) devenv
-	@$(MAKE) apply-recipes
+	@$(MAKE) themes USE_DDEV=$(USE_DDEV)
+	@$(MAKE) devenv USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipes USE_DDEV=$(USE_DDEV)
 
 # Install stock Drupal CMS with all the Extra UX
 full-install:
-	@$(MAKE) purge
-	@$(MAKE) setup
-	@$(MAKE) full-stock-install
-	@$(MAKE) full-extra-install
+	@$(MAKE) purge USE_DDEV=$(USE_DDEV)
+	@$(MAKE) setup USE_DDEV=$(USE_DDEV)
+	@$(MAKE) full-stock-install USE_DDEV=$(USE_DDEV)
+	@$(MAKE) full-extra-install USE_DDEV=$(USE_DDEV)
 
 # Prepare the CMS for development
 devenv: 
-	@ddev exec "cd $(CMS_DIR) && composer require 'drupal/default_content:^2.0@alpha'"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en block_content -y"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush en default_content -y"
+	@$(EXEC) "cd $(CMS_DIR) && composer require 'drupal/default_content:^2.0@alpha'"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush en block_content -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush en default_content -y"
 
 # Enable contrib themes and set default
 themes:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush then basecore -y"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush then corporateclean -y"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush config:set system.theme default corporateclean -y"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cr"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush then basecore -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush then corporateclean -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush config:set system.theme default corporateclean -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush cr"
 
 # Shortcut: log into the site
 login:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush uli"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush uli"
 
-#
-# Work with recipes
-#
-# make export-block BLOCK_ID=1 BLOCK_NAME=drupal_cms_olivero_about RECIPE=extra_footer
+# Export block content
 export-block:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 
 export-node:
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush dce node 15 > 15.yml -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dce node 15 > 15.yml -y"
 
+# Export config and copy locally
 dcex:
 	@rm -rf ./sync
 	@mkdir -p ./sync
 	@echo "Exporting configuration from Drupal..."
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
 	@echo "Copying sync directory to ./sync..."
 	@cp cms/web/sites/default/files/sync . -R
 	@cp -R cms/web/sites/default/files/sync/* ./sync || echo "Sync directory does not exist, skipping copy."
 
-
-
-# How to capture a block
-# 1. Find the block ID using the following command: 
-#    make list-block`
-# 2. Use the block ID and name to run the export command: 
-#    make export-block BLOCK_ID=1 BLOCK_NAME=drupal_cms_olivero_about RECIPE=extra_footer
-
 # List all custom blocks
 list-block:
-	@ddev exec "cd cms && ./vendor/bin/drush php:script ../../scripts/list_blocks.php"
-
-# List and capture all custom blocks configuration files
-# Usage:
-# make export-block-type TYPE=basic_block RECIPE=extra_footer
-# export-block-type:
-# 	@echo "Listing config files for block_content type: $(TYPE)"
-# 	@find cms/web/sites/default/files/sync -name "*$(TYPE)*.yml"
-# 	@echo "Copying to recipes/$(RECIPE)/config"
-# 	@mkdir -p recipes/$(RECIPE)/config
-# 	@find cms/web/sites/default/files/sync -name "*$(TYPE)*.yml" -exec cp {} recipes/$(RECIPE)/config/ \;
-# 	@echo "✅ Done: all config files for '$(TYPE)' copied to recipes/$(RECIPE)/config"
-
+	@$(EXEC) "cd cms && ./vendor/bin/drush php:script ../../scripts/list_blocks.php"
 
 # Apply a recipe by name (default: extra_footer)
 # Usage: make apply-recipe RECIPE=extra_footer
 apply-recipe:
 	@echo "Applying recipe: $(RECIPE)"
-	# Path to recipes is relative to the `web` folder
-	@ddev exec "cd cms && ./vendor/bin/drush recipe ../../recipes/$(RECIPE)"
-	@ddev exec "cd $(CMS_DIR) && ./vendor/bin/drush cr"
+	@$(EXEC) "cd cms && ./vendor/bin/drush recipe ../../recipes/$(RECIPE)"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush cr"
 
 # Shortcut for the default recipe
 apply-recipes:
-#	@$(MAKE) apply-recipe RECIPE=extra_form
-	@$(MAKE) apply-recipe RECIPE=extra_footer
-	@$(MAKE) apply-recipe RECIPE=extra_project
-	@$(MAKE) apply-recipe RECIPE=extra_landing_page
+#	@$(MAKE) apply-recipe RECIPE=extra_form USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_footer USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_project USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_landing_page USE_DDEV=$(USE_DDEV)
