@@ -18,7 +18,6 @@ default:
     -
       value: true
   body:
-    -
-      value: '<section class="section text-center"><div class="container"><h2 class="mb-4">Stay Updated</h2><p class="mb-5">Subscribe to our newsletter for insights on design, technology, and business.</p><form class="newsletter-form" id="newsletter-form"><div class="input-group mb-3"><input class="form-control" type="email" placeholder="Your email address" required=""> <button class="btn btn-primary" type="submit">Subscribe</button></div></form></div></section>'
+    - value: '<section class="section text-center"><h2 class="mb-4">Stay Updated</h2><p class="mb-5">Subscribe to our newsletter for insights on design, technology, and business.</p><form class="newsletter-form" id="newsletter-form"><div class="input-group mb-3"><input class="form-control" type="email" placeholder="Your email address" required=""> <button class="btn btn-primary" type="submit">Subscribe</button></div></form></section>'
       format: full_html
       summary: ''
