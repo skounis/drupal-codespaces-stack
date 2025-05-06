@@ -219,6 +219,27 @@ export-node:
 	fi; \
 	$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dce node $$NODE_ID > $$NODE_ID.yml -y"
 
+# list-menu:
+# 	@read -p "Enter the menu machine name: " menu; \
+# 	$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush sql:query 'SELECT id, title FROM menu_link_content_data  WHERE menu_name = '\''$$menu'\'''"
+
+list-menu:
+	@read -p "Enter the menu machine name: " menu; \
+	echo "Fetching menu items from '$$menu'..."; \
+	$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush sql:query 'SELECT id, title FROM menu_link_content_data WHERE menu_name = '\''$$menu'\'''"; \
+	ids=$$($(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush sql:query --extra=--skip-column-names 'SELECT id FROM menu_link_content_data WHERE menu_name = '\''$$menu'\'''" | paste -sd, -); \
+	ids=$$(echo $$ids | sed 's/,$$//'); \
+	echo "IDs (comma-separated): $$ids"
+
+export-menu-all:
+	$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dcer menu_link_content --folder=../../tmp"
+
+export-menu:
+	@read -p "Enter comma-separated menu_link_content IDs to export: " ids; \
+	for id in $$(echo $$ids | tr ',' ' '); do \
+		echo "Exporting menu_link_content $$id..."; \
+		$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dcer menu_link_content $$id --folder=../../tmp"; \
+	done
 
 # Export config and copy locally
 dcex:
