@@ -39,8 +39,10 @@
         "drupal/drupal_cms_starter": "~1.1.0",
         "drupal/project_browser": "@beta",
         "drupal/recipe_installer_kit": "^1-alpha3@alpha",
+        "drupal/simple_styleguide": "^2.0",
         "drupal/webform": "@beta",
-        "drush/drush": "^13"
+        "drush/drush": "^13",
+        "morethanthemes/extra_landing_page": "^1.0@beta"
     },
     "conflict": {
         "drupal/drupal": "*"

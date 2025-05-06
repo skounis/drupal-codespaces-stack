@@ -180,6 +180,7 @@ full-extra-install:
 
 # Install stock Drupal CMS with all the Extra UX
 full-install:
+	@$(MAKE) clean USE_DDEV=$(USE_DDEV)
 	@$(MAKE) purge USE_DDEV=$(USE_DDEV)
 	@$(MAKE) setup USE_DDEV=$(USE_DDEV)
 	@$(MAKE) full-stock-install USE_DDEV=$(USE_DDEV)
