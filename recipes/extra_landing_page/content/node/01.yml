@@ -115,27 +115,6 @@ default:
       section:
         layout_id: layout_onecol
         layout_settings:
-          label: Projects
-          context_mapping: {  }
-        components:
-          033ab7c4-3d74-42fb-8a46-d068bc542752:
-            uuid: 033ab7c4-3d74-42fb-8a46-d068bc542752
-            region: content
-            configuration:
-              id: 'views_block:projects-all'
-              label: ''
-              label_display: visible
-              provider: views
-              views_label: ''
-              items_per_page: none
-              context_mapping: {  }
-            weight: 0
-            additional: {  }
-        third_party_settings: {  }
-    -
-      section:
-        layout_id: layout_onecol
-        layout_settings:
           label: 'Stay Updated'
           context_mapping: {  }
         components:
