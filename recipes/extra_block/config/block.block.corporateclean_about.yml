@@ -8,6 +8,8 @@ dependencies:
     - block_content
   theme:
     - corporateclean
+_core:
+  default_config_hash: SoRIpms9NNptzbbcnfC3IUzFSH6VH82IfN_Myf6--AI
 id: corporateclean_about
 theme: corporateclean
 region: footer_first

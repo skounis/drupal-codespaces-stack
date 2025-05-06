@@ -1,0 +1,8 @@
+uuid: 82140df0-8f89-443c-b3b6-089f05bdc8b5
+langcode: en
+status: true
+dependencies: {  }
+id: connect
+label: Connect
+description: 'Social media links'
+locked: false
