@@ -2,10 +2,6 @@ uuid: c166fc52-0d61-45d5-8de5-a72d4803e59c
 langcode: en
 status: true
 dependencies:
-  content:
-    - 'block_content:basic_block:8c030b09-a8d8-4e0c-9c87-cc3719d5ac8e'
-  module:
-    - block_content
   theme:
     - corporateclean
 _core:
