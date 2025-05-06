@@ -10,7 +10,7 @@ dependencies:
     - corporateclean
 id: corporateclean_connect
 theme: corporateclean
-region: footer_second
+region: footer_third
 weight: 0
 provider: null
 plugin: 'system_menu_block:connect'
