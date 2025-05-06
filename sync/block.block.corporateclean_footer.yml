@@ -1,4 +1,4 @@
-uuid: c72f157d-7e83-4415-be25-0684aa10d19e
+uuid: c1ba0b46-2b1b-4c6e-b80a-9179a70a7f32
 langcode: en
 status: true
 dependencies:
@@ -9,16 +9,16 @@ dependencies:
   theme:
     - corporateclean
 _core:
-  default_config_hash: 53IzIEBQiPcHVQvnEhoP49auDf2zbyI2tbaR2wGX2n8
+  default_config_hash: 6v6fnsFxlj_tTHMa3keV4Auckj6AT7XSN_aH85gDs8o
 id: corporateclean_footer
 theme: corporateclean
-region: footer_third
-weight: -5
+region: footer_second
+weight: -8
 provider: null
 plugin: 'system_menu_block:footer'
 settings:
   id: 'system_menu_block:footer'
-  label: 'Footer menu'
+  label: Legal
   label_display: visible
   provider: system
   level: 1

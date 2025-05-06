@@ -2,12 +2,10 @@ uuid: fbd991db-4133-4d55-b431-ffaea5a1bdc0
 langcode: en
 status: true
 dependencies:
-  content:
-    - 'block_content:basic_block:bead9350-a093-4655-b613-2b9c2a2b253b'
-  module:
-    - block_content
   theme:
     - corporateclean
+_core:
+  default_config_hash: QjKW8kavOJT1NM59IgL5SaWafgw3Ebzh3dMUwHtxK14
 id: corporateclean_copyright
 theme: corporateclean
 region: sub_footer_first

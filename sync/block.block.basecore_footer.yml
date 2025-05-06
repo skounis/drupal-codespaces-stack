@@ -1,4 +1,4 @@
-uuid: 70a99a36-201f-44d5-9787-c9dfe36eb308
+uuid: 89b525b4-ea4f-46e1-8f79-37da42b41dda
 langcode: en
 status: true
 dependencies:
@@ -9,17 +9,17 @@ dependencies:
   theme:
     - basecore
 _core:
-  default_config_hash: Nc4frhIR-JGnbFfYUtBkOLb75bxQMFyGMAvPZBfqbRI
+  default_config_hash: RcXdjs0V7h6HskIqWMWAAggOWh_u6Cv5wF6KdXwlTv4
 id: basecore_footer
 theme: basecore
-region: footer
+region: footer_second
 weight: -8
 provider: null
 plugin: 'system_menu_block:footer'
 settings:
   id: 'system_menu_block:footer'
-  label: 'Footer menu'
-  label_display: '0'
+  label: Legal
+  label_display: visible
   provider: system
   level: 1
   depth: 0

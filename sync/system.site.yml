@@ -1,9 +1,9 @@
 _core:
   default_config_hash: HlN7eAN2N4JIHsYv56V4E7sqC9bS609KwvGFjyD_mgk
 langcode: en
-uuid: 91afc7e4-9fe5-4a69-8f2a-62d6e92f13ba
-name: 'My Drupal CMS site'
-mail: skounis@gmail.com
+uuid: 36b542a0-d547-4dee-be06-e6ba6b40c872
+name: 'My Site'
+mail: admin@example.com
 slogan: ''
 page:
   403: /user/login
