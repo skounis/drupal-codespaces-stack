@@ -1,4 +1,4 @@
-uuid: c1ba0b46-2b1b-4c6e-b80a-9179a70a7f32
+uuid: 193b63c8-2d22-4fcc-bb64-5733b3a6315c
 langcode: en
 status: true
 dependencies:
@@ -12,8 +12,8 @@ _core:
   default_config_hash: 6v6fnsFxlj_tTHMa3keV4Auckj6AT7XSN_aH85gDs8o
 id: corporateclean_footer
 theme: corporateclean
-region: footer_second
-weight: -8
+region: footer_third
+weight: -6
 provider: null
 plugin: 'system_menu_block:footer'
 settings:

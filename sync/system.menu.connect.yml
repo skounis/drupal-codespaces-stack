@@ -1,0 +1,10 @@
+uuid: 82140df0-8f89-443c-b3b6-089f05bdc8b5
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 8UJFchANzi3eLuUW7RIZxsnI3faRVVle-S8Cflf_Xr8
+id: connect
+label: Connect
+description: 'Social media links'
+locked: false

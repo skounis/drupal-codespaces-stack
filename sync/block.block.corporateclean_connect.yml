@@ -1,0 +1,27 @@
+uuid: e2688f8c-e854-48d5-b50a-2907493a27fc
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.connect
+  module:
+    - system
+  theme:
+    - corporateclean
+_core:
+  default_config_hash: P7-Kg3txBT4r6MPlytW7GSnY3R4BzVUKcfsYXLXo3H0
+id: corporateclean_connect
+theme: corporateclean
+region: footer_second
+weight: 0
+provider: null
+plugin: 'system_menu_block:connect'
+settings:
+  id: 'system_menu_block:connect'
+  label: Connect
+  label_display: visible
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: false
+visibility: {  }
