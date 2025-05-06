@@ -208,8 +208,17 @@ export-block:
 	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush cex -y"
 	@scripts/export_block.sh $(BLOCK_ID) $(BLOCK_NAME) $(RECIPE)
 
+# export-node:
+# 	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dce node 15 > 15.yml -y"
+
 export-node:
-	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dce node 15 > 15.yml -y"
+	@read -p "Enter the node ID to export (or Ctrl+C to cancel): " NODE_ID; \
+	if [ -z "$$NODE_ID" ]; then \
+		echo "No ID provided. Aborting."; \
+		exit 1; \
+	fi; \
+	$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush dce node $$NODE_ID > $$NODE_ID.yml -y"
+
 
 # Export config and copy locally
 dcex:
