@@ -1,0 +1,10 @@
+{
+    "name": "morethanthemes/extra_block",
+    "description": "Creates reusable blocks for demontattion. Places then in regions (eg. footer).",
+    "type": "drupal-recipe",
+    "require": {
+      "drupal/core": "^10 || ^11"
+    },
+    "license": "GPL-2.0-or-later"
+  }
+  

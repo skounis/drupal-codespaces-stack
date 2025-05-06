@@ -1,0 +1,10 @@
+{
+    "name": "morethanthemes/extra_page",
+    "description": "Creates extra pages (bundle `page`) for demonstration.",
+    "type": "drupal-recipe",
+    "require": {
+      "drupal/core": "^10 || ^11"
+    },
+    "license": "GPL-2.0-or-later"
+  }
+  

@@ -1,0 +1,6 @@
+name: Extra Page
+type: Drupal CMS
+description: 'Creates extra pages (bundle `page`) for demonstration.'
+
+config:
+  strict: false
