@@ -235,6 +235,7 @@ apply-recipe:
 # Shortcut for the default recipe
 apply-recipes:
 #	@$(MAKE) apply-recipe RECIPE=extra_form USE_DDEV=$(USE_DDEV)
-	@$(MAKE) apply-recipe RECIPE=extra_footer USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_block USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_project USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_landing_page USE_DDEV=$(USE_DDEV)
