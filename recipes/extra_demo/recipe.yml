@@ -1,0 +1,6 @@
+name: Extra Demo
+type: Drupal CMS
+description: 'Creates extra content for convincing demonstration.'
+
+config:
+  strict: false
