@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 4e63a718-4abb-4710-aab6-e604519c46ae
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: u5831424359_hyper_realistic_CV_photo_of_Indian_born_female_de_b594bdb9-9d5f-47fb-9ab7-e26140388662_2.png
+  uri:
+    -
+      value: 'public://2025-04/u5831424359_hyper_realistic_CV_photo_of_Indian_born_female_de_b594bdb9-9d5f-47fb-9ab7-e26140388662_2.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1563825
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1744738100

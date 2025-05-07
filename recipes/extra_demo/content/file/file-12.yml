@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 7e6c4ddf-3798-42b7-9bbc-ea10415e592e
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: 'ChatGPT Image Apr 15, 2025, 07_00_14 PM.png'
+  uri:
+    -
+      value: 'public://2025-04/ChatGPT Image Apr 15, 2025, 07_00_14 PM.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1552489
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1744736458

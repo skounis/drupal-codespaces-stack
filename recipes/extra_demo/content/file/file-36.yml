@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 0f184864-87a1-4053-9dd2-718c067e82ed
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: clearlaunch.png
+  uri:
+    -
+      value: 'public://2025-04/clearlaunch.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1237053
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1745521645

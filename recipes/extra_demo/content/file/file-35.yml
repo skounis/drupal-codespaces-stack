@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 6f8fa2db-39ad-4553-b3f5-e9b01dbeb960
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: award_2.png
+  uri:
+    -
+      value: 'public://2025-04/award_2.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1889918
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1745520993

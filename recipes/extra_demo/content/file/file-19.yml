@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 36cdca28-826a-4e28-96e3-d1d178c7d805
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: u5831424359_hyper_realistic_CV_photo_of_German_born_male_deve_2aabd976-adf4-4460-bebf-70222051f937_0.png
+  uri:
+    -
+      value: 'public://2025-04/u5831424359_hyper_realistic_CV_photo_of_German_born_male_deve_2aabd976-adf4-4460-bebf-70222051f937_0.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1118924
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1744738231

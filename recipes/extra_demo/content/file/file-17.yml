@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: e145ca47-3401-4c76-9a2b-03d1d25aa3a6
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: u5831424359_hyper_realistic_CV_photo_of_English_male_marketin_fa14f641-f674-4f6c-b430-9e24cf3225e3_1.png
+  uri:
+    -
+      value: 'public://2025-04/u5831424359_hyper_realistic_CV_photo_of_English_male_marketin_fa14f641-f674-4f6c-b430-9e24cf3225e3_1.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1084613
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1744737850

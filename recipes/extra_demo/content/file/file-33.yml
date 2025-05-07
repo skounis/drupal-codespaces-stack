@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 89f6efb2-f839-407a-af0f-c210f6bdb192
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: u5831424359_photo_of_a_man_giving_a_presentation_on_stage_in__b880a821-7d19-4676-85c8-dd62e71dd55a_1.png
+  uri:
+    -
+      value: 'public://2025-04/u5831424359_photo_of_a_man_giving_a_presentation_on_stage_in__b880a821-7d19-4676-85c8-dd62e71dd55a_1.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1430231
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1745499335

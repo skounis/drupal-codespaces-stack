@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 81ef4bc0-7246-42c7-8c67-4cf81368b359
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: award.png
+  uri:
+    -
+      value: 'public://2025-04/award.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1260980
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1745520326

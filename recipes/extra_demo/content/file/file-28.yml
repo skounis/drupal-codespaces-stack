@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 27d2f629-cdfd-47ae-955d-e20d144786c2
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: zoom-call-event.png
+  uri:
+    -
+      value: 'public://2025-04/zoom-call-event.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 489
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1745485428

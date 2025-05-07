@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: a9c57aa4-1620-45fd-9be5-aded080df490
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: u5831424359_hyper_realistic_CV_photo_male_CEO_and_lead_design_af7d141b-2076-4412-a45c-f5dd24b415c7_0.png
+  uri:
+    -
+      value: 'public://2025-04/u5831424359_hyper_realistic_CV_photo_male_CEO_and_lead_design_af7d141b-2076-4412-a45c-f5dd24b415c7_0_0.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1312366
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1744814809

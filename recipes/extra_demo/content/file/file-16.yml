@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 7b8e9744-d1f7-4f6b-bbea-e6f70e5e4c67
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: u5831424359_hyper_realistic_CV_photo_of_Asian-American_female_4771bb83-90bc-4a9b-a713-d20f442e481b_1.png
+  uri:
+    -
+      value: 'public://2025-04/u5831424359_hyper_realistic_CV_photo_of_Asian-American_female_4771bb83-90bc-4a9b-a713-d20f442e481b_1.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 1316532
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1744737758

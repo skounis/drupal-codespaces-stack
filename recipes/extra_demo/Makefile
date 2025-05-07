@@ -52,13 +52,37 @@ export-nodes:
 	echo "Export complete."
 
 
-list-media:
+list-media-01:
 	@echo "Fetching all media items..."; \
 	$(CMS_DIR)/vendor/bin/drush sql:query "\
 		SELECT mfd.mid, m.uuid, mfd.bundle, mfd.name \
 		FROM media_field_data mfd \
 		INNER JOIN media m ON mfd.mid = m.mid \
 		ORDER BY mfd.mid;" | tee media.txt | column -t
+
+
+list-media-02:
+	@echo "Fetching real media file names..."; \
+	$(CMS_DIR)/vendor/bin/drush sql:query "\
+		SELECT mfd.mid, m.uuid, mfd.bundle, fm.filename \
+		FROM media_field_data mfd \
+		JOIN media m ON mfd.mid = m.mid \
+		JOIN file_managed fm ON mfd.field_media_image_target_id = fm.fid \
+		ORDER BY mfd.mid;" > media.txt; \
+	cat media.txt | column -t
+
+
+list-media:
+	@echo "Fetching real media image filenames..."; \
+	$(CMS_DIR)/vendor/bin/drush sql:query "\
+		SELECT mfd.mid, m.uuid, mfd.bundle, f.filename \
+		FROM media_field_data mfd \
+		JOIN media m ON mfd.mid = m.mid \
+		JOIN media__field_media_image img ON mfd.mid = img.entity_id \
+		JOIN file_managed f ON img.field_media_image_target_id = f.fid \
+		ORDER BY mfd.mid;" > media.txt; \
+	cat media.txt | column -t
+
 
 export-media-all:
 	@echo "Exporting all media listed in media.txt..."; \
@@ -69,7 +93,8 @@ export-media-all:
 		if [ -n "$$MID" ] && [ -n "$$UUID" ] && [ -n "$$FILENAME" ]; then \
 			PADDED_ID=$$(printf "%02d" $$MID); \
 			CLEAN_FILENAME=$$(echo "$$FILENAME" | tr -d '\r' | tr ' ' '-' | tr -cd '[:alnum:]._-'); \
-			OUTFILE="media-$$PADDED_ID-$$UUID-$$CLEAN_FILENAME.yml"; \
+#			OUTFILE="media-$$PADDED_ID-$$UUID-$$CLEAN_FILENAME.yml"; \
+			OUTFILE="media-$$PADDED_ID-$$UUID.yml"; \
 			echo "Exporting media ID $$MID to $$OUTFILE..."; \
 			if $(CMS_DIR)/vendor/bin/drush dce media $$MID -y > "$$OUTFILE"; then \
 				echo "✔ Exported $$OUTFILE"; \
@@ -79,3 +104,30 @@ export-media-all:
 		fi; \
 	done < media.txt; \
 	echo "All media exports complete."
+
+
+list-files:
+	@echo "Listing file entities used in media images..."; \
+	$(CMS_DIR)/vendor/bin/drush sql:query "\
+		SELECT f.fid, f.uuid, f.filename, f.uri \
+		FROM media_field_data mfd \
+		JOIN media__field_media_image img ON mfd.mid = img.entity_id \
+		JOIN file_managed f ON img.field_media_image_target_id = f.fid \
+		ORDER BY f.fid;" > files.txt; \
+	cat files.txt | column -t
+
+
+export-files:
+	@echo "Exporting file entities from files.txt..."; \
+	while read -r line; do \
+		FID=$$(echo "$$line" | awk '{print $$1}'); \
+		FILENAME=$$(echo "$$line" | cut -d' ' -f3-); \
+		if [ -n "$$FID" ] && [ -n "$$FILENAME" ]; then \
+			CLEAN_NAME=$$(echo "$$FILENAME" | tr -d '\r' | tr ' ' '-' | tr -cd '[:alnum:]._-'); \
+#			OUTFILE="file-$$FID--$$CLEAN_NAME.yml"; \
+			OUTFILE="file-$$FID.yml"; \
+			echo "Exporting file $$FID to $$OUTFILE..."; \
+			$(CMS_DIR)/vendor/bin/drush dce file $$FID -y > "$$OUTFILE"; \
+		fi; \
+	done < files.txt; \
+	echo "All file exports complete."
