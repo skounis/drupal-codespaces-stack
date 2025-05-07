@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 49e38ee0-8286-4c35-b46b-8e1d926bf009
+  bundle: image
+  default_langcode: en
+  depends:
+    f6f9b9d3-14d0-4ca2-8eff-58ed6a9a1854: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'CleanShot 2025-04-14 at 21.44.50@2x.png'
+  created:
+    -
+      value: 1744659935
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: f6f9b9d3-14d0-4ca2-8eff-58ed6a9a1854
+      alt: 'Corporate Clean landing page'
+      title: ''
+      width: 3374
+      height: 3130

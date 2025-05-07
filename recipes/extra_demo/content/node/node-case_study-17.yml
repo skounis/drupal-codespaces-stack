@@ -1,0 +1,69 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 5d9fb37b-395e-49bc-bd37-36a9baa19a80
+  bundle: case_study
+  default_langcode: en
+  depends:
+    ef8958e8-615d-474f-b5fc-d815d5f23fe5: media
+    3972a140-fab0-42b8-b3d1-d576198f1386: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+    d48adeba-e388-4e82-820b-98bbd2f35a46: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'GreenLife Organics: Multi-Channel Campaign Success'
+  created:
+    -
+      value: 1744734307
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /case-studies/greenlife-organics-multi-channel-campaign-success
+      langcode: en
+      pathauto: 1
+  field_case_study__client_link:
+    -
+      uri: 'https://webmaker.morethanthemes.com'
+      title: 'Discover Webmaker+ for Drupal'
+      options: {  }
+  field_case_study__client_name:
+    -
+      value: 'GreenLife Organics'
+  field_content:
+    -
+      value: "<p>Our integrated marketing campaign for GreenLife Organics' nationwide product launch delivered exceptional results by combining strategic digital advertising, targeted social media engagement, and carefully curated influencer partnerships.&nbsp;</p><p>The campaign successfully positioned GreenLife Organics as a leading sustainable food brand in the competitive organic market.</p><p>Key achievements:</p><ul><li>520% return on marketing investment within first quarter</li><li>3.5 million campaign impressions across all channels</li><li>42,000 new customer acquisitions</li><li>Featured in 5 major food and lifestyle publications</li><li>Successfully launched in 250+ retail locations</li><li>185% increase in direct-to-consumer sales</li></ul><blockquote><p>DigitalPeak Marketing's campaign strategy transformed our market presence completely. Their holistic approach not only exceeded our sales targets but also established GreenLife Organics as a household name in the organic food space. The ROI we've seen is beyond our most optimistic projections.<br>— Michael Zhang, CEO of GreenLife Organics</p></blockquote>"
+      format: content_format
+  field_description:
+    -
+      value: "Our integrated marketing campaign for GreenLife Organics' nationwide product launch delivered exceptional results by combining strategic digital advertising, targeted social media engagement, and carefully curated influencer partnerships. "
+  field_featured_image:
+    -
+      entity: ef8958e8-615d-474f-b5fc-d815d5f23fe5
+  field_tags:
+    -
+      entity: 3972a140-fab0-42b8-b3d1-d576198f1386
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998
+    -
+      entity: d48adeba-e388-4e82-820b-98bbd2f35a46

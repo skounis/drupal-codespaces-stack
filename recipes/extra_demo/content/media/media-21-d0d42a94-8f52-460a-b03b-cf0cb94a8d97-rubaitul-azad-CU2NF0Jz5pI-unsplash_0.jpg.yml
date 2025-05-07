@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: d0d42a94-8f52-460a-b03b-cf0cb94a8d97
+  bundle: image
+  default_langcode: en
+  depends:
+    9fea3c4c-8224-4439-be4e-3b58faaa495a: file
+default:
+  revision_user:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: rubaitul-azad-CU2NF0Jz5pI-unsplash_0.jpg
+  created:
+    -
+      value: 1744738839
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 9fea3c4c-8224-4439-be4e-3b58faaa495a
+      alt: 'Image Credits: Rubaitul Azad, on Unsplash'
+      title: ''
+      width: 14467
+      height: 9744

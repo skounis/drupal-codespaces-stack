@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 57b9451e-36df-4bf1-a747-8c2fbf4c2230
+  bundle: image
+  default_langcode: en
+  depends:
+    81ef4bc0-7246-42c7-8c67-4cf81368b359: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: award.png
+  created:
+    -
+      value: 1745520326
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 81ef4bc0-7246-42c7-8c67-4cf81368b359
+      alt: 'award winning'
+      title: ''
+      width: 1024
+      height: 1024

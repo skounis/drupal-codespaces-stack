@@ -1,0 +1,57 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 1446fb31-2ebf-4db7-beb9-1aaf15e21f38
+  bundle: person
+  default_langcode: en
+  depends:
+    c7d27b93-1eb9-4072-aea4-62ee1d91570b: media
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Nina Patel'
+  created:
+    -
+      value: 1744735398
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /people/nina-patel
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Meet Nina, Our Visual Genius</strong><br>Nina Patel is a design powerhouse with an eye for detail and a passion for bold aesthetics. She brings concepts to life across web, social, and print with style and consistency at <strong>Corporate Clean</strong>.</p><blockquote><p><em>“Design is how we communicate without words. I make sure it speaks the right message.”</em></p></blockquote><p>With a degree in Graphic Design and a background in fashion and editorial art direction, Nina brings a multidisciplinary perspective to every project. She’s worked with global agencies and boutique studios alike, with work featured in design publications and industry showcases. Her focus is on creating design systems that are not only beautiful but also functional and user-focused.</p><p><strong>Expertise</strong>: UI/UX design, motion graphics, social visuals</p><p><strong>Fun Fact</strong>: Nina collects vintage posters and reimagines them in modern styles.</p><p><a href="#"><strong>LinkedIn</strong></a> | <a href="#"><strong>Contact Nina</strong></a></p>'
+      format: content_format
+  field_description:
+    -
+      value: 'Nina Patel is a design powerhouse with an eye for detail and a passion for bold aesthetics. '
+  field_featured_image:
+    -
+      entity: c7d27b93-1eb9-4072-aea4-62ee1d91570b
+  field_person__email:
+    -
+      value: nina@corporateclean.com
+  field_person__role_job_title:
+    -
+      value: Designer

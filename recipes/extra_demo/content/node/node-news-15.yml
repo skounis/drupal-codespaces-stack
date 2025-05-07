@@ -1,0 +1,61 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: c5225377-240b-4b7e-8fc1-099f4d8161c7
+  bundle: news
+  default_langcode: en
+  depends:
+    57e8fd08-0a08-4f89-81bf-4d63ef119d40: media
+    7d5c50d2-1d9e-4068-89b9-93aa36f736dd: taxonomy_term
+    e120c496-e0b8-42ab-9bfb-3d4cc9922f10: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Introducing Corporate Clean: A Smarter Way to Launch Your Business Website'
+  created:
+    -
+      value: 1744659380
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /news/2025-04/introducing-corporate-clean-smarter-way-launch-your-business-website
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: "<p>We’re thrilled to unveil <strong>Corporate Clean</strong>, our new professional website template designed specifically for modern businesses that want a sleek, responsive, and high-performing online presence. Whether you're launching a new brand or refreshing your corporate identity, Corporate Clean gives you the tools to build a trustworthy and compelling digital front door—without writing a single line of code.</p><p>Built with clean design principles, intuitive navigation, and performance in mind, Corporate Clean is perfect for showcasing your services, highlighting your team, and sharing company updates. The template is fully responsive, meaning it looks and performs beautifully across all devices—from desktops to smartphones.</p><p>Corporate Clean comes packed with customizable sections including hero banners, service grids, testimonials, news modules, and contact forms. You can easily adapt the layout to match your brand identity with flexible color schemes, font choices, and visual blocks that require zero design experience.</p><p>Speed, accessibility, and CMS compatibility were top priorities during development. The template is optimized for fast loading, SEO-ready out of the box, and WCAG-compliant to ensure your site is inclusive and easy to find. Best of all, Corporate Clean is built for the <strong>Drupal CMS</strong>, making it an ideal choice for organizations that rely on Drupal’s flexibility, scalability, and enterprise-grade features.</p><p>Starting today, Corporate Clean is available as a free download. Explore the <strong>Demo</strong> to see how it works in action and imagine how your business could benefit from a polished, professional website that’s ready to grow with you.</p>"
+      format: content_format
+  field_description:
+    -
+      value: 'Discover Corporate Clean, a free Drupal website template built for modern businesses. Learn how its clean design, flexibility, and powerful features can help you create a professional, high-performing corporate website with ease'
+  field_featured_image:
+    -
+      entity: 57e8fd08-0a08-4f89-81bf-4d63ef119d40
+  field_tags:
+    -
+      entity: 7d5c50d2-1d9e-4068-89b9-93aa36f736dd
+    -
+      entity: e120c496-e0b8-42ab-9bfb-3d4cc9922f10
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

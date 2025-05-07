@@ -1,0 +1,94 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: dbf878bf-ac0f-42f1-979f-3fbfdcd1378c
+  bundle: event
+  default_langcode: en
+  depends:
+    3b187bec-e796-4583-ba42-9bd8689465ae: media
+    97429334-fae8-4af9-9a12-46ad7ee1d01c: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Speaking at ForwardUX 2026: Building Brands with Purpose'
+  created:
+    -
+      value: 1745434697
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /events/speaking-forwardux-2026-building-brands-purpose
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p>Corporate Clean’s CEO Alex Morgan and Designer Nina Patel will take the stage at <strong>ForwardUX 2026</strong>, one of Europe’s premier conferences on user experience and digital branding. Their talk will focus on how strategic storytelling, clean design systems, and modular UX empower fast-scaling businesses.</p><p>We’re excited to be part of a global conversation on purpose-driven design. Attendees will gain insights from real-world brand transformations and learn how to design systems that scale with integrity and consistency.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'How strategy-first design powers modern digital identities'
+  field_event__date:
+    -
+      value: 1779562800
+      end_value: 1779566400
+      duration: 60
+      rrule: 0
+      rrule_index: 0
+      timezone: ''
+  field_event__link:
+    -
+      uri: 'https://webmaker.morethanthemes.com'
+      title: Webmaker+
+      options: {  }
+  field_event__location_address:
+    -
+      langcode: ''
+      country_code: NL
+      administrative_area: ''
+      locality: Amsterdam
+      dependent_locality: ''
+      postal_code: '1012 NP'
+      sorting_code: ''
+      address_line1: Damrak
+      address_line2: ''
+  field_featured_image:
+    -
+      entity: 3b187bec-e796-4583-ba42-9bd8689465ae
+  field_geofield:
+    -
+      value: 'POINT(4.893416 52.373256)'
+      geo_type: Point
+      lat: 52.373256
+      lon: 4.893416
+      left: 4.893416
+      top: 52.373256
+      right: 4.893416
+      bottom: 52.373256
+      geohash: u173zq722fe3
+      latlon: '52.373256,4.893416'
+  field_tags:
+    -
+      entity: 97429334-fae8-4af9-9a12-46ad7ee1d01c
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

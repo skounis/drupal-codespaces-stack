@@ -1,0 +1,57 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: e5b2a83c-52ef-4a3f-ae86-59d02f26daa2
+  bundle: person
+  default_langcode: en
+  depends:
+    62c04be9-b310-46c5-b449-d50b8ad00177: media
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Samira Chen'
+  created:
+    -
+      value: 1744735193
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /people/samira-chen
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Meet Samira, Our Tech Lead &amp; Co-Founder</strong><br>Samira Chen brings technical excellence and startup experience to the table. As our CTO, she leads digital strategy, oversees development, and ensures our client projects are scalable, fast, and future-proof at <strong>Corporate Clean</strong>.</p><blockquote><p><em>“I love building things that are both beautiful and bulletproof. Our clients deserve nothing less.”</em></p></blockquote><p>Samira holds a Master’s in Computer Science and has worked as a lead developer for two venture-backed tech startups, where she architected custom CMS platforms and led cross-functional teams. She''s an active contributor to open-source projects and frequently speaks at web development and Drupal conferences. Her background combines deep technical knowledge with a passion for clean, maintainable code.</p><p><strong>Expertise</strong>: CMS architecture, front-end performance, API integrations</p><p><strong>Fun Fact</strong>: Samira speaks four languages—code and otherwise.</p><p><a href="#"><strong>LinkedIn</strong></a> | <a href="#"><strong>Contact Samira</strong></a></p>'
+      format: content_format
+  field_description:
+    -
+      value: 'Samira Chen brings technical excellence and startup experience to the table.'
+  field_featured_image:
+    -
+      entity: 62c04be9-b310-46c5-b449-d50b8ad00177
+  field_person__email:
+    -
+      value: samira@corporateclean.com
+  field_person__role_job_title:
+    -
+      value: CTO

@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 762dc591-ca71-41b0-b954-a6ab71659750
+  bundle: image
+  default_langcode: en
+  depends:
+    210e8b55-cac0-49aa-a7d1-a113b89b56a0: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: brand-design.png
+  created:
+    -
+      value: 1744736229
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 210e8b55-cac0-49aa-a7d1-a113b89b56a0
+      alt: 'Brand design by corporate clean'
+      title: ''
+      width: 1536
+      height: 1024

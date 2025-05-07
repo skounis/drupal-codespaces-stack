@@ -1,0 +1,61 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 5d630b15-00a3-4e0a-a740-2c4d8f71a4e4
+  bundle: blog
+  default_langcode: en
+  depends:
+    4da16d4d-1906-4bb9-a8a8-0159019a9bff: media
+    24f130f9-f023-457b-80d6-84947e1e1628: taxonomy_term
+    1646c68c-9010-4a26-b9f8-d30022b843ec: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Building a Personal Brand on LinkedIn from Scratch'
+  created:
+    -
+      value: 1744735766
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /blog/2025-04/building-personal-brand-linkedin-scratch
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Helping a founder find their voice—and their audience.</strong></p><p>One of our favorite projects was helping the founder of a tech consultancy build a personal brand on LinkedIn. They had years of experience and plenty of insights to share but lacked the structure and visual presence to stand out.</p><p><strong>Our Process</strong><br>We created a brand guide tailored to LinkedIn—visual identity, tone of voice, and content categories. Then we built a post calendar, designed content templates, and coached the founder on storytelling and engagement strategies.</p><p><strong>The Transformation</strong><br>Within 90 days, their followers grew from 400 to over 3,500. Several posts went viral in the tech startup space, and new client leads came directly through DMs. The founder even got invited to speak at an industry panel.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'One of our favorite projects was helping the founder of a tech consultancy build a personal brand on LinkedIn. '
+  field_featured_image:
+    -
+      entity: 4da16d4d-1906-4bb9-a8a8-0159019a9bff
+  field_tags:
+    -
+      entity: 24f130f9-f023-457b-80d6-84947e1e1628
+    -
+      entity: 1646c68c-9010-4a26-b9f8-d30022b843ec
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

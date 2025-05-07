@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: c7d27b93-1eb9-4072-aea4-62ee1d91570b
+  bundle: image
+  default_langcode: en
+  depends:
+    4e63a718-4abb-4710-aab6-e604519c46ae: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: designer.png
+  created:
+    -
+      value: 1744738100
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 4e63a718-4abb-4710-aab6-e604519c46ae
+      alt: Designer
+      title: ''
+      width: 1024
+      height: 1024

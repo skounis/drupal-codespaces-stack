@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 35b2338e-6e9d-4687-bca3-8a91e69e5c5d
+  bundle: image
+  default_langcode: en
+  depends:
+    36cdca28-826a-4e28-96e3-d1d178c7d805: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: Developer.png
+  created:
+    -
+      value: 1744738231
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 36cdca28-826a-4e28-96e3-d1d178c7d805
+      alt: Developer
+      title: ''
+      width: 1024
+      height: 1024

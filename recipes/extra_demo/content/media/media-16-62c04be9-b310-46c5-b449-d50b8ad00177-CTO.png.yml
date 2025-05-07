@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 62c04be9-b310-46c5-b449-d50b8ad00177
+  bundle: image
+  default_langcode: en
+  depends:
+    7b8e9744-d1f7-4f6b-bbea-e6f70e5e4c67: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: CTO.png
+  created:
+    -
+      value: 1744737758
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 7b8e9744-d1f7-4f6b-bbea-e6f70e5e4c67
+      alt: CTO
+      title: ''
+      width: 1024
+      height: 1024

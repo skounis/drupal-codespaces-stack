@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 3b187bec-e796-4583-ba42-9bd8689465ae
+  bundle: image
+  default_langcode: en
+  depends:
+    89f6efb2-f839-407a-af0f-c210f6bdb192: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: u5831424359_photo_of_a_man_giving_a_presentation_on_stage_in__b880a821-7d19-4676-85c8-dd62e71dd55a_1.png
+  created:
+    -
+      value: 1745499335
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 89f6efb2-f839-407a-af0f-c210f6bdb192
+      alt: 'building brands with purpose presentation'
+      title: ''
+      width: 1232
+      height: 928

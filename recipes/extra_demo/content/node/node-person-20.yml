@@ -1,0 +1,57 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: b2760f17-9008-4c44-aea2-95f501dbd828
+  bundle: person
+  default_langcode: en
+  depends:
+    e2123a7c-7843-417f-8c5a-5bbcd429ab50: media
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Alex Morgan, CEO'
+  created:
+    -
+      value: 1744735007
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /people/alex-morgan-ceo
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Meet Alex, Our Founder &amp; Creative Visionary</strong><br>Alex Morgan is the heart and soul of <strong>Corporate Clean</strong>. With over a decade of experience in design and branding, Alex founded the agency to help businesses tell compelling visual stories. As both CEO and lead designer, Alex brings strategic thinking and artistic flair to every project.</p><blockquote><p><em>“I believe great design has the power to change how people feel about a brand. That’s what drives me.”</em></p></blockquote><p><strong>Expertise</strong>: Brand identity, creative direction, client strategy</p><p><strong>Fun Fact</strong>: Alex once designed a logo on a napkin that went viral.</p><p><a href="#"><strong>LinkedIn</strong></a> | <a href="#"><strong>Contact Alex</strong></a></p>'
+      format: content_format
+  field_description:
+    -
+      value: 'Alex Morgan is the heart and soul of Corporate Clean. '
+  field_featured_image:
+    -
+      entity: e2123a7c-7843-417f-8c5a-5bbcd429ab50
+  field_person__email:
+    -
+      value: alex@corporateclean.com
+  field_person__role_job_title:
+    -
+      value: 'CEO & Founder'

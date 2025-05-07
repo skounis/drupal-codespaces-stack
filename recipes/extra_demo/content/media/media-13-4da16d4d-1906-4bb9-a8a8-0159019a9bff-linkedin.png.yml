@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 4da16d4d-1906-4bb9-a8a8-0159019a9bff
+  bundle: image
+  default_langcode: en
+  depends:
+    3c42c9fc-6d54-4b43-9082-91a3eb44477d: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: linkedin.png
+  created:
+    -
+      value: 1744736766
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 3c42c9fc-6d54-4b43-9082-91a3eb44477d
+      alt: 'Linkedin brand'
+      title: ''
+      width: 1536
+      height: 1024

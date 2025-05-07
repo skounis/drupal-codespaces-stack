@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 4d5efdeb-8d1a-45a4-b6aa-2c234f21b0bd
+  bundle: image
+  default_langcode: en
+  depends:
+    7e6c4ddf-3798-42b7-9bbc-ea10415e592e: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: beauty-brand.png
+  created:
+    -
+      value: 1744736458
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 7e6c4ddf-3798-42b7-9bbc-ea10415e592e
+      alt: 'Affiliate marketing for a beauty brand'
+      title: ''
+      width: 1024
+      height: 1024

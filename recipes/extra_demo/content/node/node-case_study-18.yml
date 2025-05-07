@@ -1,0 +1,69 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: e60a6224-e425-4bec-a49a-e9d4eb03a6fa
+  bundle: case_study
+  default_langcode: en
+  depends:
+    4da16d4d-1906-4bb9-a8a8-0159019a9bff: media
+    24f130f9-f023-457b-80d6-84947e1e1628: taxonomy_term
+    1646c68c-9010-4a26-b9f8-d30022b843ec: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Urban Fitness Collective: Social Media Growth'
+  created:
+    -
+      value: 1744734495
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /case-studies/urban-fitness-collective-social-media-growth
+      langcode: en
+      pathauto: 1
+  field_case_study__client_link:
+    -
+      uri: 'https://webmaker.morethanthemes.com'
+      title: 'Discover Webmaker+ for Drupal'
+      options: {  }
+  field_case_study__client_name:
+    -
+      value: 'Urban Fitness Collective'
+  field_content:
+    -
+      value: "<p>Through strategic social media management and innovative content creation, we transformed Urban Fitness Collective from a local fitness center into a nationally recognized wellness inspiration destination. Our comprehensive digital strategy revolutionized their online presence through meticulously crafted content that resonated with fitness enthusiasts across the country.&nbsp;</p><p>The approach encompassed professionally produced daily workout demonstrations, expert-backed nutrition guidance, compelling member transformation narratives, and high-quality live-streaming fitness sessions that brought the gym experience directly to members' homes. We implemented an engaging mix of motivational content, practical fitness advice, and community-building initiatives that helped establish Urban Fitness Collective as a trusted voice in the health and wellness space.</p><p>Impact delivered:</p><ul><li>400% follower growth in 6 months across Instagram, TikTok, and YouTube</li><li>85% increase in class bookings, with 40% coming from out-of-state visitors</li><li>30+ branded content partnerships with leading fitness influencers</li><li>250,000+ monthly engagement rate across all platforms</li><li>Successful launch of virtual training program with 5,000+ subscribers</li><li>Featured in Women's Health and Men's Fitness magazines</li></ul><blockquote><p>DigitalPeak Marketing's social media strategy completely revolutionized our business model. What started as a local gym has evolved into a nationwide fitness movement. Their content strategy not only grew our following but created a genuine community that drives real business results. We've seen membership retention increase by 65% since implementing their social-first approach.<br>— Marcus Rodriguez, Founder &amp; CEO of Urban Fitness Collective</p></blockquote>"
+      format: content_format
+  field_description:
+    -
+      value: 'We helped Urban Fitness Collective transform from a local gym into a national fitness inspiration hub through strategic social media management and content creation.'
+  field_featured_image:
+    -
+      entity: 4da16d4d-1906-4bb9-a8a8-0159019a9bff
+  field_tags:
+    -
+      entity: 24f130f9-f023-457b-80d6-84947e1e1628
+    -
+      entity: 1646c68c-9010-4a26-b9f8-d30022b843ec
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

@@ -1,0 +1,92 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 5b77237f-a328-432b-a610-5cd2133c7d78
+  bundle: event
+  default_langcode: en
+  depends:
+    62704620-1c3f-4692-a848-d61b85ec83ed: media
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+    7dff1aac-10d5-4241-acdb-9cfcb95aa759: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Introducing ClearLaunch: The Smart Way to Start Your Brand'
+  created:
+    -
+      value: 1745434818
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /events/introducing-clearlaunch-smart-way-start-your-brand
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p>We’re excited to invite you to the official launch of <strong>ClearLaunch</strong>, our brand-new service designed to help startups and small businesses build a professional brand foundation—quickly and affordably. This new offering includes a streamlined logo design process, brand guidelines, and web-ready assets—all in one intuitive package.</p><p>At the event, our team will walk through the inspiration behind ClearLaunch, show client beta results, and reveal how it integrates into our larger service ecosystem. Drinks, networking, and a live demo booth will round out the evening.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'A live unveiling of our new branding starter package for small businesses'
+  field_event__date:
+    -
+      value: 1776895200
+      end_value: 1776981540
+      duration: 1439
+      rrule: 0
+      rrule_index: 0
+      timezone: ''
+  field_event__location_address:
+    -
+      langcode: ''
+      country_code: GB
+      administrative_area: ''
+      locality: London
+      dependent_locality: ''
+      postal_code: 'E2 7JE'
+      sorting_code: ''
+      address_line1: Shoreditch
+      address_line2: ''
+  field_event__location_name:
+    -
+      value: 'The Glasshouse Studio, Shoreditch'
+  field_featured_image:
+    -
+      entity: 62704620-1c3f-4692-a848-d61b85ec83ed
+  field_geofield:
+    -
+      value: 'POINT(-0.079893 51.526669)'
+      geo_type: Point
+      lat: 51.526669
+      lon: -0.079893
+      left: -0.079893
+      top: 51.526669
+      right: -0.079893
+      bottom: 51.526669
+      geohash: gcpvnhjud773
+      latlon: '51.526669,-0.079893'
+  field_tags:
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998
+    -
+      entity: 7dff1aac-10d5-4241-acdb-9cfcb95aa759

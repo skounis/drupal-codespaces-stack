@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 62704620-1c3f-4692-a848-d61b85ec83ed
+  bundle: image
+  default_langcode: en
+  depends:
+    0f184864-87a1-4053-9dd2-718c067e82ed: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: clearlaunch.png
+  created:
+    -
+      value: 1745521645
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 0f184864-87a1-4053-9dd2-718c067e82ed
+      alt: clearlaunch
+      title: ''
+      width: 1024
+      height: 1024

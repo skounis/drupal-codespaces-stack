@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: c8699a41-0110-48c9-98d1-3bef299f2525
+  bundle: image
+  default_langcode: en
+  depends:
+    227b79ee-efd1-4887-bfa4-1dd613921a9a: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: brand-id-campaign.png
+  created:
+    -
+      value: 1744737009
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 227b79ee-efd1-4887-bfa4-1dd613921a9a
+      alt: 'Brand ID campaign'
+      title: ''
+      width: 1024
+      height: 1536

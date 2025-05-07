@@ -1,0 +1,82 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 5fb0307e-da49-4956-86f6-1aed7938edc1
+  bundle: event
+  default_langcode: en
+  depends:
+    ab7e0620-2d20-4aae-941c-e0b0460189c0: media
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Corporate Clean Wins Gold at the 2026 Digital Agency Awards'
+  created:
+    -
+      value: 1745434605
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /events/corporate-clean-wins-gold-2026-digital-agency-awards
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p>We’re proud to announce that Corporate Clean has been awarded <strong>Gold in Integrated Campaign Strategy</strong> at the prestigious 2026 Digital Agency Awards. This recognition celebrates our multi-channel campaign for GreenLife Organics, which generated over 42,000 new customer acquisitions and a 520% ROI within the first quarter.</p><p>The jury praised our holistic approach, creativity, and measurable impact. This award is a testament to our team’s dedication and our client partnerships that drive meaningful, sustainable growth.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'Honored for Excellence in Integrated Campaign Strategy'
+  field_event__date:
+    -
+      value: 1766509200
+      end_value: 1766512800
+      duration: 60
+      rrule: 0
+      rrule_index: 0
+      timezone: ''
+  field_event__location_address:
+    -
+      langcode: ''
+      country_code: DE
+      administrative_area: ''
+      locality: Berlin
+      dependent_locality: ''
+      postal_code: '11011'
+      sorting_code: ''
+      address_line1: 'Platz der Republik 1'
+      address_line2: ''
+  field_featured_image:
+    -
+      entity: ab7e0620-2d20-4aae-941c-e0b0460189c0
+  field_geofield:
+    -
+      value: 'POINT(13.376282 52.518594)'
+      geo_type: Point
+      lat: 52.518594
+      lon: 13.376282
+      left: 13.376282
+      top: 52.518594
+      right: 13.376282
+      bottom: 52.518594
+      geohash: u33db2sqczwb
+      latlon: '52.518594,13.376282'

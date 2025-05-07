@@ -1,0 +1,57 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 65699043-71b7-48a0-85f7-a1722d9c3e7f
+  bundle: person
+  default_langcode: en
+  depends:
+    35b2338e-6e9d-4687-bca3-8a91e69e5c5d: media
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Leo Fischer'
+  created:
+    -
+      value: 1744735455
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /people/leo-fischer
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Meet Leo, Our Code Craftsman</strong><br>Leo Fischer turns design into seamless digital experiences. Whether it''s building responsive sites, integrating third-party tools, or customizing CMS platforms like Drupal, Leo brings the tech to life at <strong>Corporate Clean</strong>.</p><blockquote><p><em>“My job is to make the design feel effortless for the end user—and work flawlessly under the hood.”</em></p></blockquote><p>Leo studied Software Engineering and spent several years working as a freelance web developer, collaborating with design studios across Europe. He has contributed to Drupal modules and specializes in performance optimization and accessibility. Leo’s meticulous approach to front-end development ensures every detail matches the creative vision—and functions perfectly on every screen size.</p><p><strong>Expertise</strong>: Front-end development, CMS customization, accessibility</p><p><strong>Fun Fact</strong>: Leo once built an interactive portfolio entirely in ASCII.</p><p><a href="#"><strong>LinkedIn</strong></a> | <a href="#"><strong>Contact Leo</strong></a></p>'
+      format: content_format
+  field_description:
+    -
+      value: 'Leo Fischer turns design into seamless digital experiences. '
+  field_featured_image:
+    -
+      entity: 35b2338e-6e9d-4687-bca3-8a91e69e5c5d
+  field_person__email:
+    -
+      value: Leo@corporateclean.com
+  field_person__role_job_title:
+    -
+      value: Developer

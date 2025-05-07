@@ -1,0 +1,58 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 446a16d7-4081-494d-98b0-aa26f46cc850
+  bundle: blog
+  default_langcode: en
+  depends:
+    762dc591-ca71-41b0-b954-a6ab71659750: media
+    1646c68c-9010-4a26-b9f8-d30022b843ec: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'How We Rebranded a Fintech Startup in Just 6 Weeks'
+  created:
+    -
+      value: 1744735568
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /blog/2025-04/how-we-rebranded-fintech-startup-just-6-weeks
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>When speed meets strategy, great things happen.</strong></p><p>We partnered with a fast-scaling fintech startup that needed a complete brand refresh to align with its growing user base and international expansion. The challenge? A tight six-week timeline and a saturated market full of similar-looking brands.</p><p><strong>Our Approach</strong><br>We kicked off with a brand audit and competitor analysis, followed by two collaborative workshops to define tone, values, and visual identity. From there, we developed a bold new logo, color palette, typography system, and design assets.</p><p><strong>The Outcome</strong><br>The new brand launched ahead of schedule and instantly boosted recognition across investor presentations, app store listings, and digital ads. The client reported a 3x increase in web engagement in the month following launch.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'We partnered with a fast-scaling fintech startup that needed a complete brand refresh to align with its growing user base and international expansion. '
+  field_featured_image:
+    -
+      entity: 762dc591-ca71-41b0-b954-a6ab71659750
+  field_tags:
+    -
+      entity: 1646c68c-9010-4a26-b9f8-d30022b843ec
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

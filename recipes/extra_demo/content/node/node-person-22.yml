@@ -1,0 +1,57 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 658640da-dbd6-4209-bf75-6c05f7bd1879
+  bundle: person
+  default_langcode: en
+  depends:
+    dd262bab-a883-4681-9bb2-055a7c1137e4: media
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Jordan Reyes'
+  created:
+    -
+      value: 1744735344
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /people/jordan-reyes
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Meet Jordan, Our Campaign Strategist</strong><br>Jordan Reyes drives results with strategy, analytics, and a keen understanding of audiences. As Marketing Manager at <strong>Corporate Clean</strong>, Jordan crafts data-backed plans that turn attention into action.</p><blockquote><p><em>“Marketing is storytelling plus timing. Get both right, and people will listen.”</em></p></blockquote><p>Jordan holds a degree in Marketing and Digital Media and brings over 8 years of experience working with e-commerce brands and SaaS companies. Before joining Corporate Clean, Jordan led the marketing department at a fast-growing lifestyle brand, where their campaigns regularly doubled online conversions. Jordan also brings deep knowledge of customer personas, funnel optimization, and channel strategy.</p><p><strong>Expertise</strong>: Campaign strategy, email marketing, paid media<br><strong>Fun Fact</strong>: Jordan is a certified coffee snob and runs a niche food blog.<br><strong>LinkedIn</strong> | <strong>Contact Jordan</strong></p>'
+      format: content_format
+  field_description:
+    -
+      value: 'Jordan Reyes drives results with strategy, analytics, and a keen understanding of audiences. '
+  field_featured_image:
+    -
+      entity: dd262bab-a883-4681-9bb2-055a7c1137e4
+  field_person__email:
+    -
+      value: Jordan@corporateclean.com
+  field_person__role_job_title:
+    -
+      value: 'Marketing Manager'

@@ -1,0 +1,64 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 3d86fbcf-9318-4b42-afbc-d7c8df9e63df
+  bundle: blog
+  default_langcode: en
+  depends:
+    c8699a41-0110-48c9-98d1-3bef299f2525: media
+    97429334-fae8-4af9-9a12-46ad7ee1d01c: taxonomy_term
+    7dff1aac-10d5-4241-acdb-9cfcb95aa759: taxonomy_term
+    1646c68c-9010-4a26-b9f8-d30022b843ec: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Running a 3-Month Campaign That Doubled Signups'
+  created:
+    -
+      value: 1744735714
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /blog/2025-04/running-3-month-campaign-doubled-signups
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>A clear message, strong creative, and great timing can make all the difference.</strong></p><p>A productivity app came to Corporate Clean to launch a seasonal promotion aimed at converting free users into paying subscribers. They needed campaign strategy, creative assets, and analytics support—all aligned with their brand voice.</p><p><strong>Our Strategy</strong><br>We built a three-month, cross-platform campaign that included email funnels, targeted social ads, blog content, and optimized landing pages. Messaging focused on productivity goals, aligned with the New Year mindset.</p><p><strong>Results We’re Proud Of</strong><br>The campaign exceeded expectations, doubling subscriber signups compared to the previous quarter. Paid ad conversion rates jumped from 2.1% to 4.5%, and the landing page we designed became their top performer of the year.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'A productivity app came to Corporate Clean to launch a seasonal promotion aimed at converting free users into paying subscribers. '
+  field_featured_image:
+    -
+      entity: c8699a41-0110-48c9-98d1-3bef299f2525
+  field_tags:
+    -
+      entity: 97429334-fae8-4af9-9a12-46ad7ee1d01c
+    -
+      entity: 7dff1aac-10d5-4241-acdb-9cfcb95aa759
+    -
+      entity: 1646c68c-9010-4a26-b9f8-d30022b843ec
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

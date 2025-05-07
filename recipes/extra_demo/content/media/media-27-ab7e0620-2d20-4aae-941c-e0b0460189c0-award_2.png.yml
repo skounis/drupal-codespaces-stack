@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: ab7e0620-2d20-4aae-941c-e0b0460189c0
+  bundle: image
+  default_langcode: en
+  depends:
+    6f8fa2db-39ad-4553-b3f5-e9b01dbeb960: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: award_2.png
+  created:
+    -
+      value: 1745520993
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 6f8fa2db-39ad-4553-b3f5-e9b01dbeb960
+      alt: 'CEO receiving award '
+      title: ''
+      width: 1365
+      height: 1024

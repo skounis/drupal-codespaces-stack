@@ -1,0 +1,61 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 3df9b53b-01b0-4daa-aa5e-3ef71700db8d
+  bundle: blog
+  default_langcode: en
+  depends:
+    4d5efdeb-8d1a-45a4-b6aa-2c234f21b0bd: media
+    c55713ad-348f-4ed8-9db5-d83b2b820a98: taxonomy_term
+    3972a140-fab0-42b8-b3d1-d576198f1386: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'How Affiliate Marketing Helped a Beauty Brand Scale'
+  created:
+    -
+      value: 1744735804
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /blog/2025-04/how-affiliate-marketing-helped-beauty-brand-scale
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p><strong>Affiliate marketing can work wonders—if you treat it like a real channel.</strong></p><p>A clean beauty brand approached Corporate Clean to develop an affiliate program from scratch. They had great products and loyal customers, but no structure in place to scale word-of-mouth into something measurable.</p><p><strong>What We Did</strong><br>We built a full affiliate strategy: from partner onboarding flows and payout structures to branded marketing kits and tracking dashboards. We also reached out to micro-influencers and curated a list of aligned partners.</p><p><strong>What Happened Next</strong><br>In just four months, affiliate-driven sales made up 22% of their total revenue. Partners loved the easy-to-use platform and professionally designed promo materials—and the brand gained a growing network of enthusiastic ambassadors.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'A clean beauty brand approached Corporate Clean to develop an affiliate program from scratch. '
+  field_featured_image:
+    -
+      entity: 4d5efdeb-8d1a-45a4-b6aa-2c234f21b0bd
+  field_tags:
+    -
+      entity: c55713ad-348f-4ed8-9db5-d83b2b820a98
+    -
+      entity: 3972a140-fab0-42b8-b3d1-d576198f1386
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

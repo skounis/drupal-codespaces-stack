@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 4539763d-05bd-4fef-99fa-e41b3fd49d7e
+  bundle: image
+  default_langcode: en
+  depends:
+    0e9ba057-35da-4b6e-a98a-f87db0793c89: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: zoom-call-event_2.png
+  created:
+    -
+      value: 1745485540
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 0e9ba057-35da-4b6e-a98a-f87db0793c89
+      alt: 'Zoom call event'
+      title: ''
+      width: 1024
+      height: 1024

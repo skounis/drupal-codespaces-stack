@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: ef8958e8-615d-474f-b5fc-d815d5f23fe5
+  bundle: image
+  default_langcode: en
+  depends:
+    ea6ba117-c0ea-4e25-bf27-b1c54989663a: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: campaign.png
+  created:
+    -
+      value: 1744738573
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: ea6ba117-c0ea-4e25-bf27-b1c54989663a
+      alt: campaign
+      title: ''
+      width: 1024
+      height: 1536

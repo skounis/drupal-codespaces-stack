@@ -1,0 +1,74 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 25a40071-ceee-4348-8816-aa064973cb07
+  bundle: event
+  default_langcode: en
+  depends:
+    4539763d-05bd-4fef-99fa-e41b3fd49d7e: media
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+    97429334-fae8-4af9-9a12-46ad7ee1d01c: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'Showcase: Launching Brand Systems for Enterprise Growth'
+  created:
+    -
+      value: 1745434495
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /events/showcase-launching-brand-systems-enterprise-growth
+      langcode: en
+      pathauto: 1
+  field_content:
+    -
+      value: '<p>In this live virtual session, the Corporate Clean team presents the complete brand transformation we led for enterprise client TechFlex Solutions. From brand strategy to visual identity and rollout, we’ll walk you through the design process, collaboration tools, and real-world results—including a 56% increase in brand recognition.</p><p>Join our CEO Alex Morgan and CTO Samira Chen as they dive into case study insights, share visual design iterations, and discuss the challenges of rebranding in a competitive tech space. The session will include a live Q&amp;A and downloadable resource kit for attendees.</p>'
+      format: content_format
+  field_description:
+    -
+      value: 'A behind-the-scenes look at our brand transformation for TechFlex Solutions'
+  field_event__date:
+    -
+      value: 1782241200
+      end_value: 1782244800
+      duration: 60
+      rrule: 0
+      rrule_index: 0
+      timezone: ''
+  field_event__link:
+    -
+      uri: 'https://webmaker.morethanthemes.com'
+      title: Webmaker+
+      options: {  }
+  field_event__location_name:
+    -
+      value: 'Hosted via Zoom Pro Conference Suite'
+  field_featured_image:
+    -
+      entity: 4539763d-05bd-4fef-99fa-e41b3fd49d7e
+  field_tags:
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998
+    -
+      entity: 97429334-fae8-4af9-9a12-46ad7ee1d01c

@@ -1,0 +1,69 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 0f789e28-7630-4dd7-a387-da721adb8f03
+  bundle: case_study
+  default_langcode: en
+  depends:
+    4d5efdeb-8d1a-45a4-b6aa-2c234f21b0bd: media
+    c55713ad-348f-4ed8-9db5-d83b2b820a98: taxonomy_term
+    f8ff5a7b-5c35-43ee-8113-751ecfba182b: taxonomy_term
+    08326ee7-2757-4b3a-9b15-df17c6f9b998: taxonomy_term
+default:
+  revision_uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  title:
+    -
+      value: 'StyleBox Boutique: Affiliate Success Story'
+  created:
+    -
+      value: 1744734563
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  revision_translation_affected:
+    -
+      value: true
+  moderation_state:
+    -
+      value: published
+  path:
+    -
+      alias: /case-studies/stylebox-boutique-affiliate-success-story
+      langcode: en
+      pathauto: 1
+  field_case_study__client_link:
+    -
+      uri: 'https://webmaker.morethanthemes.com'
+      title: 'Discover Webmaker+ for Drupal'
+      options: {  }
+  field_case_study__client_name:
+    -
+      value: 'StyleBox Boutique'
+  field_content:
+    -
+      value: "<p>Our strategic affiliate program transformed StyleBox Boutique from a regional fashion retailer into a nationwide e-commerce success story. By carefully curating partnerships with fashion influencers and style bloggers, we developed a powerful network of brand advocates who authentically connected with their audiences.&nbsp;</p><p>Our team implemented sophisticated tracking systems and provided partners with high-converting creative assets, while maintaining brand consistency across all channels. This comprehensive approach not only expanded their market reach but also established StyleBox Boutique as a trusted name in contemporary fashion.</p><p>Results achieved:</p><ul><li>167% increase in online sales within the first year</li><li>Network of 50+ active affiliates generating consistent monthly revenue</li><li>32% of total revenue through affiliate channels</li><li>280% improvement in customer acquisition cost</li><li>Average order value increased by 45% through affiliate purchases</li><li>95% affiliate partner retention rate</li></ul><blockquote><p>DigitalPeak Marketing's affiliate program was a game-changer for StyleBox Boutique. Their strategic approach to partner selection and relationship management helped us scale our business beyond our expectations. The program now generates a third of our revenue, with customer lifetime values significantly higher than other acquisition channels.&nbsp;<br>— Emma Richardson, Chief Revenue Officer at StyleBox Boutique</p></blockquote>"
+      format: content_format
+  field_description:
+    -
+      value: 'Our strategic affiliate program transformed StyleBox Boutique from a regional fashion retailer into a nationwide e-commerce success story.'
+  field_featured_image:
+    -
+      entity: 4d5efdeb-8d1a-45a4-b6aa-2c234f21b0bd
+  field_tags:
+    -
+      entity: c55713ad-348f-4ed8-9db5-d83b2b820a98
+    -
+      entity: f8ff5a7b-5c35-43ee-8113-751ecfba182b
+    -
+      entity: 08326ee7-2757-4b3a-9b15-df17c6f9b998

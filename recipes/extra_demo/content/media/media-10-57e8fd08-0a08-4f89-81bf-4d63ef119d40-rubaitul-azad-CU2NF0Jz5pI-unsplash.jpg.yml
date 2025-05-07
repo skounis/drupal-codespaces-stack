@@ -1,0 +1,36 @@
+_meta:
+  version: '1.0'
+  entity_type: media
+  uuid: 57e8fd08-0a08-4f89-81bf-4d63ef119d40
+  bundle: image
+  default_langcode: en
+  depends:
+    7e1ee291-fed8-4729-8e16-cb2a3cf09f42: file
+default:
+  status:
+    -
+      value: true
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: rubaitul-azad-CU2NF0Jz5pI-unsplash.jpg
+  created:
+    -
+      value: 1744660035
+  revision_translation_affected:
+    -
+      value: true
+  path:
+    -
+      alias: ''
+      langcode: en
+      pathauto: 0
+  field_media_image:
+    -
+      entity: 7e1ee291-fed8-4729-8e16-cb2a3cf09f42
+      alt: Drupal
+      title: ''
+      width: 14467
+      height: 9744
