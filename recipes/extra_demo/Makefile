@@ -24,18 +24,6 @@ export-node:
 	$(CMS_DIR)/vendor/bin/drush dce node $$NODE_ID > node-$$NODE_ID.yml -y; \
 	echo "Node exported to node-$$NODE_ID.yml"
 
-export-nodes-01:
-	@read -p "Enter comma-separated node IDs to export (e.g., 1,4,5,6): " IDS; \
-	if [ -z "$$IDS" ]; then \
-		echo "No IDs provided. Aborting."; \
-		exit 1; \
-	fi; \
-	echo "$$IDS" | tr ',' '\n' | while read NODE_ID; do \
-		echo "Exporting node $$NODE_ID..."; \
-		$(CMS_DIR)/vendor/bin/drush dce node $$NODE_ID > node-$$NODE_ID.yml -y; \
-	done; \
-	echo "Export complete."
-
 
 export-nodes:
 	@read -p "Enter the content type (bundle) machine name: " BUNDLE; \
@@ -50,26 +38,6 @@ export-nodes:
 		$(CMS_DIR)/vendor/bin/drush dce node $$NODE_ID > node-$$BUNDLE-$$PADDED_ID.yml -y; \
 	done; \
 	echo "Export complete."
-
-
-list-media-01:
-	@echo "Fetching all media items..."; \
-	$(CMS_DIR)/vendor/bin/drush sql:query "\
-		SELECT mfd.mid, m.uuid, mfd.bundle, mfd.name \
-		FROM media_field_data mfd \
-		INNER JOIN media m ON mfd.mid = m.mid \
-		ORDER BY mfd.mid;" | tee media.txt | column -t
-
-
-list-media-02:
-	@echo "Fetching real media file names..."; \
-	$(CMS_DIR)/vendor/bin/drush sql:query "\
-		SELECT mfd.mid, m.uuid, mfd.bundle, fm.filename \
-		FROM media_field_data mfd \
-		JOIN media m ON mfd.mid = m.mid \
-		JOIN file_managed fm ON mfd.field_media_image_target_id = fm.fid \
-		ORDER BY mfd.mid;" > media.txt; \
-	cat media.txt | column -t
 
 
 list-media:
