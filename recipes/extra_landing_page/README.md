@@ -18,7 +18,7 @@ composer require morethanthemes/extra_landing_page
 ```
 
 ## Requirements
-- Drupal **9.3+**
+- Drupal **10 or 11**
 - Composer package manager
 
 ## License
