@@ -9,10 +9,10 @@ dependencies:
   theme:
     - corporateclean
 _core:
-  default_config_hash: P7-Kg3txBT4r6MPlytW7GSnY3R4BzVUKcfsYXLXo3H0
+  default_config_hash: 7SKBgZljaNNaCWmW-EKFP_jE_twvnUN4Di7VsQextnI
 id: corporateclean_connect
 theme: corporateclean
-region: footer_second
+region: footer_third
 weight: 0
 provider: null
 plugin: 'system_menu_block:connect'

@@ -5,7 +5,7 @@ dependencies:
   theme:
     - corporateclean
 _core:
-  default_config_hash: UAk6Jo-fPmBdPU2xMEBJ6Dju9vp4mLd8Hsj-TFIGrhs
+  default_config_hash: rcqFijKyKsOuwB_2q3cYJjSUpzh4HjPxhsT_PouZvrU
 id: corporateclean_about
 theme: corporateclean
 region: footer_first
