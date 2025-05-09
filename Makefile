@@ -270,5 +270,5 @@ apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_landing_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_content USE_DDEV=$(USE_DDEV)
-	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site page.front /landing-page"
-	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site name 'Corporate Clean'"
+	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site page.front /landing-page -y"
+	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site name 'Corporate Clean' -y"
