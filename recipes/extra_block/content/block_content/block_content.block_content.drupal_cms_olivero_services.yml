@@ -18,6 +18,6 @@ default:
     -
       value: true
   body:
-    - value: '<section class="section" id="services"><div class="row g-4"><div class="col-md-4"><div class="service-card"><h3>Strategy</h3><p>We help businesses identify opportunities and create roadmaps for digital success.</p></div></div><div class="col-md-4"><div class="service-card"><h3>Design</h3><p>Clean, functional designs that communicate your brand''s unique value proposition.</p></div></div><div class="col-md-4"><div class="service-card"><h3>Development</h3><p>Robust, scalable solutions built with modern technologies and best practices.</p></div></div></div></section>'
+    - value: '<section class="section" id="services"><div class="row g-4"><div class="col-md-4"><div class="service-card"><h3>Strategy</h3><p>We help businesses identify opportunities and create roadmaps for digital success.</p><p><a href="projects">See Projects</a></p></div></div><div class="col-md-4"><div class="service-card"><h3>Design</h3><p>Well-thought solutions that communicate your unique value proposition.</p><p><a href="case-studies">See Case studies</a></p></div></div><div class="col-md-4"><div class="service-card"><h3>Development</h3><p>Robust, scalable solutions built with modern technologies and best practices.</p><p><a href="events">See Events</a></p></div></div></div></section>'
       format: full_html
       summary: ''

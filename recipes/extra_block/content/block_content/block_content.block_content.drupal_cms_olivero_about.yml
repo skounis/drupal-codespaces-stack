@@ -19,6 +19,6 @@ default:
       value: true
   body:
     -
-      value: '<p>Nordic Design Co. combines Scandinavian design principles with cutting-edge technology to create meaningful digital experiences. We believe in simplicity, functionality, and sustainable digital solutions.</p>'
+      value: '<div class="pr-5"><p>Corporate Clean blends minimalist design principles with innovative technology to create meaningful digital experiences. We believe in simplicity, functionality, and impactful digital solutions.</p></div>'
       format: content_format
       summary: ''
