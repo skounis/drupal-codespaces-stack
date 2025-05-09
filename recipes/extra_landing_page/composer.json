@@ -1,10 +1,9 @@
 {
-    "name": "drupal/extra_landing_page",
-    "description": "Creates a content type with the machine name mt-landing-page. Add sample content.",
-    "type": "drupal-recipe",
-    "require": {
-      "drupal/core": "^10 || ^11"
-    },
-    "license": "GPL-2.0-or-later"
-  }
-  
+  "name": "morethanthemes/extra_landing_page",
+  "description": "A minimal Drupal content type ('mt-landing-page') optimized for Layout Builder, enabling block-based landing page creation with flexibility.",
+  "type": "drupal-recipe",
+  "require": {
+    "drupal/core": "^10 || ^11"
+  },
+  "license": "GPL-2.0-or-later"
+}

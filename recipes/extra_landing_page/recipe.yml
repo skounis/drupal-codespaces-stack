@@ -1,6 +1,6 @@
 name: Extra Landing page
 type: Drupal CMS
-description: 'Creates a content type with the machine name mt-landing-page. Add sample content.'
+description: 'Provides a minimal content type (mt-landing-page) optimized for Layout Builder, allowing flexible block-based landing page creation.'
 
 config:
   strict: false
