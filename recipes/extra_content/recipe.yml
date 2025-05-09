@@ -1,0 +1,6 @@
+name: Extra Content
+type: Drupal CMS
+description: 'Creates extra sample content for convincing demonstration.'
+
+config:
+  strict: false

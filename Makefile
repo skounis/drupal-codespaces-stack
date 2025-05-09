@@ -269,4 +269,4 @@ apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_project USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_landing_page USE_DDEV=$(USE_DDEV)
-	@$(MAKE) apply-recipe RECIPE=extra_demo USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_content USE_DDEV=$(USE_DDEV)

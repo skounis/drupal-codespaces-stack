@@ -1,6 +1,6 @@
 {
-    "name": "morethanthemes/extra_demo",
-    "description": "Creates extra content for convincing demonstration.",
+    "name": "morethanthemes/extra_content",
+    "description": "Creates extra sample content for convincing demonstration.",
     "type": "drupal-recipe",
     "require": {
       "drupal/core": "^10 || ^11"
