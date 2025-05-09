@@ -272,3 +272,59 @@ apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_content USE_DDEV=$(USE_DDEV)
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site page.front /landing-page"
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site name 'Corporate Clean'"
+
+
+# -----------------------------------------------------------------------------
+# Recipe Sync Tasks
+#
+# Context:
+# This monorepo (e.g. /home/skounis/drupal/drupal-codespaces) is used to develop
+# and test all Drupal recipes in a unified environment. However, some recipes
+# (e.g. extra_landing_page) are meant to be published separately through their
+# own Git repositories (e.g. /home/skounis/drupal/recipes/extra_landing_page).
+#
+# Current constraint: We cannot clone or check out the standalone repositories
+# into the monorepo workspace. As a result, editing happens *only in the monorepo*,
+# and changes are then propagated (one-way sync) to the standalone recipe repos.
+#
+# Assumptions:
+# - All edits occur in ./recipes/ inside the monorepo.
+# - Each corresponding published repo already exists under $(RECIPE_REPOS_BASE).
+# - Sync direction is only monorepo → standalone (never the reverse).
+# - Optional: Each standalone repo has its own git version control.
+#
+# Usage:
+#   make sync-recipe RECIPE=extra_landing_page   # Sync single recipe
+#   make sync-all-recipes                        # Sync all recipes to their repos
+# -----------------------------------------------------------------------------
+
+# Path to the directory containing the standalone recipe repos
+RECIPE_REPOS_BASE := /home/skounis/drupal/recipes
+
+# Sync a recipe to its standalone repo
+# Usage: make sync-recipe RECIPE=extra_landing_page
+sync-recipe:
+	@if [ -z "$(RECIPE)" ]; then \
+		echo "❌ Please provide a RECIPE name (e.g. make sync-recipe RECIPE=extra_landing_page)"; \
+		exit 1; \
+	fi
+	@echo "Syncing recipe '$(RECIPE)' from monorepo to standalone repo..."
+	@rsync -av --delete --exclude='.git' --exclude='.DS_Store' \
+		./recipes/$(RECIPE)/ $(RECIPE_REPOS_BASE)/$(RECIPE)/
+	@echo "✅ Sync complete: ./recipes/$(RECIPE) → $(RECIPE_REPOS_BASE)/$(RECIPE)"
+
+# Sync all recipes to their respective standalone repos (if destination exists)
+sync-all-recipes:
+	@echo "Syncing all recipes from monorepo to standalone repos..."
+	@for dir in ./recipes/*/; do \
+		name=$$(basename $$dir); \
+		dest="$(RECIPE_REPOS_BASE)/$$name"; \
+		if [ -d "$$dest" ]; then \
+			echo "→ Syncing $$name..."; \
+			rsync -av --delete --exclude='.git' --exclude='.DS_Store' \
+				"./recipes/$$name/" "$$dest/"; \
+		else \
+			echo "⚠️ Destination repo $$dest not found. Skipping."; \
+		fi \
+	done
+	@echo "✅ All recipes synced."
