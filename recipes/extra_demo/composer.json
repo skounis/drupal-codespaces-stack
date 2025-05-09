@@ -1,0 +1,10 @@
+{
+    "name": "drupal/extra_demo",
+    "description": "Configure the Drupal CMS demo site.",
+    "type": "drupal-recipe",
+    "require": {
+      "drupal/core": "^10 || ^11"
+    },
+    "license": "GPL-2.0-or-later"
+  }
+  

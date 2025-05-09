@@ -1,0 +1,6 @@
+name: Extra Demo
+type: Drupal CMS
+description: '"Configure the Drupal CMS demo site."'
+
+config:
+  strict: true
