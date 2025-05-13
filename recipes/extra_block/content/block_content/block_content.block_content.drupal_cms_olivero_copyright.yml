@@ -19,6 +19,6 @@ default:
       value: true
   body:
     -
-      value: '<p class="mb-0">© 2025 Nordic Design Co. All rights reserved.</p>'
+      value: '<p class="mb-0">© 2025 Corporate Clean. All rights reserved.</p>'
       format: full_html
       summary: ''
