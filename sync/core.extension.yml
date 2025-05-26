@@ -88,6 +88,7 @@ module:
   sam: 0
   scheduler: 0
   scheduler_content_moderation_integration: 0
+  simple_styleguide: 0
   smart_date: 0
   svg_image: 0
   symfony_mailer_lite: 0

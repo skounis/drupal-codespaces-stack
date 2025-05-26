@@ -1,14 +1,14 @@
 _core:
   default_config_hash: HlN7eAN2N4JIHsYv56V4E7sqC9bS609KwvGFjyD_mgk
 langcode: en
-uuid: 1f8d1c17-a173-4b7c-b271-c00861cbe753
+uuid: 3d132074-98d5-4954-abfc-f13250dd7bed
 name: 'Corporate Clean'
 mail: admin@example.com
 slogan: ''
 page:
   403: /user/login
   404: ''
-  front: /
+  front: /landing-page
 admin_compact_mode: false
 weight_select_max: 100
 default_langcode: en
