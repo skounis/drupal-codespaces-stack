@@ -18,6 +18,6 @@ default:
     -
       value: true
   body:
-    - value: '<section class="hero d-flex align-items-center"><div class="row"><div class="col-lg-8"><h1 class="mb-4">We create digital experiences that matter</h1><p class="mb-5">Combining Scandinavian simplicity with innovative technology to deliver exceptional results for forward-thinking businesses.</p><p><a class="mt-button" href="#contact">Let''s work together</a></p></div></div></section>'
+    - value: '<section class="hero d-flex align-items-center"><div class="row"><div class="col-lg-8"><h1 class="mb-4">We create digital experiences that matter</h1><p class="mb-5">Combining clean, modern design with <a href="projects">cutting-edge technology</a> to deliver <a href="case-studies">cutting-edge technology</a> exceptional results for forward-thinking businesses.</p><p><a class="mt-button" href="#contact">Let''s work together</a></p></div></div></section>'
       format: full_html
       summary: ''
