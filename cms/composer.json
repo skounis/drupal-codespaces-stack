@@ -44,7 +44,8 @@
         "drush/drush": "^13",
         "morethanthemes/extra_block": "^1.0",
         "morethanthemes/extra_content": "^1.0",
-        "morethanthemes/extra_landing_page": "^1.0"
+        "morethanthemes/extra_landing_page": "^1.0",
+        "morethanthemes/extra_styleguide": "^1.0"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -80,7 +81,8 @@
             "../recipes/{$name}": [
                 "morethanthemes/extra_content",
                 "morethanthemes/extra_block",
-                "morethanthemes/extra_landing_page"
+                "morethanthemes/extra_landing_page",
+                "morethanthemes/extra_styleguide"
             ],
             "recipes/{$name}": ["type:drupal-recipe"],
             "web/themes/custom/{$name}": ["type:drupal-custom-theme"]
