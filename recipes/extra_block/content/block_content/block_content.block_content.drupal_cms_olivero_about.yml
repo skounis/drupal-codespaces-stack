@@ -18,7 +18,6 @@ default:
     -
       value: true
   body:
-    -
-      value: '<p>Nordic Design Co. combines Scandinavian design principles with cutting-edge technology to create meaningful digital experiences. We believe in simplicity, functionality, and sustainable digital solutions.</p>'
+    - value: '<p>Introducing the reimagined <strong>Corporate Clean for Drupal CMS</strong>, a ground-up rebuild of our beloved classic template which was originally released more than 10 years ago, now redesigned for the modern web. Corporate Clean is supported by <a href="https://morethanthemes.com/">More than Themes</a>, as part of our ongoing effort to bring top quality templates to Drupal CMS.</p>'
       format: content_format
       summary: ''

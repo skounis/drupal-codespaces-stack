@@ -1,0 +1,9 @@
+{
+  "name": "morethanthemes/extra_styleguide",
+  "description": "A Drupal recipe that configures the Styleguide module to provide a visual reference for UI components and theme elements.",
+  "type": "drupal-recipe",
+  "require": {
+    "drupal/core": "^10 || ^11"
+  },
+  "license": "GPL-2.0-or-later"
+}

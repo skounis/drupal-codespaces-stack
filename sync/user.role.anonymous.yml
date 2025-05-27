@@ -1,10 +1,11 @@
-uuid: c4c00a40-d684-42a9-a10b-a5ebafb1c5fd
+uuid: 99388a8a-1811-488e-8504-e25c0a89f7b6
 langcode: en
 status: true
 dependencies:
   module:
     - klaro
     - media
+    - simple_styleguide
     - system
 _core:
   default_config_hash: j5zLMOdJBqC0bMvSdth5UebkprJB8g_2FXHqhfpJzow
@@ -14,5 +15,6 @@ weight: 0
 is_admin: false
 permissions:
   - 'access content'
+  - 'access style guide'
   - 'use klaro'
   - 'view media'

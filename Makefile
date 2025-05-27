@@ -191,6 +191,7 @@ devenv:
 	@$(EXEC) "cd $(CMS_DIR) && composer require 'drupal/default_content:^2.0@alpha'"
 	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush en block_content -y"
 	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush en default_content -y"
+	@$(EXEC) "cd $(CMS_DIR) && ./vendor/bin/drush en simple_styleguide -y"
 
 # Enable contrib themes and set default
 themes:
@@ -270,8 +271,11 @@ apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_landing_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_content USE_DDEV=$(USE_DDEV)
+	@$(MAKE) apply-recipe RECIPE=extra_styleguide USE_DDEV=$(USE_DDEV)
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site page.front /landing-page -y"
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site name 'Corporate Clean' -y"
+	# Exclude landing pages from latest
+	@$(EXEC) "cd cms && ./vendor/bin/drush config:import --partial --source=../../recipes/extra_landing_page/config/sync -y"
 
 
 # -----------------------------------------------------------------------------

@@ -18,11 +18,11 @@
     "require": {
         "composer/installers": "^2.3",
         "cweagans/composer-patches": "^1.6.5",
-        "drupal/basecore": "^1.0@beta",
+        "drupal/basecore": "^1.0@RC",
         "drupal/core-composer-scaffold": "^11.1.4",
         "drupal/core-project-message": "^11.1.4",
         "drupal/core-recommended": "^11.1.4",
-        "drupal/corporateclean": "^1.0@beta",
+        "drupal/corporateclean": "^1.0@RC",
         "drupal/default_content": "^2.0@alpha",
         "drupal/drupal_cms_accessibility_tools": "~1.1.0",
         "drupal/drupal_cms_ai": "~1.1.0",
@@ -42,7 +42,9 @@
         "drupal/simple_styleguide": "^2.0",
         "drupal/webform": "@beta",
         "drush/drush": "^13",
-        "morethanthemes/extra_landing_page": "^1.0@beta"
+        "morethanthemes/extra_block": "^1.0",
+        "morethanthemes/extra_content": "^1.0",
+        "morethanthemes/extra_landing_page": "^1.0"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -75,6 +77,11 @@
             "drush/Commands/contrib/{$name}": ["type:drupal-drush"],
             "web/modules/custom/{$name}": ["type:drupal-custom-module"],
             "web/profiles/custom/{$name}": ["type:drupal-custom-profile"],
+            "../recipes/{$name}": [
+                "morethanthemes/extra_content",
+                "morethanthemes/extra_block",
+                "morethanthemes/extra_landing_page"
+            ],
             "recipes/{$name}": ["type:drupal-recipe"],
             "web/themes/custom/{$name}": ["type:drupal-custom-theme"]
         },

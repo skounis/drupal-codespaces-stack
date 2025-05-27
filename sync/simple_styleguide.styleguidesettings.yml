@@ -1,0 +1,16 @@
+_core:
+  default_config_hash: pq9hoIRrDSKFHcxAor7aj-HbI1RkbcBiuG1EtpmisSU
+default_patterns:
+  headings: headings
+  text: text
+  lists: lists
+  blockquote: blockquote
+  rule: rule
+  table: table
+  alerts: alerts
+  breadcrumbs: breadcrumbs
+  forms: forms
+  buttons: buttons
+  pagination: pagination
+default_colors:
+  - ''

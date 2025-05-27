@@ -1,0 +1,9 @@
+name: Extra Styleguide
+type: Drupal CMS
+description: "A Drupal recipe that configures the Styleguide module to provide a visual reference for UI components and theme elements."
+
+config:
+  strict: false
+  actions:
+    user.role.anonymous:
+      grantPermission: 'access style guide'
