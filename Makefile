@@ -272,8 +272,10 @@ apply-recipes:
 	@$(MAKE) apply-recipe RECIPE=extra_landing_page USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_content USE_DDEV=$(USE_DDEV)
 	@$(MAKE) apply-recipe RECIPE=extra_styleguide USE_DDEV=$(USE_DDEV)
-	# @$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site page.front /landing-page -y"
+	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site page.front /landing-page -y"
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site name 'Corporate Clean' -y"
+	# Exclude landing pages from latest
+	@$(EXEC) "cd cms && ./vendor/bin/drush config:import --partial --source=../../recipes/extra_landing_page/config/sync -y"
 
 
 # -----------------------------------------------------------------------------
