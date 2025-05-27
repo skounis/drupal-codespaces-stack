@@ -4,3 +4,6 @@ description: "A Drupal recipe that configures the Styleguide module to provide a
 
 config:
   strict: false
+  actions:
+    user.role.anonymous:
+      grantPermission: 'access style guide'
