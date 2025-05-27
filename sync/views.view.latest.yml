@@ -1,9 +1,10 @@
-uuid: 19c28533-b068-4636-86f3-d4485c631f02
+uuid: a03ce856-c6c0-4a44-a78e-fa599d69a74a
 langcode: en
 status: true
 dependencies:
   config:
     - core.entity_view_mode.node.card
+    - node.type.mt_landing_page
     - node.type.page
   module:
     - node
@@ -139,6 +140,7 @@ display:
           operator: 'not in'
           value:
             page: page
+            mt_landing_page: mt_landing_page
           group: 1
           exposed: false
           expose:
