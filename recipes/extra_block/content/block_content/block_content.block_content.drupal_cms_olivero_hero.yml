@@ -18,6 +18,8 @@ default:
     -
       value: true
   body:
-    - value: '<section class="hero d-flex align-items-center"><div class="row"><div class="col-lg-8"><h1 class="mb-4">We create digital experiences that matter</h1><p class="mb-5">Combining clean, modern design with <a href="projects">cutting-edge technology</a> to deliver <a href="case-studies">cutting-edge technology</a> exceptional results for forward-thinking businesses.</p><p><a class="mt-button" href="#contact">Let''s work together</a></p></div></div></section>'
+    - value: '<section class="hero d-flex align-items-center"><div class="row"><div class="col-lg-8"><h1 class="mb-4">Ideal for Small Biz &amp; Corporates Alike</h1><p class="mb-5">Whether you''re a <strong>small business owner</strong> or part of a <strong>corporate team</strong>, Corporate Clean is ideal for presenting your <a href="projects"><strong>projects</strong></a>, <a href="people"><strong>team members</strong></a>, <a href="case-studies"><strong>customers</strong></a>, and <a href="events"><strong>events</strong></a> — all with style and clarity. A sub-theme of Base+, that powers our premium Drupal product, <a href="https://webmaker.morethanthemes.com/">Webmaker+</a>.</p><p><a class="mt-button" href="https://morethanthemes.com/contact-us">Let''s work together</a> <a class="mt-button" href="https://webmaker.morethanthemes.com/">View Webmaker+</a></p></div></div></section>'
       format: full_html
       summary: ''
+
+

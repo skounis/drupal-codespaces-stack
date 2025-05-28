@@ -1,7 +1,7 @@
 _meta:
   version: '1.0'
   entity_type: menu_link_content
-  uuid: 1f3ca1e8-e7c1-43cf-8cbd-7f03dbf5e762
+  uuid: 02d3f2d3-0497-4461-bed4-8c8b13af6ff7
   bundle: menu_link_content
   default_langcode: en
 default:
@@ -10,13 +10,13 @@ default:
       value: true
   title:
     -
-      value: Styleguide
+      value: 'Alt Home'
   menu_name:
     -
       value: main
   link:
     -
-      uri: 'internal:/simple-styleguide'
+      uri: 'internal:/home'
       title: ''
       options: {  }
   external:
@@ -27,7 +27,7 @@ default:
       value: true
   weight:
     -
-      value: -9
+      value: -10
   expanded:
     -
       value: false
