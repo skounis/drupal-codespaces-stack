@@ -276,7 +276,8 @@ apply-recipes:
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:set system.site name 'Corporate Clean' -y"
 	# Exclude landing pages from latest
 	@$(EXEC) "cd cms && ./vendor/bin/drush config:import --partial --source=../../recipes/extra_landing_page/config/sync -y"
-
+	# Disable the default Home menu link
+	# ./vendor/bin/drush php:eval "foreach (\Drupal::entityTypeManager()->getStorage('menu_link_content')->loadMultiple() as \$link) { if (\$link->get('link')->first()->getUrl()->toUriString() === 'route:<front>') { \$link->set('enabled', FALSE)->save(); echo 'Disabled ID: ' . \$link->id() . PHP_EOL; } }"
 
 # -----------------------------------------------------------------------------
 # Recipe Sync Tasks
@@ -303,7 +304,7 @@ apply-recipes:
 # -----------------------------------------------------------------------------
 
 # Path to the directory containing the standalone recipe repos
-RECIPE_REPOS_BASE := /home/skounis/drupal/recipes
+RECIPE_REPOS_BASE := /home/skounis/drupal
 
 # Sync a recipe to its standalone repo
 # Usage: make sync-recipe RECIPE=extra_landing_page
